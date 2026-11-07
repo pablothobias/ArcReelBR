@@ -71,7 +71,7 @@ pnpm check-consistency
 
 ## 测试
 
-个人 fork 的本地检查按改动范围选择，已通过且相关文件未变的结果可以复用。commit 和 push 不要求完整闸门或额外诊断扫描；完整闸门按明确请求运行，CI 检查保持启用。测试选择与手动检查命令见 [`AGENTS.md`](https://github.com/ArcReel/ArcReel/blob/main/AGENTS.md)「Toolchain and validation」和 [`docs/agents/testing.md`](https://github.com/ArcReel/ArcReel/blob/main/docs/agents/testing.md)。
+个人 fork 的本地检查按改动范围选择，已通过且相关文件未变的结果可以复用。commit 和 push 不要求完整闸门或额外诊断扫描；完整闸门按明确请求运行。PR 事件不自动触发检查；推送到 `main` 后的检查、定时检查和手动运行入口保留。测试选择与手动检查命令见 [`AGENTS.md`](https://github.com/ArcReel/ArcReel/blob/main/AGENTS.md)「Toolchain and validation」和 [`docs/agents/testing.md`](https://github.com/ArcReel/ArcReel/blob/main/docs/agents/testing.md)。
 
 ### 前端页面级测试
 
@@ -136,8 +136,8 @@ pnpm e2e:remote   # 终端二：构建前端，连接容器里的浏览器运行
 
 ### 分支策略（trunk-based）
 
-- 只有 `main` 是长期分支。所有工作从最新 `main` 切短分支完成，PR 合回 `main`
-- 禁止直接 push 到 `main`。个人分支同样经 PR 流程合并，提交前自行检查 diff 与验收清单
+- `main` 是个人 fork 的主分支，可直接提交、push 或将本地分支合并到 `main`
+- PR 为可选流程，不作为合并前置条件；提交或合并前检查 diff，并按改动范围选择本地检查
 
 ### 分支命名约定
 
@@ -161,7 +161,7 @@ AFK 团队流程的短期运行分支例外使用 `afk/<batch-id>/stage-<K>` 与
 
 ### Squash merge
 
-每个 PR 压缩为 1 个 commit 合并回 `main`，commit message 遵循 conventional commits 规范（见下节）。GitHub 上选择 "Squash and merge"。
+选择 PR 流程时，可将 PR 压缩为 1 个 commit 合并回 `main`，commit message 遵循 conventional commits 规范（见下节）。GitHub 上可选择 "Squash and merge"；直接提交或本地合并不要求创建 PR。
 
 `afk-team-workflow` 生成的 stage PR 是例外：它用 "Rebase and merge" 保留每个 issue 的 conventional commit；清尾与 review loop 产生的非 issue commits 在合并前压成一个 conventional integration-fix commit。
 
@@ -185,7 +185,7 @@ chore: 构建/工具变更
 
 ### 工作流程
 
-1. 普通 PR 按 conventional commits 规范 squash merge 到 `main`；`afk-team-workflow` stage PR 按上述例外 rebase merge
+1. 按 conventional commits 规范将个人改动提交或合并到 `main`；选择 PR 流程时按上述合并方式处理
 2. release-please 扫描自上次 release 以来的 commit，自动创建或更新标题形如 `chore(main): release X.Y.Z` 的 Release PR，包含下一版本号与更新后的 `CHANGELOG.md`
 3. 合并该 Release PR 即自动创建 `vX.Y.Z` tag 并发布 GitHub Release
 

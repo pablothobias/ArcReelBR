@@ -13,6 +13,8 @@ uv run python scripts/gate.py backend frontend     # Or name domains explicitly;
 
 If another gate run is active, this one queues; waiting is normal. Report which checks actually ran and any unresolved failures. Local hooks are optional and do not run on push. Before opening a PR, check whether a mistake in this work warrants improving the environment; criteria and recording instructions are in `docs/agents/lessons.md`, “Closing self-check.” For new or upgraded dependencies, read `docs/agents/dependencies.md`. Development servers, database migrations, and branch and commit conventions: `CONTRIBUTING.md`.
 
+Direct commits, pushes and merges into `main` are permitted for this personal fork; PRs are optional. Repository workflows do not run automatically on PR events. Checks remain available after pushes to `main`, on their existing schedules, and through manual runs.
+
 ## Code Review Rules
 
 When reviewing a diff, use the index in `CODING_STANDARDS.md` to read the standards matching the changed paths. Report violations with the file and rule heading.

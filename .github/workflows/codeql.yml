@@ -3,8 +3,7 @@ name: "CodeQL"
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
+  workflow_dispatch:
   schedule:
     - cron: "22 9 * * 3"
 
@@ -26,8 +25,8 @@ jobs:
       - uses: ./.github/actions/domain-filter
         id: domains
         with:
-          # schedule has no change-comparison baseline; scan everything. Release PRs also run fully, matching test.yml.
-          full: ${{ github.event_name == 'schedule' || (github.event_name == 'pull_request' && startsWith(github.head_ref, 'release-please--')) }}
+          # Scheduled and manual scans cover every domain without a PR comparison baseline.
+          full: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
       - id: languages
         # Select analysis languages by domain: frontend-only changes skip python analysis, and vice versa.
         env:
