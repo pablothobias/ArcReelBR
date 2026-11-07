@@ -6,16 +6,9 @@
 
 name: React Doctor
 
-# This check is optional, so filter directly with on.paths; if made required, switch to the test.yml domain-filter pattern,
-# or PRs without frontend changes would wait for it indefinitely.
+# Advisory scans run after main changes or by manual request, without PR checks or comments.
 on:
-  # Scans the PR's changed files and posts a sticky summary comment listing only the new issues introduced relative to the merge base of the target branch.
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-    paths:
-      - "frontend/**"
-      - ".github/workflows/react-doctor.yml"
-  # Scans `main` on every push to track the health-score trend and catch regressions that slipped past PR review.
+  workflow_dispatch:
   push:
     branches: ["main"]
     paths:
@@ -24,41 +17,28 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
-  issues: write
   statuses: write
 
-# Cancels any in-flight scan for the same PR (or branch, on push) the moment a new commit arrives, so reviewers only ever see the latest run.
+# A newer run replaces an in-flight scan of the same branch.
 concurrency:
-  group: react-doctor-${{ github.event.pull_request.number || github.ref }}
+  group: react-doctor-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   react-doctor:
     runs-on: ubuntu-latest
     steps:
-      # fetch-depth: 0 gives React Doctor the full git history it needs to find the merge base with the target branch. Without it a shallow checkout has no merge base, so PR runs can't compare against the base and fall back to reporting every issue in the changed files (pre-existing ones included) instead of only the ones the PR introduced.
+      # Full history supports comparisons with earlier revisions.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           persist-credentials: false
 
       - uses: millionco/react-doctor@695e46eee203a5d1855020191aa7e9c010a1250e # v2.4.0
-        # Advisory by default: React Doctor reports findings on every PR — a
-        # sticky summary comment, inline review comments, and a commit status
-        # with the health score — but never fails the check, so it won't red-X
-        # a teammate's PR on day one. When your team trusts the signal, graduate
-        # the gate: uncomment blocking below and set it to "error" (fail
-        # on new error-severity findings) or "warning" (fail on any finding).
-        # Full reference: https://www.react.doctor/ci
+        # Report branch health without PR notifications or a merge gate.
         with:
           directory: frontend
           # CI installs no dependencies; omitting version runs npm latest. Update this when upgrading react-doctor in frontend/package.json.
           version: "0.9.18"
-        #   blocking: error          # Gate level: "none" (advisory, the default) | "warning" | "error"
-        #   scope: full              # On PRs, scan the whole project instead of just changed files
-        #   comment: false           # Disable the sticky PR summary comment
-        #   comment-on-clean: false # Skip new comments for clean scans
-        #   review-comments: false   # Disable inline review comments on changed lines
-        #   commit-status: false     # Disable the commit status (score + counts, links to the run)
-        #   project: "web,admin"     # In a monorepo, scan specific workspace project(s)
+          comment: false
+          review-comments: false

@@ -1,3 +1,7 @@
+# Optional local hooks run at commit time; pushes do not launch checks.
+# CI keeps using these hooks explicitly through pre-commit run.
+default_stages: [pre-commit]
+
 repos:
   - repo: local
     hooks:
@@ -21,7 +25,7 @@ repos:
         language: system
         pass_filenames: false
         always_run: true
-        stages: [pre-push]
+        stages: [manual]
 
       - id: frontend-eslint
         name: eslint (frontend staged)
@@ -42,7 +46,7 @@ repos:
     hooks:
       - id: zizmor
         args: [--no-progress, --offline, --min-severity, medium]
-        exclude: ^\.agents/  # Vendored skills’ upstream CI does not run in this repository
+        exclude: ^\.agents/ # Vendored skills’ upstream CI does not run in this repository
   - repo: local
     hooks:
       - id: react-doctor

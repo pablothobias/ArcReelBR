@@ -1,6 +1,6 @@
 # Running tests
 
-After changing code or tests, first run the smallest relevant test set during development. Before pushing, run the complete gates for affected domains listed in `AGENTS.md`.
+Choose local checks proportional to the actual changes, starting with the smallest relevant test set. The selections below are guidance for implementation, not mandatory commit or push gates. Reuse passing results while the checked files remain unchanged. Complete gates remain available through `AGENTS.md` for explicit requests and CI.
 
 ## Selecting relevant tests
 
@@ -8,11 +8,11 @@ If selection returns zero tests, broaden to the corresponding directory or the c
 
 - **Backend test files changed**: run those files directly.
 - **Backend source changed**: `uv run python -m pytest --testmon`. pytest-testmon uses coverage relationships in `.testmondata` to run cases affected by changes. With no data file it runs the complete suite and builds the database; subsequent runs are incremental. Add `-n 4 --dist loadfile` for the initial database or broad changes; parallelism makes small selections slower. Code executed in a separate process is not included in coverage relationships (for example, subprocess imports in `tests/integration/test_imports.py`); explicitly run those test paths when changing modules they touch. Passing directories can narrow selection further. Selectors containing `::`, `-k`, or `-m` disable filtering and are for manual diagnosis only.
-- **Changes requiring the complete backend suite**: `pyproject.toml`, `uv.lock`, root `tests/conftest.py`, package initializers containing behavior, or changes involving Alembic, profile, DB, i18n, or shared test infrastructure. Run the complete suite when impact is uncertain as well.
+- **Consider the complete backend suite for broad changes**: `pyproject.toml`, `uv.lock`, root `tests/conftest.py`, package initializers containing behavior, or changes involving Alembic, profile, DB, i18n, or shared test infrastructure. Broaden coverage as needed when impact is uncertain.
 - **Frontend test files changed**: pass those files directly to Vitest.
 - **Frontend source changed**: run `pnpm exec vitest related --run <源文件>` in `frontend/`; for branch-level checks use `pnpm exec vitest run --changed <base>`. TypeScript source changes also require a complete typecheck.
 - **Changes to the frontend page-level suite (`frontend/e2e/`), layout or scrolling components, the set of called APIs, or the timing of stream connections (including SSE)**: run `pnpm e2e` in `frontend/`. Page-level suites replay only recorded fixtures and scenario `api` overrides; unrecorded requests fail immediately. If local rendering differs from CI, the container result is authoritative; see “前端页面级测试” in `CONTRIBUTING.md` for instructions. When backend response shapes change, also run `pnpm e2e:record` to record new API fixtures.
-- **Changes requiring the complete frontend suite (`pnpm check`)**: `package.json`, `pnpm-lock.yaml`, `vitest.config.*`, test setup, i18n, or branding.
+- **Consider the complete frontend suite (`pnpm check`) for broad changes**: `package.json`, `pnpm-lock.yaml`, `vitest.config.*`, test setup, i18n, or branding.
 - **Source changed in `packages/arcreel-market-core/`**: run all subpackage tests (`cd packages/arcreel-market-core && uv run python -m pytest`; the subpackage has its own pytest configuration and is collected separately), and select main-repository tests according to its consumers. When message keys are added or removed, also run `tests/unit/lib/i18n/`.
 - **Source changed in `packages/arcreel-catalog-core/`**: run all subpackage tests (`cd packages/arcreel-catalog-core && uv run python -m pytest`) and select main-repository tests according to its consumers.
 

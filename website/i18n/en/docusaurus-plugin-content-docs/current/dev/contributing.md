@@ -31,7 +31,7 @@ ArcReel assumes that contributors develop with a coding Agent. `AGENTS.md` at th
 uv sync
 cd frontend && pnpm install && cd ..
 
-# Install the pre-commit hooks once (ruff / eslint / actionlint / zizmor)
+# Optional: install local commit hooks; pushes do not run checks
 uv run pre-commit install
 
 # Initialize the database
@@ -78,7 +78,7 @@ pnpm check-consistency
 
 ## Testing {#testing}
 
-For the development loop and the full gate before pushing, see "工具链与校验" (Toolchain and checks) in [`AGENTS.md`](https://github.com/ArcReel/ArcReel/blob/main/AGENTS.md) and [`docs/agents/testing.md`](https://github.com/ArcReel/ArcReel/blob/main/docs/agents/testing.md). CI runs the same set of checks.
+For this personal fork, choose local checks according to the changes and reuse passing results while the relevant files remain unchanged. Commits and pushes do not require complete gates or extra diagnostic scans; run complete gates when explicitly requested. PR events do not automatically trigger checks; checks after pushes to `main`, scheduled checks, and manual runs remain available. For test selection and manual check commands, see "Toolchain and validation" in [`AGENTS.md`](https://github.com/ArcReel/ArcReel/blob/main/AGENTS.md) and [`docs/agents/testing.md`](https://github.com/ArcReel/ArcReel/blob/main/docs/agents/testing.md).
 
 ### Frontend Page-Level Tests {#frontend-page-tests}
 
@@ -143,8 +143,8 @@ For writing standards for published pages and the README, see [`docs/standards/d
 
 ### Branch Strategy (trunk-based) {#branching-strategy}
 
-- `main` is the only long-lived branch. Complete all work on short-lived branches created from the latest `main`, then merge them back into `main` through a PR
-- Never push directly to `main`. Personal branches are merged through the PR process as well; review the diff and acceptance checklist yourself before submitting
+- `main` is the personal fork's primary branch; direct commits, pushes, and local branch merges into `main` are permitted
+- PRs are optional rather than a merge prerequisite; inspect the diff and choose local checks according to the changes before committing or merging
 
 ### Branch Naming Convention {#branch-naming}
 
@@ -168,7 +168,7 @@ The time from creation to merge must be ≤ 3 days. If a branch runs longer, spl
 
 ### Squash Merge {#squash-merge}
 
-Squash each PR into one commit when merging back into `main`, with a commit message that follows the conventional commits specification (see the next section). Choose "Squash and merge" on GitHub.
+When choosing the PR workflow, you may squash the PR into one commit when merging into `main`, with a commit message following the conventional commits specification (see the next section). You may choose "Squash and merge" on GitHub; direct commits and local merges do not require a PR.
 
 Stage PRs created by `afk-team-workflow` are the exception: they use "Rebase and merge" to preserve each issue's conventional commit; non-issue commits produced by cleanup and the review loop are squashed into one conventional integration-fix commit before merging.
 
@@ -192,7 +192,7 @@ Version numbers and the changelog are maintained automatically by [release-pleas
 
 ### Workflow {#release-workflow}
 
-1. Squash-merge ordinary PRs into `main` according to the conventional commits specification; rebase-merge `afk-team-workflow` stage PRs as described in the exception above
+1. Commit or merge personal changes into `main` following the conventional commits specification; when choosing a PR workflow, use the merge options above
 2. release-please scans commits since the previous release and automatically opens or updates a Release PR titled like `chore(main): release X.Y.Z`, containing the next version number and an updated `CHANGELOG.md`
 3. Merging that Release PR automatically creates a `vX.Y.Z` tag and publishes a GitHub Release
 
