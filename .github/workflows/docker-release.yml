@@ -3,7 +3,6 @@ name: Docker Release
 # Manually run this workflow on a v* tag for formal releases: dual-architecture vulnerability gate → multi-architecture build → semver + latest tags;
 # the same build pushes to ghcr and Docker Hub, with SBOM and provenance attestations.
 # release-please creates the GitHub Release; do not generate it again here.
-# After image publication succeeds, trigger one build in the catalog data repository (ArcReel/arcreel-catalog).
 
 on:
   workflow_dispatch:
@@ -201,22 +200,3 @@ jobs:
             echo "::error::pushed tags diverge from the build digest"
             exit 1
           fi
-
-      # Once all images are published, trigger the catalog repository build: it releases provider models held back by minimum app versions, based on the latest ArcReel release.
-      # Run after image publication to avoid a gap with data available but images unready. Fork releases do not trigger upstream.
-      - name: Create App token for catalog build
-        id: catalog-token
-        if: github.repository == 'ArcReel/ArcReel'
-        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
-        with:
-          client-id: ${{ secrets.RELEASE_PLEASE_APP_CLIENT_ID }}
-          private-key: ${{ secrets.RELEASE_PLEASE_APP_PRIVATE_KEY }}
-          owner: ArcReel
-          repositories: arcreel-catalog
-          permission-actions: write
-
-      - name: Trigger catalog build
-        if: github.repository == 'ArcReel/ArcReel'
-        env:
-          GH_TOKEN: ${{ steps.catalog-token.outputs.token }}
-        run: gh workflow run build.yml -R ArcReel/arcreel-catalog --ref main

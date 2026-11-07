@@ -1,13 +1,12 @@
 # Market source index publication (reusable workflow).
 #
-# Callers: ArcReel/arcreel-market and forks, triggered after pushes to the default branch:
+# Callers: separately configured market repositories, started manually:
 #
 #   on:
-#     push:
-#       branches: [main]
+#     workflow_dispatch:
 #   jobs:
 #     publish-index:
-#       uses: ArcReel/ArcReel/.github/workflows/market-publish-index.yml@main
+#       uses: pablothobias/ArcReelBR/.github/workflows/market-publish-index.yml@main
 #       permissions:
 #         contents: write
 #       secrets: # Optional: required only when both App secrets below are configured.
@@ -47,6 +46,8 @@ concurrency:
 
 jobs:
   publish-index:
+    # This application repository is not a market source; run from a separate market caller.
+    if: github.repository != 'pablothobias/ArcReelBR'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -79,7 +80,7 @@ jobs:
       - name: Checkout ArcReel
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          repository: ArcReel/ArcReel
+          repository: pablothobias/ArcReelBR
           ref: main
           path: arcreel
           persist-credentials: false

@@ -2,7 +2,7 @@
 
 欢迎贡献代码、报告 Bug 或提出功能建议。
 
-以推广某项商业服务为主要目的的贡献（例如新增某家服务的接入，或在文档中加入服务推荐与链接）不走 PR 流程，这类 PR 会被关闭；合作请联系 support@arc-reel.com。
+以推广某项商业服务为主要目的的贡献（例如新增某家服务的接入，或在文档中加入服务推荐与链接）不走 PR 流程，这类 PR 会被关闭；原项目商业许可联系方式见 `NOTICE`；ArcReelBR 不提供商业合作服务。
 
 带 `ready-for-agent` 标签的 issue 已写好实现说明，由维护方的 coding Agent 实现。外部 PR 不会让它更快完成，只会多一轮审查，这类 PR 会被关闭。
 
@@ -94,15 +94,15 @@ pnpm e2e:remote   # 终端二：构建前端，连接容器里的浏览器运行
 
 ## 代码质量
 
-代码规范的入口是 [`CODING_STANDARDS.md`](https://github.com/ArcReel/ArcReel/blob/main/CODING_STANDARDS.md)：按改动路径索引到 `docs/standards/` 下的领域规范，只收工具替代不了、需要判断的项目约定。本地审查和 PR 上的 AI reviewer 都以它为依据。
+代码规范的入口是 [`CODING_STANDARDS.md`](https://github.com/pablothobias/ArcReelBR/blob/main/CODING_STANDARDS.md)：按改动路径索引到 `docs/standards/` 下的领域规范，只收工具替代不了、需要判断的项目约定。本地审查和 PR 上的 AI reviewer 都以它为依据。
 
 ### 依赖管理
 
-新增或升级依赖的步骤见 [`docs/agents/dependencies.md`](https://github.com/ArcReel/ArcReel/blob/main/docs/agents/dependencies.md)。
+新增或升级依赖的步骤见 [`docs/agents/dependencies.md`](https://github.com/pablothobias/ArcReelBR/blob/main/docs/agents/dependencies.md)。
 
 ## 文档维护
 
-用户文档的唯一发布位置是 [docs.arc-reel.com](https://docs.arc-reel.com)，源文件在 `website/docs/`（本地构建与预览见上文「文档站」）。中文是唯一写作源，英文译文由 AI 生成，人工仅审校中文源。内部文档（ADR、`GLOSSARY.md`、`AGENTS.md`、安全威胁模型、供应商 API 文档索引等）不上站，留在仓库 `docs/` 下；`SECURITY.md` 因 GitHub Security 选项卡依赖也留在仓库根。
+用户文档源文件在 `website/docs/`；ArcReelBR 默认仅本地预览，尚未部署独立文档站。`docs.arc-reel.com` 属于原项目（本地构建与预览见上文「文档站」）。中文是唯一写作源，英文译文由 AI 生成，人工仅审校中文源。内部文档（ADR、`GLOSSARY.md`、`AGENTS.md`、安全威胁模型、供应商 API 文档索引等）不上站，留在仓库 `docs/` 下；`SECURITY.md` 因 GitHub Security 选项卡依赖也留在仓库根。
 
 本文件是贡献指南的真相源，构建时复制为站点的开发区页面（`website/scripts/sync-contributing.mjs`），中文副本不入库。
 
@@ -130,7 +130,7 @@ pnpm e2e:remote   # 终端二：构建前端，连接容器里的浏览器运行
 
 ### 写作约定
 
-上站页面与 README 的写作规范见 [`docs/standards/docs.md`](https://github.com/ArcReel/ArcReel/blob/main/docs/standards/docs.md)；功能变更需要同步哪些文档见 [`docs/standards/general.md`](https://github.com/ArcReel/ArcReel/blob/main/docs/standards/general.md)「功能变更与对应文档在同一个 PR 里」。上站页面的每个标题写成 `## 标题 {#english-id}`，中英两个 locale 共用同一锚点。
+上站页面与 README 的写作规范见 [`docs/standards/docs.md`](https://github.com/pablothobias/ArcReelBR/blob/main/docs/standards/docs.md)；功能变更需要同步哪些文档见 [`docs/standards/general.md`](https://github.com/pablothobias/ArcReelBR/blob/main/docs/standards/general.md)「功能变更与对应文档在同一个 PR 里」。上站页面的每个标题写成 `## 标题 {#english-id}`，中英两个 locale 共用同一锚点。
 
 ## 工作流程
 

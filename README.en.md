@@ -1,3 +1,5 @@
+
+> ArcReelBR is an independently maintained personal repository. Docker builds from local source by default, and all GitHub workflows start manually. Links to docs.arc-reel.com, the community and commercial licensing contacts belong to the original project. See [independent maintenance](docs/independent-maintenance.md) for this repository's configuration.
 <h1 align="center">
   <br>
   <picture>
@@ -22,12 +24,10 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/ArcReel/ArcReel/releases/latest"><img src="https://img.shields.io/github/v/release/ArcReel/ArcReel?style=flat-square&label=release" alt="Release"></a>
-  <a href="https://github.com/ArcReel/ArcReel/actions/workflows/test.yml"><img src="https://img.shields.io/github/actions/workflow/status/ArcReel/ArcReel/test.yml?style=flat-square&label=tests" alt="Tests"></a>
-  <a href="https://codecov.io/gh/ArcReel/ArcReel"><img src="https://img.shields.io/codecov/c/github/ArcReel/ArcReel?style=flat-square&label=coverage" alt="Coverage"></a>
-  <a href="https://hub.docker.com/r/arcreel/arcreel"><img src="https://img.shields.io/docker/pulls/arcreel/arcreel?style=flat-square&logo=docker&logoColor=white&label=docker%20pulls" alt="Docker"></a>
+  <a href="https://github.com/pablothobias/ArcReelBR/releases/latest"><img src="https://img.shields.io/github/v/release/pablothobias/ArcReelBR?style=flat-square&label=release" alt="Release"></a>
+  <a href="https://github.com/pablothobias/ArcReelBR/actions/workflows/test.yml"><img src="https://img.shields.io/github/actions/workflow/status/pablothobias/ArcReelBR/test.yml?style=flat-square&label=tests" alt="Tests"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-2ea44f?style=flat-square" alt="License"></a>
-  <a href="https://github.com/ArcReel/ArcReel"><img src="https://img.shields.io/github/stars/ArcReel/ArcReel?style=flat-square" alt="Stars"></a>
+  <a href="https://github.com/pablothobias/ArcReelBR"><img src="https://img.shields.io/github/stars/pablothobias/ArcReelBR?style=flat-square" alt="Stars"></a>
 </p>
 
 <p align="center">
@@ -142,8 +142,8 @@ Every stage can be orchestrated by the Agent, or reviewed, adjusted, and regener
 Install Docker and Docker Compose, then run:
 
 ```bash
-git clone https://github.com/ArcReel/ArcReel.git
-cd ArcReel/deploy
+git clone https://github.com/pablothobias/ArcReelBR.git
+cd ArcReelBR/deploy
 
 cp .env.example .env
 docker compose up -d
@@ -180,7 +180,7 @@ Scan the QR code to join the ArcReel Feishu community for help, release updates,
   <img src="docs/assets/feishu-qr.png" alt="ArcReel Feishu Community QR Code" width="280">
 </p>
 
-Reproducible bugs and focused feature requests are welcome in [GitHub Issues](https://github.com/ArcReel/ArcReel/issues).
+Reproducible bugs and focused feature requests are welcome in [GitHub Issues](https://github.com/pablothobias/ArcReelBR/issues).
 
 ## Contributing
 
@@ -194,11 +194,11 @@ uv run pre-commit install
 
 ## Star History
 
-<a href="https://www.star-history.com/?repos=arcreel%2Farcreel&type=date&legend=top-left">
+<a href="https://www.star-history.com/?repos=pablothobias%2FArcReelBR&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=arcreel/arcreel&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=arcreel/arcreel&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=arcreel/arcreel&type=date&legend=top-left" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=pablothobias/ArcReelBR&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=pablothobias/ArcReelBR&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=pablothobias/ArcReelBR&type=date&legend=top-left" />
  </picture>
 </a>
 

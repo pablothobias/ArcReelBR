@@ -93,8 +93,8 @@ ArcReel 当前支持的预置供应商包括：
 ### 2.1 克隆项目 {#clone-repository}
 
 ```bash
-git clone https://github.com/ArcReel/ArcReel.git
-cd ArcReel
+git clone https://github.com/pablothobias/ArcReelBR.git
+cd ArcReelBR
 ```
 
 ### 2.2 使用 SQLite 默认部署 {#deploy-with-sqlite}

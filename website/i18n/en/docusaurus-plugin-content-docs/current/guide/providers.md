@@ -546,11 +546,11 @@ the provider, and routing by asset shape are outside the first version of declar
 Install the public skill:
 
 ```bash
-npx skills add ArcReel/skills
+npx skills add pablothobias/ArcReelBR --skill setup-arcreel-skills video-workflow
 ```
 
 Select both `setup-arcreel-skills` and `adapt-custom-endpoint` from the installation list. You can also
-[view or download the same skill source](https://github.com/ArcReel/ArcReel/tree/main/agent_runtime_profile/.claude/skills/adapt-custom-endpoint).
+[view or download the same skill source](https://github.com/pablothobias/ArcReelBR/tree/main/agent_runtime_profile/.claude/skills/adapt-custom-endpoint).
 
 First use the `setup-arcreel-skills` skill to connect ArcReel MCP. It persists the same connection in the current
 workspace so the local `adapt-custom-endpoint` script can reuse it across sessions.

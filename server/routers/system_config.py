@@ -59,7 +59,7 @@ from server.services.tasks.generation_context import audio_backend_profile
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
-_GITHUB_RELEASE_LATEST_URL = "https://api.github.com/repos/ArcReel/ArcReel/releases/latest"
+_GITHUB_RELEASE_LATEST_URL = "https://api.github.com/repos/pablothobias/ArcReelBR/releases/latest"
 _GITHUB_USER_AGENT = "ArcReel"
 _VERSION_CACHE_TTL_SECONDS = 300
 _latest_release_cache: dict[str, datetime | dict[str, str] | None] = {

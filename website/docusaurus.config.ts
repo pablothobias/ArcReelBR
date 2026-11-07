@@ -2,15 +2,15 @@ import type * as Preset from "@docusaurus/preset-classic";
 import type { Config } from "@docusaurus/types";
 
 const config: Config = {
-  title: "ArcReel 文档中心",
+  title: "ArcReelBR 文档中心",
   tagline: "开源、自托管的 AI 视频创作平台",
   favicon: "img/favicon.ico",
 
-  url: "https://docs.arc-reel.com",
-  baseUrl: "/",
+  url: process.env.DOCS_URL ?? "http://localhost:3000",
+  baseUrl: process.env.DOCS_BASE_URL ?? "/",
 
-  organizationName: "ArcReel",
-  projectName: "ArcReel",
+  organizationName: "pablothobias",
+  projectName: "ArcReelBR",
 
   onBrokenLinks: "throw",
   onBrokenAnchors: "throw",
@@ -39,7 +39,7 @@ const config: Config = {
           // docs-only mode mounts documents at the site root, so src/pages/index.* must not exist (route conflict)
           routeBasePath: "/",
           sidebarPath: "./sidebars.ts",
-          editUrl: "https://github.com/ArcReel/ArcReel/tree/main/website/",
+          editUrl: "https://github.com/pablothobias/ArcReelBR/tree/main/website/",
         },
         blog: false,
         theme: {
@@ -69,7 +69,7 @@ const config: Config = {
       respectPrefersColorScheme: true,
     },
     navbar: {
-      title: "ArcReel",
+      title: "ArcReelBR",
       logo: {
         alt: "ArcReel",
         src: "img/logo.svg",
@@ -77,15 +77,11 @@ const config: Config = {
       },
       items: [
         {
-          type: "custom-sponsors",
-          position: "right",
-        },
-        {
           type: "localeDropdown",
           position: "right",
         },
         {
-          href: "https://github.com/ArcReel/ArcReel",
+          href: "https://github.com/pablothobias/ArcReelBR",
           label: "GitHub 仓库",
           position: "right",
         },
@@ -96,10 +92,7 @@ const config: Config = {
       links: [
         {
           title: "资源",
-          items: [
-            { label: "ArcReel 官网", href: "https://arc-reel.com" },
-            { label: "GitHub 仓库", href: "https://github.com/ArcReel/ArcReel" },
-          ],
+          items: [{ label: "GitHub 仓库", href: "https://github.com/pablothobias/ArcReelBR" }],
         },
       ],
       copyright: `Copyright © ${new Date().getFullYear()} ArcReel. Licensed under AGPL-3.0.`,

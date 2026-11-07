@@ -52,7 +52,7 @@ Chinese is the default; `arcreel_market_core.market.cli.main` also accepts `tran
 Install as a dependency pinned to a Git tag:
 
 ```bash
-pip install "arcreel-market-core @ git+https://github.com/ArcReel/ArcReel@<tag>#subdirectory=packages/arcreel-market-core"
+pip install "arcreel-market-core @ git+https://github.com/pablothobias/ArcReelBR@<tag>#subdirectory=packages/arcreel-market-core"
 ```
 
 ```python

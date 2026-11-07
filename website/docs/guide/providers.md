@@ -515,10 +515,10 @@ Veo 的音轨开关由调用方式决定：AI Studio 固定有声，Vertex AI �
 安装公开 skill：
 
 ```bash
-npx skills add ArcReel/skills
+npx skills add pablothobias/ArcReelBR --skill setup-arcreel-skills video-workflow
 ```
 
-在安装列表中同时选择 `setup-arcreel-skills` 与 `adapt-custom-endpoint`。也可以直接[查看或下载同一份适配 skill 源文件](https://github.com/ArcReel/ArcReel/tree/main/agent_runtime_profile/.claude/skills/adapt-custom-endpoint)。
+在安装列表中同时选择 `setup-arcreel-skills` 与 `adapt-custom-endpoint`。也可以直接[查看或下载同一份适配 skill 源文件](https://github.com/pablothobias/ArcReelBR/tree/main/agent_runtime_profile/.claude/skills/adapt-custom-endpoint)。
 
 先使用 `setup-arcreel-skills` skill 完成 ArcReel MCP 接入；它会在当前工作区持久化同一连接，供
 `adapt-custom-endpoint` 的本地脚本跨会话复用。

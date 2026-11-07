@@ -1,9 +1,11 @@
-# ArcReel skills
+# ArcReelBR skills
 
-ArcReel publishes three public Agent skills, mirrored to [ArcReel/skills](https://github.com/ArcReel/skills) for lightweight installation:
+Install the public Agent skills directly from this repository:
 
 ```bash
-npx skills add ArcReel/skills
+npx skills add pablothobias/ArcReelBR --skill setup-arcreel-skills video-workflow
 ```
 
-This directory is the source of truth for `setup-arcreel-skills` and `video-workflow`, and is licensed under the [MIT License](LICENSE). The third, `adapt-custom-endpoint`, is also used by ArcReel's embedded Agent, so its source lives in `agent_runtime_profile/.claude/skills/adapt-custom-endpoint/` and the mirror workflow copies it into the distribution repository from there — it is deliberately not duplicated here.
+This directory is the source of truth for `setup-arcreel-skills` and `video-workflow`, licensed under the [MIT License](LICENSE). The embedded Agent also uses `adapt-custom-endpoint`, whose source is `agent_runtime_profile/.claude/skills/adapt-custom-endpoint/`.
+
+The manual `sync-public-skills.yml` workflow packages all three skills as a downloadable artifact. It does not push to a separate distribution repository.

@@ -7,7 +7,7 @@ update_docs: fact-check
 
 # Deployment and Operations {#deployment}
 
-This document covers ArcReel's default deployment, PostgreSQL production deployment, environment variables, data persistence, upgrades, backups, restoration, reverse proxies, and troubleshooting. See the [Security Policy](https://github.com/ArcReel/ArcReel/blob/main/SECURITY.md) for the official support boundaries and the [Security Threat Model](https://github.com/ArcReel/ArcReel/blob/main/docs/security/threat-model.md) for the complete trust boundaries.
+This document covers ArcReel's default deployment, PostgreSQL production deployment, environment variables, data persistence, upgrades, backups, restoration, reverse proxies, and troubleshooting. See the [Security Policy](https://github.com/pablothobias/ArcReelBR/blob/main/SECURITY.md) for the official support boundaries and the [Security Threat Model](https://github.com/pablothobias/ArcReelBR/blob/main/docs/security/threat-model.md) for the complete trust boundaries.
 
 ## Choosing a Deployment Mode {#choose-deployment-mode}
 
@@ -26,8 +26,8 @@ ArcReel is currently designed for a single trusted operator and does not support
 ### 1.1 Start {#sqlite-start}
 
 ```bash
-git clone https://github.com/ArcReel/ArcReel.git
-cd ArcReel/deploy
+git clone https://github.com/pablothobias/ArcReelBR.git
+cd ArcReelBR/deploy
 
 cp .env.example .env
 ```
@@ -254,7 +254,7 @@ Do not paste complete logs directly into a public issue. Remove the following be
 
 ### 5.1 Before Upgrading {#before-upgrade}
 
-1. Read the [CHANGELOG](https://github.com/ArcReel/ArcReel/blob/main/CHANGELOG.md) and the target release notes;
+1. Read the [CHANGELOG](https://github.com/pablothobias/ArcReelBR/blob/main/CHANGELOG.md) and the target release notes;
 2. Check for breaking changes;
 3. Back up the data root and the database; see [Backup and Restore](#backup-and-restore);
 4. Record the current image version;
@@ -270,7 +270,7 @@ From `deploy/`:
 
 ```bash
 # Back up first; see below
-docker compose pull
+docker compose build --pull arcreel
 docker compose up -d
 
 docker compose ps
@@ -286,7 +286,7 @@ From `deploy/production/`:
 
 ```bash
 # Back up the database and the data root projects/ first
-docker compose pull
+docker compose build --pull arcreel
 docker compose up -d
 
 docker compose ps
@@ -317,7 +317,7 @@ Two more items are not governed by the completion marker and are checked on ever
 
 The new Compose files mount a single data volume, `./projects`, plus `.env` and `claude_data/`; they no longer mount `./logs` or `./vertex_keys`. Files in the old volumes are merged into the data root only while those volumes are still mounted at startup, and Vertex credentials are moved only once, during the layout migration; after the completion marker is written they are no longer processed. A Docker deployment therefore upgrades from an older version in two phases (the examples use `deploy/`; for the production deployment use `deploy/production/`):
 
-1. **Upgrade with your existing Compose file (no configuration changes).** Leave the Compose file as it is and run `docker compose pull` and `docker compose up -d` as described in [Upgrade the Default Deployment](#upgrade-sqlite-deployment) or [Upgrade the Production Deployment](#upgrade-postgresql-deployment). Both old volumes are still mounted, so the first startup merges their files into the data root. Confirm that the startup log contains the data root layout migration completion message (「数据根布局迁移完成」), and that the original log and credential files now appear under `deploy/projects/logs/` and `deploy/projects/vertex_keys/` (credential files may have been renamed to `vertex_cred_<credential-id>.json`).
+1. **Keep the old volumes and enable local builds.** Preserve the existing volume mounts, set `build`, `image` and `pull_policy` for this checkout as shown in the new Compose file, and run `docker compose build --pull arcreel` and `docker compose up -d` as described in [Upgrade the Default Deployment](#upgrade-sqlite-deployment) or [Upgrade the Production Deployment](#upgrade-postgresql-deployment). Both old volumes are still mounted, so the first startup merges their files into the data root. Confirm that the startup log contains the data root layout migration completion message (「数据根布局迁移完成」), and that the original log and credential files now appear under `deploy/projects/logs/` and `deploy/projects/vertex_keys/` (credential files may have been renamed to `vertex_cred_<credential-id>.json`).
 2. **Then switch to the single-volume Compose file.** Remove the `./logs` and `./vertex_keys` volume lines from the Compose file (or switch to the new Compose file), then run `docker compose up -d` again. You can then delete `deploy/logs/` and `deploy/vertex_keys/`; if files remain in them (for example because a file with the same name already existed in the data root, or because the old volume was mounted read-only), first confirm that you no longer need them.
 
 If you already switched to the new Compose file but have not started the new version yet, temporarily add the two volume lines back before the first startup, then follow the two phases above.
@@ -418,12 +418,12 @@ If a project migration fails, preserve the files and inspect the startup logs. D
 
 ### 5.6 Pin a Version {#pin-version}
 
-`latest` is suitable for a quick evaluation, but pinning a release tag is a better choice for production.
+ArcReelBR builds the application image from the current checkout by default. It does not pull the original project's application image. Pin a reviewed commit and rebuild for production.
 
-Change the image in Compose to:
+Only after manually publishing the corresponding version to your own GHCR repository, remove `build` and `pull_policy` from Compose and set the image to:
 
 ```yaml
-image: arcreel/arcreel:X.Y.Z
+image: ghcr.io/pablothobias/arcreelbr:X.Y.Z
 ```
 
 Explicitly changing the version when upgrading reduces the risk of unintentionally pulling a new version.

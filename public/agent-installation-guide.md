@@ -7,7 +7,7 @@ Help the user connect the current Agent host to ArcReel. Complete these steps be
 Run in this Agent’s working directory:
 
 ```bash
-npx skills add ArcReel/skills
+npx skills add pablothobias/ArcReelBR --skill setup-arcreel-skills video-workflow
 ```
 
 Verify both `setup-arcreel-skills` and `video-workflow` are installed.

@@ -10,7 +10,7 @@ import { CopyableValue } from "./CopyableValue";
 import { CreateAccessTokenDialog } from "./CreateAccessTokenDialog";
 
 const MCP_ENDPOINT = `${window.location.origin}/mcp`;
-const INSTALL_COMMAND = "npx skills add ArcReel/skills";
+const INSTALL_COMMAND = "npx skills add pablothobias/ArcReelBR --skill setup-arcreel-skills video-workflow";
 const SETUP_SKILL = "setup-arcreel-skills";
 const INSTALL_GUIDE_URL = `${window.location.origin}/agent-installation-guide.md`;
 

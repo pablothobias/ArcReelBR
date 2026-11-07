@@ -75,7 +75,7 @@ const frontmatter = [
   "id: contributing",
   "title: 贡献指南",
   "sidebar_position: 2",
-  "custom_edit_url: https://github.com/ArcReel/ArcReel/blob/main/CONTRIBUTING.md",
+  "custom_edit_url: https://github.com/pablothobias/ArcReelBR/blob/main/CONTRIBUTING.md",
   "---",
   "",
   "",

@@ -91,9 +91,9 @@ const LONG_RELEASE: ApiOverrides = {
           ...Array.from({ length: 24 }, (_, i) => `- 第 ${i + 1} 项改进：分镜画布在矮窗口下保留完整的编辑区域，长提示词不再撑开内容列，并补齐键盘操作`),
           "",
           "## 升级说明",
-          "升级前请备份数据目录。完整说明见 https://github.com/ArcReel/ArcReel/releases/tag/v0.33.0-with-a-very-long-anchor-for-wrapping-checks",
+          "升级前请备份数据目录。完整说明见 https://github.com/pablothobias/ArcReelBR/releases/tag/v0.33.0-with-a-very-long-anchor-for-wrapping-checks",
         ].join("\n"),
-        html_url: "https://github.com/ArcReel/ArcReel/releases/tag/v0.33.0",
+        html_url: "https://github.com/pablothobias/ArcReelBR/releases/tag/v0.33.0",
         published_at: "2025-12-30T08:00:00Z",
       },
       has_update: true,
@@ -281,7 +281,7 @@ defineRegionScenarios("全局设置", [
       await expect(page.getByRole("button", { name: /发布说明/ })).toHaveAttribute("aria-expanded", "false");
       const main = page.getByRole("main");
       await main.evaluate((el) => el.scrollTo({ top: el.scrollHeight }));
-      await expect(main.getByRole("link", { name: "https://github.com/ArcReel/ArcReel" })).toBeInViewport();
+      await expect(main.getByRole("link", { name: "https://github.com/pablothobias/ArcReelBR" })).toBeInViewport();
     },
     screenshot: { name: "settings-about-version", target: (page) => page.getByRole("region", { name: "当前版本" }) },
   },

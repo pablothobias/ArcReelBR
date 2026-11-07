@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Synchronize the organization Project board Status field.
+"""Synchronize the configured GitHub Project board Status field.
 
 Status derives one-way from repository triage labels, assignee, linked PRs, and open/closed state;
 see derive_status. Board edits are not preserved and are overwritten by derived values.
 
 Usage:
-    GH_TOKEN=<org Projects RW token> python3 scripts/project_status_sync.py --issue 123 [456 ...]
+    GH_TOKEN=<Projects RW token> python3 scripts/project_status_sync.py --issue 123 [456 ...]
     GH_TOKEN=... python3 scripts/project_status_sync.py --pr 789
     GH_TOKEN=... python3 scripts/project_status_sync.py --all
 """
@@ -20,21 +20,38 @@ import urllib.request
 from typing import Any
 
 API = "https://api.github.com/graphql"
-OWNER = "ArcReel"
-REPO = "ArcReel"
-PROJECT_NUMBER = 2
-PROJECT_ID = "PVT_kwDOD3-zC84BQUFK"
-STATUS_FIELD_ID = "PVTSSF_lADOD3-zC84BQUFKzg-eFX8"
+OWNER = "pablothobias"
+REPO = "ArcReelBR"
+PROJECT_ID = ""
+STATUS_FIELD_ID = ""
+STATUS_OPTIONS: dict[str, str] = {}
+REQUIRED_STATUSES = {"Inbox", "Needs info", "Ready · agent", "Ready · human", "In progress", "In review", "Done"}
 
-STATUS_OPTIONS = {
-    "Inbox": "f75ad846",
-    "Needs info": "ad9eec1f",
-    "Ready · agent": "61e4505c",
-    "Ready · human": "22a5fcab",
-    "In progress": "47fc9ee4",
-    "In review": "df73e18b",
-    "Done": "98236657",
-}
+
+def load_project_config() -> None:
+    """Require explicit board coordinates before any network requests or mutations."""
+    global OWNER, REPO, PROJECT_ID, STATUS_FIELD_ID, STATUS_OPTIONS
+    repository = os.environ.get("GITHUB_REPOSITORY", "pablothobias/ArcReelBR")
+    owner, separator, repo = repository.partition("/")
+    if not separator or not owner or not repo or "/" in repo:
+        raise ValueError("GITHUB_REPOSITORY must be owner/repository")
+    project_id = os.environ.get("PROJECT_STATUS_PROJECT_ID", "")
+    field_id = os.environ.get("PROJECT_STATUS_FIELD_ID", "")
+    options = json.loads(os.environ.get("PROJECT_STATUS_OPTIONS", "{}"))
+    if not project_id or not field_id or not isinstance(options, dict) or set(options) != REQUIRED_STATUSES:
+        raise ValueError("Configure PROJECT_STATUS_PROJECT_ID, PROJECT_STATUS_FIELD_ID and PROJECT_STATUS_OPTIONS")
+    # IDs are interpolated into GraphQL mutation text; accept only GitHub node/option ID characters.
+    identifiers = [project_id, field_id, *options.values()]
+    if any(
+        not isinstance(value, str) or not value or not all(c.isascii() and (c.isalnum() or c in "_-") for c in value)
+        for value in identifiers
+    ):
+        raise ValueError(
+            "Project, field and option IDs must contain only ASCII letters, digits, underscores or hyphens"
+        )
+    OWNER, REPO = owner, repo
+    PROJECT_ID, STATUS_FIELD_ID, STATUS_OPTIONS = project_id, field_id, options
+
 
 # Issues with these labels do not advance status: clear Status and exclude through view filters.
 OFF_BOARD_LABELS = {"Spec", "parked"}
@@ -185,9 +202,9 @@ def sync_pr(number: int) -> None:
 
 
 ALL_ITEMS_QUERY = """
-query($org: String!, $projectNumber: Int!, $cursor: String) {
-  organization(login: $org) {
-    projectV2(number: $projectNumber) {
+query($projectId: ID!, $cursor: String) {
+  node(id: $projectId) {
+    ... on ProjectV2 {
       items(first: 100, after: $cursor) {
         pageInfo { hasNextPage endCursor }
         nodes {
@@ -244,8 +261,8 @@ def sync_all() -> None:
     items: list[dict[str, Any]] = []
     cursor: str | None = None
     while True:
-        data = gql(ALL_ITEMS_QUERY, {"org": OWNER, "projectNumber": PROJECT_NUMBER, "cursor": cursor})
-        page = data["organization"]["projectV2"]["items"]
+        data = gql(ALL_ITEMS_QUERY, {"projectId": PROJECT_ID, "cursor": cursor})
+        page = data["node"]["items"]
         items.extend(page["nodes"])
         if not page["pageInfo"]["hasNextPage"]:
             break
@@ -295,6 +312,10 @@ def main() -> None:
     group.add_argument("--pr", type=int, help="同步该 PR closing reference 指向的 issue")
     group.add_argument("--all", action="store_true", help="全量对账")
     args = parser.parse_args()
+    try:
+        load_project_config()
+    except (ValueError, TypeError) as exc:
+        parser.error(str(exc))
 
     if args.all:
         sync_all()

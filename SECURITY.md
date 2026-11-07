@@ -19,7 +19,7 @@ See the [security threat model](docs/security/threat-model.md) for the complete 
 
 ## Reporting a vulnerability
 
-Report suspected vulnerabilities through [GitHub Private Vulnerability Reporting](https://github.com/ArcReel/ArcReel/security/advisories/new). Include the affected version or commit, prerequisites, impact, and a minimal reproducer when possible.
+Report suspected vulnerabilities through [GitHub Private Vulnerability Reporting](https://github.com/pablothobias/ArcReelBR/security/advisories/new). Include the affected version or commit, prerequisites, impact, and a minimal reproducer when possible.
 
 Do not disclose an unresolved vulnerability through a public issue, discussion, chat group, support channel, or pull request.
 

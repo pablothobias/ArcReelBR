@@ -44,7 +44,7 @@ describe("ExternalAgentSection", () => {
     expect(within(steps[2]).getByText(/加入 \.gitignore/)).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "复制安装命令" }));
-    expect(writeText).toHaveBeenLastCalledWith("npx skills add ArcReel/skills");
+    expect(writeText).toHaveBeenLastCalledWith("npx skills add pablothobias/ArcReelBR --skill setup-arcreel-skills video-workflow");
     await user.click(screen.getByRole("button", { name: "复制 MCP 端点" }));
     expect(writeText).toHaveBeenLastCalledWith(`${window.location.origin}/mcp`);
     await user.click(screen.getByRole("button", { name: "复制提示词" }));

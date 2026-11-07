@@ -93,8 +93,8 @@ For detailed recommendations, see [Provider and Model Configuration](./providers
 ### 2.1 Clone the Repository {#clone-repository}
 
 ```bash
-git clone https://github.com/ArcReel/ArcReel.git
-cd ArcReel
+git clone https://github.com/pablothobias/ArcReelBR.git
+cd ArcReelBR
 ```
 
 ### 2.2 Use the Default SQLite Deployment {#deploy-with-sqlite}

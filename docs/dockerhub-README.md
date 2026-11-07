@@ -1,10 +1,10 @@
 # ArcReel
 
-> 中文说明见[项目文档](https://docs.arc-reel.com/)与 [GitHub 仓库](https://github.com/ArcReel/ArcReel)。
+> 中文说明见[项目文档](https://docs.arc-reel.com/)与 [GitHub 仓库](https://github.com/pablothobias/ArcReelBR)。
 
 An open-source, self-hosted AI video production workspace. Turn novels, finished screenplays, or product assets into character-consistent, controllable, cost-trackable short videos that remain editable.
 
-- **Source**: https://github.com/ArcReel/ArcReel
+- **Source**: https://github.com/pablothobias/ArcReelBR
 - **Documentation**: https://docs.arc-reel.com/en/
 - **License**: AGPL-3.0
 
@@ -24,8 +24,8 @@ Images are published for `linux/amd64` and `linux/arm64`, with SBOM and provenan
 Compose is the supported way to run ArcReel — the application needs a database, a data volume, and specific kernel capabilities for its sandbox:
 
 ```bash
-git clone https://github.com/ArcReel/ArcReel.git
-cd ArcReel/deploy
+git clone https://github.com/pablothobias/ArcReelBR.git
+cd ArcReelBR/deploy
 
 cp .env.example .env
 docker compose up -d
@@ -46,4 +46,4 @@ For the complete first-run walkthrough see [Getting Started](https://docs.arc-re
 
 ## Support
 
-Reproducible bugs and focused feature requests are welcome in [GitHub Issues](https://github.com/ArcReel/ArcReel/issues).
+Reproducible bugs and focused feature requests are welcome in [GitHub Issues](https://github.com/pablothobias/ArcReelBR/issues).

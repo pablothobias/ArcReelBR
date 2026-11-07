@@ -192,12 +192,12 @@ export function AboutSection() {
           <p>
             Powered by ArcReel —{" "}
             <a
-              href="https://github.com/ArcReel/ArcReel"
+              href="https://github.com/pablothobias/ArcReelBR"
               target="_blank"
               rel="noreferrer"
               className="break-all text-primary underline-offset-4 hover:underline"
             >
-              https://github.com/ArcReel/ArcReel
+              https://github.com/pablothobias/ArcReelBR
             </a>
           </p>
         </div>

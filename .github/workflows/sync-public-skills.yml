@@ -1,4 +1,4 @@
-name: Sync public skills
+name: Package public skills
 
 on:
   workflow_dispatch:
@@ -11,49 +11,22 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  sync:
+  package:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
-        id: app-token
-        with:
-          client-id: ${{ secrets.RELEASE_PLEASE_APP_CLIENT_ID }}
-          private-key: ${{ secrets.RELEASE_PLEASE_APP_PRIVATE_KEY }}
-          owner: ArcReel
-          repositories: skills
-          permission-contents: write
-
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          path: source
-          ref: main
           persist-credentials: false
 
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Package skills from this revision
+        run: |
+          mkdir -p distribution/skills
+          cp -R skills/setup-arcreel-skills skills/video-workflow distribution/skills/
+          cp -R agent_runtime_profile/.claude/skills/adapt-custom-endpoint distribution/skills/
+          cp skills/LICENSE distribution/LICENSE
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          repository: ArcReel/skills
-          path: distribution
-          token: ${{ steps.app-token.outputs.token }}
-          # Do not write credentials into distribution/.git/config; the single push command below supplies its own remote URL.
-          persist-credentials: false
-
-      - name: Mirror skills
-        run: |
-          rsync -a --delete --exclude /LICENSE --exclude /README.md source/skills/ distribution/skills/
-          rsync -a --delete source/agent_runtime_profile/.claude/skills/adapt-custom-endpoint/ distribution/skills/adapt-custom-endpoint/
-          cp source/skills/LICENSE distribution/LICENSE
-
-      - name: Push changes
-        working-directory: distribution
-        env:
-          PUSH_TOKEN: ${{ steps.app-token.outputs.token }}
-        run: |
-          git add -A LICENSE skills
-          if ! git diff --cached --quiet; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git commit -m "chore: sync skills from ArcReel/ArcReel"
-            # Read the branch name from the local branch materialized by checkout (the default branch of ArcReel/skills).
-            branch=$(git rev-parse --abbrev-ref HEAD)
-            git push "https://x-access-token:${PUSH_TOKEN}@github.com/ArcReel/skills.git" "HEAD:refs/heads/${branch}"
-          fi
+          name: arcreelbr-skills
+          path: distribution/
+          retention-days: 7

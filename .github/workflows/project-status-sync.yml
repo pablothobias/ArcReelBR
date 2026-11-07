@@ -1,6 +1,6 @@
 name: project-status-sync
 
-# Sync the org Project board Status field, derived one-way from triage labels, assignee, linked PRs, and open/closed state.
+# Sync the configured GitHub Project board Status field, derived one-way from triage labels, assignee, linked PRs, and open/closed state.
 # Manual runs reconcile all issues. Rules live in scripts/project_status_sync.py.
 on:
   workflow_dispatch:
@@ -15,10 +15,10 @@ permissions: {}
 
 jobs:
   sync:
+    # No board is assumed. Configure repository variables before opting into synchronization.
+    if: vars.PROJECT_STATUS_PROJECT_ID != '' && vars.PROJECT_STATUS_FIELD_ID != '' && vars.PROJECT_STATUS_OPTIONS != ''
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    # Runs triggered by Dependabot cannot access repository Actions secrets.
-    if: github.actor != 'dependabot[bot]'
     steps:
       # Use the default-branch script for manual reconciliation.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -28,4 +28,7 @@ jobs:
       - name: Sync project status
         env:
           GH_TOKEN: ${{ secrets.PROJECT_STATUS_SYNC_TOKEN }}
+          PROJECT_STATUS_PROJECT_ID: ${{ vars.PROJECT_STATUS_PROJECT_ID }}
+          PROJECT_STATUS_FIELD_ID: ${{ vars.PROJECT_STATUS_FIELD_ID }}
+          PROJECT_STATUS_OPTIONS: ${{ vars.PROJECT_STATUS_OPTIONS }}
         run: python3 scripts/project_status_sync.py --all

@@ -7,7 +7,7 @@ update_docs: fact-check
 
 # 部署与运维 {#deployment}
 
-本文档说明 ArcReel 的默认部署、PostgreSQL 生产部署、环境变量、数据持久化、升级、备份、恢复、反向代理和故障排查。正式支持边界见 [安全政策](https://github.com/ArcReel/ArcReel/blob/main/SECURITY.md)，完整信任边界见 [安全威胁模型](https://github.com/ArcReel/ArcReel/blob/main/docs/security/threat-model.md)。
+本文档说明 ArcReel 的默认部署、PostgreSQL 生产部署、环境变量、数据持久化、升级、备份、恢复、反向代理和故障排查。正式支持边界见 [安全政策](https://github.com/pablothobias/ArcReelBR/blob/main/SECURITY.md)，完整信任边界见 [安全威胁模型](https://github.com/pablothobias/ArcReelBR/blob/main/docs/security/threat-model.md)。
 
 ## 部署方式选择 {#choose-deployment-mode}
 
@@ -26,8 +26,8 @@ ArcReel 当前按单一可信操作员设计，不支持互不信任的用户共
 ### 1.1 启动 {#sqlite-start}
 
 ```bash
-git clone https://github.com/ArcReel/ArcReel.git
-cd ArcReel/deploy
+git clone https://github.com/pablothobias/ArcReelBR.git
+cd ArcReelBR/deploy
 
 cp .env.example .env
 ```
@@ -254,7 +254,7 @@ docker compose logs -f postgres
 
 ### 5.1 升级前 {#before-upgrade}
 
-1. 阅读 [CHANGELOG](https://github.com/ArcReel/ArcReel/blob/main/CHANGELOG.md) 和目标 Release 说明；
+1. 阅读 [CHANGELOG](https://github.com/pablothobias/ArcReelBR/blob/main/CHANGELOG.md) 和目标 Release 说明；
 2. 确认是否存在破坏性变更；
 3. 备份数据根和数据库，见[备份与恢复](#backup-and-restore)；
 4. 记录当前镜像版本；
@@ -270,7 +270,7 @@ docker compose logs -f postgres
 
 ```bash
 # 先备份，见后文
-docker compose pull
+docker compose build --pull arcreel
 docker compose up -d
 
 docker compose ps
@@ -286,7 +286,7 @@ curl -f http://localhost:1241/health
 
 ```bash
 # 先备份数据库和数据根 projects/
-docker compose pull
+docker compose build --pull arcreel
 docker compose up -d
 
 docker compose ps
@@ -317,7 +317,7 @@ curl -f http://localhost:1241/health
 
 新版 Compose 只挂载一个数据卷 `./projects`，外加 `.env` 和 `claude_data/`，不再挂载 `./logs` 与 `./vertex_keys`。旧卷里的文件只有在启动时仍挂着才会并入数据根，其中 Vertex 凭据只在布局迁移那一次搬入，写下完成标记后不再处理。因此 Docker 部署从旧版本升级分两个阶段（以下以 `deploy/` 为例，生产部署换成 `deploy/production/`）：
 
-1. **沿用原来的 Compose 升级（零配置）。** 不改 Compose 文件，按[默认部署升级](#upgrade-sqlite-deployment)或[生产部署升级](#upgrade-postgresql-deployment)执行 `docker compose pull` 与 `docker compose up -d`。此时两个旧卷仍挂着，首次启动会把其中的文件并入数据根。在启动日志中确认出现「数据根布局迁移完成」，并确认原来的日志和凭据文件已出现在 `deploy/projects/logs/`、`deploy/projects/vertex_keys/` 下（凭据文件名可能已改为 `vertex_cred_<凭据编号>.json`）。
+1. **保留旧卷并启用本地构建。** 保留现有卷配置，并参考新版 Compose 设置当前仓库的 `build`、`image` 和 `pull_policy`，按[默认部署升级](#upgrade-sqlite-deployment)或[生产部署升级](#upgrade-postgresql-deployment)执行 `docker compose build --pull arcreel` 与 `docker compose up -d`。此时两个旧卷仍挂着，首次启动会把其中的文件并入数据根。在启动日志中确认出现「数据根布局迁移完成」，并确认原来的日志和凭据文件已出现在 `deploy/projects/logs/`、`deploy/projects/vertex_keys/` 下（凭据文件名可能已改为 `vertex_cred_<凭据编号>.json`）。
 2. **之后再切到单卷 Compose。** 删去 Compose 中 `./logs` 与 `./vertex_keys` 两行卷（或换用新版 Compose 文件），再执行 `docker compose up -d`。之后 `deploy/logs/`、`deploy/vertex_keys/` 可以删除；如果其中还有文件（例如数据根里已有同名文件，或旧卷是只读挂载），先确认不再需要。
 
 如果已经换成新版 Compose、但还没有用新版本启动过，首次启动前把这两行卷临时加回去，再按上面两个阶段操作。
@@ -418,12 +418,12 @@ docker compose start arcreel
 
 ### 5.6 固定版本 {#pin-version}
 
-`latest` 适合快速体验，但生产环境更适合固定 Release 标签。
+ArcReelBR 的默认 Compose 从当前 checkout 本地构建，不拉取原项目的应用镜像。生产环境应固定已审核的 commit，并重新构建。
 
-将 Compose 中的镜像改为：
+只有在自己的 GHCR 仓库已手动发布对应版本后，才可移除 Compose 的 `build` 和 `pull_policy`，并将镜像改为：
 
 ```yaml
-image: arcreel/arcreel:X.Y.Z
+image: ghcr.io/pablothobias/arcreelbr:X.Y.Z
 ```
 
 升级时显式修改版本，可以降低无意中拉取新版本的风险。

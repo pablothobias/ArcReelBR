@@ -1,7 +1,8 @@
 services:
   arcreel:
-    image: arcreel/arcreel:latest
-    # build: ../  # For local builds uncomment this and comment out image
+    image: arcreelbr:local
+    build: ..
+    pull_policy: build
     ports:
       - "1241:1241"
     # Published on all host interfaces: remote deployments must not set AUTH_ENABLED=false in .env.

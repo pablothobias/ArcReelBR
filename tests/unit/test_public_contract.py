@@ -24,7 +24,7 @@ class TestAgentInstallationGuide:
 
     def test_covers_installation_and_connection(self):
         assert "arc-" in self.guide
-        assert "npx skills add ArcReel/skills" in self.guide
+        assert "npx skills add pablothobias/ArcReelBR --skill setup-arcreel-skills video-workflow" in self.guide
         assert "setup-arcreel-skills" in self.guide
         assert "video-workflow" in self.guide
         assert "{{BASE_URL}}/mcp" in self.guide
