@@ -31,7 +31,7 @@ ArcReel assumes that contributors develop with a coding Agent. `AGENTS.md` at th
 uv sync
 cd frontend && pnpm install && cd ..
 
-# Install the pre-commit hooks once (ruff / eslint / actionlint / zizmor)
+# Optional: install local commit hooks; pushes do not run checks
 uv run pre-commit install
 
 # Initialize the database
@@ -78,7 +78,7 @@ pnpm check-consistency
 
 ## Testing {#testing}
 
-For the development loop and the full gate before pushing, see "工具链与校验" (Toolchain and checks) in [`AGENTS.md`](https://github.com/ArcReel/ArcReel/blob/main/AGENTS.md) and [`docs/agents/testing.md`](https://github.com/ArcReel/ArcReel/blob/main/docs/agents/testing.md). CI runs the same set of checks.
+For this personal fork, choose local checks according to the changes and reuse passing results while the relevant files remain unchanged. Commits and pushes do not require complete gates or extra diagnostic scans; run complete gates when explicitly requested, while CI checks remain enabled. For test selection and manual check commands, see "Toolchain and validation" in [`AGENTS.md`](https://github.com/ArcReel/ArcReel/blob/main/AGENTS.md) and [`docs/agents/testing.md`](https://github.com/ArcReel/ArcReel/blob/main/docs/agents/testing.md).
 
 ### Frontend Page-Level Tests {#frontend-page-tests}
 

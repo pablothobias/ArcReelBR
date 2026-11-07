@@ -24,7 +24,7 @@ ArcReel 假定贡献者用 coding Agent 开发。仓库根的 `AGENTS.md`（`CLA
 uv sync
 cd frontend && pnpm install && cd ..
 
-# 一次性安装 pre-commit 钩子（ruff / eslint / actionlint / zizmor）
+# 可选：安装本地 commit 钩子，push 时不运行检查
 uv run pre-commit install
 
 # 初始化数据库
@@ -71,7 +71,7 @@ pnpm check-consistency
 
 ## 测试
 
-开发循环与 push 前的完整闸门见 [`AGENTS.md`](https://github.com/ArcReel/ArcReel/blob/main/AGENTS.md)「工具链与校验」和 [`docs/agents/testing.md`](https://github.com/ArcReel/ArcReel/blob/main/docs/agents/testing.md)；CI 跑同一套检查。
+个人 fork 的本地检查按改动范围选择，已通过且相关文件未变的结果可以复用。commit 和 push 不要求完整闸门或额外诊断扫描；完整闸门按明确请求运行，CI 检查保持启用。测试选择与手动检查命令见 [`AGENTS.md`](https://github.com/ArcReel/ArcReel/blob/main/AGENTS.md)「Toolchain and validation」和 [`docs/agents/testing.md`](https://github.com/ArcReel/ArcReel/blob/main/docs/agents/testing.md)。
 
 ### 前端页面级测试
 
