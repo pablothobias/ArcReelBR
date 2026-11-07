@@ -1,11 +1,7 @@
 name: "CodeQL"
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
-  schedule:
-    - cron: "22 9 * * 3"
 
 permissions:
   contents: read
@@ -25,8 +21,8 @@ jobs:
       - uses: ./.github/actions/domain-filter
         id: domains
         with:
-          # Scheduled and manual scans cover every domain without a PR comparison baseline.
-          full: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
+          # Manual scans cover every domain without a PR comparison baseline.
+          full: true
       - id: languages
         # Select analysis languages by domain: frontend-only changes skip python analysis, and vice versa.
         env:

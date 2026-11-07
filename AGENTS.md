@@ -4,7 +4,7 @@ An AI video creation platform that turns novels, screenplays, or creative ideas 
 
 ## Toolchain and validation
 
-The backend uses `uv`; the frontend and documentation site use `pnpm`. This personal fork uses a lightweight local workflow: choose checks proportional to the actual changes according to `docs/agents/testing.md`, and reuse passing results while the checked files remain unchanged. A commit or push request does not require complete gates or additional diagnostic scans. Run complete gates when explicitly requested or in CI; the commands remain available for manual use:
+The backend uses `uv`; the frontend and documentation site use `pnpm`. This personal repository uses a lightweight local workflow: choose checks proportional to the actual changes according to `docs/agents/testing.md`, and reuse passing results while the checked files remain unchanged. A commit or push request does not require complete gates or additional diagnostic scans. Run complete gates when explicitly requested or in CI; the commands remain available for manual use:
 
 ```bash
 uv run python scripts/gate.py --changed            # Select domains by changes relative to origin/main and run them together
@@ -13,7 +13,7 @@ uv run python scripts/gate.py backend frontend     # Or name domains explicitly;
 
 If another gate run is active, this one queues; waiting is normal. Report which checks actually ran and any unresolved failures. Local hooks are optional and do not run on push. Before opening a PR, check whether a mistake in this work warrants improving the environment; criteria and recording instructions are in `docs/agents/lessons.md`, “Closing self-check.” For new or upgraded dependencies, read `docs/agents/dependencies.md`. Development servers, database migrations, and branch and commit conventions: `CONTRIBUTING.md`.
 
-Direct commits, pushes and merges into `main` are permitted for this personal fork; PRs are optional. Repository workflows do not run automatically on PR events. Checks remain available after pushes to `main`, on their existing schedules, and through manual runs.
+Direct commits, pushes and merges into `main` are permitted for this personal repository; PRs are optional. Repository workflows run only by manual request. Pushes, PRs, tags and schedules do not launch workflows. Reusable workflows remain callable by manually started workflows.
 
 ## Code Review Rules
 

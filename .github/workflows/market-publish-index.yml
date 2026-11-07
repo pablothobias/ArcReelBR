@@ -28,6 +28,7 @@
 name: Market publish index
 
 on:
+  workflow_dispatch:
   workflow_call:
     secrets:
       MARKET_APP_CLIENT_ID:

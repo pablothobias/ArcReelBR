@@ -1,8 +1,6 @@
 name: Tests
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
   workflow_call:
     inputs:
@@ -42,7 +40,7 @@ jobs:
         id: domains
         with:
           # Manual runs check every domain; reusable callers can also request full coverage.
-          full: ${{ github.event_name == 'workflow_dispatch' || inputs.full == true || (github.event_name == 'pull_request' && startsWith(github.head_ref, 'release-please--')) }}
+          full: ${{ github.event_name == 'workflow_dispatch' || inputs.full == true }}
 
   workflow-static:
     # Workflow syntax/security gate. The official actionlint container includes shellcheck and

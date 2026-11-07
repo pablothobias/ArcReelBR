@@ -18,6 +18,7 @@
 name: Market validate
 
 on:
+  workflow_dispatch:
   workflow_call:
 
 permissions:

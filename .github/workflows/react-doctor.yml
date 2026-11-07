@@ -6,14 +6,9 @@
 
 name: React Doctor
 
-# Advisory scans run after main changes or by manual request, without PR checks or comments.
+# Advisory scans run only by manual request, without PR checks or comments.
 on:
   workflow_dispatch:
-  push:
-    branches: ["main"]
-    paths:
-      - "frontend/**"
-      - ".github/workflows/react-doctor.yml"
 
 permissions:
   contents: read

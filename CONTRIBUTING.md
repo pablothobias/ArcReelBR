@@ -71,7 +71,7 @@ pnpm check-consistency
 
 ## 测试
 
-个人 fork 的本地检查按改动范围选择，已通过且相关文件未变的结果可以复用。commit 和 push 不要求完整闸门或额外诊断扫描；完整闸门按明确请求运行。PR 事件不自动触发检查；推送到 `main` 后的检查、定时检查和手动运行入口保留。测试选择与手动检查命令见 [`AGENTS.md`](https://github.com/ArcReel/ArcReel/blob/main/AGENTS.md)「Toolchain and validation」和 [`docs/agents/testing.md`](https://github.com/ArcReel/ArcReel/blob/main/docs/agents/testing.md)。
+个人独立仓库的本地检查按改动范围选择，已通过且相关文件未变的结果可以复用。commit 和 push 不要求完整闸门或额外诊断扫描；完整闸门按明确请求运行。所有 workflow 仅手动运行，push、PR、tag 和定时事件均不触发；可复用 workflow 由手动启动的 workflow 调用。测试选择与手动检查命令见 [`AGENTS.md`](https://github.com/pablothobias/ArcReelBR/blob/main/AGENTS.md)「Toolchain and validation」和 [`docs/agents/testing.md`](https://github.com/pablothobias/ArcReelBR/blob/main/docs/agents/testing.md)。
 
 ### 前端页面级测试
 
@@ -136,7 +136,7 @@ pnpm e2e:remote   # 终端二：构建前端，连接容器里的浏览器运行
 
 ### 分支策略（trunk-based）
 
-- `main` 是个人 fork 的主分支，可直接提交、push 或将本地分支合并到 `main`
+- `main` 是个人独立仓库的主分支，可直接提交、push 或将本地分支合并到 `main`
 - PR 为可选流程，不作为合并前置条件；提交或合并前检查 diff，并按改动范围选择本地检查
 
 ### 分支命名约定
@@ -186,8 +186,8 @@ chore: 构建/工具变更
 ### 工作流程
 
 1. 按 conventional commits 规范将个人改动提交或合并到 `main`；选择 PR 流程时按上述合并方式处理
-2. release-please 扫描自上次 release 以来的 commit，自动创建或更新标题形如 `chore(main): release X.Y.Z` 的 Release PR，包含下一版本号与更新后的 `CHANGELOG.md`
-3. 合并该 Release PR 即自动创建 `vX.Y.Z` tag 并发布 GitHub Release
+2. 手动运行 release-please workflow；它扫描自上次 release 以来的 commit，自动创建或更新标题形如 `chore(main): release X.Y.Z` 的 Release PR，包含下一版本号与更新后的 `CHANGELOG.md`
+3. 合并该 Release PR 后，再次手动运行 release-please workflow，创建 `vX.Y.Z` tag 并发布 GitHub Release。镜像发布需在对应的 `v*` tag 上手动运行 Docker Release workflow
 
 ### commit type → 版本步进
 
@@ -218,7 +218,7 @@ feat(grid): 支持 grid_12 布局
 将多宫格分镜系统扩展到 12 宫格，适用于长篇剧集的批量预览。
 ```
 
-**本仓库不使用破坏性变更标记。** 前后端同仓一体发布，后端 API 不做版本化对外承诺——自带前端随版本同步演进，外部集成通过 `/agent-installation-guide.md` 获取当前安装入口、不依赖版本号。接口删改按 `fix`/`refactor` 正常分类，不加 `!` 后缀、不写 `BREAKING CHANGE:` footer。误标合并后的纠正按 merge 方式处理：普通 squash PR 编辑正文追加 `BEGIN_COMMIT_OVERRIDE`/`END_COMMIT_OVERRIDE` 块，等待下一次 main push 或手动重跑 workflow；AFK rebase stage 则在最后一次 main push 更新 Release PR 后，直接校正其版本与 changelog 产物并通过完整性校验，再合并 Release PR。0.x 阶段的 `bump-minor-pre-major` 仅把误标的版本跃迁限制为 minor，不修正 changelog。
+**本仓库不使用破坏性变更标记。** 前后端同仓一体发布，后端 API 不做版本化对外承诺——自带前端随版本同步演进，外部集成通过 `/agent-installation-guide.md` 获取当前安装入口、不依赖版本号。接口删改按 `fix`/`refactor` 正常分类，不加 `!` 后缀、不写 `BREAKING CHANGE:` footer。误标合并后的纠正按 merge 方式处理：普通 squash PR 编辑正文追加 `BEGIN_COMMIT_OVERRIDE`/`END_COMMIT_OVERRIDE` 块，手动重跑 workflow；AFK rebase stage 则在最后一次 main push 后手动运行 workflow 更新 Release PR，再直接校正其版本与 changelog 产物并通过完整性校验，再合并 Release PR。0.x 阶段的 `bump-minor-pre-major` 仅把误标的版本跃迁限制为 minor，不修正 changelog。
 
 以下语法说明仅用于识别误标。**破坏性变更**有两种等价写法：
 

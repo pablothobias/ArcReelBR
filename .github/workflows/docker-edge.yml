@@ -1,29 +1,9 @@
 name: Docker Edge
 
-# Build development images after merges to main: push immutable sha-* tags and the mutable main tag
+# Manually build development images: push immutable sha-* tags and the mutable main tag
 # (some deployments track main). Formal releases use docker-release.yml.
 
 on:
-  push:
-    branches: [main]
-    # Paths affecting image contents: Dockerfile COPY sources and dependency files.
-    paths:
-      # Changes to this workflow must also exercise the publishing pipeline immediately after merge.
-      - ".github/workflows/docker-edge.yml"
-      - "Dockerfile"
-      - ".dockerignore"
-      - "lib/**"
-      - "packages/**"
-      - "server/**"
-      - "alembic/**"
-      - "alembic.ini"
-      - "scripts/**"
-      - "agent_runtime_profile/**"
-      - "public/**"
-      - "frontend/**"
-      - "pyproject.toml"
-      - "uv.lock"
-      - "README.md"
   workflow_dispatch:
 
 concurrency:

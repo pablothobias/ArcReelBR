@@ -78,7 +78,7 @@ pnpm check-consistency
 
 ## Testing {#testing}
 
-For this personal fork, choose local checks according to the changes and reuse passing results while the relevant files remain unchanged. Commits and pushes do not require complete gates or extra diagnostic scans; run complete gates when explicitly requested. PR events do not automatically trigger checks; checks after pushes to `main`, scheduled checks, and manual runs remain available. For test selection and manual check commands, see "Toolchain and validation" in [`AGENTS.md`](https://github.com/ArcReel/ArcReel/blob/main/AGENTS.md) and [`docs/agents/testing.md`](https://github.com/ArcReel/ArcReel/blob/main/docs/agents/testing.md).
+For this independent personal repository, choose local checks according to the changes and reuse passing results while the relevant files remain unchanged. Commits and pushes do not require complete gates or extra diagnostic scans; run complete gates when explicitly requested. All workflows run only by manual request. Pushes, PRs, tags and schedules do not launch workflows; reusable workflows are called by manually started workflows. For test selection and manual check commands, see "Toolchain and validation" in [`AGENTS.md`](https://github.com/pablothobias/ArcReelBR/blob/main/AGENTS.md) and [`docs/agents/testing.md`](https://github.com/pablothobias/ArcReelBR/blob/main/docs/agents/testing.md).
 
 ### Frontend Page-Level Tests {#frontend-page-tests}
 
@@ -143,7 +143,7 @@ For writing standards for published pages and the README, see [`docs/standards/d
 
 ### Branch Strategy (trunk-based) {#branching-strategy}
 
-- `main` is the personal fork's primary branch; direct commits, pushes, and local branch merges into `main` are permitted
+- `main` is the independent personal repository's primary branch; direct commits, pushes, and local branch merges into `main` are permitted
 - PRs are optional rather than a merge prerequisite; inspect the diff and choose local checks according to the changes before committing or merging
 
 ### Branch Naming Convention {#branch-naming}
@@ -193,8 +193,8 @@ Version numbers and the changelog are maintained automatically by [release-pleas
 ### Workflow {#release-workflow}
 
 1. Commit or merge personal changes into `main` following the conventional commits specification; when choosing a PR workflow, use the merge options above
-2. release-please scans commits since the previous release and automatically opens or updates a Release PR titled like `chore(main): release X.Y.Z`, containing the next version number and an updated `CHANGELOG.md`
-3. Merging that Release PR automatically creates a `vX.Y.Z` tag and publishes a GitHub Release
+2. Manually run the release-please workflow; it scans commits since the previous release and automatically opens or updates a Release PR titled like `chore(main): release X.Y.Z`, containing the next version number and an updated `CHANGELOG.md`
+3. After merging that Release PR, manually run release-please again to create a `vX.Y.Z` tag and publish a GitHub Release. Image publication requires manually running Docker Release on the corresponding `v*` tag
 
 ### commit type → version increment {#commit-type-version-bump}
 
@@ -225,7 +225,7 @@ feat(grid): 支持 grid_12 布局
 将多宫格分镜系统扩展到 12 宫格，适用于长篇剧集的批量预览。
 ```
 
-**This repository does not use breaking-change markers.** The frontend and backend are released together from one repository, and the backend API makes no versioned external guarantees—the bundled frontend evolves with each version, while external integrations use `/agent-installation-guide.md` to find the current installation entry point rather than depending on a version number. Classify API removals and changes normally as `fix`/`refactor`; do not add a `!` suffix or write a `BREAKING CHANGE:` footer. Correct an incorrectly marked merge according to its merge method: for an ordinary squash PR, edit the PR body to append a `BEGIN_COMMIT_OVERRIDE`/`END_COMMIT_OVERRIDE` block, then wait for the next main push or rerun the workflow manually; for an AFK rebase stage, after the final main push has updated the Release PR, correct its version and changelog artifacts directly, pass the integrity checks, and then merge the Release PR. During the 0.x stage, `bump-minor-pre-major` only limits the version jump caused by an incorrect marker to minor; it does not correct the changelog.
+**This repository does not use breaking-change markers.** The frontend and backend are released together from one repository, and the backend API makes no versioned external guarantees—the bundled frontend evolves with each version, while external integrations use `/agent-installation-guide.md` to find the current installation entry point rather than depending on a version number. Classify API removals and changes normally as `fix`/`refactor`; do not add a `!` suffix or write a `BREAKING CHANGE:` footer. Correct an incorrectly marked merge according to its merge method: for an ordinary squash PR, edit the PR body to append a `BEGIN_COMMIT_OVERRIDE`/`END_COMMIT_OVERRIDE` block, then rerun the workflow manually; for an AFK rebase stage, after the final main push, manually run the workflow to update the Release PR and then correct its version and changelog artifacts directly, pass the integrity checks, and then merge the Release PR. During the 0.x stage, `bump-minor-pre-major` only limits the version jump caused by an incorrect marker to minor; it does not correct the changelog.
 
 The following syntax is documented only to help identify incorrect markers. There are two equivalent ways to mark a **breaking change**:
 

@@ -8,11 +8,6 @@ name: Docker Hub Description
 # scopes. Give DOCKERHUB_TOKEN those scopes here; the release workflow shares the same token.
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "docs/dockerhub-README.md"
-      - ".github/workflows/dockerhub-description.yml"
   workflow_dispatch:
 
 concurrency:

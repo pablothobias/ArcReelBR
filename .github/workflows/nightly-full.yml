@@ -1,11 +1,9 @@
-name: Nightly Full CI
+name: Full CI (manual)
 
-# Daily full tests without path filtering, catching cross-domain regressions missed by domain selection
+# Manually requested full tests without path filtering, catching cross-domain regressions missed by domain selection
 # (e.g. backend changes breaking image builds or dependency upgrades breaking PG dialect tests).
 
 on:
-  schedule:
-    - cron: "0 20 * * *" # 04:00 Beijing time
   workflow_dispatch:
 
 # Issue reads/updates in the report job are not concurrently idempotent; serialize the entire workflow.
