@@ -24,6 +24,7 @@ from lib.db import safe_session_factory
 from lib.db.base import DEFAULT_USER_ID, utc_now
 from lib.db.models.session_event import AgentSessionEventLogEntry
 from lib.db.models.session_message_link import AgentSessionUserMessageLink
+from server.agent_runtime.conversation_language import user_content_without_language_context
 from server.agent_runtime.failure_observation import build_turn_failure_observation
 from server.agent_runtime.keyed_locks import KeyedLocks
 from server.agent_runtime.message_serialization import utc_now_iso
@@ -356,7 +357,9 @@ class SdkMessageNormalizer:
     def _normalize_user(self, message: dict[str, Any]) -> list[dict[str, Any]]:
         if message.get(REPLAYED_USER_ECHO_KEY):
             return []
-        blocks = normalize_content(message.get("content", ""))
+        blocks = user_content_without_language_context(
+            normalize_content(message.get("content", "")), message.get("uuid")
+        )
         tool_results = [b for b in blocks if b.get("type") == "tool_result"]
         timestamp = message.get("timestamp") or utc_now_iso()
         base_uuid = message.get("uuid")

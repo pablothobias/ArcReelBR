@@ -1097,9 +1097,9 @@ async def test_open_reference_prompt_authoring_returns_flat_editable_content(fak
     [
         (
             {"text": "@[张三] 起身\n@[张三]：{" + "这是一段非常长的台词" * 6 + "}", "duration_seconds": 4},
-            "视频单元 1 的台词念完约需",
+            "video unit 1 in the script needs about",
         ),
-        ({"text": "@[张三] 起身", "duration_seconds": 5}, "视频单元 1 的时长 5 秒"),
+        ({"text": "@[张三] 起身", "duration_seconds": 5}, "video unit 1 in the script is 5 s long"),
     ],
     ids=["dialogue_overload", "duration_off_tier"],
 )

@@ -17,11 +17,12 @@ from uuid import uuid4
 from lib.agent.agent_memory_paths import project_memory_dir
 from lib.agent.credential_tiers import AgentPricing
 from lib.db.base import DEFAULT_USER_ID
-from lib.i18n import DEFAULT_LOCALE
+from lib.i18n import DEFAULT_LOCALE, normalize_locale
 from lib.infra.data_root_layout import DataRootLayout
 from lib.infra.logging_utils import redact_diagnostic_text
 from lib.infra.path_safety import PathTraversalError, safe_join
 from server.agent_runtime.agent_access_policy import AgentAccessPolicy
+from server.agent_runtime.conversation_language import conversation_language_block
 from server.agent_runtime.entry_pipeline import SessionEntryPipeline
 from server.agent_runtime.event_log import (
     REPLAYED_USER_ECHO_ENTRY_UUID_KEY,
@@ -220,14 +221,20 @@ class _QueuedMessageSettled:
 
 
 def _user_message_frame(
-    content: str | list[dict[str, Any]], cli_uuid: str, *, priority: Literal["now"] | None = None
+    content: str | list[dict[str, Any]],
+    cli_uuid: str,
+    *,
+    locale: str = DEFAULT_LOCALE,
+    priority: Literal["now"] | None = None,
 ) -> dict[str, Any]:
     """User-message frame sent to the CLI. Only messages with uuid receive ``command_lifecycle`` frames; replay preserves that uuid.
 
     ``priority="now"`` interrupts the current turn to process this message first (immediate sending)."""
+    context = conversation_language_block(locale, cli_uuid)
+    blocks = [{"type": "text", "text": content}] if isinstance(content, str) else list(content)
     frame: dict[str, Any] = {
         "type": "user",
-        "message": {"role": "user", "content": content},
+        "message": {"role": "user", "content": [context, *blocks]},
         "parent_tool_use_id": None,
         "uuid": cli_uuid,
     }
@@ -972,7 +979,7 @@ class SessionManager:
         managed.turn_usage_recorded = False
 
         try:
-            await managed.send_query(_user_message_frame(content, cli_uuid))
+            await managed.send_query(_user_message_frame(content, cli_uuid, locale=locale))
         except Exception as exc:
             sdk_stderr = startup_stderr.render()
             startup_error = _make_agent_startup_error(
@@ -1181,13 +1188,10 @@ class SessionManager:
     ) -> ManagedSession:
         """Get existing managed session or spin up an actor for resumed session.
 
-        ``locale`` shapes the system prompt when a fresh session starts.
-        ``SystemPromptPreset.snapshot`` freezes the first-request system prompt,
-        including appended instructions, across resume until compaction or a new
-        session (CLI >= 2.1.257). Within that snapshot lifetime, resumed sessions
-        retain the original language regulation. Already-resident sessions return
-        from cache. Here locale matters for ``resumable=False`` sessions, which
-        start fresh.
+        ``locale`` supplies the default reply language in the rebuilt system prompt.
+        ``snapshot=False`` replaces historical prompt snapshots on resume (CLI >= 2.1.257)
+        while retaining the transcript. Resident sessions keep their client; each accepted
+        user message supplies its own reply-language context without reconnecting.
 
         ``resumable=False`` applies to sessions with metadata but empty transcripts (branches rewriting the
         first message). They have no resumable history, so start fresh with identity prespecified via
@@ -1353,8 +1357,8 @@ class SessionManager:
         is the accepted user entry, built from ``content`` if omitted. Same-``client_key`` retries never resend:
         return the same queued message while pending or authoritative ``{"entry": ...}`` once logged.
 
-        ``locale`` is forwarded to ``get_or_connect``; it shapes the system
-        prompt only when the revival starts a fresh session (see there).
+        ``locale`` selects the accepted message's conversational reply language independently
+        of historical system snapshots and the project/source creative language.
         ``resumable`` forwards to ``get_or_connect``; see its documentation."""
         exited = self.sessions.get(session_id)
         if client_key is not None and exited is not None and exited.actor_exited:
@@ -1378,7 +1382,13 @@ class SessionManager:
                 user_entry = build_user_entry(
                     [{"type": "text", "text": content}] if isinstance(content, str) else content
                 )
-            queued = QueuedMessage(entry=user_entry, cli_uuid=str(uuid4()), content=content, client_key=client_key)
+            queued = QueuedMessage(
+                entry=user_entry,
+                cli_uuid=str(uuid4()),
+                content=content,
+                reply_locale=normalize_locale(locale),
+                client_key=client_key,
+            )
             managed.queued_messages.append(queued)
             if client_key is not None:
                 managed.sent_client_keys[client_key] = queued.id
@@ -1418,7 +1428,8 @@ class SessionManager:
                 raise RuntimeError("session evicted while the message was being delivered")
             delivering = True
             await managed.send_query(
-                _user_message_frame(queued.content, cli_uuid, priority=priority), sdk_session_id=session_id
+                _user_message_frame(queued.content, cli_uuid, locale=queued.reply_locale, priority=priority),
+                sdk_session_id=session_id,
             )
         except Exception as exc:
             logger.error("会话消息处理失败: %s", redact_diagnostic_text(exc))

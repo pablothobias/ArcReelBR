@@ -100,14 +100,14 @@ logger = logging.getLogger(__name__)
 #: ``duration_seconds``; references derive at execution from first-occurrence body ``@[名称]`` mentions;
 #: narration delivery is project configuration and does not affect video requests.
 _RETIRED_PARAMS: dict[str, str] = {
-    "resume": "查询 durable batch，并用 selected scope、force=false 只重发未成功的 ID",
-    "shot_ids": "改用 target.ids，并选择 scene（单个）或 selected（批量）scope",
-    "unit_id": "改用 target.ids——参考生视频项目直接传 unit_id，并选择 scene scope",
-    "unit_ids": "改用 target.ids——参考生视频项目直接传 unit_id 列表，并选择 selected scope",
-    "shots": "视频单元不再有 shots 数组；正文写在剧本的 text 字段里，经 patch_episode_script 修改",
-    "references": "视频单元不再有参考清单；参考图由正文的 @[名称] 提及在执行期派生",
-    "reference_images": "视频单元不再有参考清单；参考图由正文的 @[名称] 提及在执行期派生",
-    "narration_delivery": "视频生成不再按请求选择旁白交付方式；视频一律按剧本计划时长请求，旁白交付方式是项目配置",
+    "resume": "Query the durable batch, then use selected scope and force=false to resend only unsuccessful IDs",
+    "shot_ids": "Use target.ids with scene scope for one ID or selected scope for a batch",
+    "unit_id": "Use target.ids: pass unit_id directly for reference-video projects and select scene scope",
+    "unit_ids": "Use target.ids: pass the unit_id list directly for reference-video projects and select selected scope",
+    "shots": "Video units have no shots array; write their body in the script text field and edit it through patch_episode_script",
+    "references": "Video units have no reference list; reference images derive at execution from body mentions in @[名称] syntax",
+    "reference_images": "Video units have no reference list; reference images derive at execution from body mentions in @[名称] syntax",
+    "narration_delivery": "Video requests do not select narration delivery per call; all videos request the script-planned duration, and narration delivery is project configuration",
 }
 
 
@@ -118,7 +118,7 @@ def _reject_retired_params(args: Mapping[str, Any]) -> None:
         ValueError: A parameter matches :data:`_RETIRED_PARAMS`."""
     for name, guidance in _RETIRED_PARAMS.items():
         if name in args:
-            raise ValueError(f"参数 {name!r} 已不存在：{guidance}")
+            raise ValueError(f"Parameter {name!r} is no longer supported: {guidance}")
 
 
 _PositiveInt = Annotated[StrictInt, Field(ge=1)]
@@ -205,7 +205,7 @@ class GenerateVideosRequest(BaseModel):
     @model_validator(mode="after")
     def _force_needs_explicit_ids(self) -> Self:
         if self.force and self.target.scope not in ("scene", "selected"):
-            raise ValueError("force=true 只允许用于带显式 ID 的 scene/selected scope")
+            raise ValueError("force=true is allowed only for scene/selected scope with explicit IDs")
         return self
 
 
@@ -289,7 +289,7 @@ def _reference_request_options(request: GenerateVideosRequest) -> ReferenceReque
 
 def _speech_admission_error(name: str, exc: SpeechAdmissionError, log: list[str] | None = None) -> ToolOutcome[Any]:
     payload = exc.admission.to_dict()
-    text = f"{name} 失败: unit {exc.admission.unit_id} 发声准入未通过；请按 problems 的 action 修复"
+    text = f"{name} failed: unit {exc.admission.unit_id} did not pass speech admission; follow each problem action to repair it"
     if log:
         text = "\n".join([text, *log])
     return ToolOutcome(problem=ToolProblem("speech_admission_refused", text, params={"speech_admission": payload}))
@@ -337,19 +337,21 @@ def _preview_outcome(
 
 
 def _confirmation_lines(admission: BatchAdmission) -> list[str]:
-    lines = ["以下 unit 将改用不同的视频时长档位，需先向用户确认，本次未入队任何任务："]
+    lines = [
+        "The following units need different video-duration tiers. Obtain user confirmation first; this call enqueued no tasks:"
+    ]
     for tier in admission.confirmation_tiers():
         # Unresolved tiers have no confirmable seconds; say so rather than interpolating a "None s tier" that suggests
         # a tier named None exists.
         tier_label = (
-            f"{tier.request_duration_seconds}s 档位" if tier.request_duration_seconds is not None else "档位待定"
+            f"{tier.request_duration_seconds}s tier" if tier.request_duration_seconds is not None else "tier unresolved"
         )
         headline = f"- {tier_label} × {tier.unit_count}：{'、'.join(tier.unit_ids)}"
         if tier.cost_amount is not None:
-            suffix = "（仅含已定价的 unit）" if tier.unpriced_count else ""
-            headline += f"；合计 {tier.cost_amount} {tier.cost_currency}{suffix}"
+            suffix = " (priced units only)" if tier.unpriced_count else ""
+            headline += f"; total {tier.cost_amount} {tier.cost_currency}{suffix}"
         if tier.unpriced_count:
-            headline += f"；其中 {tier.unpriced_count} 个 unit 未定价，费用未知，须如实告知用户"
+            headline += f"; {tier.unpriced_count} units are unpriced, with unknown cost; tell the user clearly"
         lines.append(headline)
     for ticket in admission.tickets:
         if not ticket.confirmation_only:
@@ -359,27 +361,27 @@ def _confirmation_lines(admission: BatchAdmission) -> list[str]:
         # Show the difference from script-planned duration directly; tier numbers alone do not indicate longer or shorter output.
         delta = ""
         if isinstance(planned, int) and isinstance(requested, int) and requested != planned:
-            direction = "更长" if requested > planned else "更短"
-            delta = f"（成片{direction} {abs(requested - planned)}s）"
-        requested_label = f"{requested}s" if isinstance(requested, int) else "档位待定"
-        lines.append(f"  · {ticket.unit_id}：剧本时长 {planned}s，将申请 {requested_label}{delta}")
+            direction = "longer" if requested > planned else "shorter"
+            delta = f" (output {direction} by {abs(requested - planned)}s)"
+        requested_label = f"{requested}s" if isinstance(requested, int) else "tier unresolved"
+        lines.append(f"  · {ticket.unit_id}: script duration {planned}s, requesting {requested_label}{delta}")
     lines.append(
-        "视频费用按上述申请档位计算，确认仅对本次请求有效。用户同意后，带 "
-        "confirmed_request_durations={<unit_id>: <request_duration>} 把原来这一批目标一次性重发；"
-        "整批只有一个档位时也可以用 confirmed_request_duration_seconds=<request_duration>。"
-        "不要按档位拆成多次调用——先入队的那一档已经花了钱，这批目标就不再是一次全有或全无的请求。"
+        "Video cost follows the requested tiers above; confirmation applies only to this request. After the user agrees, use "
+        "confirmed_request_durations={<unit_id>: <request_duration>} to resend the original batch of targets in one call; "
+        "only when the entire batch has one tier may you instead use confirmed_request_duration_seconds=<request_duration>. "
+        "Do not split tiers into separate calls: the first enqueued tier would already incur charges, so these targets would no longer be one all-or-nothing request."
     )
     return lines
 
 
 def _blocked_lines(admission: BatchAdmission) -> list[str]:
-    lines = ["本次批量请求未通过准入，未入队任何任务。逐 unit 缺口如下："]
+    lines = ["This batch failed admission and enqueued no tasks. Gaps by unit:"]
     for ticket in admission.refused_tickets:
         lines.extend(
-            f"- {ticket.unit_id}：{problem.code}（下一步：{problem.action.value}）{problem.detail}"
+            f"- {ticket.unit_id}: {problem.code} (next step: {problem.action.value}) {problem.detail}"
             for problem in ticket.problems
         )
-    lines.append("修复全部缺口后重试即可一次性提交整批。")
+    lines.append("Repair all gaps, then retry to submit the entire batch in one call.")
     return lines
 
 
@@ -492,7 +494,7 @@ def _build_reference_specs(
                 refused_ticket(
                     unit_id,
                     code=GenerationProblemCode.UNIT_REQUEST_INVALID,
-                    detail=f"入队校验未通过：{exc}",
+                    detail=f"Enqueue validation failed: {exc}",
                     action=GenerationAction.FIX_INPUT,
                 )
             )
@@ -572,7 +574,7 @@ async def _generate_reference_units(
                         refused_ticket(
                             unit_id,
                             code=GenerationProblemCode.ARTIFACT_STATE_UNAVAILABLE,
-                            detail=f"unit {unit_id} 的产物状态不可读，跳过自动重生",
+                            detail=f"Artifact state for unit {unit_id} is unreadable; automatic regeneration skipped",
                             action=GenerationAction.REPAIR_ARTIFACT_STATE,
                         )
                     )
@@ -742,9 +744,11 @@ async def _run_reference_episode(
         # Mode gating checks key presence, not value type, so validate containers here: imported/externally edited malformed values
         # such as dicts/strings would otherwise reach unit iteration and raise an unlocatable TypeError.
         logger.debug("第 %d 集 video_units 类型非法: %s (%s)", episode, type(units).__name__, script_filename)
-        raise ValueError(f"{describe_episode_for_agent(project, episode)} 的 video_units 必须是数组：{script_filename}")
+        raise ValueError(
+            f"video_units for {describe_episode_for_agent(project, episode)} must be an array: {script_filename}"
+        )
     if not units:
-        raise ValueError(f"{describe_episode_for_agent(project, episode)} 的 video_units 为空：{script_filename}")
+        raise ValueError(f"video_units for {describe_episode_for_agent(project, episode)} is empty: {script_filename}")
     units, malformed = screen_script_entries(units, requested_ids=None)
     return await _run_reference_batch(
         call=call,
@@ -825,14 +829,14 @@ async def _run_reference_units(
 
     selected, unmatched, duplicated = _select_reference_units(script, unit_ids)
     if selected:
-        action = "重新生成（已有成片一律覆盖）" if force else "生成（已有可用成片复用）"
-        log.append(f"{action} {len(selected)} 个 unit：{', '.join(u['unit_id'] for u in selected)}")
+        action = "Regenerate (overwrite every existing clip)" if force else "Generate (reuse existing usable clips)"
+        log.append(f"{action} {len(selected)} units: {', '.join(u['unit_id'] for u in selected)}")
 
     unmatched_tickets = [
         refused_ticket(
             unit_id,
             code=GenerationProblemCode.UNIT_NOT_FOUND,
-            detail=f"unit {unit_id} 不在 video_units 中",
+            detail=f"unit {unit_id} is not in video_units",
             action=GenerationAction.FIX_INPUT,
         )
         for unit_id in unmatched
@@ -841,7 +845,7 @@ async def _run_reference_units(
         refused_ticket(
             unit_id,
             code=GenerationProblemCode.UNIT_REQUEST_INVALID,
-            detail=f"unit {unit_id} 在剧本中重复出现",
+            detail=f"unit {unit_id} occurs more than once in the script",
             action=GenerationAction.FIX_INPUT,
         )
         for unit_id in duplicated
@@ -1084,7 +1088,7 @@ def _check_target_episode(call: _VideoCall, request: _VideoRequestContext, episo
         script_filename=request.script_filename,
     ) or ProjectManager.resolve_episode_from_script(request.script, request.script_filename)
     if episode != actual_episode:
-        raise ValueError(f"target.episode_id={episode} 与剧本所属的集 ID {actual_episode} 不一致")
+        raise ValueError(f"target.episode_id={episode} does not match the script episode ID {actual_episode}")
 
 
 async def _generate_episode(call: _VideoCall, request: _VideoRequestContext, log: list[str]) -> ToolOutcome[Any]:
@@ -1106,7 +1110,9 @@ async def _generate_episode(call: _VideoCall, request: _VideoRequestContext, log
     sb = await asyncio.to_thread(_storyboard_context, call, request)
     episode = sb.episode
     if not items and not screen_refused:
-        raise ValueError(f"{describe_episode_for_agent(sb.project, episode)} 的剧本为空：{script_filename}")
+        raise ValueError(
+            f"The script for {describe_episode_for_agent(sb.project, episode)} is empty: {script_filename}"
+        )
 
     def load_states() -> tuple[ArtifactCurrencyResolver, dict[str, GenerationTargetState]]:
         resolver = active_artifact_currency_resolver(project_dir, sb.project)
@@ -1154,7 +1160,7 @@ async def _generate_episode(call: _VideoCall, request: _VideoRequestContext, log
     refused.extend(spec_refused)
 
     if not specs and not refused and not builder.recorded_ids:
-        raise RuntimeError("没有可生成的分镜")
+        raise RuntimeError("No shots are available for generation")
 
     return await batch.admit_and_submit(
         items=items,
@@ -1301,7 +1307,7 @@ async def _generate_selected(
                 refused_ticket(
                     sid,
                     code=GenerationProblemCode.UNIT_NOT_FOUND,
-                    detail=f"分镜 '{sid}' 不存在",
+                    detail=f"Shot '{sid}' does not exist",
                     action=GenerationAction.FIX_INPUT,
                 )
             )

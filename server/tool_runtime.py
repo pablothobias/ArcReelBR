@@ -713,7 +713,7 @@ async def _run_text_generation(
     except ModelNotInCatalogError as exc:
         return ToolOutcome(problem=model_not_in_catalog_problem(exc))
     except Exception as exc:
-        return ToolOutcome(problem=_unexpected_text_failure_problem(f"{operation} 失败: {exc}", exc))
+        return ToolOutcome(problem=_unexpected_text_failure_problem(f"{operation} failed: {exc}", exc))
 
 
 def _unexpected_text_failure_problem(detail: str, cause: BaseException) -> ToolProblem:
@@ -920,7 +920,9 @@ class GenerateEpisodeScriptRequest(BaseModel):
     @model_validator(mode="after")
     def _regenerate_is_whole_script(self) -> Self:
         if self.regenerate and (self.entry_ids or self.rewrite):
-            raise ValueError("regenerate 整份重做全部条目，不与 entry_ids / rewrite 同用")
+            raise ValueError(
+                "regenerate redoes all entries in the entire script and cannot be combined with entry_ids / rewrite"
+            )
         return self
 
     def text_request(self) -> TextGenerationRequest:
@@ -983,7 +985,7 @@ async def generate_episode_script(
     except TextGenerationError as exc:
         return ToolOutcome(problem=ToolProblem("generation_refused", str(exc)))
     except Exception as exc:
-        return ToolOutcome(problem=ToolProblem("internal_error", f"generate_episode_script 失败: {exc}"))
+        return ToolOutcome(problem=ToolProblem("internal_error", f"generate_episode_script failed: {exc}"))
     return await _submit_text_task(
         task_type=_TEXT_EPISODE_SCRIPT,
         operation="generate_episode_script",
@@ -1006,7 +1008,7 @@ async def generate_script_plan(
         project = await asyncio.to_thread(services.projects.load_project, scope.project_name)
         content_mode = project.get("content_mode", "narration")
         if content_mode not in {"narration", "drama", "ad"}:
-            raise TextGenerationError(f"不支持的创作类型: {content_mode}")
+            raise TextGenerationError(f"Unsupported content mode: {content_mode}")
         await asyncio.to_thread(
             lambda: script_plan_preflight(
                 services.projects.get_project_path(scope.project_name),
@@ -1026,7 +1028,7 @@ async def generate_script_plan(
     except TextGenerationError as exc:
         return ToolOutcome(problem=ToolProblem("generation_refused", str(exc)))
     except Exception as exc:
-        return ToolOutcome(problem=ToolProblem("internal_error", f"generate_script_plan 失败: {exc}"))
+        return ToolOutcome(problem=ToolProblem("internal_error", f"generate_script_plan failed: {exc}"))
     if text_request.dry_run:
         return await _execute_text_handler("generate_script_plan", handler, text_request, scope, services)
     return await _submit_text_task(

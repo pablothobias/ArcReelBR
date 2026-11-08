@@ -1,0 +1,76 @@
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies", "pnpm.overrides". See https://pnpm.io/settings for the new home of each setting.
+
+> arcreel-frontend@0.35.0 e2e /Users/pablo.carminatti.br/Projects/ArcReelBR/frontend
+> playwright test --project=1440x900 --workers=2 e2e/regions/language-policy.spec.ts e2e/regions/settings.spec.ts e2e/regions/project-settings.spec.ts e2e/regions/agent-session-projection.spec.ts
+
+[WebServer] (node:75760) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:75772) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+[WebServer]   - `__dirname` (vite.config.ts:9:36). Use `import.meta.dirname` instead
+[WebServer] Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+[WebServer] [plugin builtin:vite-reporter] 
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] (node:75804) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:75814) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+[WebServer]   - `__dirname` (vite.config.ts:9:36). Use `import.meta.dirname` instead
+[WebServer] Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+Running 43 tests using 2 workers
+
+(node:75849) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:75850) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [1440x900] › e2e/support/scenarios.ts:49:7 › Agent 会话投影 › 压缩续接的会话：缺锚点的审片子代理显示推断出的描述与完成状态 (2.4s)
+  ✓   2 [1440x900] › e2e/support/scenarios.ts:49:7 › Agent 会话投影 › 续接摘要是「上下文已压缩」分隔线，展开后看到很长的摘要 (2.9s)
+  ✓   3 [1440x900] › e2e/support/scenarios.ts:49:7 › Agent 会话投影 › 失败卡片只给一句话结论与操作，不露出原始错误码 (2.1s)
+  ✓   5 [1440x900] › e2e/regions/language-policy.spec.ts:10:5 › fresh zh-CN browser › loads English metadata and UI and sends English login requests (395ms)
+  ✓   6 [1440x900] › e2e/regions/language-policy.spec.ts:10:5 › fresh vi-VN browser › loads English metadata and UI and sends English login requests (377ms)
+  ✓   7 [1440x900] › e2e/regions/language-policy.spec.ts:10:5 › fresh ru-RU browser › loads English metadata and UI and sends English login requests (368ms)
+  ✓   8 [1440x900] › e2e/regions/language-policy.spec.ts:10:5 › fresh pt-BR browser › loads English metadata and UI and sends English login requests (368ms)
+  ✓   9 [1440x900] › e2e/regions/language-policy.spec.ts:33:3 › retains saved zh-Hant-TW with normalized document language (282ms)
+  ✓   4 [1440x900] › e2e/support/scenarios.ts:49:7 › Agent 会话投影 › 面板最窄 320px 时展开失败详情，长堆栈折行不撑破面板 (3.7s)
+  ✓  10 [1440x900] › e2e/regions/language-policy.spec.ts:33:3 › retains saved en-US with normalized document language (255ms)
+  ✓  11 [1440x900] › e2e/regions/language-policy.spec.ts:33:3 › retains saved vi-VN with normalized document language (306ms)
+  ✓  12 [1440x900] › e2e/regions/language-policy.spec.ts:33:3 › retains saved ru-RU with normalized document language (322ms)
+  ✓  13 [1440x900] › e2e/regions/language-policy.spec.ts:42:3 › retains a supported cookie preference after unsupported local storage (312ms)
+  ✓  14 [1440x900] › e2e/regions/language-policy.spec.ts:42:3 › retains a supported sessionStorage preference after unsupported local storage (364ms)
+  ✓  15 [1440x900] › e2e/regions/language-policy.spec.ts:54:1 › updates document language and persisted preference after an explicit UI selection (1.7s)
+  ✓  16 [1440x900] › e2e/support/scenarios.ts:49:7 › 项目设置 › 基础分页：改动后侧栏标出修改，外壳底行的保存栏在表单滚到底时完整可见 (1.9s)
+  ✓  17 [1440x900] › e2e/support/scenarios.ts:49:7 › 项目设置 › 广告项目的基础分页：目标总时长自定义输入无效时的行内提示 (1.8s)
+  ✓  18 [1440x900] › e2e/support/scenarios.ts:49:7 › 项目设置 › 风格分页：「更换」打开风格对话框，只有对话框正文滚动 (1.9s)
+  ✓  19 [1440x900] › e2e/support/scenarios.ts:49:7 › 项目设置 › 模型分页（压力）：覆盖说明条、通道来源与展开的细分区，滚到底仍可保存 (2.0s)
+  ✓  20 [1440x900] › e2e/support/scenarios.ts:49:7 › 项目设置 › 模型分页：打开默认视频模型下拉，弹层留在视口内 (2.1s)
+  ✓  21 [1440x900] › e2e/support/scenarios.ts:49:7 › 项目设置 › 配音分页：参考生视频项目使用 TTS 配音，显示角色声音绑定 (1.7s)
+  ✓  22 [1440x900] › e2e/support/scenarios.ts:49:7 › 项目设置 › 项目记忆分页：入口在 Agent 组，不显示外壳保存栏 (1.6s)
+  ✓  23 [1440x900] › e2e/support/scenarios.ts:49:7 › 项目设置 › Agent 配置（压力）：很多定制文件，打开重置确认 (1.9s)
+  ✓  24 [1440x900] › e2e/support/scenarios.ts:49:7 › 项目设置 › 侧栏：模型分页的覆盖数与修改标记 (2.0s)
+  ✓  25 [1440x900] › e2e/support/scenarios.ts:49:7 › 全局设置 › 默认落在全出血档的供应商，侧栏与供应商列表各自滚动 (2.0s)
+  ✓  26 [1440x900] › e2e/support/scenarios.ts:49:7 › 全局设置 › 限宽档的保存栏固定在外壳底行，表单滚动时保存按钮始终可见 (1.9s)
+  ✓  27 [1440x900] › e2e/support/scenarios.ts:49:7 › 全局设置 › 通用分区没有保存栏，外壳不显示底行 (1.7s)
+  ✓  28 [1440x900] › e2e/support/scenarios.ts:49:7 › 全局设置 › 打开界面语言下拉，选项留在视口内 (1.8s)
+  ✓  29 [1440x900] › e2e/support/scenarios.ts:49:7 › 全局设置 › 缺少供应商时提示只出现在供应商分区顶部，侧栏只标记问题所属的分区 (2.0s)
+  ✓  30 [1440x900] › e2e/support/scenarios.ts:49:7 › 全局设置 › 没有可用供应商时，默认模型各通道显示空状态并链接到供应商 (1.7s)
+  ✓  31 [1440x900] › e2e/support/scenarios.ts:49:7 › 全局设置 › 模型多且名称长时，默认模型的细分区展开、长名称截断不撑宽内容列 (1.8s)
+  ✓  32 [1440x900] › e2e/support/scenarios.ts:49:7 › 全局设置 › 打开模型多的默认视频模型下拉，列表在弹层里滚动到底，弹层留在视口内 (2.2s)
+  ✓  33 [1440x900] › e2e/support/scenarios.ts:49:7 › 全局设置 › 编辑默认模型后切换分区，弹出未保存修改的拦截对话框 (1.8s)
+  ✓  34 [1440x900] › e2e/support/scenarios.ts:49:7 › 全局设置 › 关于：版本卡的发布说明默认收起 (1.7s)
+  ✓  35 [1440x900] › e2e/support/scenarios.ts:49:7 › 全局设置 › 关于：展开很长的发布说明，内容随分区滚动到底，长链接不撑宽 (2.0s)
+  ✓  36 [1440x900] › e2e/support/scenarios.ts:49:7 › 全局设置 › 素材库与存储：没有对象存储连接时，新增图片只能保存在本地 (1.7s)
+  ✓  37 [1440x900] › e2e/support/scenarios.ts:49:7 › 全局设置 › 素材库与存储：新增图片保存到对象存储，长桶名截断不撑宽内容列 (1.7s)
+  ✓  38 [1440x900] › e2e/support/scenarios.ts:49:7 › 全局设置 › 素材库与存储：编辑连接时提示桶里还有未清理的中转副本 (1.9s)
+  ✓  39 [1440x900] › e2e/support/scenarios.ts:49:7 › 全局设置 › 提示词模版列表展开画风组后滚动到底 (2.2s)
+  ✓  40 [1440x900] › e2e/support/scenarios.ts:49:7 › 全局设置 › 提示词模版列表按创作类型筛选 (2.6s)
+  ✓  41 [1440x900] › e2e/support/scenarios.ts:49:7 › 全局设置 › 提示词模版详情：展开片段与输出结构后滚动到底 (2.6s)
+  ✓  42 [1440x900] › e2e/support/scenarios.ts:49:7 › 全局设置 › 提示词模版详情：打开片段的取值下拉 (1.9s)
+  ✓  43 [1440x900] › e2e/support/scenarios.ts:49:7 › 全局设置 › 提示词片段详情列出引用它的模版 (1.8s)
+
+  43 passed (40.3s)

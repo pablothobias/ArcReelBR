@@ -1,0 +1,35 @@
+........................................................................ [ 75%]
+.......................                                                  [100%]
+=============================== warnings summary ===============================
+tests/unit/lib/infra/test_validation_messages.py::TestDefaultTranslate::test_renders_in_chinese
+  /Users/pablo.carminatti.br/.local/share/uv/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/contextlib.py:144: SAWarning: Skipped unsupported reflection of expression-based index idx_tasks_dedupe_active
+    next(self.gen)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 25 durations =============================
+38.04s setup    tests/unit/lib/infra/test_validation_messages.py::TestDefaultTranslate::test_renders_in_chinese
+1.22s call     tests/unit/lib/i18n/test_display_names.py::test_every_provider_or_model_placeholder_renders_the_display_name[vi]
+0.47s setup    tests/unit/server/agent_runtime/test_session_manager_user_input.py::TestSessionManagerUserInput::test_closing_a_session_withdraws_its_queued_messages
+0.39s setup    tests/unit/server/agent_runtime/test_session_manager_user_input.py::TestSessionManagerUserInput::test_image_only_replay_is_recognized_by_its_uuid
+0.37s setup    tests/unit/server/agent_runtime/test_session_manager_user_input.py::TestSessionManagerUserInput::test_cleanup_on_error_disconnect_timeout_does_not_block
+0.34s setup    tests/unit/server/agent_runtime/test_session_manager_user_input.py::TestSessionManagerUserInput::test_send_message_hands_the_message_to_the_cli_as_a_queued_message
+0.33s setup    tests/unit/server/agent_runtime/test_session_manager_user_input.py::TestSessionManagerUserInput::test_answer_user_question_raises_for_unknown_question
+0.27s setup    tests/unit/lib/i18n/test_display_names.py::test_every_provider_or_model_placeholder_renders_the_display_name[vi]
+0.27s setup    tests/unit/server/agent_runtime/test_session_manager_user_input.py::TestSessionManagerUserInput::test_cleanup_on_error_disconnect_timeout_settles_the_startup_failure_as_error
+0.25s call     tests/unit/lib/i18n/test_market_core_rendering.py::TestDefinitionDiagnostics::test_comfyui_removed_section_embeds_the_translated_reason
+0.25s setup    tests/unit/server/agent_runtime/test_session_manager_user_input.py::TestSessionManagerUserInput::test_cli_idle_after_result_settles_status
+0.25s setup    tests/unit/server/agent_runtime/test_session_manager_user_input.py::TestSessionManagerUserInput::test_resolve_result_status_returns_interrupted_when_interrupt_requested
+0.24s setup    tests/unit/server/agent_runtime/test_session_manager_user_input.py::TestSessionManagerUserInput::test_interrupt_session_requests_interrupt_and_keeps_consumer_alive
+0.23s setup    tests/unit/server/agent_runtime/test_session_manager_user_input.py::TestSessionManagerUserInput::test_resident_language_switch_and_resend_preserve_user_content
+0.16s call     tests/unit/server/agent_runtime/test_options_assembler.py::test_build_adds_keep_alive_hook_with_can_use_tool
+0.12s call     tests/unit/server/agent_runtime/test_session_manager_user_input.py::TestSessionManagerUserInput::test_cleanup_on_error_disconnect_timeout_settles_the_startup_failure_as_error
+0.11s teardown tests/unit/server/agent_runtime/test_options_assembler.py::test_build_injects_short_lived_arcreel_api_credentials
+0.10s call     tests/unit/lib/i18n/test_display_names.py::test_every_provider_or_model_placeholder_renders_the_display_name[en]
+0.10s setup    tests/unit/server/agent_runtime/test_session_manager_user_input.py::TestSessionManagerUserInput::test_ask_user_question_waits_for_answer_and_merges_answers
+0.10s call     tests/unit/server/agent_runtime/test_options_assembler.py::test_append_prompt_omits_index_when_user_memory_index_not_utf8
+0.08s call     tests/unit/server/agent_runtime/test_session_manager_user_input.py::TestSessionManagerUserInput::test_cleanup_on_error_disconnect_timeout_does_not_block
+0.07s call     tests/unit/server/agent_runtime/test_session_manager_user_input.py::TestSessionManagerUserInput::test_resident_language_switch_and_resend_preserve_user_content
+0.06s setup    tests/unit/lib/i18n/test_i18n_consistency.py::test_templates_module_keys_match
+0.06s teardown tests/unit/lib/i18n/test_i18n_consistency.py::test_emails_module_keys_match
+0.06s call     tests/unit/lib/i18n/test_i18n_consistency.py::test_emails_module_keys_match
+95 passed, 1 warning in 48.09s

@@ -1,0 +1,19 @@
+[
+  "uv",
+  "run",
+  "python",
+  "-m",
+  "pytest",
+  "tests/integration/server/agent_toolset/test_text_generation.py::test_generate_episode_script_unknown_entry_id_is_refused_not_internal",
+  "tests/integration/server/agent_toolset/test_text_generation.py::test_generate_episode_script_without_anything_to_write_marks_the_result",
+  "tests/integration/server/agent_toolset/test_text_generation.py::test_generate_episode_script_rejects_removed_scope_with_migration_note[all]",
+  "tests/integration/server/agent_toolset/test_text_generation.py::test_generate_episode_script_rejects_removed_scope_with_migration_note[stale]",
+  "tests/integration/server/agent_toolset/test_text_generation.py::test_generate_episode_script_rejects_removed_scope_with_migration_note[None]",
+  "tests/integration/server/agent_toolset/test_text_generation.py::test_parse_normalized_content_uses_dynamic_duration_schema",
+  "tests/integration/server/agent_toolset/test_text_generation.py::test_normalize_drama_script_rejects_an_empty_explicit_source",
+  "tests/integration/server/agent_toolset/test_promote_draft.py::test_promote_narration_script_plan_names_source_scope_on_coverage_violation",
+  "tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_rejects_duration_off_reference_tier",
+  "tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_rejects_out_of_enum_duration",
+  "-q",
+  "--tb=short"
+]

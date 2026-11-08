@@ -41,7 +41,7 @@ from .zh import validation as zh_validation
 logger = logging.getLogger(__name__)
 
 # Default locale
-DEFAULT_LOCALE = "zh"
+DEFAULT_LOCALE = "en"
 SUPPORTED_LOCALES = ["zh", "en", "vi", "ru"]
 
 # Mapping from locale code to human-readable language name
@@ -51,6 +51,13 @@ LOCALE_LANGUAGE_MAP: dict[str, str] = {
     "vi": "Tiếng Việt",
     "ru": "Русский",
 }
+
+
+def normalize_locale(locale: str) -> str:
+    """Resolve a supported regional language tag, defaulting presentation to English."""
+    language = locale.strip().lower().replace("_", "-").split("-", 1)[0]
+    return language if language in SUPPORTED_LOCALES else DEFAULT_LOCALE
+
 
 # Merged message dictionary
 MESSAGES: dict[str, dict[str, str]] = {
@@ -99,7 +106,7 @@ MESSAGES: dict[str, dict[str, str]] = {
 
 def _(key: str, locale: str = DEFAULT_LOCALE, **kwargs: Any) -> str:
     """Translate a message key to the given locale."""
-    msg_map = MESSAGES.get(locale, MESSAGES[DEFAULT_LOCALE])
+    msg_map = MESSAGES[normalize_locale(locale)]
     msg = msg_map.get(key, MESSAGES[DEFAULT_LOCALE].get(key, key))
     try:
         return msg.format(**kwargs)

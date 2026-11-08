@@ -1,0 +1,588 @@
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies", "pnpm.overrides". See https://pnpm.io/settings for the new home of each setting.
+
+> arcreel-frontend@0.35.0 e2e /Users/pablo.carminatti.br/Projects/ArcReelBR/frontend
+> playwright test --workers=8
+
+[WebServer] (node:73585) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:73601) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+[WebServer]   - `__dirname` (vite.config.ts:9:36). Use `import.meta.dirname` instead
+[WebServer] Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+[WebServer] [plugin builtin:vite-reporter] 
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] (node:73639) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:73652) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+[WebServer]   - `__dirname` (vite.config.ts:9:36). Use `import.meta.dirname` instead
+[WebServer] Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+Running 1546 tests using 8 workers
+
+(node:73680) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73688) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73685) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73681) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73682) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73686) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73683) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73684) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓     4 [layout-probe] › e2e/probe/layout-probe.spec.ts:42:1 › overflow-x:hidden 吞掉横向内容时报告 x 轴 (722ms)
+  ✓     2 [layout-probe] › e2e/probe/layout-probe.spec.ts:51:1 › 固定高度裁切时报告，并指出越界的最深后代 (755ms)
+  ✓     1 [layout-probe] › e2e/probe/layout-probe.spec.ts:29:1 › flex 链补上 min-height:0 后内容可在内层滚动，不报告 (760ms)
+  ✓     7 [layout-probe] › e2e/probe/layout-probe.spec.ts:64:1 › overflow:clip 与 hidden 同样视为裁切 (738ms)
+  ✓     5 [layout-probe] › e2e/probe/layout-probe.spec.ts:87:3 › 豁免 › 带 text-overflow:ellipsis 的单行横向溢出不报告 (689ms)
+  ✓     3 [layout-probe] › e2e/probe/layout-probe.spec.ts:14:1 › flex 链中间层漏设 min-height:0 时报告裁切它的外壳 (782ms)
+  ✓     8 [layout-probe] › e2e/probe/layout-probe.spec.ts:70:1 › 不超过 1px 的取整误差不报告 (717ms)
+  ✓     6 [layout-probe] › e2e/probe/layout-probe.spec.ts:77:3 › 豁免 › 不可见元素不报告 (716ms)
+  ✓    10 [layout-probe] › e2e/probe/layout-probe.spec.ts:111:3 › 豁免 › data-overflow-ok 写明原因时豁免该元素及其后代 (1.5s)
+  ✓    12 [layout-probe] › e2e/probe/layout-probe.spec.ts:122:3 › 豁免 › data-overflow-ok 没写原因时不豁免 (1.6s)
+  ✓    13 [layout-probe] › e2e/probe/layout-probe.spec.ts:129:1 › 报告文档自身的滚动高度，用于断言文档不滚动 (1.6s)
+  ✓    16 [layout-probe] › e2e/probe/layout-probe.spec.ts:147:5 › 横向滚动 › 弹层正文（alert-dialog-body）被不折行的内容撑出横向滚动时报告，并指出越界的后代 (1.6s)
+  ✓    11 [layout-probe] › e2e/probe/layout-probe.spec.ts:96:3 › 豁免 › 单行输入框里放不下的长值不报告 (1.6s)
+  ✓     9 [layout-probe] › e2e/probe/layout-probe.spec.ts:102:3 › 豁免 › line-clamp 截断的多行文本不报告 (1.7s)
+  ✓    15 [layout-probe] › e2e/probe/layout-probe.spec.ts:147:5 › 横向滚动 › 弹层正文（dialog-body）被不折行的内容撑出横向滚动时报告，并指出越界的后代 (1.7s)
+  ✓    14 [layout-probe] › e2e/probe/layout-probe.spec.ts:138:3 › 横向滚动 › 报告文档自身的滚动宽度，用于断言文档不横向滚动 (1.7s)
+  ✓    17 [layout-probe] › e2e/probe/layout-probe.spec.ts:147:5 › 横向滚动 › 弹层正文（sheet-body）被不折行的内容撑出横向滚动时报告，并指出越界的后代 (301ms)
+  ✓    21 [layout-probe] › e2e/probe/layout-probe.spec.ts:199:3 › 横向滚动 › data-overflow-ok 写明原因时豁免 (181ms)
+  ✓    20 [layout-probe] › e2e/probe/layout-probe.spec.ts:188:3 › 横向滚动 › 用 overflow-x-auto 类或行内样式声明横向滚动的区域不报告 (212ms)
+  ✓    18 [layout-probe] › e2e/probe/layout-probe.spec.ts:165:3 › 横向滚动 › 页面上只写了纵向滚动的栏被撑出横向滚动时同样报告 (274ms)
+  ✓    19 [layout-probe] › e2e/probe/layout-probe.spec.ts:176:3 › 横向滚动 › 内容折行、或宽内容在声明了横向滚动的子区域里时不报告 (300ms)
+(node:73776) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73777) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73779) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73778) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73780) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73816) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73817) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73819) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓    26 [1024x600] › e2e/support/scenarios.ts:49:7 › 广告项目概览与故事设定 › 视频页的「故事设定」tab：排在第一个，没有批量动作，也没有「从原文生成」 (4.4s)
+  ✓    23 [1024x600] › e2e/support/scenarios.ts:49:7 › 广告项目概览与故事设定 › 长创作灵感与十二个商品：字段随内容撑高，由画布滚动到最后一个商品 (5.1s)
+  ✓    24 [1024x600] › e2e/support/scenarios.ts:49:7 › 广告项目概览与故事设定 › 「添加商品」从右侧打开资产详情 Sheet 的新建表单 (5.0s)
+  ✓    25 [1024x600] › e2e/support/scenarios.ts:49:7 › 广告项目概览与故事设定 › 创作灵感改了目标时长：提示条在区块下方 (5.0s)
+  ✓    22 [1024x600] › e2e/support/scenarios.ts:49:7 › 广告项目概览与故事设定 › 刚建好的广告项目：概览里直接填写创作灵感，商品区是空状态与「添加商品」 (5.3s)
+  ✓    28 [1024x600] › e2e/support/scenarios.ts:49:7 › 广告项目概览与故事设定 › 「故事设定」tab 的分秒脚本式长梗概与长世界观：字段随内容撑高，由视图滚动到底 (4.1s)
+  ✓    27 [1024x600] › e2e/support/scenarios.ts:49:7 › 广告项目概览与故事设定 › 已登记三个商品：整行列出缩略图、名称与描述，标题行有「查看全部」与「添加商品」 (4.3s)
+  ✓    30 [1024x600] › e2e/support/scenarios.ts:49:7 › 广告项目概览与故事设定 › 「故事设定」tab 有修改时提示条完整可见 (3.9s)
+  ✓    32 [1024x600] › e2e/support/scenarios.ts:49:7 › 外部 Agent 接入与访问令牌 › 创建成功后对话框一次性展示完整令牌，长令牌折行不撑出视口 (3.4s)
+  ✓    34 [1024x600] › e2e/support/scenarios.ts:49:7 › 外部 Agent 接入与访问令牌 › 访问令牌多且名称长时，列表在外壳主体里滚动到底，吊销按钮可达 (3.7s)
+  ✓    31 [1024x600] › e2e/support/scenarios.ts:49:7 › 外部 Agent 接入与访问令牌 › 外部 Agent 接入按三步展示，滚到底时给 AI Agent 的提示词与复制按钮可达 (3.9s)
+  ✓    33 [1024x600] › e2e/support/scenarios.ts:49:7 › 外部 Agent 接入与访问令牌 › 第三步打开创建访问令牌对话框，表单与按钮留在视口内 (3.9s)
+  ✓    29 [1024x600] › e2e/support/scenarios.ts:49:7 › 广告项目概览与故事设定 › 创作灵感有修改时下方出现未保存提示条 (5.1s)
+  ✓    35 [1024x600] › e2e/support/scenarios.ts:49:7 › 外部 Agent 接入与访问令牌 › 访问令牌列表区分永久、已过期与从未使用 (2.8s)
+  ✓    36 [1024x600] › e2e/support/scenarios.ts:49:7 › 外部 Agent 接入与访问令牌 › 吊销确认对话框打开时，焦点在取消上且按钮留在视口内 (2.8s)
+  ✓    38 [1024x600] › e2e/support/scenarios.ts:49:7 › 外部 Agent 接入与访问令牌 › 还没有访问令牌时显示空状态 (2.8s)
+  ✓    37 [1024x600] › e2e/support/scenarios.ts:49:7 › 外部 Agent 接入与访问令牌 › 吊销失败的原因很长时，对话框正文可用键盘聚焦并滚动，按钮留在视口内 (3.1s)
+  ✓    39 [1024x600] › e2e/support/scenarios.ts:49:7 › Agent 输入区 › Agent 提问时问卷占用输入框的位置，待办进度显示在它上方 (4.4s)
+  ✓    42 [1024x600] › e2e/support/scenarios.ts:49:7 › Agent 输入区 › 展开待办清单后问卷压缩题目区，按钮仍可用 (5.0s)
+  ✓    41 [1024x600] › e2e/support/scenarios.ts:49:7 › Agent 输入区 › 回复进行中排队 20 条消息：托盘在自己的区域里滚动，停在最新一条，输入框与停止按钮仍在面板内 (5.9s)
+  ✓    40 [1024x600] › e2e/support/scenarios.ts:49:7 › Agent 输入区 › 面板最窄 320px 时，问卷与待办进度同时出现，上方仍能看到消息 (6.5s)
+  ✓    43 [1024x600] › e2e/support/scenarios.ts:49:7 › Agent 输入区 › Agent 提问期间排队 20 条消息：托盘与问卷都在面板内，托盘里没有立即发送 (5.4s)
+  ✓    46 [1024x600] › e2e/support/scenarios.ts:49:7 › Agent 输入区 › 删除会话前确认 (3.8s)
+  ✓    45 [1024x600] › e2e/support/scenarios.ts:49:7 › Agent 输入区 › 搜索会话没有匹配时说明原因 (4.6s)
+  ✓    44 [1024x600] › e2e/support/scenarios.ts:49:7 › Agent 输入区 › 打开会话历史：长列表在自己的区域里滚动 (5.7s)
+  ✓    47 [1024x600] › e2e/support/scenarios.ts:49:7 › Agent 输入区 › 输入 / 打开斜杠命令菜单 (3.5s)
+  ✓    48 [1024x600] › e2e/support/scenarios.ts:49:7 › Agent 输入区 › 附加 5 张图片并写入长文本 (3.1s)
+  ✓    49 [1024x600] › e2e/support/scenarios.ts:49:7 › Agent 记忆 › 没有记忆文件：详情栏是新建表单 (2.6s)
+  ✓    50 [1024x600] › e2e/support/scenarios.ts:49:7 › Agent 记忆 › 文件很多、索引很长（压力）：文件列表与编辑框各自滚动 (4.0s)
+  ✓    53 [1024x600] › e2e/support/scenarios.ts:49:7 › Agent 记忆 › 删除确认：标题与按钮完整可见 (3.5s)
+  ✓    51 [1024x600] › e2e/support/scenarios.ts:49:7 › Agent 记忆 › 打开更多操作菜单，菜单留在视口内 (4.0s)
+  ✓    52 [1024x600] › e2e/support/scenarios.ts:49:7 › Agent 记忆 › 改动索引（压力）：内联提示条在编辑框下方完整可见 (4.3s)
+  ✓    54 [1024x600] › e2e/support/scenarios.ts:49:7 › Agent 记忆 › 删除失败原因很长：确认正文可聚焦并用键盘滚动 (4.2s)
+  ✓    55 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目记忆 › 文件很多、索引很长（压力）：改动后提示条可见，页面滚到底列表末尾的新建入口可见 (4.4s)
+  ✓    56 [1024x600] › e2e/support/scenarios.ts:49:7 › Agent 消息区 › 打开长会话时停在最新一条，不显示「跳到最新」 (5.4s)
+  ✓    62 [1024x600] › e2e/regions/agent-messages.spec.ts:257:1 › 代码块高亮分块晚于聚焦到达时，焦点留在代码块上 (3.5s)
+  ✓    61 [1024x600] › e2e/support/scenarios.ts:49:7 › Agent 消息区 › 放大用户消息里的图片附件 (4.8s)
+  ✓    57 [1024x600] › e2e/support/scenarios.ts:49:7 › Agent 消息区 › 上翻后出现「跳到最新」，点击回到底部 (7.0s)
+  ✓    60 [1024x600] › e2e/support/scenarios.ts:49:7 › Agent 消息区 › 原地编辑已发送的消息 (5.5s)
+  ✓    63 [1024x600] › e2e/support/scenarios.ts:49:7 › Agent 会话投影 › 压缩续接的会话：缺锚点的审片子代理显示推断出的描述与完成状态 (5.2s)
+  ✓    58 [1024x600] › e2e/support/scenarios.ts:49:7 › Agent 消息区 › 面板最宽 640px，展开思考过程 (7.3s)
+  ✓    59 [1024x600] › e2e/support/scenarios.ts:49:7 › Agent 消息区 › 面板最窄 320px 时，代码块与宽表格在自己的区域里横向滚动 (7.4s)
+  ✓    64 [1024x600] › e2e/support/scenarios.ts:49:7 › Agent 会话投影 › 续接摘要是「上下文已压缩」分隔线，展开后看到很长的摘要 (4.4s)
+  ✓    65 [1024x600] › e2e/support/scenarios.ts:49:7 › Agent 会话投影 › 失败卡片只给一句话结论与操作，不露出原始错误码 (3.6s)
+  ✓    67 [1024x600] › e2e/support/scenarios.ts:49:7 › Agent 工序行 › 工序行默认收起：工具显示本地化名称与摘要，失败与运行中在收起状态即可辨认 (4.8s)
+  ✓    70 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产详情 Sheet › 打开角色详情：资产图、原图、描述、声音、别名与衍生 (3.0s)
+  ✓    71 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产详情 Sheet › 改了描述：底部出现未保存提示条，生成与预览都先保存 (3.2s)
+  ✓    66 [1024x600] › e2e/support/scenarios.ts:49:7 › Agent 会话投影 › 面板最窄 320px 时展开失败详情，长堆栈折行不撑破面板 (5.7s)
+  ✓    68 [1024x600] › e2e/support/scenarios.ts:49:7 › Agent 工序行 › 展开长结果：只显示前 10 行，「显示全部」后整段展开，不产生内层滚动 (5.5s)
+  ✓    72 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产详情 Sheet › 重新生成过期资产图：连带影响统计失败的说明很长，只有正文滚动，按钮完整可见 (3.5s)
+  ✓    73 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产详情 Sheet › 有未保存修改时切到下一个：先弹出离开拦截 (4.0s)
+  ✓    75 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产详情 Sheet › 添加角色：在 Sheet 里打开空白表单 (2.9s)
+  ✓    74 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产详情 Sheet › 离开拦截里点「继续编辑」：回到原资产，修改还在 (3.9s)
+  ✓    76 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产详情 Sheet › 商品详情：商品原图、品牌与卖点 (3.5s)
+  ✓    69 [1024x600] › e2e/support/scenarios.ts:49:7 › Agent 工序行 › 面板最窄 320px，展开子智能体：子时间线的工序行与子智能体结论 (7.6s)
+  ✓    78 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产详情 Sheet › 打开「添加别名」弹层 (5.2s)
+  ✓    77 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产详情 Sheet › 名字与描述很长、别名很多：只有正文滚动，提示条留在底部 (5.7s)
+  ✓    80 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产详情 Sheet › 衍生区块：缩略图、引用记号、引用状态与外观变化 (4.6s)
+  ✓    79 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产详情 Sheet › 查看资产图大图：在 Sheet 之上打开，关闭后回到 Sheet (5.7s)
+  ✓    82 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产详情 Sheet › 改了衍生的外观变化：行内出现未保存提示，关闭 Sheet 先弹出离开拦截 (4.4s)
+  ✓    81 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产详情 Sheet › 衍生多且名称与外观变化很长：只有正文滚动，末条的操作完整可见 (5.4s)
+  ✓    83 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产详情 Sheet › 打开衍生的「更多」菜单 (5.1s)
+  ✓    84 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产详情 Sheet › 打开「新增衍生」弹层 (4.0s)
+  ✓    85 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产详情 Sheet › 删除衍生的确认框 (3.9s)
+  ✓    86 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产详情 Sheet › 查看衍生图大图：Esc 只关闭大图，Sheet 留在原处 (4.7s)
+  ✓    87 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产画廊 › 浏览卡网格按画布宽度加列，状态标记在图片左上角 (4.0s)
+  ✓    89 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产画廊 › 工具栏筛选只留待生成或已过期的资产 (3.9s)
+  ✓    90 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产画廊 › 打开卡片的「更多」菜单 (4.4s)
+  ✓    92 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产画廊 › 从菜单打开局部修改 (4.4s)
+  ✓    91 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产画廊 › 从菜单打开版本历史 (5.1s)
+  ✓    88 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产画廊 › 条目多且名字与描述很长：卡片不撑破网格，工具栏留在顶部 (6.9s)
+  ✓    93 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产画廊 › 从菜单打开「并入…」 (4.8s)
+  ✓    94 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产画廊 › 删除有引用的资产：确认框写明被哪些集引用，并可改为并入 (4.8s)
+  ✓    95 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产画廊 › 点卡片打开详情 Sheet (4.6s)
+  ✓    97 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产画廊 › 查看大图：←/→ 只在有资产图的资产之间切换 (5.0s)
+  ✓    96 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产画廊 › 删除被很多集引用的资产：只有影响清单滚动，按钮留在视野里 (5.6s)
+  ✓    98 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产画廊 › 查看大图：点旧版本只查看，还原要单独确认 (4.7s)
+  ✓   100 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产库 › 类型标签显示当前搜索下各类型的数量，网格铺满内容区 (3.8s)
+  ✓    99 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产画廊 › 查看大图：名字很长、版本很多时版本条横向滚动，操作留在视野里 (6.1s)
+  ✓   102 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产库 › 在详情里进入编辑后，保存栏固定在 Sheet 底部 (4.3s)
+  ✓   103 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产库 › 详情 Sheet 内容撑高时只有正文滚动，标题与底部操作留在视口内 (4.6s)
+  ✓   104 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产库 › 从卡片菜单打开「应用到项目」对话框 (2.9s)
+  ✓   107 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产库 › 画廊「加入资产库」：只读预览，重名时提供覆盖 (3.6s)
+  ✓   106 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产库 › 删除失败原因很长：正文可聚焦并用键盘滚动，取消仍可达 (3.7s)
+  ✓   109 [1024x600] › e2e/support/scenarios.ts:49:7 › 自动撑高输入框 › 容器变窄后重新计算高度 (2.5s)
+  ✓   105 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产库 › 画廊「从资产库导入」：条目多时只有正文滚动，显示匹配总数 (4.8s)
+  ✓   108 [1024x600] › e2e/support/scenarios.ts:49:7 › 自动撑高输入框 › 弹层中写入 9 行文本后撑开到上限并可内部滚动 (2.8s)
+  ✓   101 [1024x600] › e2e/support/scenarios.ts:49:7 › 资产库 › 条目多且文字长时，滚动到底自动加载下一页 (8.4s)
+  ✓   110 [1024x600] › e2e/support/scenarios.ts:49:7 › 新建项目向导 › 第一步未填写时列出缺少的必填项，正文可滚到生成方式 (3.1s)
+  ✓   111 [1024x600] › e2e/support/scenarios.ts:49:7 › 新建项目向导 › 第一步填满并展开宫格分镜后，正文仍可滚到底 (3.3s)
+  ✓   112 [1024x600] › e2e/support/scenarios.ts:49:7 › 新建项目向导 › 第二步选择 TTS 配音且模型很多时，正文可滚到底 (3.4s)
+  ✓   114 [1024x600] › e2e/support/scenarios.ts:49:7 › 新建项目向导 › 广告项目自定义目标总时长无效时说明需要修正的字段 (3.2s)
+  ✓   113 [1024x600] › e2e/support/scenarios.ts:49:7 › 新建项目向导 › 切换步骤时外框与底部按钮不移动，进入新步骤从顶部开始 (4.4s)
+  ✓   118 [1024x600] › e2e/support/scenarios.ts:49:7 › 剪辑视图 › 本集还没有剪辑时间线时显示两个入口 (4.5s)
+  ✓   116 [1024x600] › e2e/support/scenarios.ts:49:7 › 新建项目向导 › 风格步骤只有一个滚动容器，模版网格可滚到底 (5.2s)
+  ✓   115 [1024x600] › e2e/support/scenarios.ts:49:7 › 新建项目向导 › 第二步打开模型下拉，弹层留在视口内 (5.3s)
+  ✓   117 [1024x600] › e2e/support/scenarios.ts:49:7 › 新建项目向导 › 自定义风格上传后往返步骤，参考图预览仍有效 (5.3s)
+  ✓   120 [1024x600] › e2e/support/scenarios.ts:49:7 › 剪辑视图 › 出片对话框：成片过时，以重新渲染为主动作 (5.5s)
+  ✓   121 [1024x600] › e2e/support/scenarios.ts:49:7 › 剪辑视图 › 出片对话框：TTS 配音项目的剪映草稿选项最多，主操作仍在视口内 (5.3s)
+  ✓   119 [1024x600] › e2e/support/scenarios.ts:49:7 › 剪辑视图 › 播放器、详情栏与四条轨道同屏，只有详情栏滚动 (7.4s)
+  ✓   122 [1024x600] › e2e/support/scenarios.ts:49:7 › 尾帧选图器 › 分镜图与切图很多时打开尾帧选图器，选中一张后底部按钮可用 (5.9s)
+  ✓   124 [1024x600] › e2e/support/scenarios.ts:49:7 › 调用端点 › 内置端点详情：页头并排「复制为我的端点」与主按钮「新建供应商并使用」，都在视口内 (5.6s)
+  ✓   125 [1024x600] › e2e/support/scenarios.ts:49:7 › 调用端点 › 自定义端点多且名称长：二级栏滚动到「新建端点」，它在视口内 (6.1s)
+  ✓   127 [1024x600] › e2e/support/scenarios.ts:49:7 › 调用端点 › 删除确认：焦点在「取消」，按钮留在视口内 (3.5s)
+  ✓   123 [1024x600] › e2e/support/scenarios.ts:49:7 › 调用端点 › 我的端点详情：模型多、定义长时正文在详情栏里滚动，底部保存栏始终可见 (6.5s)
+  ✓   126 [1024x600] › e2e/support/scenarios.ts:49:7 › 调用端点 › 打开页头「更多操作」菜单，菜单项留在视口内 (6.1s)
+  ✓   128 [1024x600] › e2e/support/scenarios.ts:49:7 › 调用端点 › 新建端点页打开导入对话框，标题与操作按钮留在视口内 (3.3s)
+  ✓   129 [1024x600] › e2e/support/scenarios.ts:49:7 › 集页页头 › 两行页头约 85px，批量按钮写明补几份，没有可补的置灰 (3.9s)
+  ✓   130 [1024x600] › e2e/support/scenarios.ts:49:7 › 集页页头 › 录制的集：没有可补的产物时三个批量按钮都置灰 (3.9s)
+  ✓   131 [1024x600] › e2e/support/scenarios.ts:49:7 › 集页页头 › 打开制作进度不改变视图区高度，弹层留在视口内 (5.0s)
+  ✓   135 [1024x600] › e2e/support/scenarios.ts:49:7 › 分集视图 › 没有整本源文时集目录只列其他集，原文区邀请上传 (5.6s)
+  ✓   134 [1024x600] › e2e/support/scenarios.ts:49:7 › 集页页头 › 地址带 view=plan 时直接打开脚本规划视图 (6.4s)
+  ✓   133 [1024x600] › e2e/support/scenarios.ts:49:7 › 集页页头 › 集头「⋯」菜单展开删除入口 (6.7s)
+  ✓   136 [1024x600] › e2e/support/scenarios.ts:49:7 › 分集视图 › 整本源文按集分段，集目录与原文各自滚动，正文行长受控 (10.5s)
+  ✓   137 [1024x600] › e2e/support/scenarios.ts:49:7 › 分集视图 › 滚动原文时集目录高亮当前集，点击集目录让原文滚到这一集 (9.7s)
+  ✓   142 [1024x600] › e2e/support/scenarios.ts:49:7 › 分集视图 › 新建一集对话框 (4.8s)
+  ✓   141 [1024x600] › e2e/support/scenarios.ts:49:7 › 分集视图 › 未登记文件的提示条打开处理对话框 (5.1s)
+  ✓   132 [1024x600] › e2e/support/scenarios.ts:49:7 › 集页页头 › 制作进度的提示各出现一次并标出单元，长原因与大量单元只在弹层内滚动 (12.1s)
+  ✓   138 [1024x600] › e2e/support/scenarios.ts:49:7 › 分集视图 › 集的「⋯」菜单列出单集操作 (10.6s)
+  ✓   139 [1024x600] › e2e/support/scenarios.ts:49:7 › 分集视图 › 页头的「AI 规划分集」弹层 (9.7s)
+  ✓   144 [1024x600] › e2e/support/scenarios.ts:49:7 › 导出范围对话框 › 打开导出范围对话框，「导出」与两个范围选项都在视口内 (3.5s)
+  ✓   140 [1024x600] › e2e/support/scenarios.ts:49:7 › 分集视图 › 上传原文的分体按钮展开上传方式 (9.4s)
+  ✓   145 [1024x600] › e2e/support/scenarios.ts:49:7 › 导出范围对话框 › 集名很长时提示换行，「导出」仍完整可见 (3.9s)
+  ✓   143 [1024x600] › e2e/support/scenarios.ts:49:7 › 分集视图 › 有新的分集方案时集目录让位，原文右侧是方案栏 (6.9s)
+  ✓   146 [1024x600] › e2e/support/scenarios.ts:49:7 › 文件视图 › 项目根：目录树与空的详情栏 (6.0s)
+  ✓   147 [1024x600] › e2e/support/scenarios.ts:49:7 › 文件视图 › 展开目录、选中剧本：显示角色、所属集入口与 JSON 预览 (6.1s)
+  ✓   150 [1024x600] › e2e/support/scenarios.ts:49:7 › 文件视图 › 项目回收站分区：没有删除记录 (4.3s)
+  ✓   149 [1024x600] › e2e/support/scenarios.ts:49:7 › 文件视图 › 多选未引用文件：选择数量、取消选择与受保护文件 (5.2s)
+  ✓   152 [1024x600] › e2e/support/scenarios.ts:49:7 › 文件视图 › 项目回收站分区：长集名不遮住删除时的位置和正文 (4.6s)
+  ✓   156 [1024x600] › e2e/regions/language-policy.spec.ts:10:5 › fresh zh-CN browser › loads English metadata and UI and sends English login requests (1.9s)
+  ✓   157 [1024x600] › e2e/regions/language-policy.spec.ts:10:5 › fresh vi-VN browser › loads English metadata and UI and sends English login requests (1.8s)
+  ✓   158 [1024x600] › e2e/regions/language-policy.spec.ts:10:5 › fresh ru-RU browser › loads English metadata and UI and sends English login requests (1.8s)
+  ✓   153 [1024x600] › e2e/support/scenarios.ts:49:7 › 文件视图 › 项目回收站分区：降级恢复后只能下载的记录 (4.1s)
+  ✓   159 [1024x600] › e2e/regions/language-policy.spec.ts:10:5 › fresh pt-BR browser › loads English metadata and UI and sends English login requests (1.6s)
+  ✓   154 [1024x600] › e2e/support/scenarios.ts:49:7 › 多宫格分镜图 › 每组一张卡片，联合图占媒体栏，页头只有「补齐联合图」 (4.5s)
+  ✓   160 [1024x600] › e2e/regions/language-policy.spec.ts:33:3 › retains saved zh-Hant-TW with normalized document language (1.3s)
+  ✓   151 [1024x600] › e2e/support/scenarios.ts:49:7 › 文件视图 › 项目回收站分区：多条删除记录与清空确认（压力） (7.4s)
+  ✓   161 [1024x600] › e2e/regions/language-policy.spec.ts:33:3 › retains saved en-US with normalized document language (1.2s)
+  ✓   155 [1024x600] › e2e/support/scenarios.ts:49:7 › 多宫格分镜图 › 切到一组里的第二张联合图，长错误说明完整显示 (5.0s)
+  ✓   148 [1024x600] › e2e/support/scenarios.ts:49:7 › 文件视图 › 大目录与长正文（压力）：目录树与预览各自滚动 (11.5s)
+  ✓   162 [1024x600] › e2e/regions/language-policy.spec.ts:33:3 › retains saved vi-VN with normalized document language (2.0s)
+  ✓   163 [1024x600] › e2e/regions/language-policy.spec.ts:33:3 › retains saved ru-RU with normalized document language (2.0s)
+  ✓   168 [1024x600] › e2e/support/scenarios.ts:49:7 › 浅色主题 › 导出范围对话框 (3.9s)
+  ✓   165 [1024x600] › e2e/support/scenarios.ts:49:7 › 浅色主题 › 项目大厅 (4.4s)
+  ✓   166 [1024x600] › e2e/support/scenarios.ts:49:7 › 浅色主题 › 设置的通用分区 (4.8s)
+  ✓   164 [1024x600] › e2e/regions/language-policy.spec.ts:41:1 › updates document language and persisted preference after an explicit UI selection (5.3s)
+  ✓   167 [1024x600] › e2e/support/scenarios.ts:49:7 › 浅色主题 › 工作区的剧集页 (4.8s)
+  ✓   169 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目大厅 › 打开大厅：问候区、筛选工具栏与项目卡 (4.3s)
+  ✓   170 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目大厅 › 项目多、标题与待修复原因长：首行海报、标题与进度行在首屏内 (5.1s)
+  ✓   171 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目大厅 › 滚到网格底部时，筛选工具栏吸顶留在视口内 (4.9s)
+  ✓   172 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目大厅 › 没有项目：空状态给出新建与导入两个入口 (2.7s)
+  ✓   173 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目大厅 › 搜索没有匹配的项目 (3.6s)
+  ✓   174 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目大厅 › 打开「新建项目」的下拉菜单 (4.3s)
+  ✓   177 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目大厅 › 删除项目的确认，按钮留在视口内 (4.3s)
+  ✓   175 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目大厅 › 打开项目卡的更多操作菜单 (4.7s)
+  ✓   176 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目大厅 › 重命名项目的对话框说明项目 ID 不变 (4.6s)
+  ✓   179 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目大厅 › 从项目卡导出：导出范围对话框的操作按钮留在视口内 (4.3s)
+  ✓   180 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目大厅 › 删除失败原因很长：正文可聚焦并用键盘滚动，取消仍可达 (4.3s)
+  ✓   181 [1024x600] › e2e/support/scenarios.ts:49:7 › 登录页 › 未登录打开登录页 (2.9s)
+  ✓   178 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目大厅 › 已删除项目：标题很长时恢复与彻底删除按钮留在视口内 (5.0s)
+  ✓   182 [1024x600] › e2e/support/scenarios.ts:49:7 › 登录页 › 登录失败显示错误提示 (2.8s)
+  ✓   183 [1024x600] › e2e/support/scenarios.ts:49:7 › 市场 › 首次进入：官方服务说明在 Tab 之上，没有条目时说明原因 (5.2s)
+  ✓   185 [1024x600] › e2e/support/scenarios.ts:49:7 › 市场 › 按来源与媒体类型筛选后没有匹配的条目 (5.8s)
+  ✓   184 [1024x600] › e2e/support/scenarios.ts:49:7 › 市场 › 条目多、名称与说明长：失败的源列在筛选行之上，网格靠左排开 (6.8s)
+  ✓   189 [1024x600] › e2e/support/scenarios.ts:49:7 › 市场 › 我的分享：分享多、名称长，过期的状态标出原因 (5.6s)
+  ✓   187 [1024x600] › e2e/support/scenarios.ts:49:7 › 市场 › 设置：改了代理前缀后，底行的保存栏在视口内可用 (6.1s)
+  ✓   188 [1024x600] › e2e/support/scenarios.ts:49:7 › 市场 › 设置：市场源多、地址与错误长 (6.5s)
+  ✓   190 [1024x600] › e2e/support/scenarios.ts:49:7 › 市场 › 设置：用键盘把市场源上移一位，新顺序立即保存 (6.1s)
+  ✓   186 [1024x600] › e2e/support/scenarios.ts:49:7 › 市场 › 从供应商或端点带着媒体类型跳入：筛选已预设为「图片」，地址不随筛选改动 (7.6s)
+  ✓   192 [1024x600] › e2e/support/scenarios.ts:49:7 › 市场 › 设置：删除市场源的确认，按钮留在视口内 (3.8s)
+  ✓   191 [1024x600] › e2e/support/scenarios.ts:49:7 › 市场 › 设置：打开市场源的更多操作菜单，菜单项留在视口内 (5.1s)
+  ✓   193 [1024x600] › e2e/support/scenarios.ts:49:7 › 市场 › 设置：重命名市场源的对话框 (3.7s)
+  ✓   195 [1024x600] › e2e/support/scenarios.ts:49:7 › 404 页 › 打开不存在的地址 (3.1s)
+  ✓   194 [1024x600] › e2e/support/scenarios.ts:49:7 › 市场 › 安装弹窗：定义长、地址多，正文在弹窗里滚动，操作按钮留在视口内 (3.6s)
+  ✓   196 [1024x600] › e2e/support/scenarios.ts:49:7 › 新手引导 › 首次进入大厅：欢迎气泡居中，遮罩盖住页面 (3.2s)
+  ✓   197 [1024x600] › e2e/support/scenarios.ts:49:7 › 新手引导 › 第 6 步：空大厅上方出现「示例项目」区块，空状态保持不变 (4.2s)
+  ✓   198 [1024x600] › e2e/support/scenarios.ts:49:7 › 新手引导 › 第 7 步：演示 Agent 面板，工序行与禁用的输入框 (5.2s)
+  ✓   202 [1024x600] › e2e/support/scenarios.ts:49:7 › 新手引导 › 演示工作台：顶栏「演示 · 只读」徽标聚焦后显示说明 (4.1s)
+  ✓   204 [1024x600] › e2e/regions/onboarding.spec.ts:206:1 › 已有新建项目向导时启动引导：焦点只归气泡，结束后归还对话框 (3.6s)
+  ✓   203 [1024x600] › e2e/support/scenarios.ts:49:7 › 新手引导 › 故事设定从原文生成后，底部出现一次性提示 (5.0s)
+  ✓   199 [1024x600] › e2e/support/scenarios.ts:49:7 › 新手引导 › 第 10 步：落到集页的分镜视图 (6.0s)
+  ✓   205 [1024x600] › e2e/support/scenarios.ts:49:7 › 弹层与提示 › 诊断条目多且长时，标题与关闭按钮留在视口内，只有正文滚动 (5.5s)
+  ✓   206 [1024x600] › e2e/support/scenarios.ts:49:7 › 弹层与提示 › 下载提示显示在诊断对话框之上，减少动态效果时出现过程不位移 (4.4s)
+  ✓   200 [1024x600] › e2e/support/scenarios.ts:49:7 › 新手引导 › 越南语：每一步的气泡都完整落在视口内 (8.7s)
+  ✓   201 [1024x600] › e2e/support/scenarios.ts:49:7 › 新手引导 › 俄语：每一步的气泡都完整落在视口内 (9.0s)
+  ✓   208 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目概览 › 录制的演示项目：页头元信息、资产与费用两行、空的故事设定 (4.7s)
+  ✓   207 [1024x600] › e2e/support/scenarios.ts:49:7 › 弹层与提示 › 打开侧栏「添加一集」菜单 (4.9s)
+  ✓   209 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目概览 › 长文本故事设定与多条资产过期：字段随内容撑高，由画布滚动到底 (5.1s)
+  ✓   210 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目概览 › 费用明细：多币种与历史支出在弹层里分两列，底部链接到使用记录 (5.6s)
+  ✓   211 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目概览 › 费用拿不到完整数字：说明原因，列出没有价格的模型并链接到设置价格 (4.2s)
+  ✓   212 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目概览 › 故事设定有修改时下方出现未保存提示条 (4.2s)
+  ✓   213 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目概览 › 有未保存修改时从原文重新生成：确认框说明修改会丢失 (3.8s)
+  ✓   215 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目概览 › 空项目欢迎页：标题、一句说明、拖放区与从空白开始的指引 (3.2s)
+  ✓   216 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目设置 › 基础分页：改动后侧栏标出修改，外壳底行的保存栏在表单滚到底时完整可见 (3.5s)
+  ✓   214 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目概览 › 从原文生成时故事设定区显示骨架与「正在读取原文…」 (4.3s)
+  ✓   217 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目设置 › 广告项目的基础分页：目标总时长自定义输入无效时的行内提示 (3.5s)
+  ✓   218 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目设置 › 风格分页：「更换」打开风格对话框，只有对话框正文滚动 (3.9s)
+  ✓   219 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目设置 › 模型分页（压力）：覆盖说明条、通道来源与展开的细分区，滚到底仍可保存 (3.6s)
+  ✓   221 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目设置 › 项目记忆分页：入口在 Agent 组，不显示外壳保存栏 (4.1s)
+  ✓   222 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目设置 › 配音分页：参考生视频项目使用 TTS 配音，显示角色声音绑定 (4.7s)
+  ✓   220 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目设置 › 模型分页：打开默认视频模型下拉，弹层留在视口内 (5.4s)
+  ✓   223 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目设置 › Agent 配置（压力）：很多定制文件，打开重置确认 (4.7s)
+  ✓   224 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目设置 › 侧栏：模型分页的覆盖数与修改标记 (4.4s)
+  ✓   226 [1024x600] › e2e/support/scenarios.ts:49:7 › 顶栏状态条 › 打开 AI 分集规划的下一步，附加要求输入框与备选都在弹层里 (4.4s)
+  ✓   225 [1024x600] › e2e/support/scenarios.ts:49:7 › 顶栏状态条 › 30 集长标题时打开集进度，逐集清单在弹层里滚动 (5.6s)
+  ✓   227 [1024x600] › e2e/support/scenarios.ts:49:7 › 顶栏状态条 › 数据升级重试失败后，弹层展开很长的失败原因 (4.8s)
+  ✓   228 [1024x600] › e2e/support/scenarios.ts:49:7 › 供应商 › 预置供应商详情：密钥多时正文在详情栏里滚动，底部保存栏始终可见 (7.3s)
+  ✓   231 [1024x600] › e2e/support/scenarios.ts:49:7 › 供应商 › 打开「添加密钥」对话框，标题与操作按钮留在视口内 (6.3s)
+  ✓   229 [1024x600] › e2e/support/scenarios.ts:49:7 › 供应商 › 预置供应商详情：模型列表按类型分组，筛选「已启用」后停用的模型不再出现，长名称与状态标记换行 (7.6s)
+  ✓   230 [1024x600] › e2e/support/scenarios.ts:49:7 › 供应商 › 自定义供应商多且名称长：切到「自定义」后第一个位于栏顶，列表滚动到底 (7.6s)
+  ✓   232 [1024x600] › e2e/support/scenarios.ts:49:7 › 供应商 › 自定义供应商详情：模型列表的长模型 ID 换行，正文在详情栏里滚动，底部保存栏始终可见 (7.3s)
+  ✓   233 [1024x600] › e2e/support/scenarios.ts:49:7 › 供应商 › 自定义供应商「获取模型」：已识别与未识别分两组，长模型 ID 换行，每行可选调用端点 (6.3s)
+  ✓   234 [1024x600] › e2e/support/scenarios.ts:49:7 › 供应商 › 「添加模型」：输入模型 ID 后可按 ID 添加，或从模型目录选择 (7.4s)
+  ✓   235 [1024x600] › e2e/support/scenarios.ts:49:7 › 供应商 › 自定义供应商的模型 Sheet：参数全部展开时正文在 Sheet 里滚动，保存栏始终可见 (8.4s)
+  ✓   236 [1024x600] › e2e/support/scenarios.ts:49:7 › 供应商 › 自定义供应商的模型 Sheet：打开调用端点下拉，按媒体分组的选项留在视口内 (7.0s)
+  ✓   237 [1024x600] › e2e/support/scenarios.ts:49:7 › 供应商 › 自定义视频模型可选择 Gemini Omni 端点，Vertex Omni 不在选项中 (7.1s)
+  ✓   239 [1024x600] › e2e/support/scenarios.ts:49:7 › 供应商 › 模型 Sheet：「从『供应商』移除」的确认框列出在用的设置与项目 (6.4s)
+  ✓   240 [1024x600] › e2e/support/scenarios.ts:49:7 › 供应商 › 模型 Sheet：「恢复官方数据」的确认框写明无法撤销与一起恢复的供应商 (6.3s)
+  ✓   242 [1024x600] › e2e/support/scenarios.ts:49:7 › 供应商 › 自定义供应商详情：删除确认写明模型数量，操作按钮留在视口内 (4.9s)
+  ✓   241 [1024x600] › e2e/support/scenarios.ts:49:7 › 供应商 › 模型 Sheet：「手动填写模型信息」对话框的字段随类型展开，正文在对话框里滚动，确定按钮留在视口内 (7.4s)
+  ✓   238 [1024x600] › e2e/support/scenarios.ts:49:7 › 供应商 › 模型 Sheet：价格编辑器点开条件标签，选项留在视口内 (8.6s)
+  ✓   243 [1024x600] › e2e/support/scenarios.ts:49:7 › 参考视频工作台 › 单元列表、文稿编辑器与竖屏预览，选中单元带重新规划与参考图分裂提示 (5.5s)
+  ✓   244 [1024x600] › e2e/support/scenarios.ts:49:7 › 参考视频工作台 › 1440×700 与 1280×720 下编辑器与预览不低于高度下限 (6.8s)
+  ✓   247 [1024x600] › e2e/support/scenarios.ts:49:7 › 参考视频工作台 › 移除单元前的确认弹层 (6.1s)
+  ✓   248 [1024x600] › e2e/support/scenarios.ts:49:7 › 脚本规划起步态 › 切自整本源文的集：起步区在上、原文只读，导览按视图宽放右栏或原文上方 (5.8s)
+  ✓   245 [1024x600] › e2e/support/scenarios.ts:49:7 › 参考视频工作台 › 改了正文后出现内联提示条，生成按钮改为「保存并生成」 (7.3s)
+  ✓   246 [1024x600] › e2e/support/scenarios.ts:49:7 › 参考视频工作台 › 聚焦把手后用键盘把单元移到最前 (7.0s)
+  ✓   250 [1024x600] › e2e/support/scenarios.ts:49:7 › 脚本规划起步态 › 分镜 tab 置灰，悬停说明脚本生成后可用 (5.0s)
+  ✓   249 [1024x600] › e2e/support/scenarios.ts:49:7 › 脚本规划起步态 › 起步态滚到底：右栏导览固定在视野里，窄视图的导览可以收起 (5.4s)
+  ✓   251 [1024x600] › e2e/support/scenarios.ts:49:7 › 脚本规划起步态 › 自带原文的集就地编辑原文，改动后出现未保存提示条 (5.6s)
+  ✓   254 [1024x600] › e2e/support/scenarios.ts:49:7 › 重新规划与内容确认 › 已有正式脚本的集：「AI 规划脚本」打开对话框，说明确认后才替换正式脚本 (4.6s)
+  ✓   253 [1024x600] › e2e/support/scenarios.ts:49:7 › 脚本规划起步态 › 本集正在规划时起步区换成状态说明 (5.2s)
+  ✓   252 [1024x600] › e2e/support/scenarios.ts:49:7 › 脚本规划起步态 › 制作进度的下一步跳到起步区并聚焦附加指令 (5.4s)
+  ✓   257 [1024x600] › e2e/support/scenarios.ts:49:7 › 全局设置 · ArcReel Agent › 没有 Agent 供应商时，本分区就地提示内嵌 Agent 未配置 (5.5s)
+  ✓   259 [1024x600] › e2e/support/scenarios.ts:49:7 › 全局设置 · ArcReel Agent › 添加 Agent 供应商对话框展开模型路由后，内容可滚动到底，底部按钮始终可见 (5.3s)
+  ✓   258 [1024x600] › e2e/support/scenarios.ts:49:7 › 全局设置 · ArcReel Agent › Agent 供应商多且名称长时展开高级运行参数，修改后外壳底行的保存按钮可见可用 (7.4s)
+  ✓   260 [1024x600] › e2e/support/scenarios.ts:49:7 › 全局设置 · ArcReel Agent › 删除 Agent 供应商前弹出确认，说明删除的对象 (4.2s)
+  ✓   255 [1024x600] › e2e/support/scenarios.ts:49:7 › 重新规划与内容确认 › 内容确认页：二十四条长原文分镜只在视图内滚动 (9.0s)
+  ✓   261 [1024x600] › e2e/support/scenarios.ts:49:7 › 全局设置 › 默认落在全出血档的供应商，侧栏与供应商列表各自滚动 (4.8s)
+  ✓   262 [1024x600] › e2e/support/scenarios.ts:49:7 › 全局设置 › 限宽档的保存栏固定在外壳底行，表单滚动时保存按钮始终可见 (4.4s)
+  ✓   263 [1024x600] › e2e/support/scenarios.ts:49:7 › 全局设置 › 通用分区没有保存栏，外壳不显示底行 (3.9s)
+  ✓   256 [1024x600] › e2e/support/scenarios.ts:49:7 › 重新规划与内容确认 › 内容确认页展开分镜时长下拉 (10.2s)
+  ✓   264 [1024x600] › e2e/support/scenarios.ts:49:7 › 全局设置 › 打开界面语言下拉，选项留在视口内 (3.2s)
+  ✓   266 [1024x600] › e2e/support/scenarios.ts:49:7 › 全局设置 › 没有可用供应商时，默认模型各通道显示空状态并链接到供应商 (3.6s)
+  ✓   265 [1024x600] › e2e/support/scenarios.ts:49:7 › 全局设置 › 缺少供应商时提示只出现在供应商分区顶部，侧栏只标记问题所属的分区 (4.8s)
+  ✓   268 [1024x600] › e2e/support/scenarios.ts:49:7 › 全局设置 › 编辑默认模型后切换分区，弹出未保存修改的拦截对话框 (4.7s)
+  ✓   269 [1024x600] › e2e/support/scenarios.ts:49:7 › 全局设置 › 模型多且名称长时，默认模型的细分区展开、长名称截断不撑宽内容列 (4.9s)
+  ✓   270 [1024x600] › e2e/support/scenarios.ts:49:7 › 全局设置 › 关于：版本卡的发布说明默认收起 (4.4s)
+  ✓   272 [1024x600] › e2e/support/scenarios.ts:49:7 › 全局设置 › 素材库与存储：没有对象存储连接时，新增图片只能保存在本地 (5.0s)
+  ✓   267 [1024x600] › e2e/support/scenarios.ts:49:7 › 全局设置 › 打开模型多的默认视频模型下拉，列表在弹层里滚动到底，弹层留在视口内 (6.5s)
+  ✓   271 [1024x600] › e2e/support/scenarios.ts:49:7 › 全局设置 › 关于：展开很长的发布说明，内容随分区滚动到底，长链接不撑宽 (6.4s)
+  ✓   274 [1024x600] › e2e/support/scenarios.ts:49:7 › 全局设置 › 素材库与存储：编辑连接时提示桶里还有未清理的中转副本 (4.2s)
+  ✓   273 [1024x600] › e2e/support/scenarios.ts:49:7 › 全局设置 › 素材库与存储：新增图片保存到对象存储，长桶名截断不撑宽内容列 (4.4s)
+  ✓   277 [1024x600] › e2e/support/scenarios.ts:49:7 › 全局设置 › 提示词模版列表按创作类型筛选 (4.7s)
+  ✓   276 [1024x600] › e2e/support/scenarios.ts:49:7 › 全局设置 › 提示词模版详情：展开片段与输出结构后滚动到底 (5.2s)
+  ✓   275 [1024x600] › e2e/support/scenarios.ts:49:7 › 全局设置 › 提示词模版列表展开画风组后滚动到底 (6.6s)
+  ✓   279 [1024x600] › e2e/support/scenarios.ts:49:7 › 全局设置 › 提示词片段详情列出引用它的模版 (5.2s)
+  ✓   278 [1024x600] › e2e/support/scenarios.ts:49:7 › 全局设置 › 提示词模版详情：打开片段的取值下拉 (5.7s)
+  ✓   282 [1024x600] › e2e/support/scenarios.ts:49:7 › 共享组件：待修复草稿与新增资产 › 待修复草稿：丢弃前确认，写明丢弃后回到哪份内容 (5.8s)
+  ✓   281 [1024x600] › e2e/support/scenarios.ts:49:7 › 共享组件：待修复草稿与新增资产 › 待修复草稿：「AI 修复」对话框说明修复范围并接受附加指令 (5.9s)
+  ✓   280 [1024x600] › e2e/support/scenarios.ts:49:7 › 共享组件：待修复草稿与新增资产 › 待修复草稿：状态条列出逐条跳转，整集违约置顶，长草稿只在视图内滚动 (7.6s)
+  ✓   286 [1024x600] › e2e/support/scenarios.ts:49:7 › 共享组件：集页对话框与提示 › 分镜图查看大图：占满视口的查看器，按 Esc 关闭 (6.8s)
+  ✓   284 [1024x600] › e2e/support/scenarios.ts:49:7 › 共享组件：待修复草稿与新增资产 › 本集新增资产：按类型分组，归并与衍生的项给出目标下拉 (8.4s)
+  ✓   283 [1024x600] › e2e/support/scenarios.ts:49:7 › 共享组件：待修复草稿与新增资产 › 本集新增资产：十二项长依据，展开出场位置并打开处理方式下拉 (9.1s)
+  ✓   288 [1024x600] › e2e/support/scenarios.ts:49:7 › 共享组件：集页对话框与提示 › 广告项目「重新生成脚本」对话框：附加指令只随本次提交 (5.7s)
+  ✓   289 [1024x600] › e2e/support/scenarios.ts:49:7 › 共享组件：集页对话框与提示 › 交给 Agent 预填多行附加指令后输入框自动撑高 (6.2s)
+  ✓   285 [1024x600] › e2e/support/scenarios.ts:49:7 › 共享组件：集页对话框与提示 › 「编写提示词」：自选多条列出四十条分镜，只在列表内滚动 (9.0s)
+  ✓   287 [1024x600] › e2e/support/scenarios.ts:49:7 › 共享组件：集页对话框与提示 › 文本任务失败：集页顶部给出原因与去登记最大输出长度的链接 (10.4s)
+  ✓   290 [1024x600] › e2e/support/scenarios.ts:49:7 › 分镜详情 › 中栏先引用后提示词与台词，媒体栏放分镜图与视频 (9.1s)
+  ✓   296 [1024x600] › e2e/support/scenarios.ts:49:7 › 分镜详情 › 有未保存修改时按 J 切换分镜先询问 (5.0s)
+  ✓   291 [1024x600] › e2e/support/scenarios.ts:49:7 › 分镜详情 › 收起分镜列表后只剩序号列，详情跟着变宽 (7.1s)
+  ✓   292 [1024x600] › e2e/support/scenarios.ts:49:7 › 分镜详情 › 展开对应原文与参考，长原文在中栏内滚动可达 (8.7s)
+  ✓   298 [1024x600] › e2e/support/scenarios.ts:49:7 › 分镜详情 › 打开引用编辑对话框并改动引用 (5.5s)
+  ✓   299 [1024x600] › e2e/support/scenarios.ts:49:7 › 分镜详情 › 把文本提示词切回结构化前确认 (4.5s)
+  ✓   294 [1024x600] › e2e/support/scenarios.ts:49:7 › 分镜详情 › 打开分镜图的版本历史并预览旧版本 (11.5s)
+  ✓   295 [1024x600] › e2e/support/scenarios.ts:49:7 › 分镜详情 › 改了提示词后出现未保存提示条，生成按钮改为保存并生成 (11.1s)
+  ✓   293 [1024x600] › e2e/support/scenarios.ts:49:7 › 分镜详情 › 打开分镜备注弹层 (11.9s)
+  ✓   297 [1024x600] › e2e/support/scenarios.ts:49:7 › 分镜详情 › 打开时长弹层 (13.8s)
+  ✓   302 [1024x600] › e2e/support/scenarios.ts:49:7 › 使用记录 › 没有任何调用时的空态 (6.7s)
+  ✓   304 [1024x600] › e2e/support/scenarios.ts:49:7 › 使用记录 › 从深链打开长提示词的详情弹窗，只有弹窗主体滚动 (7.6s)
+  ✓   300 [1024x600] › e2e/support/scenarios.ts:49:7 › 分镜详情 › 用键盘把第二个分镜移到最前 (12.7s)
+  ✓   303 [1024x600] › e2e/support/scenarios.ts:49:7 › 使用记录 › 记录满一页且名称很长，表格滚到底后最后一行与分页可见 (10.5s)
+  ✓   305 [1024x600] › e2e/support/scenarios.ts:49:7 › 使用记录 › 趋势、构成与需要关注在压力数据下不裁切 (10.0s)
+  ✓   306 [1024x600] › e2e/support/scenarios.ts:49:7 › 使用记录 › 打开项目筛选下拉，长标题选项留在视口内 (10.6s)
+  ✓   307 [1024x600] › e2e/support/scenarios.ts:49:7 › 使用记录 › Agent 会话满一页且名称很长，展开一个会话的明细后滚到底，分页可见 (6.7s)
+  ✓   310 [1024x600] › e2e/support/scenarios.ts:49:7 › 工作区顶栏 › 没有通知时打开通知面板 (5.0s)
+  ✓   308 [1024x600] › e2e/support/scenarios.ts:49:7 › 使用记录 › 顶栏使用记录弹层在进行中与已结束都很多时，两栏各自滚动、底部链接可见 (6.9s)
+  ✓   309 [1024x600] › e2e/support/scenarios.ts:49:7 › 工作区顶栏 › 项目名很长时「← 项目」不换行，打开项目切换器后列表在弹层里滚动 (7.6s)
+  ✓   313 [1024x600] › e2e/support/scenarios.ts:49:7 › 工作区顶栏 › 项目内不存在的路径在画布里显示空状态，外壳保留 (5.1s)
+  ✓   314 [1024x600] › e2e/support/scenarios.ts:49:7 › 工作区顶栏 › 旧入口 clues 在画布里显示空状态 (5.0s)
+  ✓   315 [1024x600] › e2e/support/scenarios.ts:49:7 › 工作区顶栏 › 旧入口 lorebook 在画布里显示空状态 (4.9s)
+  ✓   312 [1024x600] › e2e/support/scenarios.ts:49:7 › 工作区顶栏 › 点通知的「查看」跳到对应的分镜与资产 (8.3s)
+  ✓   317 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目工作区外壳 › 集页侧栏收为图标栏，Agent 面板默认展开 (3.9s)
+  ✓   316 [1024x600] › e2e/support/scenarios.ts:49:7 › 工作区顶栏 › 侧栏集只用键盘调整播出顺序 (6.3s)
+  ✓   318 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目工作区外壳 › 多集长标题时侧栏列表在自己的区域里滚动 (3.7s)
+  ✘   324 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目工作区外壳 › 把 Agent 面板拖到最宽时画布至少保留 480px (830ms)
+  ✘   322 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目工作区外壳 › 收起 Agent 面板后画布占满，再展开回到原来的宽度 (1.8s)
+  ✘   323 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目工作区外壳 › 只用键盘调宽：方向键每次 16px，双击恢复默认宽度 (1.9s)
+  ✘   321 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目工作区外壳 › 紧凑档焦点在 Agent 面板内时 Esc 收起面板，焦点回到开关 (3.4s)
+  ✘   320 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目工作区外壳 › 多集时集页的图标栏在自己的区域里滚动 (4.1s)
+  ✘   319 [1024x600] › e2e/support/scenarios.ts:49:7 › 项目工作区外壳 › 紧凑档 Agent 面板覆盖画布右侧，画布不被挤窄 (4.0s)
+  ✘   311 [1024x600] › e2e/support/scenarios.ts:49:7 › 工作区顶栏 › 多条长通知时打开通知面板：角标立即清零，未读高亮保留，列表在面板里滚动 (12.1s)
+  ✘   301 [1024x600] › e2e/support/scenarios.ts:49:7 › 分镜详情 › 500 镜仍可流畅滚动并用单次方向键排序 (28.9s)
+
+
+  1) [1024x600] › e2e/support/scenarios.ts:49:7 › 分镜详情 › 500 镜仍可流畅滚动并用单次方向键排序 ──────────────────────
+
+    Test was interrupted.
+
+    Error: page.evaluate: Test ended.
+     Please check out https://github.com/dequelabs/axe-core-npm/blob/develop/packages/playwright/error-handling.md
+
+       at support/test.ts:100
+
+       98 |
+       99 | export async function expectAccessible(page: Page) {
+    > 100 |   const results = await new AxeBuilder({ page }).withTags(AXE_TAGS).analyze();
+          |                   ^
+      101 |   const violations = results.violations.map((violation) => ({
+      102 |     rule: violation.id,
+      103 |     help: violation.help,
+        at AxeBuilder.analyze (/Users/pablo.carminatti.br/Projects/ArcReelBR/frontend/node_modules/.pnpm/@axe-core+playwright@4.13.0_playwright-core@1.63.0/node_modules/@axe-core/playwright/dist/index.mjs:218:13)
+        at expectAccessible (/Users/pablo.carminatti.br/Projects/ArcReelBR/frontend/e2e/support/test.ts:100:19)
+        at /Users/pablo.carminatti.br/Projects/ArcReelBR/frontend/e2e/support/scenarios.ts:64:9
+
+    Error Context: test-results/regions-shot-detail-分镜详情-500-镜仍可流畅滚动并用单次方向键排序-1024x600/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/regions-shot-detail-分镜详情-500-镜仍可流畅滚动并用单次方向键排序-1024x600/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/regions-shot-detail-分镜详情-500-镜仍可流畅滚动并用单次方向键排序-1024x600/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [1024x600] › e2e/support/scenarios.ts:49:7 › 工作区顶栏 › 多条长通知时打开通知面板：角标立即清零，未读高亮保留，列表在面板里滚动 ──────
+
+    Test was interrupted.
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  locator('[data-slot="toast"]')
+    Expected: 0
+    Received: 3
+
+    Call log:
+      - Expect "toHaveCount" locator('[data-slot="toast"]') with timeout 15000ms
+      - waiting for locator('[data-slot="toast"]')
+        8 × locator resolved to 3 elements
+          - unexpected value "3"
+      - Test ended.
+
+
+       at regions/workspace-header.spec.ts:247
+
+      245 |       for (let i = 0; i < 6; i++) await failExport(page);
+      246 |       // Notifications auto-dismiss after 5 seconds; wait for them to leave screenshots containing only notification panels.
+    > 247 |       await expect(page.locator('[data-slot="toast"]')).toHaveCount(0, { timeout: 15_000 });
+          |                                                         ^
+      248 |       await expect(bell(page)).toHaveAccessibleName("工作区通知，未读 6 条");
+      249 |
+      250 |       await bell(page).click();
+        at Object.act (/Users/pablo.carminatti.br/Projects/ArcReelBR/frontend/e2e/regions/workspace-header.spec.ts:247:57)
+        at /Users/pablo.carminatti.br/Projects/ArcReelBR/frontend/e2e/support/scenarios.ts:59:9
+
+    Error Context: test-results/regions-workspace-header-工-3a40d-通知面板：角标立即清零，未读高亮保留，列表在面板里滚动-1024x600/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/regions-workspace-header-工-3a40d-通知面板：角标立即清零，未读高亮保留，列表在面板里滚动-1024x600/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/regions-workspace-header-工-3a40d-通知面板：角标立即清零，未读高亮保留，列表在面板里滚动-1024x600/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [1024x600] › e2e/support/scenarios.ts:49:7 › 项目工作区外壳 › 紧凑档焦点在 Agent 面板内时 Esc 收起面板，焦点回到开关 ──────
+
+    Test was interrupted.
+
+    Error: page.evaluate: Test ended.
+     Please check out https://github.com/dequelabs/axe-core-npm/blob/develop/packages/playwright/error-handling.md
+
+       at support/test.ts:100
+
+       98 |
+       99 | export async function expectAccessible(page: Page) {
+    > 100 |   const results = await new AxeBuilder({ page }).withTags(AXE_TAGS).analyze();
+          |                   ^
+      101 |   const violations = results.violations.map((violation) => ({
+      102 |     rule: violation.id,
+      103 |     help: violation.help,
+        at AxeBuilder.analyze (/Users/pablo.carminatti.br/Projects/ArcReelBR/frontend/node_modules/.pnpm/@axe-core+playwright@4.13.0_playwright-core@1.63.0/node_modules/@axe-core/playwright/dist/index.mjs:218:13)
+        at expectAccessible (/Users/pablo.carminatti.br/Projects/ArcReelBR/frontend/e2e/support/test.ts:100:19)
+        at /Users/pablo.carminatti.br/Projects/ArcReelBR/frontend/e2e/support/scenarios.ts:64:9
+
+    Error Context: test-results/regions-workspace-shell-项目-13629--Agent-面板内时-Esc-收起面板，焦点回到开关-1024x600/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/regions-workspace-shell-项目-13629--Agent-面板内时-Esc-收起面板，焦点回到开关-1024x600/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/regions-workspace-shell-项目-13629--Agent-面板内时-Esc-收起面板，焦点回到开关-1024x600/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [1024x600] › e2e/support/scenarios.ts:49:7 › 项目工作区外壳 › 收起 Agent 面板后画布占满，再展开回到原来的宽度 ────────────
+
+    Test was interrupted.
+
+    Error: locator.waitFor: Test ended.
+    Call log:
+      - waiting for getByRole('complementary', { name: 'Agent 面板' }) to be visible
+
+
+       at regions/workspace-shell.spec.ts:89
+
+      87 |
+      88 | async function shellReady(page: Page) {
+    > 89 |   await agentPanel(page).waitFor();
+         |                          ^
+      90 |   await agentInput(page).waitFor();
+      91 | }
+      92 |
+        at shellReady (/Users/pablo.carminatti.br/Projects/ArcReelBR/frontend/e2e/regions/workspace-shell.spec.ts:89:26)
+        at Object.ready (/Users/pablo.carminatti.br/Projects/ArcReelBR/frontend/e2e/regions/workspace-shell.spec.ts:94:9)
+        at /Users/pablo.carminatti.br/Projects/ArcReelBR/frontend/e2e/support/scenarios.ts:58:24
+
+    Error Context: test-results/regions-workspace-shell-项目工作区外壳-收起-Agent-面板后画布占满，再展开回到原来的宽度-1024x600/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/regions-workspace-shell-项目工作区外壳-收起-Agent-面板后画布占满，再展开回到原来的宽度-1024x600/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/regions-workspace-shell-项目工作区外壳-收起-Agent-面板后画布占满，再展开回到原来的宽度-1024x600/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [1024x600] › e2e/support/scenarios.ts:49:7 › 项目工作区外壳 › 只用键盘调宽：方向键每次 16px，双击恢复默认宽度 ─────────────
+
+    Test was interrupted.
+
+    Error: locator.waitFor: Test ended.
+    Call log:
+      - waiting for getByRole('complementary', { name: 'Agent 面板' }) to be visible
+
+
+       at regions/workspace-shell.spec.ts:89
+
+      87 |
+      88 | async function shellReady(page: Page) {
+    > 89 |   await agentPanel(page).waitFor();
+         |                          ^
+      90 |   await agentInput(page).waitFor();
+      91 | }
+      92 |
+        at Object.ready (/Users/pablo.carminatti.br/Projects/ArcReelBR/frontend/e2e/regions/workspace-shell.spec.ts:89:26)
+        at /Users/pablo.carminatti.br/Projects/ArcReelBR/frontend/e2e/support/scenarios.ts:58:24
+
+    Error Context: test-results/regions-workspace-shell-项目工作区外壳-只用键盘调宽：方向键每次-16px，双击恢复默认宽度-1024x600/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/regions-workspace-shell-项目工作区外壳-只用键盘调宽：方向键每次-16px，双击恢复默认宽度-1024x600/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/regions-workspace-shell-项目工作区外壳-只用键盘调宽：方向键每次-16px，双击恢复默认宽度-1024x600/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [1024x600] › e2e/support/scenarios.ts:49:7 › 项目工作区外壳 › 把 Agent 面板拖到最宽时画布至少保留 480px ────────────
+
+    Test was interrupted.
+
+    Error: page.goto: Test ended.
+    Call log:
+      - navigating to "http://127.0.0.1:4173/app/projects/demo/characters", waiting until "load"
+
+
+      55 |         }
+      56 |
+    > 57 |         await page.goto(scenario.path);
+         |                    ^
+      58 |         await scenario.ready(page);
+      59 |         await scenario.act?.(page);
+      60 |
+        at /Users/pablo.carminatti.br/Projects/ArcReelBR/frontend/e2e/support/scenarios.ts:57:20
+
+    Error Context: test-results/regions-workspace-shell-项目工作区外壳-把-Agent-面板拖到最宽时画布至少保留-480px-1024x600/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/regions-workspace-shell-项目工作区外壳-把-Agent-面板拖到最宽时画布至少保留-480px-1024x600/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/regions-workspace-shell-项目工作区外壳-把-Agent-面板拖到最宽时画布至少保留-480px-1024x600/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  8 interrupted
+    [1024x600] › e2e/support/scenarios.ts:49:7 › 分镜详情 › 500 镜仍可流畅滚动并用单次方向键排序 ───────────────────────
+    [1024x600] › e2e/support/scenarios.ts:49:7 › 工作区顶栏 › 多条长通知时打开通知面板：角标立即清零，未读高亮保留，列表在面板里滚动 ───────
+    [1024x600] › e2e/support/scenarios.ts:49:7 › 项目工作区外壳 › 多集时集页的图标栏在自己的区域里滚动 ──────────────────────
+    [1024x600] › e2e/support/scenarios.ts:49:7 › 项目工作区外壳 › 紧凑档 Agent 面板覆盖画布右侧，画布不被挤窄 ───────────────
+    [1024x600] › e2e/support/scenarios.ts:49:7 › 项目工作区外壳 › 紧凑档焦点在 Agent 面板内时 Esc 收起面板，焦点回到开关 ───────
+    [1024x600] › e2e/support/scenarios.ts:49:7 › 项目工作区外壳 › 收起 Agent 面板后画布占满，再展开回到原来的宽度 ─────────────
+    [1024x600] › e2e/support/scenarios.ts:49:7 › 项目工作区外壳 › 只用键盘调宽：方向键每次 16px，双击恢复默认宽度 ──────────────
+    [1024x600] › e2e/support/scenarios.ts:49:7 › 项目工作区外壳 › 把 Agent 面板拖到最宽时画布至少保留 480px ─────────────
+  1222 did not run
+  316 passed (3.8m)
+ ELIFECYCLE  Command failed with exit code 130.

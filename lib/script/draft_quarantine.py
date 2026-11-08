@@ -84,18 +84,18 @@ QUARANTINE_FILENAMES: frozenset[str] = frozenset(_QUARANTINE_FILENAMES.values())
 #: to uneditable locations. Register alongside filenames, adding one row here for each new origin.
 _QUARANTINE_REPORT_HINTS: dict[str, tuple[str, str]] = {
     QUARANTINE_KIND_SCRIPT_PLAN: (
-        "script_plan 拆分",
-        "content（按报告字段路径修复；视频单元级字段位于 content.units[i]）",
+        "script_plan splitting",
+        "content (repair the field paths listed in the report; unit-level fields are in content.units[i])",
     ),
-    QUARANTINE_KIND_PROMPT_AUTHORING: ("prompt_authoring 提示词编写", "content.units[i].text"),
+    QUARANTINE_KIND_PROMPT_AUTHORING: ("prompt_authoring prompt writing", "content.units[i].text"),
     QUARANTINE_KIND_DRAMA_SCRIPT_PLAN: (
-        "script_plan 规范化",
-        "content（分镜级字段位于 content.scenes[i]）",
+        "script_plan normalization",
+        "content (shot-level fields are in content.scenes[i])",
     ),
     QUARANTINE_KIND_NARRATION_SCRIPT_PLAN: (
-        "script_plan 分镜拆分",
-        "content（分镜级字段位于 content.segments[i]："
-        "novel_text / duration_seconds / segment_break / characters_in_segment / scenes / props）",
+        "script_plan shot splitting",
+        "content (shot-level fields are in content.segments[i]: "
+        "novel_text / duration_seconds / segment_break / characters_in_segment / scenes / props)",
     ),
 }
 
@@ -389,15 +389,18 @@ def render_report(draft: Path, kind: str, violations: list[DraftViolation], *, e
     stage, field = _QUARANTINE_REPORT_HINTS[kind]
     doc_type = QUARANTINE_KIND_TO_DOC_TYPE[kind]
     return (
-        f"❌ {stage}产出有 {len(violations)} 处违约，已保存为待修复草稿（正式文件未被改动）：{draft.as_posix()}\n\n"
+        f"❌ {stage} output has {len(violations)} violations and was saved as a draft for repair "
+        f"(formal file unchanged): {draft.as_posix()}\n\n"
         f"{render_violation_report(violations)}\n\n"
-        f'处置：调用 open_draft({{"episode_id": {episode}, "doc_type": "{doc_type}"}}) 读取正文与 revision；'
-        f"修正 {field} 后用 patch_draft 携带 base_revision 提交；"
-        "若违约是「资产名未登记」，也可改为在 project.json 登记该资产、或改用已登记的名称。\n"
-        f'改完调用 {PROMOTE_TOOL_NAME}({{"episode_id": {episode}, "doc_type": "{doc_type}", '
-        '"base_revision": "<patch_draft 返回的 revision>"}) '
-        "重新全量校验并晋升为正式文件；"
-        "仍有违约时会返回刷新后的报告，可继续修改再晋升，无轮次上限。"
+        f'Next steps: call open_draft({{"episode_id": {episode}, "doc_type": "{doc_type}"}}) '
+        "to read the content and revision; "
+        f"fix {field}, then submit with patch_draft using base_revision; "
+        "if a violation concerns an unregistered asset name, you can instead register that asset in project.json "
+        "or use an already registered name.\n"
+        f'After editing, call {PROMOTE_TOOL_NAME}({{"episode_id": {episode}, "doc_type": "{doc_type}", '
+        '"base_revision": "<revision returned by patch_draft>"}) '
+        "to rerun full validation and promote to the formal file; "
+        "remaining violations return an updated report. Continue editing and promoting as needed, with no round limit."
     )
 
 

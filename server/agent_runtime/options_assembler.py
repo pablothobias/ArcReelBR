@@ -29,7 +29,7 @@ from lib.agent.agent_session_store.store import DbSessionStore
 from lib.agent.credential_tiers import AgentPricing
 from lib.db.base import DEFAULT_USER_ID
 from lib.db.engine import async_session_factory as default_async_session_factory
-from lib.i18n import DEFAULT_LOCALE, LOCALE_LANGUAGE_MAP
+from lib.i18n import DEFAULT_LOCALE, LOCALE_LANGUAGE_MAP, normalize_locale
 from lib.infra.async_thread import run_sync_transaction
 from lib.infra.data_root_layout import DataRootLayout
 from lib.prompts.prompt_templates.builtin import builtin_templates
@@ -157,7 +157,7 @@ class OptionsAssembler:
         into the cwd, carrying the Agent persona) is auto-loaded by the SDK via
         setting_sources=["project"].
         """
-        lang = LOCALE_LANGUAGE_MAP.get(locale, "中文")
+        lang = LOCALE_LANGUAGE_MAP[normalize_locale(locale)]
         parts = [builtin_templates.render("text/agent_language_rule", lang=lang)]
 
         project_context = await asyncio.to_thread(self._build_project_context, project_name)
@@ -390,10 +390,9 @@ class OptionsAssembler:
                 type="preset",
                 preset="claude_code",
                 append=await self._build_append_prompt(project_name, locale=locale),
-                # The SDK records the first-turn system prompt and reuses it across requests and resume
-                # until compaction or a new session. Within that boundary, changed memory/locale append
-                # text does not rebuild the cached prompt. File-based instruction loading is separate.
-                snapshot=True,
+                # Rebuild on each request/resume so historical language snapshots do not override
+                # the current application policy. Transcript and submitted generation requests remain intact.
+                snapshot=False,
             ),
             include_partial_messages=True,
             max_buffer_size=CLI_STDOUT_MAX_BUFFER_BYTES,

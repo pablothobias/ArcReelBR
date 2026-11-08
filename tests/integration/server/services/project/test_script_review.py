@@ -1642,8 +1642,8 @@ class TestReferenceVideoPromptAuthoringEnforcement:
         )
         refused = await run_declared_tool(GENERATE_EPISODE_SCRIPT, ctx, {"episode_id": 1})
         assert refused.problem is not None
-        assert "尚无正式脚本" in refused.problem.detail
-        assert "内容确认" in refused.problem.detail
+        assert "has no formal script" in refused.problem.detail
+        assert "confirm a script plan" in refused.problem.detail
 
         result = await run_declared_tool(CONFIRM_SCRIPT_REVIEW, ctx, {"episode_id": 1})
         assert result.problem is None, result
@@ -2154,7 +2154,7 @@ class TestPromptAuthoringEnforcement:
         assert refused.problem.code == "script_overwrite_required"
         assert refused.problem.params == {"script_overwrite": web_overwrite}
         assert web_overwrite["text"] in refused.problem.detail
-        for lost in ("配音 1 段", "尾帧 1 张", "宫格归属 1 处"):
+        for lost in ("1 voice-over clip(s)", "1 end frame(s)", "1 grid membership(s)"):
             assert lost in web_overwrite["text"]
 
     async def test_confirm_tool_reports_the_video_request_facts_problem(self, tmp_path, set_video_request_facts):

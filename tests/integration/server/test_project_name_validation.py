@@ -9,6 +9,7 @@ import pytest
 from fastapi.routing import iter_route_contexts
 from fastapi.testclient import TestClient
 
+from lib.i18n.en import errors as en_errors
 from lib.i18n.zh import errors as zh_errors
 from server.app import app
 from server.auth import CurrentUserInfo, get_current_user
@@ -56,7 +57,7 @@ def test_invalid_project_name_is_rejected_with_400(app_client, method, path):
     resp = app_client.request(method, url, json={})
 
     assert resp.status_code == 400
-    assert resp.json()["detail"] == zh_errors.MESSAGES["invalid_project_name"].format(name=_INVALID_NAME)
+    assert resp.json()["detail"] == en_errors.MESSAGES["invalid_project_name"].format(name=_INVALID_NAME)
 
 
 @pytest.mark.parametrize("method", ["GET", "DELETE"])
@@ -64,3 +65,11 @@ def test_missing_project_with_valid_name_stays_404(app_client, method):
     resp = app_client.request(method, "/api/v1/projects/missing-project")
 
     assert resp.status_code == 404
+
+
+@pytest.mark.parametrize("locale", ["xx-XX", "zh-CN"])
+def test_project_name_error_localizes_explicit_or_unsupported_http_locale(app_client, locale):
+    response = app_client.get(f"/api/v1/projects/{_INVALID_NAME}", headers={"Accept-Language": locale})
+    messages = zh_errors.MESSAGES if locale == "zh-CN" else en_errors.MESSAGES
+    assert response.status_code == 400
+    assert response.json()["detail"] == messages["invalid_project_name"].format(name=_INVALID_NAME)

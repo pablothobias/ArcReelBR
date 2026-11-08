@@ -1,0 +1,136 @@
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies", "pnpm.overrides". See https://pnpm.io/settings for the new home of each setting.
+ WARN  Unsupported engine: wanted: {"node":">=24.12.0"} (current: {"node":"v22.22.0","pnpm":"10.33.2"})
+
+> arcreel-frontend@0.35.0 build /Users/pablo.carminatti.br/Projects/ArcReelBR/frontend
+> pnpm typecheck && vite build
+
+ WARN  Unsupported engine: wanted: {"node":">=24.12.0"} (current: {"node":"v22.22.0","pnpm":"10.33.2"})
+
+> arcreel-frontend@0.35.0 typecheck /Users/pablo.carminatti.br/Projects/ArcReelBR/frontend
+> tsc --noEmit && tsc --noEmit -p e2e
+
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - `__dirname` (vite.config.ts:9:36). Use `import.meta.dirname` instead
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+vite v8.3.5 building client environment for production...
+transforming...
+✓ 4763 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                                       2.71 kB │ gzip:   1.03 kB
+dist/assets/jetbrains-mono-vietnamese-wght-normal-Bt-aOZkq.woff2      7.50 kB
+dist/assets/jetbrains-mono-greek-wght-normal-Bw9x6K1M.woff2           9.00 kB
+dist/assets/instrument-serif-latin-ext-400-normal-CFCUzsTy.woff       9.86 kB
+dist/assets/inter-vietnamese-wght-normal-CBcvBZtf.woff2              10.25 kB
+dist/assets/instrument-serif-latin-ext-400-italic-D7-lnxEk.woff      10.50 kB
+dist/assets/inter-greek-ext-wght-normal-DlzME5K_.woff2               11.23 kB
+dist/assets/instrument-serif-latin-ext-400-normal-C2je3j2s.woff2     11.60 kB
+dist/assets/jetbrains-mono-cyrillic-wght-normal-D73BlboJ.woff2       12.10 kB
+dist/assets/instrument-serif-latin-ext-400-italic-C9HzH3YL.woff2     12.38 kB
+dist/assets/jetbrains-mono-latin-ext-wght-normal-DBQx-q_a.woff2      15.19 kB
+dist/assets/instrument-serif-latin-400-normal-BVbkICAY.woff          18.33 kB
+dist/assets/inter-cyrillic-wght-normal-DqGufNeO.woff2                18.74 kB
+dist/assets/inter-greek-wght-normal-CkhJZR-_.woff2                   18.99 kB
+dist/assets/instrument-serif-latin-400-italic-u__WvvIK.woff          19.26 kB
+dist/assets/instrument-serif-latin-400-normal-DnYpCC2O.woff2         21.03 kB
+dist/assets/instrument-serif-latin-400-italic-DKMiL14s.woff2         22.12 kB
+dist/assets/inter-cyrillic-ext-wght-normal-BOeWTOD4.woff2            25.96 kB
+dist/assets/jetbrains-mono-latin-wght-normal-B9CIFXIH.woff2          40.40 kB
+dist/assets/inter-latin-wght-normal-Dx4kXJAl.woff2                   48.25 kB
+dist/assets/inter-latin-ext-wght-normal-DO1Apj_S.woff2               85.06 kB
+dist/assets/index-D4iHU1rK.css                                      221.96 kB │ gzip:  36.62 kB
+dist/assets/mermaid-WFAXDIZX-BG3Huv-l.js                              0.04 kB │ gzip:   0.06 kB
+dist/assets/auth-CbQOVUEs.js                                          0.17 kB │ gzip:   0.17 kB
+dist/assets/auth-C5tpmLPC.js                                          0.18 kB │ gzip:   0.14 kB
+dist/assets/auth-D9ZHejpG.js                                          0.24 kB │ gzip:   0.19 kB
+dist/assets/auth-DEEObnNV.js                                          0.25 kB │ gzip:   0.22 kB
+dist/assets/task-CJ2RH9W7.js                                          0.41 kB │ gzip:   0.27 kB
+dist/assets/jsx-runtime-COQnYV8f.js                                   0.42 kB │ gzip:   0.29 kB
+dist/assets/Color-COsi1fw1.js                                         0.50 kB │ gzip:   0.38 kB
+dist/assets/Mono-Bk3abIV7.js                                          0.59 kB │ gzip:   0.44 kB
+dist/assets/Mono-dJE-D-dr.js                                          0.60 kB │ gzip:   0.43 kB
+dist/assets/highlighted-body-JLMTFACH-qqR2Ee3J.js                     0.63 kB │ gzip:   0.40 kB
+dist/assets/Color-CNYea9MW.js                                         0.64 kB │ gzip:   0.44 kB
+dist/assets/Mono-CJfFeqTd.js                                          0.67 kB │ gzip:   0.44 kB
+dist/assets/Color-3jtlDZKr.js                                         0.74 kB │ gzip:   0.46 kB
+dist/assets/SaveBar-BtABPgsy.js                                       0.83 kB │ gzip:   0.47 kB
+dist/assets/Mono-r7_Z3C9T.js                                          0.84 kB │ gzip:   0.57 kB
+dist/assets/Color-DKUTn2Gt.js                                         1.00 kB │ gzip:   0.64 kB
+dist/assets/Color-C_OvHCEX.js                                         1.05 kB │ gzip:   0.64 kB
+dist/assets/Color-ncHV34WS.js                                         1.16 kB │ gzip:   0.71 kB
+dist/assets/Color-DVhINJkQ.js                                         1.25 kB │ gzip:   0.77 kB
+dist/assets/Color-yrOH3_U2.js                                         1.36 kB │ gzip:   0.78 kB
+dist/assets/episode-display-Ck9GEoZf.js                               1.39 kB │ gzip:   0.64 kB
+dist/assets/Color-BuNnLQkM.js                                         1.40 kB │ gzip:   0.83 kB
+dist/assets/preload-helper-BLdHbfdN.js                                1.51 kB │ gzip:   0.79 kB
+dist/assets/Color-B5CIYyTM.js                                         1.92 kB │ gzip:   1.10 kB
+dist/assets/errors-iPK1Hdkd.js                                        1.92 kB │ gzip:   1.02 kB
+dist/assets/useModelCapabilities-DC8qgSNd.js                          2.01 kB │ gzip:   1.05 kB
+dist/assets/errors-yHTKLiat.js                                        2.08 kB │ gzip:   0.83 kB
+dist/assets/Color-Br7Vc-tt.js                                         2.32 kB │ gzip:   1.27 kB
+dist/assets/Color-CTimXwYi.js                                         2.36 kB │ gzip:   1.11 kB
+dist/assets/Color-aJdEkxUJ.js                                         2.39 kB │ gzip:   1.32 kB
+dist/assets/errors-DdHQrvW_.js                                        2.48 kB │ gzip:   1.08 kB
+dist/assets/Color-5-flkh_K.js                                         2.55 kB │ gzip:   1.22 kB
+dist/assets/Color-TK4r_CIC.js                                         2.76 kB │ gzip:   1.51 kB
+dist/assets/Mono-BCzDr-am.js                                          2.77 kB │ gzip:   1.36 kB
+dist/assets/common-CWHBxBLI.js                                        3.00 kB │ gzip:   1.29 kB
+dist/assets/common-Xt3_3T8r.js                                        3.01 kB │ gzip:   1.63 kB
+dist/assets/errors-Th4LA94L.js                                        3.24 kB │ gzip:   1.22 kB
+dist/assets/events-idLF77m8.js                                        3.45 kB │ gzip:   1.01 kB
+dist/assets/Color-BknTyTCU.js                                         3.47 kB │ gzip:   1.78 kB
+dist/assets/events-CLmQ6qeR.js                                        3.51 kB │ gzip:   0.86 kB
+dist/assets/list-format-DfDIWA8I.js                                   3.51 kB │ gzip:   1.73 kB
+dist/assets/common-Cr4cN_0u.js                                        3.53 kB │ gzip:   1.67 kB
+dist/assets/Color-bAnRlaMf.js                                         3.82 kB │ gzip:   1.63 kB
+dist/assets/events-BSZ3ljL_.js                                        3.84 kB │ gzip:   1.07 kB
+dist/assets/clsx-DkAOGG6o.js                                          4.21 kB │ gzip:   1.54 kB
+dist/assets/Mono-CoGPzqun.js                                          4.25 kB │ gzip:   1.88 kB
+dist/assets/common-ByvncNIO.js                                        4.59 kB │ gzip:   1.86 kB
+dist/assets/events-DziIbbhn.js                                        5.23 kB │ gzip:   1.28 kB
+dist/assets/templates-eMP2xIBe.js                                     6.51 kB │ gzip:   2.98 kB
+dist/assets/templates-Do6WrH1c.js                                     6.61 kB │ gzip:   2.46 kB
+dist/assets/templates-B1Czt5nv.js                                     8.06 kB │ gzip:   2.95 kB
+dist/assets/react-sySUN5R7.js                                         8.53 kB │ gzip:   3.28 kB
+dist/assets/UnsavedChangesBar-B35-sIdt.js                            10.24 kB │ gzip:   4.16 kB
+dist/assets/onboarding-BfvzeSuM.js                                   10.28 kB │ gzip:   5.08 kB
+dist/assets/templates-B22jLQJ7.js                                    10.69 kB │ gzip:   3.48 kB
+dist/assets/onboarding-OSmq7upN.js                                   11.90 kB │ gzip:   4.72 kB
+dist/assets/onboarding-Cl3A5IBO.js                                   14.18 kB │ gzip:   5.19 kB
+dist/assets/GridImageToVideoCanvas-B2RNVFpm.js                       16.69 kB │ gzip:   5.64 kB
+dist/assets/useModelCandidates-oajqul9Z.js                           17.83 kB │ gzip:   5.42 kB
+dist/assets/onboarding-zm_buQnR.js                                   20.06 kB │ gzip:   6.44 kB
+dist/assets/workflow-hiL6FtAp.js                                     20.35 kB │ gzip:   5.93 kB
+dist/assets/workflow-BlOrQDwZ.js                                     21.58 kB │ gzip:   5.58 kB
+dist/assets/AssetLibraryPage-BHxC1BYH.js                             21.64 kB │ gzip:   6.13 kB
+dist/assets/assets-DE2o6kJh.js                                       23.77 kB │ gzip:   6.80 kB
+dist/assets/ProjectSettingsPage-1VoerEh0.js                          24.63 kB │ gzip:   7.67 kB
+dist/assets/workflow-BTR0tqgM.js                                     25.10 kB │ gzip:   5.99 kB
+dist/assets/assets-DlM_ZHws.js                                       25.67 kB │ gzip:   6.56 kB
+dist/assets/with-selector-CXPTua9f.js                                29.70 kB │ gzip:  12.42 kB
+dist/assets/assets-HiAWuL90.js                                       29.93 kB │ gzip:   6.88 kB
+dist/assets/OnboardingTour-C1lEZ3Ri.js                               34.68 kB │ gzip:  10.38 kB
+dist/assets/workflow-COVNTUNM.js                                     41.38 kB │ gzip:   7.79 kB
+dist/assets/EditTimelineView-CdfatB65.js                             42.21 kB │ gzip:  13.21 kB
+dist/assets/SaveStatus-0tP91sN5.js                                   46.17 kB │ gzip:  15.77 kB
+dist/assets/assets-DJ9UkbsQ.js                                       46.18 kB │ gzip:   8.53 kB
+dist/assets/episode-item-DwTtiKTu.js                                 50.42 kB │ gzip:  16.67 kB
+dist/assets/toggle-group-A_CQrIU6.js                                 74.43 kB │ gzip:  25.12 kB
+dist/assets/ReferenceVideoCanvas-7qkJRAjR.js                         84.85 kB │ gzip:  23.69 kB
+dist/assets/app-routes-DztJzKeE.js                                   99.44 kB │ gzip:  24.52 kB
+dist/assets/label-lBJ-PAdp.js                                       153.05 kB │ gzip:  51.68 kB
+dist/assets/dashboard-T1ZBL713.js                                   225.66 kB │ gzip:  68.54 kB
+dist/assets/dashboard-I11jBJpK.js                                   239.15 kB │ gzip:  65.85 kB
+dist/assets/dashboard-DSGxtEA0.js                                   281.44 kB │ gzip:  69.95 kB
+dist/assets/UsageTrendChart-CTuBBBa9.js                             359.09 kB │ gzip: 104.12 kB
+dist/assets/dashboard-v0Bapw0P.js                                   386.34 kB │ gzip:  84.54 kB
+dist/assets/SystemConfigPage-Dfx71I6a.js                            460.31 kB │ gzip: 113.20 kB
+dist/assets/dist-C1nnZfRp.js                                        504.61 kB │ gzip: 154.44 kB
+dist/assets/index-DjY0iST1.js                                     1,350.08 kB │ gzip: 383.17 kB
+
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 973ms

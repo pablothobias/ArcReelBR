@@ -31,6 +31,14 @@ from tests.fakes import (
 )
 
 
+def _delivered_user_text(frame: dict[str, Any]) -> str:
+    """Assert application context is separate from the original text at the SDK wire boundary."""
+    blocks = frame["message"]["content"]
+    assert blocks[0]["text"].startswith(f'<arcreel-conversation-language message-id="{frame["uuid"]}">')
+    assert "Reply language: English" in blocks[0]["text"]
+    return "".join(block["text"] for block in blocks[1:] if block["type"] == "text")
+
+
 def user_frame(
     content: str | list[dict[str, Any]],
     *,
@@ -578,7 +586,7 @@ class TestNewSessionEventLogFlow:
 
             assert retry == {"entry": entries[0]}
             assert entries[0]["uuid"] == first["queued_message"]["id"]
-            assert client.sent_queries == ["继续"]
+            assert [_delivered_user_text(frame) for frame in client.sent_messages] == ["继续"]
         finally:
             await manager.close_session(SDK_ID)
 
@@ -619,7 +627,7 @@ class TestNewSessionEventLogFlow:
                 retry = await _send()
 
                 assert retry["queued_message"]["state"] == "queued"
-                assert client.sent_queries == ["继续"]
+                assert [_delivered_user_text(frame) for frame in client.sent_messages] == ["继续"]
             finally:
                 await manager.close_session(SDK_ID)
 
@@ -1101,7 +1109,7 @@ class TestQueuedMessages:
             assert queued["state"] == "queued"
             assert queued["content"] == [{"type": "text", "text": "加一段旁白"}]
             sent = client.sent_messages[-1]
-            assert sent["message"]["content"] == "加一段旁白"
+            assert _delivered_user_text(sent) == "加一段旁白"
             assert sent["uuid"] not in (None, client.sent_messages[0]["uuid"])
             assert (await stream.next("queue_upsert"))["message"] == queued
             assert service.session_manager.get_queued_messages_snapshot(SDK_ID) == [queued]
@@ -1633,7 +1641,7 @@ class TestUnsentQueuedMessages:
             assert result["queued_message"] == queued
             assert len(revived.sent_messages) == 1
             resent = revived.sent_messages[0]
-            assert resent["message"]["content"] == "加一段旁白"
+            assert _delivered_user_text(resent) == "加一段旁白"
             assert resent["uuid"] != client.sent_messages[-1]["uuid"]
             assert service.session_manager.get_queued_messages_snapshot(SDK_ID) == [queued]
             # Repeated clicks do not resend.
@@ -1660,7 +1668,7 @@ class TestUnsentQueuedMessages:
 
             assert service.session_manager.sessions[SDK_ID] is not stale
             # Send new messages only; unsent entries remain earlier in trays without automatic replay.
-            assert [sent["message"]["content"] for sent in revived.sent_messages] == ["换个结局"]
+            assert [_delivered_user_text(sent) for sent in revived.sent_messages] == ["换个结局"]
             assert service.session_manager.get_queued_messages_snapshot(SDK_ID) == [
                 {**unsent, "state": "unsent"},
                 result["queued_message"],
@@ -1696,7 +1704,7 @@ class TestUnsentQueuedMessages:
                 )
 
             assert len(connections) == 1
-            assert sorted(sent["message"]["content"] for sent in revived.sent_messages) == ["加一段旁白", "换个结局"]
+            assert sorted(_delivered_user_text(sent) for sent in revived.sent_messages) == ["加一段旁白", "换个结局"]
             assert second["queued_message"] == unsent
             assert {message["id"] for message in service.session_manager.get_queued_messages_snapshot(SDK_ID)} == {
                 unsent["id"],
@@ -1746,7 +1754,7 @@ class TestUnsentQueuedMessages:
             assert managed.actor_exited is False
             # Eviction still discards unsent messages.
             assert manager.get_queued_messages_snapshot(SDK_ID) == [result["queued_message"]]
-            assert [sent["message"]["content"] for sent in revived.sent_messages] == ["换个结局"]
+            assert [_delivered_user_text(sent) for sent in revived.sent_messages] == ["换个结局"]
         finally:
             await manager.close_session(SDK_ID)
 
@@ -1814,7 +1822,7 @@ class TestUnsentQueuedMessages:
             snapshot = service.session_manager.get_queued_messages_snapshot(SDK_ID)
             if action == "send_now":
                 assert outcome == "sent"
-                assert [message["message"]["content"] for message in revived.sent_messages] == [
+                assert [_delivered_user_text(message) for message in revived.sent_messages] == [
                     "换个结局",
                     "加一段旁白",
                 ]
@@ -1846,7 +1854,7 @@ class TestSendQueuedMessageNow:
             assert client.control_requests == [{"subtype": "cancel_async_message", "message_uuid": first_uuid}]
             resent = client.sent_messages[-1]
             assert resent["priority"] == "now"
-            assert resent["message"]["content"] == "先停下改结局"
+            assert _delivered_user_text(resent) == "先停下改结局"
             assert resent["uuid"] != first_uuid
             # Frontend retains the same tray message and idempotency-key target.
             assert service.session_manager.get_queued_messages_snapshot(SDK_ID) == [queued]
@@ -1931,7 +1939,7 @@ class TestSendQueuedMessageNow:
             # Redeliver discarded messages with new uuids/ordinary priority after prioritized ones, retaining the same tray entry.
             assert len(client.sent_messages) == 5
             requeued = client.sent_messages[4]
-            assert requeued["message"]["content"] == "顺便配乐"
+            assert _delivered_user_text(requeued) == "顺便配乐"
             assert requeued["uuid"] not in (dropped_uuid, now_uuid)
             assert "priority" not in requeued
             assert service.session_manager.get_queued_messages_snapshot(SDK_ID) == [dropped]

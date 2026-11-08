@@ -1,0 +1,38 @@
+........................................................................ [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /Users/pablo.carminatti.br/Projects/ArcReelBR/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+tests/unit/server/routers/test_grids_router.py::test_generate_grid_unexpected_error_no_leak
+  /Users/pablo.carminatti.br/.local/share/uv/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/contextlib.py:144: SAWarning: Skipped unsupported reflection of expression-based index idx_tasks_dedupe_active
+    next(self.gen)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 25 durations =============================
+1.93s setup    tests/unit/server/routers/test_grids_router.py::test_generate_grid_unexpected_error_no_leak
+0.08s call     tests/unit/server/routers/test_grids_router.py::test_restoring_an_uploaded_grid_version_preserves_its_manifest_claim
+0.07s call     tests/unit/server/routers/test_grids_router.py::test_upload_grid_image_rejects_invalid_image
+0.04s call     tests/unit/server/routers/test_grids_router.py::test_generate_grid_rejected_when_switch_off[_FakePMGridDisabled]
+0.04s call     tests/unit/server/routers/test_grids_router.py::test_upload_grid_image_normalizes_to_png_and_versions
+0.03s call     tests/unit/server/routers/test_grids_router.py::test_upload_grid_image_marks_stage_and_emit_as_webui
+0.03s call     tests/unit/server/routers/test_grids_router.py::test_generate_all_skips_a_ready_but_unsplit_composite
+0.03s call     tests/unit/server/routers/test_grids_router.py::test_generate_grid_resubmitted_while_in_flight_reuses_the_pending_grid
+0.03s call     tests/unit/server/routers/test_grids_router.py::test_upload_grid_image_recovers_record_left_pending_with_no_active_task
+0.03s call     tests/unit/server/routers/test_grids_router.py::test_upload_grid_image_does_not_downscale
+0.03s call     tests/unit/server/routers/test_grids_router.py::test_upload_grid_image_registration_failure_restores_file_version_and_record
+0.03s call     tests/unit/server/routers/test_grids_router.py::test_upload_grid_image_refreshes_frozen_aspect_ratio
+0.02s call     tests/unit/server/routers/test_grids_router.py::test_generate_grid_caps_at_9_without_4k[30]
+0.02s call     tests/unit/server/routers/test_grids_router.py::test_upload_grid_image_cancelled_while_staging_leaves_no_staged_file
+0.02s call     tests/unit/server/routers/test_grids_router.py::test_generate_grid_maps_each_grid_to_the_task_it_enqueued
+0.02s call     tests/unit/server/routers/test_grids_router.py::test_regenerate_replaces_an_orphan_with_an_active_task
+0.02s call     tests/unit/server/routers/test_grids_router.py::test_generate_grid_success
+0.02s call     tests/unit/server/routers/test_grids_router.py::test_generate_grid_refuses_a_batch_overlapping_another_in_flight_grid
+0.02s call     tests/unit/server/routers/test_grids_router.py::test_generate_grid_rejects_an_unknown_scene_without_enqueueing
+0.02s call     tests/unit/server/routers/test_grids_router.py::test_generate_grid_success_message_localized_en
+0.02s call     tests/unit/server/routers/test_grids_router.py::test_generate_grid_blocks_the_whole_batch_on_a_pending_prompt
+0.02s call     tests/unit/server/routers/test_grids_router.py::test_generate_grid_5_and_6_scenes_use_grid_9[5]
+0.02s call     tests/unit/server/routers/test_grids_router.py::test_split_grid_success
+0.02s call     tests/unit/server/routers/test_grids_router.py::test_generate_grid_blocks_the_whole_batch_on_an_unregistered_reference
+0.01s call     tests/unit/server/routers/test_grids_router.py::test_generate_grid_blocks_a_character_without_an_asset_sheet
+72 passed, 2 warnings in 3.62s

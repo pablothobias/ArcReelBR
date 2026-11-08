@@ -30,7 +30,7 @@ def get_locale(request: Request) -> str:
     # Simple parser for Accept-Language header
     # e.g., "en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7"
     for lang_range in accept_lang.split(","):
-        lang = lang_range.split(";")[0].split("-")[0].strip().lower()
+        lang = lang_range.split(";")[0].strip().lower().replace("_", "-").split("-")[0]
         if lang in SUPPORTED_LOCALES:
             return lang
 
@@ -59,7 +59,7 @@ def _builtin_display_names(locale: str) -> DisplayNames:
 
     The catalog only determines provider/model names in copy; loading failure must not alter the response itself.
     """
-    logger.warning("显示名目录加载失败，使用内置名称", exc_info=True)
+    logger.warning("Display-name catalog unavailable; using built-in names", exc_info=True)
     return build_display_names(locale, custom_providers={}, custom_models={})
 
 

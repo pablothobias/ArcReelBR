@@ -1,0 +1,50 @@
+................................................F....................... [ 98%]
+.                                                                        [100%]
+=================================== FAILURES ===================================
+___________________ TestTasksRouter.test_get_task_not_found ____________________
+tests/unit/server/routers/test_tasks_router.py:36: in test_get_task_not_found
+    assert "不存在" in resp.json()["detail"]
+E   assert '不存在' in "Task 'missing-task' does not exist"
+----------------------------- Captured stderr call -----------------------------
+2026-11-07 19:50:10 [INFO] httpx: HTTP Request: GET http://testserver/api/v1/tasks/missing-task "HTTP/1.1 404 Not Found"
+------------------------------ Captured log call -------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: GET http://testserver/api/v1/tasks/missing-task "HTTP/1.1 404 Not Found"
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /Users/pablo.carminatti.br/Projects/ArcReelBR/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+tests/unit/server/routers/test_asset_router_factory.py::TestAssetRouterFactory::test_character_post_passes_extra_voice_style
+  /Users/pablo.carminatti.br/.local/share/uv/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/contextlib.py:144: SAWarning: Skipped unsupported reflection of expression-based index idx_tasks_dedupe_active
+    next(self.gen)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 25 durations =============================
+1.50s setup    tests/unit/server/routers/test_asset_router_factory.py::TestAssetRouterFactory::test_character_post_passes_extra_voice_style
+0.54s call     tests/unit/server/routers/test_generate_router_voice_sample.py::TestConfirmCharacterVoiceSample::test_confirm_waits_for_video_selection_before_replacing_reference_audio
+0.04s call     tests/unit/server/routers/test_asset_router_factory.py::TestAssetRouterFactory::test_character_post_rejects_dismissed_at
+0.02s call     tests/unit/server/routers/test_generate_router_voice_sample.py::TestConfirmCharacterVoiceSample::test_confirm_invalid_character_name_400_not_500
+0.02s call     tests/unit/server/routers/test_tasks_router.py::TestTaskResourceRefs::test_list_and_cancel_preview_carry_the_episode_title_and_position
+0.02s call     tests/unit/server/routers/test_generate_router_voice_sample.py::TestConfirmCharacterVoiceSample::test_confirm_task_for_different_character_404
+0.02s call     tests/unit/server/routers/test_generate_router_voice_sample.py::TestConfirmCharacterVoiceSample::test_confirm_unknown_task_404
+0.02s call     tests/unit/server/routers/test_tasks_router.py::TestTaskErrorLocalization::test_render_problems_are_localized_without_changing_the_stored_envelope
+0.01s call     tests/unit/server/routers/test_generate_router_voice_sample.py::TestGenerateCharacterVoiceSample::test_invalid_character_name_400_not_500
+0.01s call     tests/unit/server/routers/test_tasks_router.py::TestTaskErrorLocalization::test_episode_planning_failure_is_localized_without_the_diagnostic_detail
+0.01s call     tests/unit/server/routers/test_asset_router_factory.py::TestAssetRouterFactory::test_character_post_passes_extra_voice_style
+0.01s call     tests/unit/server/routers/test_generate_router_voice_sample.py::TestConfirmCharacterVoiceSample::test_confirm_not_succeeded_400
+0.01s call     tests/unit/server/routers/test_tasks_router.py::TestRetryArtifactDownload::test_unavailable_worker_does_not_transition_task
+0.01s call     tests/unit/server/routers/test_generate_router_voice_sample.py::TestGenerateCharacterVoiceSample::test_empty_voice_rejected
+0.01s call     tests/unit/server/routers/test_tasks_router.py::TestTaskErrorLocalization::test_video_warnings_use_the_selected_providers_model_name
+0.01s call     tests/unit/server/routers/test_tasks_router.py::TestTaskErrorLocalization::test_text_task_video_model_failure_is_localized_with_the_server_text_as_detail
+0.01s call     tests/unit/server/routers/test_generate_router_voice_sample.py::TestConfirmCharacterVoiceSample::test_confirm_replaces_stale_reference_audio_with_different_extension
+0.01s call     tests/unit/server/routers/test_generate_router_voice_sample.py::TestGenerateCharacterVoiceSample::test_overlong_text_rejected
+0.01s call     tests/unit/server/routers/test_tasks_router.py::TestTaskErrorLocalization::test_edit_timeline_problems_in_render_tasks_use_the_same_keys_as_http
+0.01s call     tests/unit/server/routers/test_asset_router_factory.py::TestAssetRouterFactory::test_character_patch_rejects_non_string_value
+0.01s call     tests/unit/server/routers/test_tasks_router.py::TestTaskErrorLocalization::test_failure_of_a_deleted_provider_names_it_generically
+0.01s call     tests/unit/server/routers/test_asset_router_factory.py::TestAssetRouterFactory::test_character_post_with_reference_audio_stamps_voice_updated_at
+0.01s call     tests/unit/server/routers/test_asset_router_factory.py::TestAssetRouterFactory::test_character_patch_normalizes_aliases
+0.01s call     tests/unit/server/routers/test_tasks_router.py::TestTaskErrorLocalization::test_list_tasks_renders_known_code_per_locale
+0.01s call     tests/unit/server/routers/test_asset_router_factory.py::TestAssetRouterNoLeak::test_delete_unexpected_error_no_leak
+=========================== short test summary info ============================
+FAILED tests/unit/server/routers/test_tasks_router.py::TestTasksRouter::test_get_task_not_found
+1 failed, 72 passed, 2 warnings in 3.48s

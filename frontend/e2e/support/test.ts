@@ -20,11 +20,20 @@ function isLoopback(url: URL) {
   return url.hostname === "127.0.0.1" || url.hostname === "localhost";
 }
 
-export const test = base.extend<{ api: ApiStub }>({
+export const test = base.extend<{ api: ApiStub; savedLanguage: string | null }>({
+  savedLanguage: ['zh', { option: true }],
   api: [
-    async ({ page }, use) => {
+    async ({ page, savedLanguage }, use) => {
       const overrides = new Map<string, Pick<RecordedResponse, "status" | "body">>();
       const unrecorded: string[] = [];
+
+      // Existing scenarios exercise Chinese copy through a saved preference,
+      // while language-policy cases opt out to exercise unconfigured clients.
+      if (savedLanguage) {
+        await page.addInitScript((language) => {
+          if (!localStorage.getItem('i18nextLng')) localStorage.setItem('i18nextLng', language);
+        }, savedLanguage);
+      }
 
       await page.clock.setFixedTime(new Date(FIXED_NOW));
       // External resources such as online fonts are outside assertions; block them to avoid network variability.

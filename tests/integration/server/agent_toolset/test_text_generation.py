@@ -356,8 +356,8 @@ async def test_generate_episode_script_without_formal_script_is_refused(fake_ctx
     _prepare_script_admission(fake_ctx.project_path)
     out = await run_declared_tool("generate_episode_script", fake_ctx, {"episode_id": 1})
     assert out.problem is not None
-    assert "尚无正式脚本" in said(out)
-    assert "内容确认" in said(out)
+    assert "has no formal script" in said(out)
+    assert "confirm a script plan" in said(out)
 
 
 async def test_generate_episode_script_writes_to_default_project_scripts(fake_ctx: ToolHarness, monkeypatch) -> None:
@@ -506,7 +506,7 @@ async def test_generate_episode_script_rewrite_over_existing_prompts_returns_the
 
 @pytest.mark.parametrize(
     ("content_mode", "redo_hint"),
-    [("narration", "重跑脚本规划"), ("ad", "regenerate=true")],
+    [("narration", "Rerun script planning"), ("ad", "regenerate=true")],
 )
 async def test_generate_episode_script_without_pending_entries_says_how_to_rewrite(
     fake_ctx: ToolHarness, monkeypatch, content_mode: str, redo_hint: str
@@ -540,7 +540,7 @@ async def test_generate_episode_script_without_pending_entries_says_how_to_rewri
     assert problem.code == "operation_not_admitted"
     assert problem.params == {"operation": "author_prompts", "reason": "no_pending_authoring"}
     message = said(out)
-    assert "没有待编写的条目" in message
+    assert "has no pending entries" in message
     assert "entry_ids" in message
     assert redo_hint in message
 
@@ -634,8 +634,8 @@ async def test_generate_episode_script_unknown_entry_id_is_refused_not_internal(
 
     assert out.problem is not None
     text = said(out)
-    assert "编写范围无效" in text
-    assert "generate_episode_script 失败" not in text
+    assert "Invalid authoring scope" in text
+    assert "generate_episode_script failed" not in text
 
 
 def _narration_formal_script(project_path: Path) -> None:
@@ -707,7 +707,7 @@ async def test_generate_episode_script_unit_rejected_before_the_model_is_an_inpu
         "duration_seconds": 4,
     }
     assert float(problem["params"]["spoken_seconds"]) > 4
-    assert "generate_episode_script 失败" not in said(out)
+    assert "generate_episode_script failed" not in said(out)
     assert model.requests == []
 
 
@@ -731,7 +731,7 @@ async def test_generate_episode_script_without_anything_to_write_marks_the_resul
     assert out.value.no_pending_authoring is True
     assert script_path.read_bytes() == original
     assert model.requests == []
-    assert "没有待编写的条目" in out.value.message
+    assert "has no pending entries to author" in out.value.message
 
 
 async def test_generate_episode_script_facts_failure_reports_the_real_problem(
@@ -777,7 +777,7 @@ async def test_generate_episode_script_rejects_removed_scope_with_migration_note
     out = await run_declared_tool("generate_episode_script", fake_ctx, {"episode_id": 1, "scope": scope})
     assert problem_of(out).code == "invalid_request"
     text = said(out)
-    assert "scope 参数已取消" in text
+    assert "The scope argument has been removed" in text
     assert "entry_ids" in text
 
 
@@ -840,7 +840,7 @@ def test_parse_normalized_content_uses_dynamic_duration_schema() -> None:
 
     bad = {**base_scene, "duration_seconds": 5}  # 5 is outside supported_durations.
     # Off-enum dynamic schema raises ValueError, never persisting unvalidated formal script_plan.
-    with pytest.raises(ValueError, match="script_plan 规范化内容结构校验失败"):
+    with pytest.raises(ValueError, match="normalized script_plan content structure validation failed"):
         _parse_normalized_content(json.dumps({"title": "t", "scenes": [bad]}), model)
 
 
@@ -1334,7 +1334,7 @@ async def test_normalize_drama_script_rejects_an_empty_explicit_source(fake_ctx:
     out = await run_declared_tool("generate_script_plan", fake_ctx, {"episode_id": 1, "source": "", "dry_run": True})
 
     assert out.problem is not None
-    assert "源文件路径不能为空" in problem_of(out).detail
+    assert "The source file path must not be empty" in problem_of(out).detail
 
 
 async def test_normalize_drama_script_treats_a_default_source_symlink_escape_as_no_episode_source(

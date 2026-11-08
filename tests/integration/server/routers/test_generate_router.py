@@ -254,7 +254,7 @@ class TestGenerateRouter:
                 json={"script_file": "episode_1.json", "prompt": "请求体里带的提示词不算数"},
             )
             assert response.status_code == 409
-            assert "未命名集 · S02" in str(response.json()["detail"])
+            assert "Untitled episode · S02" in str(response.json()["detail"])
             assert fake_queue.calls == []
 
     def test_video_refuses_a_pending_video_prompt_before_enqueue(self, tmp_path, monkeypatch):
@@ -270,7 +270,7 @@ class TestGenerateRouter:
                 json={"script_file": "episode_1.json", "duration_seconds": 5, "prompt": "跑"},
             )
             assert response.status_code == 409
-            assert "未命名集 · S01" in str(response.json()["detail"])
+            assert "Untitled episode · S01" in str(response.json()["detail"])
             assert fake_queue.calls == []
 
     def test_video_enqueue_success(self, tmp_path, monkeypatch):
@@ -545,7 +545,7 @@ class TestGenerateRouter:
         assert res.status_code == 400
         assert res.json()["detail"] == i18n_message(
             "video_capability_missing_i2v",
-            **make_display_names().apply({"provider": "dashscope", "model": "happyhorse-1.0-r2v"}),
+            **make_display_names("en").apply({"provider": "dashscope", "model": "happyhorse-1.0-r2v"}),
         )
         assert fake_queue.calls == []
 
@@ -582,7 +582,7 @@ class TestGenerateRouter:
         assert res.status_code == 400
         assert res.json()["detail"] == i18n_message(
             "video_audio_switch_not_supported",
-            **make_display_names().apply({"provider": "dashscope", "model": "wan2.7-i2v"}),
+            **make_display_names("en").apply({"provider": "dashscope", "model": "wan2.7-i2v"}),
         )
         assert fake_queue.calls == []
 
@@ -622,7 +622,9 @@ class TestGenerateRouter:
                 json={"script_file": "episode_1.json", "prompt": "x"},
             )
             assert video.status_code == 400, video.text
-            assert video.json()["detail"] == i18n_message("generate_storyboard_first", segment_id="未命名集 · S01")
+            assert video.json()["detail"] == i18n_message(
+                "generate_storyboard_first", segment_id="Untitled episode · S01"
+            )
             assert fake_queue.calls == []
 
     def test_video_does_not_infer_storyboard_from_same_name_file(self, tmp_path, monkeypatch):
@@ -639,7 +641,7 @@ class TestGenerateRouter:
             )
 
         assert video.status_code == 400, video.text
-        assert video.json()["detail"] == i18n_message("generate_storyboard_first", segment_id="未命名集 · S01")
+        assert video.json()["detail"] == i18n_message("generate_storyboard_first", segment_id="Untitled episode · S01")
         assert fake_queue.calls == []
 
     def test_storyboard_rejects_an_unbound_script_before_enqueue(self, tmp_path, monkeypatch):
@@ -656,7 +658,7 @@ class TestGenerateRouter:
             )
 
         assert response.status_code == 400, response.text
-        assert response.json()["detail"] == i18n_message("invalid_script_file", name="「未命名集」的剧本")
+        assert response.json()["detail"] == i18n_message("invalid_script_file", name="Script for “Untitled episode”")
         assert fake_queue.calls == []
 
     def test_video_reports_an_unbound_script_before_storyboard_validation(self, tmp_path, monkeypatch):
@@ -673,7 +675,7 @@ class TestGenerateRouter:
             )
 
         assert response.status_code == 400, response.text
-        assert response.json()["detail"] == i18n_message("invalid_script_file", name="「未命名集」的剧本")
+        assert response.json()["detail"] == i18n_message("invalid_script_file", name="Script for “Untitled episode”")
         assert fake_queue.calls == []
 
     def test_video_rejects_an_explicit_but_unregistered_storyboard(self, tmp_path, monkeypatch):
@@ -690,7 +692,9 @@ class TestGenerateRouter:
             )
 
         assert response.status_code == 400
-        assert response.json()["detail"] == i18n_message("generate_storyboard_first", segment_id="未命名集 · S01")
+        assert response.json()["detail"] == i18n_message(
+            "generate_storyboard_first", segment_id="Untitled episode · S01"
+        )
         assert fake_queue.calls == []
 
     def test_video_invalid_end_frame_has_its_own_error_message(self, tmp_path, monkeypatch):
@@ -708,7 +712,9 @@ class TestGenerateRouter:
             )
 
         assert response.status_code == 400
-        assert response.json()["detail"] == i18n_message("invalid_end_frame_image_path", segment_id="未命名集 · S01")
+        assert response.json()["detail"] == i18n_message(
+            "invalid_end_frame_image_path", segment_id="Untitled episode · S01"
+        )
         assert fake_queue.calls == []
 
     def test_video_storyboard_image_non_string_returns_400(self, tmp_path, monkeypatch):
@@ -726,7 +732,9 @@ class TestGenerateRouter:
                 json={"script_file": "episode_1.json", "prompt": "x"},
             )
             assert video.status_code == 400, video.text
-            assert video.json()["detail"] == i18n_message("invalid_storyboard_image_path", segment_id="未命名集 · S01")
+            assert video.json()["detail"] == i18n_message(
+                "invalid_storyboard_image_path", segment_id="Untitled episode · S01"
+            )
             assert fake_queue.calls == []
 
     def test_video_storyboard_image_absolute_path_returns_400(self, tmp_path, monkeypatch):
@@ -743,7 +751,9 @@ class TestGenerateRouter:
                 json={"script_file": "episode_1.json", "prompt": "x"},
             )
             assert video.status_code == 400, video.text
-            assert video.json()["detail"] == i18n_message("invalid_storyboard_image_path", segment_id="未命名集 · S01")
+            assert video.json()["detail"] == i18n_message(
+                "invalid_storyboard_image_path", segment_id="Untitled episode · S01"
+            )
             assert fake_queue.calls == []
 
     def test_video_storyboard_image_path_traversal_returns_400(self, tmp_path, monkeypatch):
@@ -760,7 +770,9 @@ class TestGenerateRouter:
                 json={"script_file": "episode_1.json", "prompt": "x"},
             )
             assert video.status_code == 400, video.text
-            assert video.json()["detail"] == i18n_message("invalid_storyboard_image_path", segment_id="未命名集 · S01")
+            assert video.json()["detail"] == i18n_message(
+                "invalid_storyboard_image_path", segment_id="Untitled episode · S01"
+            )
             assert fake_queue.calls == []
 
     def test_video_dirty_script_fail_fast_400(self, tmp_path, monkeypatch):

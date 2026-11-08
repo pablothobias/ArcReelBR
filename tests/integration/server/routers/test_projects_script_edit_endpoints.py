@@ -269,7 +269,7 @@ class TestProjectsRouter:
             assert resp.status_code == 422
             body = resp.json()
             # Summaries use product languages; raw exceptions stay in separate diagnostics.
-            assert body["detail"] == "脚本结构校验失败，请检查后重试"
+            assert body["detail"] == "Script structure validation failed; please check and retry"
             assert "不一致" in body["diagnostic"]
 
     def test_update_scene_supports_character_and_clue_refs(self, tmp_path, monkeypatch):
@@ -310,12 +310,12 @@ class TestProjectsRouter:
 
             gen_overview_bad = client.post("/api/v1/projects/bad/generate-overview")
             assert gen_overview_bad.status_code == 400
-            assert "源目录为空" in gen_overview_bad.json()["detail"]
+            assert "Source directory is empty" in gen_overview_bad.json()["detail"]
 
             # Unconfigured providers differ from empty source directories, each with separate i18n keys.
             gen_overview_no_provider = client.post("/api/v1/projects/no-provider/generate-overview")
             assert gen_overview_no_provider.status_code == 400
-            assert "配置文本供应商" in gen_overview_no_provider.json()["detail"]
+            assert "configure a text provider" in gen_overview_no_provider.json()["detail"]
 
             update_overview = client.patch(
                 "/api/v1/projects/ready/overview",

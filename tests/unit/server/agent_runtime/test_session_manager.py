@@ -189,9 +189,7 @@ class TestSessionManager:
 
     @pytest.mark.asyncio
     async def test_get_or_connect_threads_locale_into_system_prompt(self, session_manager, meta_store, monkeypatch):
-        """Revival renders the language regulation from the caller's locale instead
-        of the default zh, and pins the system prompt as a session snapshot: a
-        resumed session keeps its first-turn prompt, a fresh one records this."""
+        """Revival rebuilds language instructions without restoring a historical prompt snapshot."""
 
         (session_manager.layout.projects_dir / "demo").mkdir(parents=True)
         meta = await meta_store.create("demo", "sdk-locale-vi")
@@ -203,7 +201,7 @@ class TestSessionManager:
             system_prompt = created_clients[0].options.kwargs["system_prompt"]
             assert "Tiếng Việt" in system_prompt["append"]
             assert "中文" not in system_prompt["append"]
-            assert system_prompt["snapshot"] is True
+            assert system_prompt["snapshot"] is False
             await session_manager.close_session(meta.id)
 
     @pytest.mark.asyncio

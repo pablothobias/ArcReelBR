@@ -130,8 +130,8 @@ class TestAudioBackendVoices:
         assert body["configured"] is True
         assert body["provider_id"] == "dashscope"
         assert body["model"] == "qwen3-tts-flash"
-        # Missing Accept-Language renders DEFAULT_LOCALE (zh).
-        assert body["voices"] == [{"id": "Cherry", "label": "芊悦 · 阳光正向的自然年轻女声"}]
+        # Missing Accept-Language renders DEFAULT_LOCALE (en).
+        assert body["voices"] == [{"id": "Cherry", "label": "Cherry — Warm, upbeat natural young female voice"}]
 
     def test_configured_localizes_label_by_accept_language(self, tmp_path, monkeypatch):
         # DashScope labels are translation keys; failing request-locale rendering is the guarded regression:

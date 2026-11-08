@@ -1158,7 +1158,7 @@ class TestComfyuiEndpoints:
 
         assert resp.status_code == 400
         # Use failure codes' own trilingual explanations, never separate wording.
-        assert "无法改图" in resp.json()["detail"]
+        assert "cannot be rewired for fewer images" in resp.json()["detail"]
 
     def test_a_trial_run_reports_the_prompt_id_stages_and_artifact(
         self, client: TestClient, trial_runs: TrialRunManager
@@ -1415,7 +1415,7 @@ class TestComfyuiEndpoints:
         fetched = client.get(f"/api/v1/custom-endpoints/trial-runs/{run_id}").json()
         assert fetched["status"] == "failed"
         assert fetched["error_code"] == "image_capability_missing_t2i"
-        assert "不支持文生图" in fetched["error"]
+        assert "does not support text-to-image" in fetched["error"]
         # Block before submission: not one byte reaches ComfyUI.
         assert router.calls.call_count == 0
 

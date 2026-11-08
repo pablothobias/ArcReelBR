@@ -25,7 +25,7 @@ Architecture overview, adding providers, and extending workflow stages: `website
 
 ## Maintenance language
 
-Scope and compatibility rules: [ADR 0121](docs/adr/0121-english-maintenance-language-preserves-localization-and-contracts.md).
+Scope and compatibility rules: [ADR 0121](docs/adr/0121-english-maintenance-language-preserves-localization-and-contracts.md). Product language defaults and future-turn conversation policy: [ADR 0122](docs/adr/0122-english-product-defaults-preserve-project-language.md), which narrowly supersedes ADR 0121 while preserving project/content language and history.
 
 Write repository-owned maintenance sources, development instructions, comments and built-in Agent instruction prose in English. Preserve functional literals, historical compatibility syntax, localized resources and user content. This does not override explicit output-language requirements in existing workflows or change supported languages. Public documentation retains its existing Chinese-source-to-English translation workflow.
 

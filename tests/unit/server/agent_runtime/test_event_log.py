@@ -978,6 +978,26 @@ class _FakeAdapter:
 
 
 class TestLazyBackfill:
+    async def test_backfill_hides_only_uuid_bound_application_context(self, log_store: EventLogStore):
+        from server.agent_runtime.conversation_language import conversation_language_block
+        from server.agent_runtime.session_manager import _user_message_frame
+
+        quoted = conversation_language_block("ru", "quoted-other-message")
+        original = [quoted, {"type": "text", "text": "保留原文"}]
+        frame = _user_message_frame(original, "delivery-one", locale="en")
+        adapter = _FakeAdapter(
+            [
+                {"type": "user", "uuid": frame["uuid"], "content": frame["message"]["content"]},
+                {"type": "user", "uuid": "literal-user", "content": [quoted]},
+            ]
+        )
+        service = EventLogService(log_store, adapter)
+        await service.ensure_backfilled("new-branch", None)
+        entries = await service.list_entries("new-branch", None)
+        assert entries[0]["content"] == original
+        assert entries[1]["content"] == [quoted]
+        assert [e["uuid"] for e in entries] == ["delivery-one", "literal-user"]
+
     async def test_backfills_from_transcript_once(self, log_store: EventLogStore):
         adapter = _FakeAdapter(
             [

@@ -3,9 +3,8 @@ import { afterEach, vi } from "vitest";
 import { cleanup } from "@testing-library/react";
 
 // i18n uses lazy backends; await resource loading before tests or initial t() returns keys rather than
-// Chinese, failing assertions. LanguageDetector reads localStorage at init: prewrite zh to load only Chinese
-// namespaces; otherwise jsdom navigator.language loads en-US/en before switching back to zh.
-// This setup runs per test file; loading those two extra resource sets is pure overhead.
+// Chinese, failing assertions. Seed the existing Chinese preference used by component fixtures;
+// product startup without a saved preference defaults to English.
 window.localStorage.setItem("i18nextLng", "zh");
 const { i18nReady } = await import("@/i18n");
 await i18nReady;

@@ -223,7 +223,7 @@ async def test_generate_videos_refuses_a_narration_delivery_without_enqueuing(
     assert out.problem is not None
     assert out.problem.code == "invalid_request"
     assert "narration_delivery" in out.problem.detail
-    assert "项目配置" in out.problem.detail
+    assert "project configuration" in out.problem.detail
     enqueue.assert_not_awaited()
     assert (await fake_ctx.queue.list_tasks(project_name="demo"))["items"] == []
 
@@ -239,7 +239,7 @@ async def test_generate_videos_refuses_a_retired_param_with_its_replacement(
     assert out.problem is not None
     assert out.problem.code == "invalid_request"
     assert retired_param in out.problem.detail
-    assert "已不存在" in out.problem.detail
+    assert "no longer supported" in out.problem.detail
     if retired_param in {"shot_ids", "unit_id", "unit_ids"}:
         assert "target.ids" in out.problem.detail
 
@@ -252,7 +252,7 @@ async def test_generate_videos_refuses_an_episode_target_that_is_not_the_scripts
     out = await run_generate_videos(fake_ctx, {"scope": "episode", "episode_id": 2}, batch_waiter=enqueue)
 
     assert out.problem is not None
-    assert "不一致" in out.problem.detail
+    assert "does not match" in out.problem.detail
     enqueue.assert_not_awaited()
 
 
@@ -739,7 +739,7 @@ async def test_generate_videos_episode_scope_reference_rejects_malformed_unit_co
         out = await run_generate_videos(fake_ctx, _EPISODE_1)
 
         assert out.problem is not None
-        assert "video_units 必须是数组" in out.problem.detail
+        assert "must be an array" in out.problem.detail
 
 
 async def test_generate_videos_episode_scope_reference_duration_needs_confirmation(
@@ -774,7 +774,7 @@ async def test_generate_videos_episode_scope_reference_duration_needs_confirmati
     assert item.problem.code == "reference_duration_confirmation_required"
     assert item.problem.action == "confirm_request_duration"
     # Summaries compare script-planned durations and state whether final videos get longer or shorter.
-    assert "E1U1：剧本时长 5s，将申请 8s（成片更长 3s）" in _text(out)
+    assert "E1U1: script duration 5s, requesting 8s (output longer by 3s)" in _text(out)
 
 
 async def test_generate_videos_episode_scope_reference_duration_confirm_enqueues(
@@ -1923,5 +1923,5 @@ async def test_generate_videos_preview_states_plainly_that_a_unit_is_unpriced(
     assert unit["estimated_cost"]["unpriced_reason"] == "no_entry"
     assert quote["unpriced_count"] == 1
     assert quote["estimated_total"] is None
-    assert "未定价" in out.value["summary"]
-    assert "费用未知" in out.value["summary"]
+    assert "Unpriced" in out.value["summary"]
+    assert "cost is unknown" in out.value["summary"]

@@ -1,0 +1,145 @@
+.................................FF.FF                                   [100%]
+=================================== FAILURES ===================================
+______ test_split_reference_video_units_surfaces_tolerated_voice_warnings ______
+tests/integration/server/agent_toolset/test_split_reference_video_units.py:555: in test_split_reference_video_units_surfaces_tolerated_voice_warnings
+    assert "未设置参考音频" in text
+E   AssertionError: assert '未设置参考音频' in '✅ Video units split and saved (structured script_plan): drafts/episode_1/script_plan_reference_units.json\n📊 Generati...s the dialogue voice\n- unit E1U2：This unit references no scene; the model decides the location of the shot on its own'
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:52:20 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+----------------------------- Captured stderr call -----------------------------
+2026-11-07 19:52:20 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-aa9f56927f)
+2026-11-07 19:52:20 [INFO] lib.generation.generation_queue: 任务入队 task_id=921202ef8f2f43c9a402244a3d4677e3 type=text_reference_script_plan
+2026-11-07 19:52:20 [INFO] lib.generation.generation_worker: 开始处理任务 921202ef8f2f43c9a402244a3d4677e3 (type=text_reference_script_plan, provider=text)
+2026-11-07 19:52:20 [INFO] lib.generation.generation_queue: 任务成功 task_id=921202ef8f2f43c9a402244a3d4677e3
+2026-11-07 19:52:20 [INFO] lib.generation.generation_worker: 任务完成 921202ef8f2f43c9a402244a3d4677e3 (type=text_reference_script_plan, provider=text)
+------------------------------ Captured log call -------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-aa9f56927f)
+INFO     lib.generation.generation_queue:generation_queue.py:506 任务入队 task_id=921202ef8f2f43c9a402244a3d4677e3 type=text_reference_script_plan
+INFO     lib.generation.generation_worker:generation_worker.py:855 开始处理任务 921202ef8f2f43c9a402244a3d4677e3 (type=text_reference_script_plan, provider=text)
+INFO     lib.generation.generation_queue:generation_queue.py:704 任务成功 task_id=921202ef8f2f43c9a402244a3d4677e3
+INFO     lib.generation.generation_worker:generation_worker.py:931 任务完成 921202ef8f2f43c9a402244a3d4677e3 (type=text_reference_script_plan, provider=text)
+_____ test_split_reference_video_units_names_units_without_scene_reference _____
+tests/integration/server/agent_toolset/test_split_reference_video_units.py:575: in test_split_reference_video_units_names_units_without_scene_reference
+    assert "未引用场景" in text
+E   AssertionError: assert '未引用场景' in '✅ Video units split and saved (structured script_plan): drafts/episode_1/script_plan_reference_units.json\n📊 Generati...g; artifacts saved):\n- unit E1U3：This unit references no scene; the model decides the location of the shot on its own'
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:52:21 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+----------------------------- Captured stderr call -----------------------------
+2026-11-07 19:52:21 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-d1b2447f67)
+2026-11-07 19:52:21 [INFO] lib.generation.generation_queue: 任务入队 task_id=5ae94738b5254100ac2050937201fbff type=text_reference_script_plan
+2026-11-07 19:52:21 [INFO] lib.generation.generation_worker: 开始处理任务 5ae94738b5254100ac2050937201fbff (type=text_reference_script_plan, provider=text)
+2026-11-07 19:52:21 [INFO] lib.generation.generation_queue: 任务成功 task_id=5ae94738b5254100ac2050937201fbff
+2026-11-07 19:52:21 [INFO] lib.generation.generation_worker: 任务完成 5ae94738b5254100ac2050937201fbff (type=text_reference_script_plan, provider=text)
+------------------------------ Captured log call -------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-d1b2447f67)
+INFO     lib.generation.generation_queue:generation_queue.py:506 任务入队 task_id=5ae94738b5254100ac2050937201fbff type=text_reference_script_plan
+INFO     lib.generation.generation_worker:generation_worker.py:855 开始处理任务 5ae94738b5254100ac2050937201fbff (type=text_reference_script_plan, provider=text)
+INFO     lib.generation.generation_queue:generation_queue.py:704 任务成功 task_id=5ae94738b5254100ac2050937201fbff
+INFO     lib.generation.generation_worker:generation_worker.py:931 任务完成 5ae94738b5254100ac2050937201fbff (type=text_reference_script_plan, provider=text)
+_ test_split_reference_video_units_reports_soft_violations_alongside_the_violation_report _
+tests/integration/server/agent_toolset/test_split_reference_video_units.py:617: in test_split_reference_video_units_reports_soft_violations_alongside_the_violation_report
+    assert "未引用场景" in text
+E   AssertionError: assert '未引用场景' in '❌ script_plan splitting output has 1 violations and was saved as a draft for repair (formal file unchanged): drafts/e... is still present):\n- unit E1U02：This unit references no scene; the model decides the location of the shot on its own'
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:52:21 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+----------------------------- Captured stderr call -----------------------------
+2026-11-07 19:52:21 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-2612f5750a)
+2026-11-07 19:52:21 [INFO] lib.generation.generation_queue: 任务入队 task_id=b07df72f79ac414b9db7fde6290975f2 type=text_reference_script_plan
+2026-11-07 19:52:21 [INFO] lib.generation.generation_worker: 开始处理任务 b07df72f79ac414b9db7fde6290975f2 (type=text_reference_script_plan, provider=text)
+2026-11-07 19:52:21 [ERROR] lib.generation.generation_worker: 任务失败 b07df72f79ac414b9db7fde6290975f2 (type=text_reference_script_plan, provider=text)
+Traceback (most recent call last):
+  File "/Users/pablo.carminatti.br/Projects/ArcReelBR/lib/generation/generation_worker.py", line 861, in _run_claimed_task
+    result = await self._executor(task, claimed_provider_id=provider_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pablo.carminatti.br/Projects/ArcReelBR/server/services/tasks/generation_tasks.py", line 1918, in execute_generation_task
+    return await execute_queued_text_task(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pablo.carminatti.br/Projects/ArcReelBR/server/tool_runtime.py", line 3333, in execute_queued_text_task
+    raise RuntimeError(encode_generation_problem(_queued_generation_problem(outcome.problem)))
+RuntimeError: generation_problem:{"code":"generation_refused","detail":"❌ script_plan splitting output has 1 violations and was saved as a draft for repair (formal file unchanged): drafts/episode_1/script_plan_reference_units.invalid.json\n\n1. [unregistered_asset] unit E1U02 引用了未登记的资产名: ['不存在的人']；资产名必须逐字取自 project.json 三张表\n\nNext steps: call open_draft({\"episode_id\": 1, \"doc_type\": \"reference_script_plan\"}) to read the content and revision; fix content (repair the field paths listed in the report; unit-level fields are in content.units[i]), then submit with patch_draft using base_revision; if a violation concerns an unregistered asset name, you can instead register that asset in project.json or use an already registered name.\nAfter editing, call promote_draft({\"episode_id\": 1, \"doc_type\": \"reference_script_plan\", \"base_revision\": \"<revision returned by patch_draft>\"}) to rerun full validation and promote to the formal file; remaining violations return an updated report. Continue editing and promoting as needed, with no round limit.\n⚠️ Fallback notices (non-blocking; not violations, no rework needed for these notices; the draft is still present):\n- unit E1U02：This unit references no scene; the model decides the location of the shot on its own","action":"fix_input","params":{}}
+2026-11-07 19:52:21 [WARNING] lib.generation.generation_queue: 任务失败 task_id=b07df72f79ac414b9db7fde6290975f2 error=generation_problem:{"code":"generation_refused","detail":"❌ script_plan splitting output has 1 violations and was saved as a draft for repair (formal file unchanged): drafts/episode_1/script_plan_refe
+------------------------------ Captured log call -------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-2612f5750a)
+INFO     lib.generation.generation_queue:generation_queue.py:506 任务入队 task_id=b07df72f79ac414b9db7fde6290975f2 type=text_reference_script_plan
+INFO     lib.generation.generation_worker:generation_worker.py:855 开始处理任务 b07df72f79ac414b9db7fde6290975f2 (type=text_reference_script_plan, provider=text)
+ERROR    lib.generation.generation_worker:generation_worker.py:912 任务失败 b07df72f79ac414b9db7fde6290975f2 (type=text_reference_script_plan, provider=text)
+Traceback (most recent call last):
+  File "/Users/pablo.carminatti.br/Projects/ArcReelBR/lib/generation/generation_worker.py", line 861, in _run_claimed_task
+    result = await self._executor(task, claimed_provider_id=provider_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pablo.carminatti.br/Projects/ArcReelBR/server/services/tasks/generation_tasks.py", line 1918, in execute_generation_task
+    return await execute_queued_text_task(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pablo.carminatti.br/Projects/ArcReelBR/server/tool_runtime.py", line 3333, in execute_queued_text_task
+    raise RuntimeError(encode_generation_problem(_queued_generation_problem(outcome.problem)))
+RuntimeError: generation_problem:{"code":"generation_refused","detail":"❌ script_plan splitting output has 1 violations and was saved as a draft for repair (formal file unchanged): drafts/episode_1/script_plan_reference_units.invalid.json\n\n1. [unregistered_asset] unit E1U02 引用了未登记的资产名: ['不存在的人']；资产名必须逐字取自 project.json 三张表\n\nNext steps: call open_draft({\"episode_id\": 1, \"doc_type\": \"reference_script_plan\"}) to read the content and revision; fix content (repair the field paths listed in the report; unit-level fields are in content.units[i]), then submit with patch_draft using base_revision; if a violation concerns an unregistered asset name, you can instead register that asset in project.json or use an already registered name.\nAfter editing, call promote_draft({\"episode_id\": 1, \"doc_type\": \"reference_script_plan\", \"base_revision\": \"<revision returned by patch_draft>\"}) to rerun full validation and promote to the formal file; remaining violations return an updated report. Continue editing and promoting as needed, with no round limit.\n⚠️ Fallback notices (non-blocking; not violations, no rework needed for these notices; the draft is still present):\n- unit E1U02：This unit references no scene; the model decides the location of the shot on its own","action":"fix_input","params":{}}
+WARNING  lib.generation.generation_queue:generation_queue.py:714 任务失败 task_id=b07df72f79ac414b9db7fde6290975f2 error=generation_problem:{"code":"generation_refused","detail":"❌ script_plan splitting output has 1 violations and was saved as a draft for repair (formal file unchanged): drafts/episode_1/script_plan_refe
+__ test_split_reference_video_units_keeps_voice_warnings_on_per_image_backend __
+tests/integration/server/agent_toolset/test_split_reference_video_units.py:649: in test_split_reference_video_units_keeps_voice_warnings_on_per_image_backend
+    assert "参考音频最多 1 段" in said(out)
+E   assert '参考音频最多 1 段' in "✅ Video units split and saved (structured script_plan): drafts/episode_1/script_plan_reference_units.json\n📊 Generati...e for character '李四'\n- unit E1U2：This unit references no scene; the model decides the location of the shot on its own"
+E    +  where "✅ Video units split and saved (structured script_plan): drafts/episode_1/script_plan_reference_units.json\n📊 Generati...e for character '李四'\n- unit E1U2：This unit references no scene; the model decides the location of the shot on its own" = said(ToolOutcome(value=TextGenerationResult(message="✅ Video units split and saved (structured script_plan): drafts/episode...el decides the location of the shot on its own", warnings=[], new_assets=[], no_pending_authoring=False), problem=None))
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:52:21 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+----------------------------- Captured stderr call -----------------------------
+2026-11-07 19:52:21 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-ca4dfcaa74)
+2026-11-07 19:52:21 [INFO] lib.generation.generation_queue: 任务入队 task_id=4f8b8d0902cc42f2a99c0ab64a1ee2d9 type=text_reference_script_plan
+2026-11-07 19:52:21 [INFO] lib.generation.generation_worker: 开始处理任务 4f8b8d0902cc42f2a99c0ab64a1ee2d9 (type=text_reference_script_plan, provider=text)
+2026-11-07 19:52:21 [INFO] lib.generation.generation_queue: 任务成功 task_id=4f8b8d0902cc42f2a99c0ab64a1ee2d9
+2026-11-07 19:52:21 [INFO] lib.generation.generation_worker: 任务完成 4f8b8d0902cc42f2a99c0ab64a1ee2d9 (type=text_reference_script_plan, provider=text)
+------------------------------ Captured log call -------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-ca4dfcaa74)
+INFO     lib.generation.generation_queue:generation_queue.py:506 任务入队 task_id=4f8b8d0902cc42f2a99c0ab64a1ee2d9 type=text_reference_script_plan
+INFO     lib.generation.generation_worker:generation_worker.py:855 开始处理任务 4f8b8d0902cc42f2a99c0ab64a1ee2d9 (type=text_reference_script_plan, provider=text)
+INFO     lib.generation.generation_queue:generation_queue.py:704 任务成功 task_id=4f8b8d0902cc42f2a99c0ab64a1ee2d9
+INFO     lib.generation.generation_worker:generation_worker.py:931 任务完成 4f8b8d0902cc42f2a99c0ab64a1ee2d9 (type=text_reference_script_plan, provider=text)
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /Users/pablo.carminatti.br/Projects/ArcReelBR/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_fetch_reference_split_caps_returns_declared_slots
+  /Users/pablo.carminatti.br/.local/share/uv/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/contextlib.py:144: SAWarning: Skipped unsupported reflection of expression-based index idx_tasks_dedupe_active
+    next(self.gen)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 25 durations =============================
+1.28s setup    tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_fetch_reference_split_caps_returns_declared_slots
+0.08s setup    tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_counts_this_episodes_new_scenes_as_scene_references
+0.08s call     tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_rejects_braces_in_description
+0.08s call     tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_keeps_voice_warnings_on_per_image_backend
+0.08s call     tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_names_units_without_scene_reference
+0.07s call     tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_buckets_a_reference_without_usable_image_as_i2v[unclaimed]
+0.07s setup    tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_rejects_braces_in_description
+0.07s call     tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_surfaces_tolerated_voice_warnings
+0.07s call     tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_buckets_a_reference_without_usable_image_as_i2v[absent]
+0.07s call     tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_rejects_duration_off_reference_tier
+0.07s call     tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_accepts_wide_tier_without_references
+0.07s setup    tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_keeps_voice_warnings_on_per_image_backend
+0.06s call     tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_reports_soft_violations_alongside_the_violation_report
+0.06s setup    tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_no_source
+0.06s setup    tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_rejects_empty_units
+0.06s setup    tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_injects_instructions
+0.06s setup    tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_issues_unit_ids_after_the_highest_used_number
+0.06s setup    tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_rejects_unregistered_asset
+0.06s setup    tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_rejects_unregistered_speaker
+0.06s call     tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_issues_unit_ids_after_the_highest_used_number
+0.06s setup    tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_rejects_dialogue_overload
+0.06s setup    tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_rejects_duration_off_reference_tier
+0.06s call     tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_happy_derives_structure
+0.06s call     tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_counts_this_episodes_new_scenes_as_scene_references
+0.06s setup    tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_accepts_source_text_substring
+=========================== short test summary info ============================
+FAILED tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_surfaces_tolerated_voice_warnings
+FAILED tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_names_units_without_scene_reference
+FAILED tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_reports_soft_violations_alongside_the_violation_report
+FAILED tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_keeps_voice_warnings_on_per_image_backend
+4 failed, 34 passed, 2 warnings in 10.22s

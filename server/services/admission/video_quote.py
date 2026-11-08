@@ -135,43 +135,51 @@ class VideoQuoteSheet:
         }
 
     def summary(self, log: Sequence[str] = ()) -> str:
-        lines = [*log, "预检完成，未入队任何任务。", *(f"- {unit.unit_id}：{_unit_line(unit)}" for unit in self.units)]
+        lines = [
+            *log,
+            "Preflight complete; no tasks enqueued.",
+            *(f"- {unit.unit_id}：{_unit_line(unit)}" for unit in self.units),
+        ]
         total = self.estimated_total
         unpriced = self.unpriced_count
         if total is None:
-            lines.append(f"预计合计：{unpriced} 个单元未定价，无法给出合计，须如实告知用户费用未知。")
+            lines.append(
+                f"Estimated total: {unpriced} units are unpriced, so no total is available; tell the user clearly that the cost is unknown."
+            )
         else:
             if total:
                 amounts = "、".join(f"{amount:g} {currency}" for currency, amount in total.items())
-                lines.append(f"预计合计：{amounts}" + ("（仅含已定价的单元）" if unpriced else ""))
+                lines.append(f"Estimated total: {amounts}" + (" (priced units only)" if unpriced else ""))
             if unpriced:
-                lines.append(f"另有 {unpriced} 个单元未定价，上面的合计不含它们的费用，须如实告知用户。")
+                lines.append(
+                    f"Another {unpriced} units are unpriced; the total above excludes their costs. Tell the user clearly."
+                )
         if not self.submittable:
-            lines.append("有单元受阻：按各单元的 problems 修复后再预检或提交。")
+            lines.append("Some units are blocked: repair their problems, then preflight or submit again.")
         elif self.confirmed_request_durations:
             lines.append(
-                "档位有变化的单元经用户确认后，正式提交时带上 confirmed_request_durations="
-                f"{json.dumps(self.confirmed_request_durations, ensure_ascii=False)}，不会再要求确认档位。"
+                "After the user confirms the units with changed tiers, submit with confirmed_request_durations="
+                f"{json.dumps(self.confirmed_request_durations, ensure_ascii=False)}; tier confirmation will not be requested again."
             )
         return "\n".join(lines)
 
 
 def _unit_line(unit: VideoUnitQuote) -> str:
     if unit.outcome is VideoQuoteOutcome.REUSE:
-        return "已有可用视频，复用，不收费"
+        return "Usable video exists; reuse it without a new charge"
     if unit.outcome is VideoQuoteOutcome.BLOCKED:
-        return "受阻：" + "；".join(f"{problem.code}（{problem.detail}）" for problem in unit.problems)
-    request = f"{unit.request_duration_seconds}s" if unit.request_duration_seconds is not None else "档位待定"
-    script = f"{unit.script_duration_seconds}s" if unit.script_duration_seconds is not None else "未写"
-    tier = f"申请 {request}（编排 {script}，档位有变化）" if unit.tier_changed else f"申请 {request}"
+        return "Blocked: " + "; ".join(f"{problem.code} ({problem.detail})" for problem in unit.problems)
+    request = f"{unit.request_duration_seconds}s" if unit.request_duration_seconds is not None else "tier unresolved"
+    script = f"{unit.script_duration_seconds}s" if unit.script_duration_seconds is not None else "not specified"
+    tier = f"Request {request} (script {script}; tier changed)" if unit.tier_changed else f"Request {request}"
     cost = unit.cost
     if cost is None:
-        price = "未定价（无法为这次请求报价）"
+        price = "Unpriced (cannot quote this request)"
     elif cost.get("amount") is None:
-        price = f"未定价（原因：{cost.get('unpriced_reason')}）"
+        price = f"Unpriced (reason: {cost.get('unpriced_reason')})"
     else:
-        price = f"预计 {cost.get('amount')} {cost.get('currency')}"
-    return f"{tier}，{price}"
+        price = f"Estimated {cost.get('amount')} {cost.get('currency')}"
+    return f"{tier}, {price}"
 
 
 def _own_problems(ticket: UnitAdmissionTicket) -> tuple[GenerationProblem, ...]:

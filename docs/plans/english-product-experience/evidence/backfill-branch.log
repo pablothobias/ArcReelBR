@@ -1,0 +1,39 @@
+........................................................................ [ 61%]
+..............................................                           [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /Users/pablo.carminatti.br/Projects/ArcReelBR/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+tests/unit/server/agent_runtime/test_event_log.py::TestNormalize::test_assistant_message_becomes_single_entry_with_message_id
+  /Users/pablo.carminatti.br/.local/share/uv/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/contextlib.py:144: SAWarning: Skipped unsupported reflection of expression-based index idx_tasks_dedupe_active
+    next(self.gen)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 25 durations =============================
+18.58s setup    tests/unit/server/agent_runtime/test_event_log.py::TestNormalize::test_assistant_message_becomes_single_entry_with_message_id
+3.93s setup    tests/unit/server/agent_runtime/test_event_log.py::TestLazyBackfill::test_backfill_preserves_historical_assistant_error_as_assistant_message
+3.11s setup    tests/unit/server/agent_runtime/test_event_log.py::TestLazyBackfill::test_concurrent_first_access_backfills_once
+2.99s setup    tests/unit/server/agent_runtime/test_event_log.py::TestLazyBackfill::test_backfill_hides_only_uuid_bound_application_context
+2.86s setup    tests/unit/server/agent_runtime/test_event_log.py::TestEventLogStore::test_append_user_entry_idempotent_by_client_key
+2.59s setup    tests/unit/server/agent_runtime/test_event_log.py::TestEventLogStore::test_has_entries
+2.57s setup    tests/unit/server/agent_runtime/test_event_log.py::TestUserMessageLink::test_records_and_finds_mapping
+2.54s setup    tests/unit/server/agent_runtime/test_event_log.py::TestLazyBackfill::test_backfill_lock_not_leaked_when_transcript_empty
+2.44s setup    tests/unit/server/agent_runtime/test_event_log.py::TestEventLogStore::test_seq_isolated_per_session
+2.38s setup    tests/unit/server/agent_runtime/test_event_log.py::TestEventLogStore::test_append_retries_pk_conflict_even_without_literal_seq_in_message
+2.32s setup    tests/unit/server/agent_runtime/test_event_log.py::TestEventLogStore::test_last_entry
+2.31s setup    tests/unit/server/agent_runtime/test_event_log.py::TestEventLogStore::test_list_after_returns_only_later_entries
+2.29s call     tests/unit/server/agent_runtime/test_event_log.py::TestLazyBackfill::test_backfill_lock_not_leaked_when_transcript_empty
+2.26s setup    tests/unit/server/agent_runtime/test_event_log.py::TestEventLogStore::test_seq_is_monotonic_across_appends
+2.25s setup    tests/unit/server/agent_runtime/test_event_log.py::TestEventLogStore::test_find_new_session_by_client_key_scans_across_sessions
+2.22s setup    tests/unit/server/agent_runtime/test_event_log.py::TestEventLogStore::test_concurrent_appends_keep_seq_unique
+2.21s setup    tests/unit/server/agent_runtime/test_event_log.py::TestUserMessageLink::test_mapping_is_scoped_per_session
+2.14s setup    tests/unit/server/agent_runtime/test_event_log.py::TestEventLogStore::test_append_seq_race_retries_when_client_key_absent_despite_false_positive_violation_check
+2.09s setup    tests/unit/server/agent_runtime/test_event_log.py::TestLazyBackfill::test_cursor_filtering
+1.96s call     tests/unit/server/agent_runtime/test_event_log.py::TestEventLogStore::test_concurrent_appends_keep_seq_unique
+1.88s setup    tests/unit/server/agent_runtime/test_event_log.py::TestEventLogStore::test_append_raises_non_unique_integrity_error_without_retry
+1.85s setup    tests/unit/server/agent_runtime/test_event_log.py::TestUserMessageLink::test_repeat_record_keeps_first_mapping
+1.75s setup    tests/unit/server/agent_runtime/test_event_log.py::TestLazyBackfill::test_no_backfill_when_log_already_has_entries
+1.72s setup    tests/unit/server/agent_runtime/test_event_log.py::TestLazyBackfill::test_backfilled_session_works_without_mapping
+1.69s setup    tests/unit/server/agent_runtime/test_event_log.py::TestEventLogStore::test_append_retries_seq_race_with_localized_pg_error_via_sqlstate
+118 passed, 2 warnings in 115.39s (0:01:55)

@@ -1,0 +1,272 @@
+.....................................F.F.FFF.F...............F.......... [ 12%]
+................................................................F....... [ 24%]
+..................................................................F....F [ 36%]
+........................................................................ [ 49%]
+........................................................................ [ 61%]
+........................................................................ [ 73%]
+........................................................................ [ 86%]
+........................................................................ [ 98%]
+........                                                                 [100%]
+=================================== FAILURES ===================================
+____ test_generate_episode_script_unknown_entry_id_is_refused_not_internal _____
+tests/integration/server/agent_toolset/test_text_generation.py:637: in test_generate_episode_script_unknown_entry_id_is_refused_not_internal
+    assert "编写范围无效" in text
+E   assert '编写范围无效' in "❌ Invalid authoring scope: entry_ids 不在第 1 集正式脚本内: ['E9U99']"
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:58:53 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+----------------------------- Captured stderr call -----------------------------
+2026-11-07 19:58:53 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-2aed07c6e7)
+2026-11-07 19:58:53 [INFO] lib.generation.generation_queue: 任务入队 task_id=478d63f5ed5446c1a4d45ed088374fdc type=text_episode_script
+2026-11-07 19:58:53 [INFO] lib.generation.generation_worker: 开始处理任务 478d63f5ed5446c1a4d45ed088374fdc (type=text_episode_script, provider=text)
+2026-11-07 19:58:53 [ERROR] lib.generation.generation_worker: 任务失败 478d63f5ed5446c1a4d45ed088374fdc (type=text_episode_script, provider=text)
+Traceback (most recent call last):
+  File "/Users/pablo.carminatti.br/Projects/ArcReelBR/lib/generation/generation_worker.py", line 861, in _run_claimed_task
+    result = await self._executor(task, claimed_provider_id=provider_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pablo.carminatti.br/Projects/ArcReelBR/server/services/tasks/generation_tasks.py", line 1918, in execute_generation_task
+    return await execute_queued_text_task(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pablo.carminatti.br/Projects/ArcReelBR/server/tool_runtime.py", line 3335, in execute_queued_text_task
+    raise RuntimeError(encode_generation_problem(_queued_generation_problem(outcome.problem)))
+RuntimeError: generation_problem:{"code":"generation_refused","detail":"❌ Invalid authoring scope: entry_ids 不在第 1 集正式脚本内: ['E9U99']","action":"fix_input","params":{}}
+2026-11-07 19:58:53 [WARNING] lib.generation.generation_queue: 任务失败 task_id=478d63f5ed5446c1a4d45ed088374fdc error=generation_problem:{"code":"generation_refused","detail":"❌ Invalid authoring scope: entry_ids 不在第 1 集正式脚本内: ['E9U99']","action":"fix_input","params":{}}
+------------------------------ Captured log call -------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-2aed07c6e7)
+INFO     lib.generation.generation_queue:generation_queue.py:506 任务入队 task_id=478d63f5ed5446c1a4d45ed088374fdc type=text_episode_script
+INFO     lib.generation.generation_worker:generation_worker.py:855 开始处理任务 478d63f5ed5446c1a4d45ed088374fdc (type=text_episode_script, provider=text)
+ERROR    lib.generation.generation_worker:generation_worker.py:912 任务失败 478d63f5ed5446c1a4d45ed088374fdc (type=text_episode_script, provider=text)
+Traceback (most recent call last):
+  File "/Users/pablo.carminatti.br/Projects/ArcReelBR/lib/generation/generation_worker.py", line 861, in _run_claimed_task
+    result = await self._executor(task, claimed_provider_id=provider_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pablo.carminatti.br/Projects/ArcReelBR/server/services/tasks/generation_tasks.py", line 1918, in execute_generation_task
+    return await execute_queued_text_task(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pablo.carminatti.br/Projects/ArcReelBR/server/tool_runtime.py", line 3335, in execute_queued_text_task
+    raise RuntimeError(encode_generation_problem(_queued_generation_problem(outcome.problem)))
+RuntimeError: generation_problem:{"code":"generation_refused","detail":"❌ Invalid authoring scope: entry_ids 不在第 1 集正式脚本内: ['E9U99']","action":"fix_input","params":{}}
+WARNING  lib.generation.generation_queue:generation_queue.py:714 任务失败 task_id=478d63f5ed5446c1a4d45ed088374fdc error=generation_problem:{"code":"generation_refused","detail":"❌ Invalid authoring scope: entry_ids 不在第 1 集正式脚本内: ['E9U99']","action":"fix_input","params":{}}
+___ test_generate_episode_script_without_anything_to_write_marks_the_result ____
+tests/integration/server/agent_toolset/test_text_generation.py:734: in test_generate_episode_script_without_anything_to_write_marks_the_result
+    assert "没有待编写的条目" in out.value.message
+E   AssertionError: assert '没有待编写的条目' in '✅ 未命名集（第 1 个，id=1） has no pending entries to author. No text model was called and the formal script is unchanged: scr...ame entries with entry_ids and pass rewrite=true; to redo the entire episode, rerun script planning and confirm again.'
+E    +  where '✅ 未命名集（第 1 个，id=1） has no pending entries to author. No text model was called and the formal script is unchanged: scr...ame entries with entry_ids and pass rewrite=true; to redo the entire episode, rerun script planning and confirm again.' = TextGenerationResult(message='✅ 未命名集（第 1 个，id=1） has no pending entries to author. No text model was called and the fo...o the entire episode, rerun script planning and confirm again.', warnings=[], new_assets=[], no_pending_authoring=True).message
+E    +    where TextGenerationResult(message='✅ 未命名集（第 1 个，id=1） has no pending entries to author. No text model was called and the fo...o the entire episode, rerun script planning and confirm again.', warnings=[], new_assets=[], no_pending_authoring=True) = ToolOutcome(value=TextGenerationResult(message='✅ 未命名集（第 1 个，id=1） has no pending entries to author. No text model was...isode, rerun script planning and confirm again.', warnings=[], new_assets=[], no_pending_authoring=True), problem=None).value
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:58:54 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+----------------------------- Captured stderr call -----------------------------
+2026-11-07 19:58:54 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-ffef4b962a)
+2026-11-07 19:58:54 [INFO] lib.generation.generation_queue: 任务入队 task_id=cbb1ca93b273481abc26a441a6a039ea type=text_episode_script
+2026-11-07 19:58:54 [INFO] lib.generation.generation_worker: 开始处理任务 cbb1ca93b273481abc26a441a6a039ea (type=text_episode_script, provider=text)
+2026-11-07 19:58:54 [INFO] lib.script.script_generator: 第 1 集没有待编写条目，未调用文本模型
+2026-11-07 19:58:54 [INFO] lib.generation.generation_queue: 任务成功 task_id=cbb1ca93b273481abc26a441a6a039ea
+2026-11-07 19:58:54 [INFO] lib.generation.generation_worker: 任务完成 cbb1ca93b273481abc26a441a6a039ea (type=text_episode_script, provider=text)
+------------------------------ Captured log call -------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-ffef4b962a)
+INFO     lib.generation.generation_queue:generation_queue.py:506 任务入队 task_id=cbb1ca93b273481abc26a441a6a039ea type=text_episode_script
+INFO     lib.generation.generation_worker:generation_worker.py:855 开始处理任务 cbb1ca93b273481abc26a441a6a039ea (type=text_episode_script, provider=text)
+INFO     lib.script.script_generator:script_generator.py:583 第 1 集没有待编写条目，未调用文本模型
+INFO     lib.generation.generation_queue:generation_queue.py:704 任务成功 task_id=cbb1ca93b273481abc26a441a6a039ea
+INFO     lib.generation.generation_worker:generation_worker.py:931 任务完成 cbb1ca93b273481abc26a441a6a039ea (type=text_episode_script, provider=text)
+_ test_generate_episode_script_rejects_removed_scope_with_migration_note[all] __
+tests/integration/server/agent_toolset/test_text_generation.py:780: in test_generate_episode_script_rejects_removed_scope_with_migration_note
+    assert "scope 参数已取消" in text
+E   AssertionError: assert 'scope 参数已取消' in '<root>: Value error, The scope argument has been removed: generate_episode_script defaults to authoring all pending e..._ids and pass rewrite=true. To redo the entire episode, rerun script planning and complete content confirmation again.'
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:58:54 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+--------------------------- Captured stderr teardown ---------------------------
+2026-11-07 19:58:54 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-6eef6d9373)
+---------------------------- Captured log teardown -----------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-6eef6d9373)
+_ test_generate_episode_script_rejects_removed_scope_with_migration_note[stale] _
+tests/integration/server/agent_toolset/test_text_generation.py:780: in test_generate_episode_script_rejects_removed_scope_with_migration_note
+    assert "scope 参数已取消" in text
+E   AssertionError: assert 'scope 参数已取消' in '<root>: Value error, The scope argument has been removed: generate_episode_script defaults to authoring all pending e..._ids and pass rewrite=true. To redo the entire episode, rerun script planning and complete content confirmation again.'
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:58:54 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+--------------------------- Captured stderr teardown ---------------------------
+2026-11-07 19:58:54 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-a1f8060c55)
+---------------------------- Captured log teardown -----------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-a1f8060c55)
+_ test_generate_episode_script_rejects_removed_scope_with_migration_note[None] _
+tests/integration/server/agent_toolset/test_text_generation.py:780: in test_generate_episode_script_rejects_removed_scope_with_migration_note
+    assert "scope 参数已取消" in text
+E   AssertionError: assert 'scope 参数已取消' in '<root>: Value error, The scope argument has been removed: generate_episode_script defaults to authoring all pending e..._ids and pass rewrite=true. To redo the entire episode, rerun script planning and complete content confirmation again.'
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:58:54 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+--------------------------- Captured stderr teardown ---------------------------
+2026-11-07 19:58:54 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-8ea2ff017a)
+---------------------------- Captured log teardown -----------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-8ea2ff017a)
+__________ test_parse_normalized_content_uses_dynamic_duration_schema __________
+tests/integration/server/agent_toolset/test_text_generation.py:843: in test_parse_normalized_content_uses_dynamic_duration_schema
+    with pytest.raises(ValueError, match="script_plan 规范化内容结构校验失败"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'script_plan 规范化内容结构校验失败'
+E     Actual message: 'normalized script_plan content structure validation failed: 1 validation error for DramaNormalizedScript\nscenes.0.duration_seconds\n  Input should be 4, 6 or 8 [type=literal_error, input_value=5, input_type=int]\n    For further information visit https://errors.pydantic.dev/2.14/v/literal_error'
+_________ test_normalize_drama_script_rejects_an_empty_explicit_source _________
+tests/integration/server/agent_toolset/test_text_generation.py:1337: in test_normalize_drama_script_rejects_an_empty_explicit_source
+    assert "源文件路径不能为空" in problem_of(out).detail
+E   AssertionError: assert '源文件路径不能为空' in '❌ The source file path must not be empty'
+E    +  where '❌ The source file path must not be empty' = ToolProblem(code='generation_refused', detail='❌ The source file path must not be empty', action=None, params=None).detail
+E    +    where ToolProblem(code='generation_refused', detail='❌ The source file path must not be empty', action=None, params=None) = problem_of(ToolOutcome(value=None, problem=ToolProblem(code='generation_refused', detail='❌ The source file path must not be empty', action=None, params=None)))
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:58:55 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+--------------------------- Captured stderr teardown ---------------------------
+2026-11-07 19:58:55 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-9f103485cf)
+---------------------------- Captured log teardown -----------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-9f103485cf)
+_ test_promote_narration_script_plan_names_source_scope_on_coverage_violation __
+tests/integration/server/agent_toolset/test_promote_draft.py:1472: in test_promote_narration_script_plan_names_source_scope_on_coverage_violation
+    assert "源文件 source/episode_2.txt" in text
+E   AssertionError: assert '源文件 source/episode_2.txt' in '❌ script_plan shot splitting output has 1 violations and was saved as a draft for repair (formal file unchanged): dra...al file; remaining violations return an updated report. Continue editing and promoting as needed, with no round limit.'
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:59:04 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+----------------------------- Captured stderr call -----------------------------
+2026-11-07 19:59:04 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-154a1f8850)
+------------------------------ Captured log call -------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-154a1f8850)
+_____ test_split_reference_video_units_rejects_duration_off_reference_tier _____
+tests/integration/server/agent_toolset/test_split_reference_video_units.py:398: in test_split_reference_video_units_rejects_duration_off_reference_tier
+    assert "生效档位" in text
+E   AssertionError: assert '生效档位' in '❌ script_plan splitting output has 1 violations and was saved as a draft for repair (formal file unchanged): drafts/e... is still present):\n- unit E1U01：This unit references no scene; the model decides the location of the shot on its own'
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:59:09 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+----------------------------- Captured stderr call -----------------------------
+2026-11-07 19:59:09 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-29cf2a583b)
+2026-11-07 19:59:09 [INFO] lib.generation.generation_queue: 任务入队 task_id=668251335a8b456aab2d70f403df4bad type=text_reference_script_plan
+2026-11-07 19:59:09 [INFO] lib.generation.generation_worker: 开始处理任务 668251335a8b456aab2d70f403df4bad (type=text_reference_script_plan, provider=text)
+2026-11-07 19:59:09 [ERROR] lib.generation.generation_worker: 任务失败 668251335a8b456aab2d70f403df4bad (type=text_reference_script_plan, provider=text)
+Traceback (most recent call last):
+  File "/Users/pablo.carminatti.br/Projects/ArcReelBR/lib/generation/generation_worker.py", line 861, in _run_claimed_task
+    result = await self._executor(task, claimed_provider_id=provider_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pablo.carminatti.br/Projects/ArcReelBR/server/services/tasks/generation_tasks.py", line 1918, in execute_generation_task
+    return await execute_queued_text_task(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pablo.carminatti.br/Projects/ArcReelBR/server/tool_runtime.py", line 3335, in execute_queued_text_task
+    raise RuntimeError(encode_generation_problem(_queued_generation_problem(outcome.problem)))
+RuntimeError: generation_problem:{"code":"generation_refused","detail":"❌ script_plan splitting output has 1 violations and was saved as a draft for repair (formal file unchanged): drafts/episode_1/script_plan_reference_units.invalid.json\n\n1. [duration_off_tier] unit E1U01 duration 4s is outside the effective tiers [8] for a unit with usable reference images; choose a duration within these tiers, or incorporate secondary assets into descriptive text without `@` references\n\nNext steps: call open_draft({\"episode_id\": 1, \"doc_type\": \"reference_script_plan\"}) to read the content and revision; fix content (repair the field paths listed in the report; unit-level fields are in content.units[i]), then submit with patch_draft using base_revision; if a violation concerns an unregistered asset name, you can instead register that asset in project.json or use an already registered name.\nAfter editing, call promote_draft({\"episode_id\": 1, \"doc_type\": \"reference_script_plan\", \"base_revision\": \"<revision returned by patch_draft>\"}) to rerun full validation and promote to the formal file; remaining violations return an updated report. Continue editing and promoting as needed, with no round limit.\n⚠️ Fallback notices (non-blocking; not violations, no rework needed for these notices; the draft is still present):\n- unit E1U01：This unit references no scene; the model decides the location of the shot on its own","action":"fix_input","params":{}}
+2026-11-07 19:59:09 [WARNING] lib.generation.generation_queue: 任务失败 task_id=668251335a8b456aab2d70f403df4bad error=generation_problem:{"code":"generation_refused","detail":"❌ script_plan splitting output has 1 violations and was saved as a draft for repair (formal file unchanged): drafts/episode_1/script_plan_refe
+------------------------------ Captured log call -------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-29cf2a583b)
+INFO     lib.generation.generation_queue:generation_queue.py:506 任务入队 task_id=668251335a8b456aab2d70f403df4bad type=text_reference_script_plan
+INFO     lib.generation.generation_worker:generation_worker.py:855 开始处理任务 668251335a8b456aab2d70f403df4bad (type=text_reference_script_plan, provider=text)
+ERROR    lib.generation.generation_worker:generation_worker.py:912 任务失败 668251335a8b456aab2d70f403df4bad (type=text_reference_script_plan, provider=text)
+Traceback (most recent call last):
+  File "/Users/pablo.carminatti.br/Projects/ArcReelBR/lib/generation/generation_worker.py", line 861, in _run_claimed_task
+    result = await self._executor(task, claimed_provider_id=provider_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pablo.carminatti.br/Projects/ArcReelBR/server/services/tasks/generation_tasks.py", line 1918, in execute_generation_task
+    return await execute_queued_text_task(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pablo.carminatti.br/Projects/ArcReelBR/server/tool_runtime.py", line 3335, in execute_queued_text_task
+    raise RuntimeError(encode_generation_problem(_queued_generation_problem(outcome.problem)))
+RuntimeError: generation_problem:{"code":"generation_refused","detail":"❌ script_plan splitting output has 1 violations and was saved as a draft for repair (formal file unchanged): drafts/episode_1/script_plan_reference_units.invalid.json\n\n1. [duration_off_tier] unit E1U01 duration 4s is outside the effective tiers [8] for a unit with usable reference images; choose a duration within these tiers, or incorporate secondary assets into descriptive text without `@` references\n\nNext steps: call open_draft({\"episode_id\": 1, \"doc_type\": \"reference_script_plan\"}) to read the content and revision; fix content (repair the field paths listed in the report; unit-level fields are in content.units[i]), then submit with patch_draft using base_revision; if a violation concerns an unregistered asset name, you can instead register that asset in project.json or use an already registered name.\nAfter editing, call promote_draft({\"episode_id\": 1, \"doc_type\": \"reference_script_plan\", \"base_revision\": \"<revision returned by patch_draft>\"}) to rerun full validation and promote to the formal file; remaining violations return an updated report. Continue editing and promoting as needed, with no round limit.\n⚠️ Fallback notices (non-blocking; not violations, no rework needed for these notices; the draft is still present):\n- unit E1U01：This unit references no scene; the model decides the location of the shot on its own","action":"fix_input","params":{}}
+WARNING  lib.generation.generation_queue:generation_queue.py:714 任务失败 task_id=668251335a8b456aab2d70f403df4bad error=generation_problem:{"code":"generation_refused","detail":"❌ script_plan splitting output has 1 violations and was saved as a draft for repair (formal file unchanged): drafts/episode_1/script_plan_refe
+________ test_split_reference_video_units_rejects_out_of_enum_duration _________
+tests/integration/server/agent_toolset/test_split_reference_video_units.py:465: in test_split_reference_video_units_rejects_out_of_enum_duration
+    assert "script_plan 拆分内容结构校验失败" in said(out)
+E   AssertionError: assert 'script_plan 拆分内容结构校验失败' in 'generate_script_plan failed: split script_plan content structure validation failed: 1 validation error for ReferenceS...or, input_value=5, input_type=int]\n    For further information visit https://errors.pydantic.dev/2.14/v/literal_error'
+E    +  where 'generate_script_plan failed: split script_plan content structure validation failed: 1 validation error for ReferenceS...or, input_value=5, input_type=int]\n    For further information visit https://errors.pydantic.dev/2.14/v/literal_error' = said(ToolOutcome(value=None, problem=ToolProblem(code='generation_task_failed', detail='generate_script_plan failed: split ...=int]\n    For further information visit https://errors.pydantic.dev/2.14/v/literal_error', action='retry', params={})))
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:59:10 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+----------------------------- Captured stderr call -----------------------------
+2026-11-07 19:59:10 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-7becc27788)
+2026-11-07 19:59:10 [INFO] lib.generation.generation_queue: 任务入队 task_id=db47cd6c4a034cb591d66c31373c3ab3 type=text_reference_script_plan
+2026-11-07 19:59:10 [INFO] lib.generation.generation_worker: 开始处理任务 db47cd6c4a034cb591d66c31373c3ab3 (type=text_reference_script_plan, provider=text)
+2026-11-07 19:59:10 [ERROR] lib.generation.generation_worker: 任务失败 db47cd6c4a034cb591d66c31373c3ab3 (type=text_reference_script_plan, provider=text)
+Traceback (most recent call last):
+  File "/Users/pablo.carminatti.br/Projects/ArcReelBR/lib/generation/generation_worker.py", line 861, in _run_claimed_task
+    result = await self._executor(task, claimed_provider_id=provider_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pablo.carminatti.br/Projects/ArcReelBR/server/services/tasks/generation_tasks.py", line 1918, in execute_generation_task
+    return await execute_queued_text_task(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pablo.carminatti.br/Projects/ArcReelBR/server/tool_runtime.py", line 3335, in execute_queued_text_task
+    raise RuntimeError(encode_generation_problem(_queued_generation_problem(outcome.problem)))
+RuntimeError: generation_problem:{"code":"generation_task_failed","detail":"generate_script_plan failed: split script_plan content structure validation failed: 1 validation error for ReferenceScriptPlanFlatDraft\nunits.0.duration_seconds\n  Input should be 4, 6 or 8 [type=literal_error, input_value=5, input_type=int]\n    For further information visit https://errors.pydantic.dev/2.14/v/literal_error","action":"retry","params":{}}
+2026-11-07 19:59:10 [WARNING] lib.generation.generation_queue: 任务失败 task_id=db47cd6c4a034cb591d66c31373c3ab3 error=generation_problem:{"code":"generation_task_failed","detail":"generate_script_plan failed: split script_plan content structure validation failed: 1 validation error for ReferenceScriptPlanFlatDraft\nu
+------------------------------ Captured log call -------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-7becc27788)
+INFO     lib.generation.generation_queue:generation_queue.py:506 任务入队 task_id=db47cd6c4a034cb591d66c31373c3ab3 type=text_reference_script_plan
+INFO     lib.generation.generation_worker:generation_worker.py:855 开始处理任务 db47cd6c4a034cb591d66c31373c3ab3 (type=text_reference_script_plan, provider=text)
+ERROR    lib.generation.generation_worker:generation_worker.py:912 任务失败 db47cd6c4a034cb591d66c31373c3ab3 (type=text_reference_script_plan, provider=text)
+Traceback (most recent call last):
+  File "/Users/pablo.carminatti.br/Projects/ArcReelBR/lib/generation/generation_worker.py", line 861, in _run_claimed_task
+    result = await self._executor(task, claimed_provider_id=provider_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pablo.carminatti.br/Projects/ArcReelBR/server/services/tasks/generation_tasks.py", line 1918, in execute_generation_task
+    return await execute_queued_text_task(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pablo.carminatti.br/Projects/ArcReelBR/server/tool_runtime.py", line 3335, in execute_queued_text_task
+    raise RuntimeError(encode_generation_problem(_queued_generation_problem(outcome.problem)))
+RuntimeError: generation_problem:{"code":"generation_task_failed","detail":"generate_script_plan failed: split script_plan content structure validation failed: 1 validation error for ReferenceScriptPlanFlatDraft\nunits.0.duration_seconds\n  Input should be 4, 6 or 8 [type=literal_error, input_value=5, input_type=int]\n    For further information visit https://errors.pydantic.dev/2.14/v/literal_error","action":"retry","params":{}}
+WARNING  lib.generation.generation_queue:generation_queue.py:714 任务失败 task_id=db47cd6c4a034cb591d66c31373c3ab3 error=generation_problem:{"code":"generation_task_failed","detail":"generate_script_plan failed: split script_plan content structure validation failed: 1 validation error for ReferenceScriptPlanFlatDraft\nu
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /Users/pablo.carminatti.br/Projects/ArcReelBR/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+tests/integration/server/agent_toolset/test_text_generation.py::test_get_video_capabilities_happy
+  /Users/pablo.carminatti.br/.local/share/uv/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/contextlib.py:144: SAWarning: Skipped unsupported reflection of expression-based index idx_tasks_dedupe_active
+    next(self.gen)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 25 durations =============================
+0.90s setup    tests/integration/server/agent_toolset/test_text_generation.py::test_get_video_capabilities_happy
+0.41s call     tests/integration/server/test_tool_runtime_episode_planning.py::test_a_replan_stuck_without_a_cut_point_keeps_its_part_and_continues_with_the_same_instructions
+0.35s call     tests/integration/server/test_tool_runtime_episode_planning.py::test_a_pending_candidate_refuses_planning_and_another_replan
+0.32s call     tests/integration/server/test_tool_runtime_episode_planning.py::test_the_gap_left_by_a_deleted_middle_episode_is_planned_back
+0.28s call     tests/integration/server/test_tool_runtime_episode_planning.py::test_replanning_fills_a_candidate_window_by_window_and_leaves_the_ledger_alone
+0.24s call     tests/integration/server/test_tool_runtime_episode_planning.py::test_a_truncated_replan_window_fails_with_the_way_out
+0.20s call     tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_buckets_a_reference_without_usable_image_as_i2v[unclaimed]
+0.19s call     tests/integration/server/agent_toolset/test_promote_draft.py::test_promote_draft_reports_broken_outer_shape[units_emptied]
+0.17s call     tests/integration/lib/script/test_script_generator_incremental.py::TestScriptPlanMaterialization::test_reconfirm_after_purging_deleted_entries_uses_new_ids_and_keeps_confirmation[narration]
+0.17s call     tests/integration/lib/script/test_script_generator_incremental.py::TestPromptAuthoring::test_timeline_insert_and_remove_survive_default_authoring[drama]
+0.17s call     tests/integration/server/test_tool_runtime_episode_planning.py::test_web_planning_runs_window_by_window_to_the_end
+0.17s call     tests/integration/server/test_tool_runtime_episode_planning.py::test_a_final_window_capped_by_the_batch_size_keeps_planning_to_the_end
+0.16s call     tests/integration/server/test_tool_runtime_episode_planning.py::test_stop_keeps_finished_windows_and_the_next_run_resumes_from_the_cursor
+0.16s call     tests/integration/server/test_tool_runtime_episode_planning.py::test_stop_during_a_capped_final_window_does_not_queue_another
+0.16s call     tests/integration/lib/script/test_script_generator_incremental.py::TestScriptPlanMaterialization::test_reconfirm_after_purging_deleted_entries_uses_new_ids_and_keeps_confirmation[drama]
+0.16s call     tests/integration/lib/script/test_script_generator_incremental.py::TestScriptPlanMaterialization::test_reconfirm_after_purging_deleted_entries_uses_new_ids_and_keeps_confirmation[reference_video]
+0.16s call     tests/integration/lib/script/test_script_generator_incremental.py::TestPromptAuthoring::test_timeline_insert_and_remove_survive_default_authoring[narration]
+0.14s call     tests/integration/lib/script/test_script_generator_ad_prompt_authoring.py::TestAdShotAuthoring::test_timeline_insert_and_remove_survive_default_authoring
+0.14s call     tests/integration/server/agent_toolset/test_text_generation.py::test_get_video_capabilities_reports_endpoint_fixed_per_bucket[i2v]
+0.11s call     tests/integration/server/agent_toolset/test_promote_draft.py::test_split_reference_video_units_clears_stale_quarantine_on_success
+0.11s setup    tests/integration/server/agent_toolset/test_promote_draft.py::test_promote_draft_without_draft
+0.09s setup    tests/integration/server/agent_toolset/test_text_generation.py::test_text_tools_reject_a_non_positive_or_non_integer_episode[True-generate_script_plan]
+0.08s call     tests/integration/lib/script/test_script_generator_incremental.py::TestFillAndRewrite::test_rewrite_over_existing_content_requires_the_overwrite_token[drama]
+0.08s setup    tests/integration/server/agent_toolset/test_promote_draft.py::test_promote_drama_script_plan_returns_a_receipt_with_statistics
+0.08s call     tests/integration/server/agent_toolset/test_promote_draft.py::test_promote_draft_reports_promotion_not_split
+=========================== short test summary info ============================
+FAILED tests/integration/server/agent_toolset/test_text_generation.py::test_generate_episode_script_unknown_entry_id_is_refused_not_internal
+FAILED tests/integration/server/agent_toolset/test_text_generation.py::test_generate_episode_script_without_anything_to_write_marks_the_result
+FAILED tests/integration/server/agent_toolset/test_text_generation.py::test_generate_episode_script_rejects_removed_scope_with_migration_note[all]
+FAILED tests/integration/server/agent_toolset/test_text_generation.py::test_generate_episode_script_rejects_removed_scope_with_migration_note[stale]
+FAILED tests/integration/server/agent_toolset/test_text_generation.py::test_generate_episode_script_rejects_removed_scope_with_migration_note[None]
+FAILED tests/integration/server/agent_toolset/test_text_generation.py::test_parse_normalized_content_uses_dynamic_duration_schema
+FAILED tests/integration/server/agent_toolset/test_text_generation.py::test_normalize_drama_script_rejects_an_empty_explicit_source
+FAILED tests/integration/server/agent_toolset/test_promote_draft.py::test_promote_narration_script_plan_names_source_scope_on_coverage_violation
+FAILED tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_rejects_duration_off_reference_tier
+FAILED tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_rejects_out_of_enum_duration
+10 failed, 574 passed, 2 warnings in 34.96s

@@ -1,0 +1,392 @@
+............................F.......FF.FFFFFFFFFFFFF.FFF...F............ [ 20%]
+........................................................................ [ 41%]
+........................................................................ [ 62%]
+...............FFFFFFFFFFF.........................FF................... [ 82%]
+.....................................F.....................              [100%]
+=================================== FAILURES ===================================
+______________ test_the_rendered_summary_spells_out_item_warnings ______________
+tests/unit/lib/generation/test_generation_result.py:526: in test_the_rendered_summary_spells_out_item_warnings
+    assert "✓ E1S02 → storyboards/scene_E1S02.png\n    ⚠️ 参考图数量 8 超出 viduq2 上限 7，已取前 7 张" in text
+E   AssertionError: assert '✓ E1S02 → storyboards/scene_E1S02.png\n    ⚠️ 参考图数量 8 超出 viduq2 上限 7，已取前 7 张' in 'Storyboard image generation: 1 succeeded, 0 failed, 0 blocked\n  ✓ E1S02 → storyboards/scene_E1S02.png\n    ⚠️ Reference image count 8 exceeds viduq2 limit of 7, kept the first 7'
+__________ test_the_rendered_text_is_only_a_projection_of_the_payload __________
+tests/unit/lib/generation/test_generation_result.py:682: in test_the_rendered_text_is_only_a_projection_of_the_payload
+    assert "成功 1 件、失败 1 件、受阻 0 件、复用 1 件" in text
+E   AssertionError: assert '成功 1 件、失败 1 件、受阻 0 件、复用 1 件' in 'Video generation: 1 succeeded, 1 failed, 0 blocked, 1 reused\n注意\n  ✓ A → videos/a.mp4\n  ✗ B: boom → Retry available\n  ↺ C: reuse existing artifact (older than current content)'
+__________ test_rendered_summary_uses_product_language_not_raw_enums ___________
+tests/unit/lib/generation/test_generation_result.py:719: in test_rendered_summary_uses_product_language_not_raw_enums
+    assert "需修正输入" in text
+E   AssertionError: assert '需修正输入' in 'Video generation: 0 succeeded, 1 failed, 1 blocked, 1 reused\n  ✗ E1S01: 剧本中未找到该 ID → Fix input\n  ⛔ E1S02: 该 ID 有在途任务 → Wait for running tasks to finish\n  ↺ E1S03: reuse existing artifact (older than current content)'
+________ test_every_generation_entry_point_has_a_product_language_label ________
+tests/unit/lib/generation/test_generation_result.py:760: in test_every_generation_entry_point_has_a_product_language_label
+    assert text.startswith(f"{label}：")
+E   AssertionError: assert False
+E    +  where False = <built-in method startswith of str object at 0x11bb9d890>('Narration audio generation：')
+E    +    where <built-in method startswith of str object at 0x11bb9d890> = 'Narration audio generation: 1 succeeded, 0 failed, 0 blocked\n  ✓ E1S01 → videos/E1S01.mp4'.startswith
+_______ test_the_summary_header_names_the_operation_in_product_language ________
+tests/unit/lib/generation/test_generation_result.py:771: in test_the_summary_header_names_the_operation_in_product_language
+    assert text.startswith("视频生成：")
+E   AssertionError: assert False
+E    +  where False = <built-in method startswith of str object at 0x11beccc70>('视频生成：')
+E    +    where <built-in method startswith of str object at 0x11beccc70> = 'Video generation: 1 succeeded, 0 failed, 0 blocked\n  ✓ E1S01 → videos/E1S01.mp4'.startswith
+________________ test_validate_script_filename_rejects_paths[] _________________
+tests/unit/server/media_tools/test_context.py:27: in test_validate_script_filename_rejects_paths
+    with pytest.raises(ValueError, match=r"script (文件名不能为空|必须是纯文件名，禁止路径分隔符)"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'script (文件名不能为空|必须是纯文件名，禁止路径分隔符)'
+E     Actual message: 'script filename must not be empty'
+_____ test_validate_script_filename_rejects_paths[scripts/episode_1.json] ______
+tests/unit/server/media_tools/test_context.py:27: in test_validate_script_filename_rejects_paths
+    with pytest.raises(ValueError, match=r"script (文件名不能为空|必须是纯文件名，禁止路径分隔符)"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'script (文件名不能为空|必须是纯文件名，禁止路径分隔符)'
+E     Actual message: "script must be a bare filename without path separators: 'scripts/episode_1.json'"
+__________ test_validate_script_filename_rejects_paths[../etc/passwd] __________
+tests/unit/server/media_tools/test_context.py:27: in test_validate_script_filename_rejects_paths
+    with pytest.raises(ValueError, match=r"script (文件名不能为空|必须是纯文件名，禁止路径分隔符)"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'script (文件名不能为空|必须是纯文件名，禁止路径分隔符)'
+E     Actual message: "script must be a bare filename without path separators: '../etc/passwd'"
+________ test_validate_script_filename_rejects_paths[sub/dir/file.json] ________
+tests/unit/server/media_tools/test_context.py:27: in test_validate_script_filename_rejects_paths
+    with pytest.raises(ValueError, match=r"script (文件名不能为空|必须是纯文件名，禁止路径分隔符)"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'script (文件名不能为空|必须是纯文件名，禁止路径分隔符)'
+E     Actual message: "script must be a bare filename without path separators: 'sub/dir/file.json'"
+____________ test_validate_script_filename_rejects_paths[a\\b.json] ____________
+tests/unit/server/media_tools/test_context.py:27: in test_validate_script_filename_rejects_paths
+    with pytest.raises(ValueError, match=r"script (文件名不能为空|必须是纯文件名，禁止路径分隔符)"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'script (文件名不能为空|必须是纯文件名，禁止路径分隔符)'
+E     Actual message: "script must be a bare filename without path separators: 'a\\\\b.json'"
+________________ test_validate_script_filename_rejects_paths[.] ________________
+tests/unit/server/media_tools/test_context.py:27: in test_validate_script_filename_rejects_paths
+    with pytest.raises(ValueError, match=r"script (文件名不能为空|必须是纯文件名，禁止路径分隔符)"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'script (文件名不能为空|必须是纯文件名，禁止路径分隔符)'
+E     Actual message: "script must be a bare filename without path separators: '.'"
+_______________ test_validate_script_filename_rejects_paths[..] ________________
+tests/unit/server/media_tools/test_context.py:27: in test_validate_script_filename_rejects_paths
+    with pytest.raises(ValueError, match=r"script (文件名不能为空|必须是纯文件名，禁止路径分隔符)"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'script (文件名不能为空|必须是纯文件名，禁止路径分隔符)'
+E     Actual message: "script must be a bare filename without path separators: '..'"
+________ test_validate_script_filename_rejects_non_string_agent_args[1] ________
+tests/unit/server/media_tools/test_context.py:37: in test_validate_script_filename_rejects_non_string_agent_args
+    with pytest.raises(ValueError, match="script 文件名不能为空"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'script 文件名不能为空'
+E     Actual message: 'script filename must not be empty'
+______ test_validate_script_filename_rejects_non_string_agent_args[None] _______
+tests/unit/server/media_tools/test_context.py:37: in test_validate_script_filename_rejects_non_string_agent_args
+    with pytest.raises(ValueError, match="script 文件名不能为空"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'script 文件名不能为空'
+E     Actual message: 'script filename must not be empty'
+______ test_validate_script_filename_rejects_non_string_agent_args[bad2] _______
+tests/unit/server/media_tools/test_context.py:37: in test_validate_script_filename_rejects_non_string_agent_args
+    with pytest.raises(ValueError, match="script 文件名不能为空"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'script 文件名不能为空'
+E     Actual message: 'script filename must not be empty'
+______ test_validate_script_filename_rejects_non_string_agent_args[bad3] _______
+tests/unit/server/media_tools/test_context.py:37: in test_validate_script_filename_rejects_non_string_agent_args
+    with pytest.raises(ValueError, match="script 文件名不能为空"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'script 文件名不能为空'
+E     Actual message: 'script filename must not be empty'
+_____ test_total_covers_the_priced_units_and_the_unpriced_ones_are_counted _____
+tests/unit/server/services/admission/test_video_quote.py:45: in test_total_covers_the_priced_units_and_the_unpriced_ones_are_counted
+    assert "预计合计：0.75 USD（仅含已定价的单元）" in summary
+E   AssertionError: assert '预计合计：0.75 USD（仅含已定价的单元）' in 'Preflight complete; no tasks enqueued.\n- E1U1：Request 8s, Estimated 0.5 USD\n- E1U2：Request 8s, Unpriced (reason: mi...75 USD (priced units only)\nAnother 2 units are unpriced; the total above excludes their costs. Tell the user clearly.'
+________________ test_no_total_is_given_when_no_unit_is_priced _________________
+tests/unit/server/services/admission/test_video_quote.py:55: in test_no_total_is_given_when_no_unit_is_priced
+    assert "1 个单元未定价，无法给出合计" in sheet.summary()
+E   AssertionError: assert '1 个单元未定价，无法给出合计' in 'Preflight complete; no tasks enqueued.\n- E1U1：Request 8s, Unpriced (reason: no_usage_estimate)\nEstimated total: 1 units are unpriced, so no total is available; tell the user clearly that the cost is unknown.'
+E    +  where 'Preflight complete; no tasks enqueued.\n- E1U1：Request 8s, Unpriced (reason: no_usage_estimate)\nEstimated total: 1 units are unpriced, so no total is available; tell the user clearly that the cost is unknown.' = summary()
+E    +    where summary = VideoQuoteSheet(units=(VideoUnitQuote(unit_id='E1U1', outcome=<VideoQuoteOutcome.GENERATE: 'generate'>, script_duratio...st_duration_seconds=8, cost={'amount': None, 'currency': None, 'unpriced_reason': 'no_usage_estimate'}, problems=()),)).summary
+___________ test_a_unit_that_cannot_be_quoted_at_all_is_unpriced_too ___________
+tests/unit/server/services/admission/test_video_quote.py:65: in test_a_unit_that_cannot_be_quoted_at_all_is_unpriced_too
+    assert "未定价（无法为这次请求报价）" in sheet.summary()
+E   AssertionError: assert '未定价（无法为这次请求报价）' in 'Preflight complete; no tasks enqueued.\n- E1U2：Request 8s, Estimated 1.0 USD\n- E1U1：Request 8s, Unpriced (cannot quo... 1 USD (priced units only)\nAnother 1 units are unpriced; the total above excludes their costs. Tell the user clearly.'
+E    +  where 'Preflight complete; no tasks enqueued.\n- E1U2：Request 8s, Estimated 1.0 USD\n- E1U1：Request 8s, Unpriced (cannot quo... 1 USD (priced units only)\nAnother 1 units are unpriced; the total above excludes their costs. Tell the user clearly.' = summary()
+E    +    where summary = VideoQuoteSheet(units=(VideoUnitQuote(unit_id='E1U2', outcome=<VideoQuoteOutcome.GENERATE: 'generate'>, script_duratio...QuoteOutcome.GENERATE: 'generate'>, script_duration_seconds=None, request_duration_seconds=8, cost=None, problems=()))).summary
+__ test_confirmation_text_tells_the_agent_which_units_in_a_tier_are_unpriced ___
+tests/unit/server/services/admission/test_video_quote.py:131: in test_confirmation_text_tells_the_agent_which_units_in_a_tier_are_unpriced
+    assert "8s 档位 × 2：E1U1、E1U2；合计 0.8 USD（仅含已定价的 unit）；其中 1 个 unit 未定价，费用未知" in text
+E   AssertionError: assert '8s 档位 × 2：E1U1、E1U2；合计 0.8 USD（仅含已定价的 unit）；其中 1 个 unit 未定价，费用未知' in 'The following units need different video-duration tiers. Obtain user confirmation first; this call enqueued no tasks:...: the first enqueued tier would already incur charges, so these targets would no longer be one all-or-nothing request.'
+_ test_generate_videos_refuses_a_narration_delivery_without_enqueuing[post_production] _
+tests/integration/server/media_tools/test_videos.py:226: in test_generate_videos_refuses_a_narration_delivery_without_enqueuing
+    assert "项目配置" in out.problem.detail
+E   assert '项目配置' in "<root>: Value error, Parameter 'narration_delivery' is no longer supported: Video requests do not select narration delivery per call; all videos request the script-planned duration, and narration delivery is project configuration"
+E    +  where "<root>: Value error, Parameter 'narration_delivery' is no longer supported: Video requests do not select narration delivery per call; all videos request the script-planned duration, and narration delivery is project configuration" = ToolProblem(code='invalid_request', detail="<root>: Value error, Parameter 'narration_delivery' is no longer supported...videos request the script-planned duration, and narration delivery is project configuration", 'type': 'value_error'}]}).detail
+E    +    where ToolProblem(code='invalid_request', detail="<root>: Value error, Parameter 'narration_delivery' is no longer supported...videos request the script-planned duration, and narration delivery is project configuration", 'type': 'value_error'}]}) = ToolOutcome(value=None, problem=ToolProblem(code='invalid_request', detail="<root>: Value error, Parameter 'narration_...ideos request the script-planned duration, and narration delivery is project configuration", 'type': 'value_error'}]})).problem
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:57:23 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+--------------------------- Captured stderr teardown ---------------------------
+2026-11-07 19:57:23 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-9d90a1a08c)
+---------------------------- Captured log teardown -----------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-9d90a1a08c)
+_ test_generate_videos_refuses_a_narration_delivery_without_enqueuing[use_tts] _
+tests/integration/server/media_tools/test_videos.py:226: in test_generate_videos_refuses_a_narration_delivery_without_enqueuing
+    assert "项目配置" in out.problem.detail
+E   assert '项目配置' in "<root>: Value error, Parameter 'narration_delivery' is no longer supported: Video requests do not select narration delivery per call; all videos request the script-planned duration, and narration delivery is project configuration"
+E    +  where "<root>: Value error, Parameter 'narration_delivery' is no longer supported: Video requests do not select narration delivery per call; all videos request the script-planned duration, and narration delivery is project configuration" = ToolProblem(code='invalid_request', detail="<root>: Value error, Parameter 'narration_delivery' is no longer supported...videos request the script-planned duration, and narration delivery is project configuration", 'type': 'value_error'}]}).detail
+E    +    where ToolProblem(code='invalid_request', detail="<root>: Value error, Parameter 'narration_delivery' is no longer supported...videos request the script-planned duration, and narration delivery is project configuration", 'type': 'value_error'}]}) = ToolOutcome(value=None, problem=ToolProblem(code='invalid_request', detail="<root>: Value error, Parameter 'narration_...ideos request the script-planned duration, and narration delivery is project configuration", 'type': 'value_error'}]})).problem
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:57:23 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+--------------------------- Captured stderr teardown ---------------------------
+2026-11-07 19:57:23 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-79820323e6)
+---------------------------- Captured log teardown -----------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-79820323e6)
+_ test_generate_videos_refuses_a_retired_param_with_its_replacement[narration_delivery] _
+tests/integration/server/media_tools/test_videos.py:242: in test_generate_videos_refuses_a_retired_param_with_its_replacement
+    assert "已不存在" in out.problem.detail
+E   assert '已不存在' in "<root>: Value error, Parameter 'narration_delivery' is no longer supported: Video requests do not select narration delivery per call; all videos request the script-planned duration, and narration delivery is project configuration"
+E    +  where "<root>: Value error, Parameter 'narration_delivery' is no longer supported: Video requests do not select narration delivery per call; all videos request the script-planned duration, and narration delivery is project configuration" = ToolProblem(code='invalid_request', detail="<root>: Value error, Parameter 'narration_delivery' is no longer supported...videos request the script-planned duration, and narration delivery is project configuration", 'type': 'value_error'}]}).detail
+E    +    where ToolProblem(code='invalid_request', detail="<root>: Value error, Parameter 'narration_delivery' is no longer supported...videos request the script-planned duration, and narration delivery is project configuration", 'type': 'value_error'}]}) = ToolOutcome(value=None, problem=ToolProblem(code='invalid_request', detail="<root>: Value error, Parameter 'narration_...ideos request the script-planned duration, and narration delivery is project configuration", 'type': 'value_error'}]})).problem
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:57:23 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+--------------------------- Captured stderr teardown ---------------------------
+2026-11-07 19:57:23 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-ea926ee782)
+---------------------------- Captured log teardown -----------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-ea926ee782)
+_ test_generate_videos_refuses_a_retired_param_with_its_replacement[reference_images] _
+tests/integration/server/media_tools/test_videos.py:242: in test_generate_videos_refuses_a_retired_param_with_its_replacement
+    assert "已不存在" in out.problem.detail
+E   assert '已不存在' in "<root>: Value error, Parameter 'reference_images' is no longer supported: Video units have no reference list; reference images derive at execution from body mentions in @[名称] syntax"
+E    +  where "<root>: Value error, Parameter 'reference_images' is no longer supported: Video units have no reference list; reference images derive at execution from body mentions in @[名称] syntax" = ToolProblem(code='invalid_request', detail="<root>: Value error, Parameter 'reference_images' is no longer supported: ... no reference list; reference images derive at execution from body mentions in @[名称] syntax", 'type': 'value_error'}]}).detail
+E    +    where ToolProblem(code='invalid_request', detail="<root>: Value error, Parameter 'reference_images' is no longer supported: ... no reference list; reference images derive at execution from body mentions in @[名称] syntax", 'type': 'value_error'}]}) = ToolOutcome(value=None, problem=ToolProblem(code='invalid_request', detail="<root>: Value error, Parameter 'reference_...no reference list; reference images derive at execution from body mentions in @[名称] syntax", 'type': 'value_error'}]})).problem
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:57:23 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+--------------------------- Captured stderr teardown ---------------------------
+2026-11-07 19:57:23 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-239e45be3a)
+---------------------------- Captured log teardown -----------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-239e45be3a)
+_ test_generate_videos_refuses_a_retired_param_with_its_replacement[references] _
+tests/integration/server/media_tools/test_videos.py:242: in test_generate_videos_refuses_a_retired_param_with_its_replacement
+    assert "已不存在" in out.problem.detail
+E   assert '已不存在' in "<root>: Value error, Parameter 'references' is no longer supported: Video units have no reference list; reference images derive at execution from body mentions in @[名称] syntax"
+E    +  where "<root>: Value error, Parameter 'references' is no longer supported: Video units have no reference list; reference images derive at execution from body mentions in @[名称] syntax" = ToolProblem(code='invalid_request', detail="<root>: Value error, Parameter 'references' is no longer supported: Video ... no reference list; reference images derive at execution from body mentions in @[名称] syntax", 'type': 'value_error'}]}).detail
+E    +    where ToolProblem(code='invalid_request', detail="<root>: Value error, Parameter 'references' is no longer supported: Video ... no reference list; reference images derive at execution from body mentions in @[名称] syntax", 'type': 'value_error'}]}) = ToolOutcome(value=None, problem=ToolProblem(code='invalid_request', detail="<root>: Value error, Parameter 'references...no reference list; reference images derive at execution from body mentions in @[名称] syntax", 'type': 'value_error'}]})).problem
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:57:23 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+--------------------------- Captured stderr teardown ---------------------------
+2026-11-07 19:57:23 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-0cdfd3504d)
+---------------------------- Captured log teardown -----------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-0cdfd3504d)
+__ test_generate_videos_refuses_a_retired_param_with_its_replacement[resume] ___
+tests/integration/server/media_tools/test_videos.py:242: in test_generate_videos_refuses_a_retired_param_with_its_replacement
+    assert "已不存在" in out.problem.detail
+E   assert '已不存在' in "<root>: Value error, Parameter 'resume' is no longer supported: Query the durable batch, then use selected scope and force=false to resend only unsuccessful IDs"
+E    +  where "<root>: Value error, Parameter 'resume' is no longer supported: Query the durable batch, then use selected scope and force=false to resend only unsuccessful IDs" = ToolProblem(code='invalid_request', detail="<root>: Value error, Parameter 'resume' is no longer supported: Query the ... the durable batch, then use selected scope and force=false to resend only unsuccessful IDs", 'type': 'value_error'}]}).detail
+E    +    where ToolProblem(code='invalid_request', detail="<root>: Value error, Parameter 'resume' is no longer supported: Query the ... the durable batch, then use selected scope and force=false to resend only unsuccessful IDs", 'type': 'value_error'}]}) = ToolOutcome(value=None, problem=ToolProblem(code='invalid_request', detail="<root>: Value error, Parameter 'resume' is...the durable batch, then use selected scope and force=false to resend only unsuccessful IDs", 'type': 'value_error'}]})).problem
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:57:23 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+--------------------------- Captured stderr teardown ---------------------------
+2026-11-07 19:57:23 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-2c0825dba5)
+---------------------------- Captured log teardown -----------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-2c0825dba5)
+_ test_generate_videos_refuses_a_retired_param_with_its_replacement[shot_ids] __
+tests/integration/server/media_tools/test_videos.py:242: in test_generate_videos_refuses_a_retired_param_with_its_replacement
+    assert "已不存在" in out.problem.detail
+E   assert '已不存在' in "<root>: Value error, Parameter 'shot_ids' is no longer supported: Use target.ids with scene scope for one ID or selected scope for a batch"
+E    +  where "<root>: Value error, Parameter 'shot_ids' is no longer supported: Use target.ids with scene scope for one ID or selected scope for a batch" = ToolProblem(code='invalid_request', detail="<root>: Value error, Parameter 'shot_ids' is no longer supported: Use targ... longer supported: Use target.ids with scene scope for one ID or selected scope for a batch", 'type': 'value_error'}]}).detail
+E    +    where ToolProblem(code='invalid_request', detail="<root>: Value error, Parameter 'shot_ids' is no longer supported: Use targ... longer supported: Use target.ids with scene scope for one ID or selected scope for a batch", 'type': 'value_error'}]}) = ToolOutcome(value=None, problem=ToolProblem(code='invalid_request', detail="<root>: Value error, Parameter 'shot_ids' ...longer supported: Use target.ids with scene scope for one ID or selected scope for a batch", 'type': 'value_error'}]})).problem
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:57:24 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+--------------------------- Captured stderr teardown ---------------------------
+2026-11-07 19:57:24 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-7cd696902d)
+---------------------------- Captured log teardown -----------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-7cd696902d)
+___ test_generate_videos_refuses_a_retired_param_with_its_replacement[shots] ___
+tests/integration/server/media_tools/test_videos.py:242: in test_generate_videos_refuses_a_retired_param_with_its_replacement
+    assert "已不存在" in out.problem.detail
+E   assert '已不存在' in "<root>: Value error, Parameter 'shots' is no longer supported: Video units have no shots array; write their body in the script text field and edit it through patch_episode_script"
+E    +  where "<root>: Value error, Parameter 'shots' is no longer supported: Video units have no shots array; write their body in the script text field and edit it through patch_episode_script" = ToolProblem(code='invalid_request', detail="<root>: Value error, Parameter 'shots' is no longer supported: Video units...s array; write their body in the script text field and edit it through patch_episode_script", 'type': 'value_error'}]}).detail
+E    +    where ToolProblem(code='invalid_request', detail="<root>: Value error, Parameter 'shots' is no longer supported: Video units...s array; write their body in the script text field and edit it through patch_episode_script", 'type': 'value_error'}]}) = ToolOutcome(value=None, problem=ToolProblem(code='invalid_request', detail="<root>: Value error, Parameter 'shots' is ... array; write their body in the script text field and edit it through patch_episode_script", 'type': 'value_error'}]})).problem
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:57:24 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+--------------------------- Captured stderr teardown ---------------------------
+2026-11-07 19:57:24 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-7e68d89dd7)
+---------------------------- Captured log teardown -----------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-7e68d89dd7)
+__ test_generate_videos_refuses_a_retired_param_with_its_replacement[unit_id] __
+tests/integration/server/media_tools/test_videos.py:242: in test_generate_videos_refuses_a_retired_param_with_its_replacement
+    assert "已不存在" in out.problem.detail
+E   assert '已不存在' in "<root>: Value error, Parameter 'unit_id' is no longer supported: Use target.ids: pass unit_id directly for reference-video projects and select scene scope"
+E    +  where "<root>: Value error, Parameter 'unit_id' is no longer supported: Use target.ids: pass unit_id directly for reference-video projects and select scene scope" = ToolProblem(code='invalid_request', detail="<root>: Value error, Parameter 'unit_id' is no longer supported: Use targe...: Use target.ids: pass unit_id directly for reference-video projects and select scene scope", 'type': 'value_error'}]}).detail
+E    +    where ToolProblem(code='invalid_request', detail="<root>: Value error, Parameter 'unit_id' is no longer supported: Use targe...: Use target.ids: pass unit_id directly for reference-video projects and select scene scope", 'type': 'value_error'}]}) = ToolOutcome(value=None, problem=ToolProblem(code='invalid_request', detail="<root>: Value error, Parameter 'unit_id' i... Use target.ids: pass unit_id directly for reference-video projects and select scene scope", 'type': 'value_error'}]})).problem
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:57:24 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+--------------------------- Captured stderr teardown ---------------------------
+2026-11-07 19:57:24 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-1c230bbd7f)
+---------------------------- Captured log teardown -----------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-1c230bbd7f)
+_ test_generate_videos_refuses_a_retired_param_with_its_replacement[unit_ids] __
+tests/integration/server/media_tools/test_videos.py:242: in test_generate_videos_refuses_a_retired_param_with_its_replacement
+    assert "已不存在" in out.problem.detail
+E   assert '已不存在' in "<root>: Value error, Parameter 'unit_ids' is no longer supported: Use target.ids: pass the unit_id list directly for reference-video projects and select selected scope"
+E    +  where "<root>: Value error, Parameter 'unit_ids' is no longer supported: Use target.ids: pass the unit_id list directly for reference-video projects and select selected scope" = ToolProblem(code='invalid_request', detail="<root>: Value error, Parameter 'unit_ids' is no longer supported: Use targ....ids: pass the unit_id list directly for reference-video projects and select selected scope", 'type': 'value_error'}]}).detail
+E    +    where ToolProblem(code='invalid_request', detail="<root>: Value error, Parameter 'unit_ids' is no longer supported: Use targ....ids: pass the unit_id list directly for reference-video projects and select selected scope", 'type': 'value_error'}]}) = ToolOutcome(value=None, problem=ToolProblem(code='invalid_request', detail="<root>: Value error, Parameter 'unit_ids' ...ids: pass the unit_id list directly for reference-video projects and select selected scope", 'type': 'value_error'}]})).problem
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:57:24 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+--------------------------- Captured stderr teardown ---------------------------
+2026-11-07 19:57:24 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-ed3cdb1b57)
+---------------------------- Captured log teardown -----------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-ed3cdb1b57)
+_ test_generate_videos_refuses_an_episode_target_that_is_not_the_scripts_episode _
+tests/integration/server/media_tools/test_videos.py:255: in test_generate_videos_refuses_an_episode_target_that_is_not_the_scripts_episode
+    assert "不一致" in out.problem.detail
+E   AssertionError: assert '不一致' in 'generate_videos failed: target.episode_id=2 does not match the script episode ID 1'
+E    +  where 'generate_videos failed: target.episode_id=2 does not match the script episode ID 1' = ToolProblem(code='internal_error', detail='generate_videos failed: target.episode_id=2 does not match the script episode ID 1', action=None, params=None).detail
+E    +    where ToolProblem(code='internal_error', detail='generate_videos failed: target.episode_id=2 does not match the script episode ID 1', action=None, params=None) = ToolOutcome(value=None, problem=ToolProblem(code='internal_error', detail='generate_videos failed: target.episode_id=2 does not match the script episode ID 1', action=None, params=None)).problem
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:57:24 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+----------------------------- Captured stderr call -----------------------------
+2026-11-07 19:57:24 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-878be3bd05)
+------------------------------ Captured log call -------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-878be3bd05)
+_ test_generate_videos_episode_scope_reference_rejects_malformed_unit_container _
+tests/integration/server/media_tools/test_videos.py:742: in test_generate_videos_episode_scope_reference_rejects_malformed_unit_container
+    assert "video_units 必须是数组" in out.problem.detail
+E   AssertionError: assert 'video_units 必须是数组' in 'generate_videos failed: video_units for 未命名集（第 1 个，id=1） must be an array: episode_1.json'
+E    +  where 'generate_videos failed: video_units for 未命名集（第 1 个，id=1） must be an array: episode_1.json' = ToolProblem(code='internal_error', detail='generate_videos failed: video_units for 未命名集（第 1 个，id=1） must be an array: episode_1.json', action=None, params=None).detail
+E    +    where ToolProblem(code='internal_error', detail='generate_videos failed: video_units for 未命名集（第 1 个，id=1） must be an array: episode_1.json', action=None, params=None) = ToolOutcome(value=None, problem=ToolProblem(code='internal_error', detail='generate_videos failed: video_units for 未命名集（第 1 个，id=1） must be an array: episode_1.json', action=None, params=None)).problem
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:57:26 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+--------------------------- Captured stderr teardown ---------------------------
+2026-11-07 19:57:26 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-810e355981)
+---------------------------- Captured log teardown -----------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-810e355981)
+___ test_generate_videos_episode_scope_reference_duration_needs_confirmation ___
+tests/integration/server/media_tools/test_videos.py:777: in test_generate_videos_episode_scope_reference_duration_needs_confirmation
+    assert "E1U1：剧本时长 5s，将申请 8s（成片更长 3s）" in _text(out)
+E   AssertionError: assert 'E1U1：剧本时长 5s，将申请 8s（成片更长 3s）' in 'The following units need different video-duration tiers. Obtain user confirmation first; this call enqueued no tasks:...: the first enqueued tier would already incur charges, so these targets would no longer be one all-or-nothing request.'
+E    +  where 'The following units need different video-duration tiers. Obtain user confirmation first; this call enqueued no tasks:...: the first enqueued tier would already incur charges, so these targets would no longer be one all-or-nothing request.' = _text(ToolOutcome(value={'generation_result': GenerationBatchResult(schema_version=1, operation='generate_videos', selection...eued tier would already incur charges, so these targets would no longer be one all-or-nothing request.'}, problem=None))
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:57:26 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+----------------------------- Captured stderr call -----------------------------
+2026-11-07 19:57:26 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-1b87f41489)
+------------------------------ Captured log call -------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-1b87f41489)
+_____ test_generate_videos_preview_states_plainly_that_a_unit_is_unpriced ______
+tests/integration/server/media_tools/test_videos.py:1926: in test_generate_videos_preview_states_plainly_that_a_unit_is_unpriced
+    assert "未定价" in out.value["summary"]
+E   AssertionError: assert '未定价' in 'Preflight complete; no tasks enqueued.\n- E1S01：Request 4s, Unpriced (reason: no_entry)\nEstimated total: 1 units are unpriced, so no total is available; tell the user clearly that the cost is unknown.'
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:57:29 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+----------------------------- Captured stderr call -----------------------------
+2026-11-07 19:57:29 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-394cb009aa)
+------------------------------ Captured log call -------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-394cb009aa)
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /Users/pablo.carminatti.br/Projects/ArcReelBR/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+tests/unit/lib/generation/test_generation_result.py::test_missing_only_selects_missing_and_reuses_stale
+  /Users/pablo.carminatti.br/.local/share/uv/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/contextlib.py:144: SAWarning: Skipped unsupported reflection of expression-based index idx_tasks_dedupe_active
+    next(self.gen)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 25 durations =============================
+1.30s call     tests/integration/server/media_tools/test_jianying_drafts.py::test_embedded_agent_waits_for_a_registered_draft
+1.24s call     tests/integration/server/media_tools/test_final_cuts.py::test_embedded_agent_waits_for_a_downloadable_final_cut
+1.22s call     tests/integration/server/media_tools/test_jianying_drafts.py::test_a_render_time_failure_comes_back_as_a_stable_problem_without_leftovers
+1.11s call     tests/integration/server/media_tools/test_inspect_video_units.py::test_the_per_call_frame_budget_is_shared_across_units
+0.84s setup    tests/unit/lib/generation/test_generation_result.py::test_missing_only_selects_missing_and_reuses_stale
+0.51s call     tests/integration/server/media_tools/test_inspect_video_units.py::test_each_version_caches_its_own_signals
+0.39s call     tests/integration/server/media_tools/test_inspect_video_units.py::test_signals_are_returned_with_marked_frames_and_cached_per_version
+0.37s call     tests/integration/server/media_tools/test_inspect_video_units.py::test_naming_an_older_version_shows_that_versions_picture
+0.27s call     tests/integration/server/media_tools/test_inspect_video_units.py::test_frame_counts_report_the_frames_actually_drawn_when_shots_exceed_the_budget
+0.26s call     tests/integration/server/media_tools/test_inspect_video_units.py::test_inspecting_current_versions_returns_one_contact_sheet_image_per_unit
+0.26s call     tests/integration/server/media_tools/test_bgm.py::test_list_bgm_reports_id_name_and_duration_in_upload_order
+0.22s call     tests/integration/server/media_tools/test_jianying_drafts.py::test_external_agent_gets_a_batch_handle_to_poll
+0.21s call     tests/integration/server/media_tools/test_jianying_drafts.py::test_refusals_happen_before_anything_is_queued[installed1-with_narration-jianying_draft_narration_unavailable]
+0.20s call     tests/integration/server/media_tools/test_final_cuts.py::test_external_agent_gets_a_batch_handle_to_poll
+0.20s call     tests/integration/server/media_tools/test_inspect_video_units.py::test_a_unit_without_video_is_reported_without_images
+0.18s call     tests/integration/server/media_tools/test_inspect_images.py::test_large_images_are_downscaled_to_the_long_edge_limit
+0.16s setup    tests/integration/server/media_tools/test_videos.py::test_generate_videos_refuses_a_malformed_request_before_enqueuing[selected-with-empty-ids]
+0.16s call     tests/integration/server/media_tools/test_inspect_images.py::test_current_images_without_history_remain_viewable_and_read_only[storyboard]
+0.16s call     tests/integration/server/media_tools/test_inspect_images.py::test_items_without_a_viewable_image_report_their_status_without_an_image
+0.15s call     tests/integration/server/media_tools/test_video_versions.py::test_selecting_an_older_version_makes_it_current[False-videos-E1S01-media0]
+0.15s call     tests/integration/server/media_tools/test_video_versions.py::test_selecting_an_older_version_makes_it_current[True-reference_videos-E1U1-media1]
+0.14s call     tests/integration/server/media_tools/test_inspect_images.py::test_current_images_without_history_remain_viewable_and_read_only[character]
+0.14s call     tests/integration/server/media_tools/test_inspect_images.py::test_current_asset_sheets_come_back_as_image_blocks_in_request_order
+0.13s call     tests/integration/server/media_tools/test_jianying_drafts.py::test_refusals_happen_before_anything_is_queued[installed0-without_narration-jianying_draft_blocked]
+0.13s call     tests/integration/server/media_tools/test_inspect_images.py::test_naming_a_version_shows_that_storyboard_from_any_episode
+=========================== short test summary info ============================
+FAILED tests/unit/lib/generation/test_generation_result.py::test_the_rendered_summary_spells_out_item_warnings
+FAILED tests/unit/lib/generation/test_generation_result.py::test_the_rendered_text_is_only_a_projection_of_the_payload
+FAILED tests/unit/lib/generation/test_generation_result.py::test_rendered_summary_uses_product_language_not_raw_enums
+FAILED tests/unit/lib/generation/test_generation_result.py::test_every_generation_entry_point_has_a_product_language_label
+FAILED tests/unit/lib/generation/test_generation_result.py::test_the_summary_header_names_the_operation_in_product_language
+FAILED tests/unit/server/media_tools/test_context.py::test_validate_script_filename_rejects_paths[]
+FAILED tests/unit/server/media_tools/test_context.py::test_validate_script_filename_rejects_paths[scripts/episode_1.json]
+FAILED tests/unit/server/media_tools/test_context.py::test_validate_script_filename_rejects_paths[../etc/passwd]
+FAILED tests/unit/server/media_tools/test_context.py::test_validate_script_filename_rejects_paths[sub/dir/file.json]
+FAILED tests/unit/server/media_tools/test_context.py::test_validate_script_filename_rejects_paths[a\\b.json]
+FAILED tests/unit/server/media_tools/test_context.py::test_validate_script_filename_rejects_paths[.]
+FAILED tests/unit/server/media_tools/test_context.py::test_validate_script_filename_rejects_paths[..]
+FAILED tests/unit/server/media_tools/test_context.py::test_validate_script_filename_rejects_non_string_agent_args[1]
+FAILED tests/unit/server/media_tools/test_context.py::test_validate_script_filename_rejects_non_string_agent_args[None]
+FAILED tests/unit/server/media_tools/test_context.py::test_validate_script_filename_rejects_non_string_agent_args[bad2]
+FAILED tests/unit/server/media_tools/test_context.py::test_validate_script_filename_rejects_non_string_agent_args[bad3]
+FAILED tests/unit/server/services/admission/test_video_quote.py::test_total_covers_the_priced_units_and_the_unpriced_ones_are_counted
+FAILED tests/unit/server/services/admission/test_video_quote.py::test_no_total_is_given_when_no_unit_is_priced
+FAILED tests/unit/server/services/admission/test_video_quote.py::test_a_unit_that_cannot_be_quoted_at_all_is_unpriced_too
+FAILED tests/unit/server/services/admission/test_video_quote.py::test_confirmation_text_tells_the_agent_which_units_in_a_tier_are_unpriced
+FAILED tests/integration/server/media_tools/test_videos.py::test_generate_videos_refuses_a_narration_delivery_without_enqueuing[post_production]
+FAILED tests/integration/server/media_tools/test_videos.py::test_generate_videos_refuses_a_narration_delivery_without_enqueuing[use_tts]
+FAILED tests/integration/server/media_tools/test_videos.py::test_generate_videos_refuses_a_retired_param_with_its_replacement[narration_delivery]
+FAILED tests/integration/server/media_tools/test_videos.py::test_generate_videos_refuses_a_retired_param_with_its_replacement[reference_images]
+FAILED tests/integration/server/media_tools/test_videos.py::test_generate_videos_refuses_a_retired_param_with_its_replacement[references]
+FAILED tests/integration/server/media_tools/test_videos.py::test_generate_videos_refuses_a_retired_param_with_its_replacement[resume]
+FAILED tests/integration/server/media_tools/test_videos.py::test_generate_videos_refuses_a_retired_param_with_its_replacement[shot_ids]
+FAILED tests/integration/server/media_tools/test_videos.py::test_generate_videos_refuses_a_retired_param_with_its_replacement[shots]
+FAILED tests/integration/server/media_tools/test_videos.py::test_generate_videos_refuses_a_retired_param_with_its_replacement[unit_id]
+FAILED tests/integration/server/media_tools/test_videos.py::test_generate_videos_refuses_a_retired_param_with_its_replacement[unit_ids]
+FAILED tests/integration/server/media_tools/test_videos.py::test_generate_videos_refuses_an_episode_target_that_is_not_the_scripts_episode
+FAILED tests/integration/server/media_tools/test_videos.py::test_generate_videos_episode_scope_reference_rejects_malformed_unit_container
+FAILED tests/integration/server/media_tools/test_videos.py::test_generate_videos_episode_scope_reference_duration_needs_confirmation
+FAILED tests/integration/server/media_tools/test_videos.py::test_generate_videos_preview_states_plainly_that_a_unit_is_unpriced
+34 failed, 313 passed, 2 warnings in 28.37s

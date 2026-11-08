@@ -1,0 +1,304 @@
+........................................................................ [  3%]
+........................................................................ [  7%]
+........................................................................ [ 10%]
+........................................................................ [ 14%]
+........................................................................ [ 18%]
+........................................................................ [ 21%]
+........................................................F............... [ 25%]
+.........................................F....F......................... [ 29%]
+........................................................................ [ 32%]
+.........................................FFFF........................... [ 36%]
+........................................................................ [ 40%]
+........................................................................ [ 43%]
+...............FF............FFF........................................ [ 47%]
+....................F................................................... [ 51%]
+........................................................................ [ 54%]
+........................................................................ [ 58%]
+...............F........................................................ [ 62%]
+........................................................................ [ 65%]
+..............................................F......................... [ 69%]
+........................................................................ [ 73%]
+........................................................................ [ 76%]
+........................................................................ [ 80%]
+...................................F.................................... [ 84%]
+......................F.FF.............................................. [ 87%]
+........................................................................ [ 91%]
+........................................................................ [ 95%]
+........................................................................ [ 98%]
+.....................                                                    [100%]
+=================================== FAILURES ===================================
+___ test_generate_episode_script_preserves_editable_draft_without_violations ___
+tests/integration/server/agent_toolset/test_promote_draft.py:1021: in test_generate_episode_script_preserves_editable_draft_without_violations
+    assert "保留已有修改" in text
+E   assert '保留已有修改' in "⏸️ Episode (id=1) has a prompt-authoring draft to resolve, so prompts can't be written yet（prompt_authoring_draft_pen...ipt.invalid.json. This draft is editable; preserve existing edits, then call promote_draft to validate and promote it."
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:46:55 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+----------------------------- Captured stderr call -----------------------------
+2026-11-07 19:46:55 [INFO] lib.project.project_manager: 已同步剧集信息: Episode 1 - 第1集
+2026-11-07 19:46:55 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-7f598cd7eb)
+------------------------------ Captured log call -------------------------------
+INFO     lib.project.project_manager:project_manager.py:1349 已同步剧集信息: Episode 1 - 第1集
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-7f598cd7eb)
+________ test_generate_episode_script_without_formal_script_is_refused _________
+tests/integration/server/agent_toolset/test_text_generation.py:360: in test_generate_episode_script_without_formal_script_is_refused
+    assert "内容确认" in said(out)
+E   AssertionError: assert '内容确认' in '⏸️ Episode (id=1) has no formal script; confirm a script plan or write a blank script before authoring prompts（formal_script_missing）。'
+E    +  where '⏸️ Episode (id=1) has no formal script; confirm a script plan or write a blank script before authoring prompts（formal_script_missing）。' = said(ToolOutcome(value=None, problem=ToolProblem(code='operation_not_admitted', detail='⏸️ Episode (id=1) has no formal scr...=<GenerationAction.FIX_INPUT: 'fix_input'>, params={'operation': 'author_prompts', 'reason': 'formal_script_missing'})))
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:47:02 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+--------------------------- Captured stderr teardown ---------------------------
+2026-11-07 19:47:02 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-e34d60ce56)
+---------------------------- Captured log teardown -----------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-e34d60ce56)
+_ test_generate_episode_script_without_pending_entries_says_how_to_rewrite[narration-\u91cd\u8dd1\u811a\u672c\u89c4\u5212] _
+tests/integration/server/agent_toolset/test_text_generation.py:545: in test_generate_episode_script_without_pending_entries_says_how_to_rewrite
+    assert redo_hint in message
+E   AssertionError: assert '重跑脚本规划' in '⏸️ Episode (id=1) has no pending entries（no_pending_authoring）。To rewrite existing prompts, pass entry_ids and rewrite=true. Rerun script planning and confirm it again before rebuilding the episode.'
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:47:02 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+----------------------------- Captured stderr call -----------------------------
+2026-11-07 19:47:02 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-3d79af4208)
+------------------------------ Captured log call -------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-3d79af4208)
+_ test_generate_videos_rejects_mismatched_unit_script_on_storyboard_route[episode] _
+tests/integration/server/media_tools/test_videos.py:1735: in test_generate_videos_rejects_mismatched_unit_script_on_storyboard_route
+    assert "Script skeleton" in out.problem.detail
+E   AssertionError: assert 'Script skeleton' in 'generate_videos 失败: 脚本骨架与项目生成模式不符：项目生成模式是分镜图生视频（storyboard），要求 segments（分镜）骨架，当前脚本是 video_units（视频单元）骨架。请重跑分集拆分（script_plan）重新拆分该集，再重新生成脚本。该脚本仍可查看、编辑与导出。'
+E    +  where 'generate_videos 失败: 脚本骨架与项目生成模式不符：项目生成模式是分镜图生视频（storyboard），要求 segments（分镜）骨架，当前脚本是 video_units（视频单元）骨架。请重跑分集拆分（script_plan）重新拆分该集，再重新生成脚本。该脚本仍可查看、编辑与导出。' = ToolProblem(code='internal_error', detail='generate_videos 失败: 脚本骨架与项目生成模式不符：项目生成模式是分镜图生视频（storyboard），要求 segments（分镜）骨架，当前脚本是 video_units（视频单元）骨架。请重跑分集拆分（script_plan）重新拆分该集，再重新生成脚本。该脚本仍可查看、编辑与导出。', action=None, params=None).detail
+E    +    where ToolProblem(code='internal_error', detail='generate_videos 失败: 脚本骨架与项目生成模式不符：项目生成模式是分镜图生视频（storyboard），要求 segments（分镜）骨架，当前脚本是 video_units（视频单元）骨架。请重跑分集拆分（script_plan）重新拆分该集，再重新生成脚本。该脚本仍可查看、编辑与导出。', action=None, params=None) = ToolOutcome(value=None, problem=ToolProblem(code='internal_error', detail='generate_videos 失败: 脚本骨架与项目生成模式不符：项目生成模式是分镜...segments（分镜）骨架，当前脚本是 video_units（视频单元）骨架。请重跑分集拆分（script_plan）重新拆分该集，再重新生成脚本。该脚本仍可查看、编辑与导出。', action=None, params=None)).problem
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:47:15 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+----------------------------- Captured stderr call -----------------------------
+2026-11-07 19:47:15 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-fa9fdf77f2)
+------------------------------ Captured log call -------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-fa9fdf77f2)
+_ test_generate_videos_rejects_mismatched_unit_script_on_storyboard_route[scene] _
+tests/integration/server/media_tools/test_videos.py:1735: in test_generate_videos_rejects_mismatched_unit_script_on_storyboard_route
+    assert "Script skeleton" in out.problem.detail
+E   AssertionError: assert 'Script skeleton' in 'generate_videos 失败: 脚本骨架与项目生成模式不符：项目生成模式是分镜图生视频（storyboard），要求 segments（分镜）骨架，当前脚本是 video_units（视频单元）骨架。请重跑分集拆分（script_plan）重新拆分该集，再重新生成脚本。该脚本仍可查看、编辑与导出。'
+E    +  where 'generate_videos 失败: 脚本骨架与项目生成模式不符：项目生成模式是分镜图生视频（storyboard），要求 segments（分镜）骨架，当前脚本是 video_units（视频单元）骨架。请重跑分集拆分（script_plan）重新拆分该集，再重新生成脚本。该脚本仍可查看、编辑与导出。' = ToolProblem(code='internal_error', detail='generate_videos 失败: 脚本骨架与项目生成模式不符：项目生成模式是分镜图生视频（storyboard），要求 segments（分镜）骨架，当前脚本是 video_units（视频单元）骨架。请重跑分集拆分（script_plan）重新拆分该集，再重新生成脚本。该脚本仍可查看、编辑与导出。', action=None, params=None).detail
+E    +    where ToolProblem(code='internal_error', detail='generate_videos 失败: 脚本骨架与项目生成模式不符：项目生成模式是分镜图生视频（storyboard），要求 segments（分镜）骨架，当前脚本是 video_units（视频单元）骨架。请重跑分集拆分（script_plan）重新拆分该集，再重新生成脚本。该脚本仍可查看、编辑与导出。', action=None, params=None) = ToolOutcome(value=None, problem=ToolProblem(code='internal_error', detail='generate_videos 失败: 脚本骨架与项目生成模式不符：项目生成模式是分镜...segments（分镜）骨架，当前脚本是 video_units（视频单元）骨架。请重跑分集拆分（script_plan）重新拆分该集，再重新生成脚本。该脚本仍可查看、编辑与导出。', action=None, params=None)).problem
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:47:15 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+----------------------------- Captured stderr call -----------------------------
+2026-11-07 19:47:15 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-4ccc9308ee)
+------------------------------ Captured log call -------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-4ccc9308ee)
+_ test_generate_videos_rejects_mismatched_unit_script_on_storyboard_route[all] _
+tests/integration/server/media_tools/test_videos.py:1735: in test_generate_videos_rejects_mismatched_unit_script_on_storyboard_route
+    assert "Script skeleton" in out.problem.detail
+E   AssertionError: assert 'Script skeleton' in 'generate_videos 失败: 脚本骨架与项目生成模式不符：项目生成模式是分镜图生视频（storyboard），要求 segments（分镜）骨架，当前脚本是 video_units（视频单元）骨架。请重跑分集拆分（script_plan）重新拆分该集，再重新生成脚本。该脚本仍可查看、编辑与导出。'
+E    +  where 'generate_videos 失败: 脚本骨架与项目生成模式不符：项目生成模式是分镜图生视频（storyboard），要求 segments（分镜）骨架，当前脚本是 video_units（视频单元）骨架。请重跑分集拆分（script_plan）重新拆分该集，再重新生成脚本。该脚本仍可查看、编辑与导出。' = ToolProblem(code='internal_error', detail='generate_videos 失败: 脚本骨架与项目生成模式不符：项目生成模式是分镜图生视频（storyboard），要求 segments（分镜）骨架，当前脚本是 video_units（视频单元）骨架。请重跑分集拆分（script_plan）重新拆分该集，再重新生成脚本。该脚本仍可查看、编辑与导出。', action=None, params=None).detail
+E    +    where ToolProblem(code='internal_error', detail='generate_videos 失败: 脚本骨架与项目生成模式不符：项目生成模式是分镜图生视频（storyboard），要求 segments（分镜）骨架，当前脚本是 video_units（视频单元）骨架。请重跑分集拆分（script_plan）重新拆分该集，再重新生成脚本。该脚本仍可查看、编辑与导出。', action=None, params=None) = ToolOutcome(value=None, problem=ToolProblem(code='internal_error', detail='generate_videos 失败: 脚本骨架与项目生成模式不符：项目生成模式是分镜...segments（分镜）骨架，当前脚本是 video_units（视频单元）骨架。请重跑分集拆分（script_plan）重新拆分该集，再重新生成脚本。该脚本仍可查看、编辑与导出。', action=None, params=None)).problem
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:47:15 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+----------------------------- Captured stderr call -----------------------------
+2026-11-07 19:47:15 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-3232abd4b7)
+------------------------------ Captured log call -------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-3232abd4b7)
+_ test_generate_videos_rejects_mismatched_unit_script_on_storyboard_route[selected] _
+tests/integration/server/media_tools/test_videos.py:1735: in test_generate_videos_rejects_mismatched_unit_script_on_storyboard_route
+    assert "Script skeleton" in out.problem.detail
+E   AssertionError: assert 'Script skeleton' in 'generate_videos 失败: 脚本骨架与项目生成模式不符：项目生成模式是分镜图生视频（storyboard），要求 segments（分镜）骨架，当前脚本是 video_units（视频单元）骨架。请重跑分集拆分（script_plan）重新拆分该集，再重新生成脚本。该脚本仍可查看、编辑与导出。'
+E    +  where 'generate_videos 失败: 脚本骨架与项目生成模式不符：项目生成模式是分镜图生视频（storyboard），要求 segments（分镜）骨架，当前脚本是 video_units（视频单元）骨架。请重跑分集拆分（script_plan）重新拆分该集，再重新生成脚本。该脚本仍可查看、编辑与导出。' = ToolProblem(code='internal_error', detail='generate_videos 失败: 脚本骨架与项目生成模式不符：项目生成模式是分镜图生视频（storyboard），要求 segments（分镜）骨架，当前脚本是 video_units（视频单元）骨架。请重跑分集拆分（script_plan）重新拆分该集，再重新生成脚本。该脚本仍可查看、编辑与导出。', action=None, params=None).detail
+E    +    where ToolProblem(code='internal_error', detail='generate_videos 失败: 脚本骨架与项目生成模式不符：项目生成模式是分镜图生视频（storyboard），要求 segments（分镜）骨架，当前脚本是 video_units（视频单元）骨架。请重跑分集拆分（script_plan）重新拆分该集，再重新生成脚本。该脚本仍可查看、编辑与导出。', action=None, params=None) = ToolOutcome(value=None, problem=ToolProblem(code='internal_error', detail='generate_videos 失败: 脚本骨架与项目生成模式不符：项目生成模式是分镜...segments（分镜）骨架，当前脚本是 video_units（视频单元）骨架。请重跑分集拆分（script_plan）重新拆分该集，再重新生成脚本。该脚本仍可查看、编辑与导出。', action=None, params=None)).problem
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:47:15 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+----------------------------- Captured stderr call -----------------------------
+2026-11-07 19:47:15 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-6e15eb1438)
+------------------------------ Captured log call -------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-6e15eb1438)
+_ TestGenerateRouter.test_storyboard_refuses_a_pending_image_prompt_before_enqueue _
+tests/integration/server/routers/test_generate_router.py:257: in test_storyboard_refuses_a_pending_image_prompt_before_enqueue
+    assert "未命名集 · S02" in str(response.json()["detail"])
+E   assert '未命名集 · S02' in "The prompt of shot 'Untitled episode · S02' is pending; let the Agent write it or fill it in before generating"
+E    +  where "The prompt of shot 'Untitled episode · S02' is pending; let the Agent write it or fill it in before generating" = str("The prompt of shot 'Untitled episode · S02' is pending; let the Agent write it or fill it in before generating")
+----------------------------- Captured stderr call -----------------------------
+2026-11-07 19:47:24 [INFO] httpx: HTTP Request: POST http://testserver/api/v1/projects/demo/generate/storyboard/E1S02 "HTTP/1.1 409 Conflict"
+------------------------------ Captured log call -------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/api/v1/projects/demo/generate/storyboard/E1S02 "HTTP/1.1 409 Conflict"
+_ TestGenerateRouter.test_video_refuses_a_pending_video_prompt_before_enqueue __
+tests/integration/server/routers/test_generate_router.py:273: in test_video_refuses_a_pending_video_prompt_before_enqueue
+    assert "未命名集 · S01" in str(response.json()["detail"])
+E   assert '未命名集 · S01' in "The prompt of shot 'Untitled episode · S01' is pending; let the Agent write it or fill it in before generating"
+E    +  where "The prompt of shot 'Untitled episode · S01' is pending; let the Agent write it or fill it in before generating" = str("The prompt of shot 'Untitled episode · S01' is pending; let the Agent write it or fill it in before generating")
+----------------------------- Captured stderr call -----------------------------
+2026-11-07 19:47:24 [INFO] httpx: HTTP Request: POST http://testserver/api/v1/projects/demo/generate/video/E1S01 "HTTP/1.1 409 Conflict"
+------------------------------ Captured log call -------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/api/v1/projects/demo/generate/video/E1S01 "HTTP/1.1 409 Conflict"
+__ TestGenerateRouter.test_video_enqueue_bucket_capability_error_returns_400 ___
+tests/integration/server/routers/test_generate_router.py:546: in test_video_enqueue_bucket_capability_error_returns_400
+    assert res.json()["detail"] == i18n_message(
+E   AssertionError: assert 'Alibaba Mode...t video model' == '阿里百炼/HappyHo...t video model'
+E     
+E     - 阿里百炼/HappyHorse 1.0 参考生视频 does not support image-to-video generation; assign a model that supports it for image-to-video in Settings, or change the default video model
+E     ? ^^^^
+E     + Alibaba Model Studio/HappyHorse 1.0 参考生视频 does not support image-to-video generation; assign a model that supports it for image-to-video in Settings, or change the default video model
+E     ? ^^^^^^^^^^^^^^^^^^^^
+----------------------------- Captured stderr call -----------------------------
+2026-11-07 19:47:25 [INFO] httpx: HTTP Request: POST http://testserver/api/v1/projects/demo/generate/video/E1S01 "HTTP/1.1 400 Bad Request"
+------------------------------ Captured log call -------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/api/v1/projects/demo/generate/video/E1S01 "HTTP/1.1 400 Bad Request"
+_ TestGenerateRouter.test_video_enqueue_rejected_when_audio_switch_unsupported[post_production] _
+tests/integration/server/routers/test_generate_router.py:583: in test_video_enqueue_rejected_when_audio_switch_unsupported
+    assert res.json()["detail"] == i18n_message(
+E   AssertionError: assert 'Alibaba Mode...and try again' == '阿里百炼/万相 2.7 ...and try again'
+E     
+E     - 阿里百炼/万相 2.7 图生视频 always produces audio and cannot be muted; turn the audio switch back on in settings and try again
+E     ? ^^^^
+E     + Alibaba Model Studio/万相 2.7 图生视频 always produces audio and cannot be muted; turn the audio switch back on in settings and try again
+E     ? ^^^^^^^^^^^^^^^^^^^^
+----------------------------- Captured stderr call -----------------------------
+2026-11-07 19:47:25 [INFO] httpx: HTTP Request: POST http://testserver/api/v1/projects/demo/generate/video/E1S01 "HTTP/1.1 400 Bad Request"
+------------------------------ Captured log call -------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/api/v1/projects/demo/generate/video/E1S01 "HTTP/1.1 400 Bad Request"
+_ TestGenerateRouter.test_video_enqueue_rejected_when_audio_switch_unsupported[use_tts] _
+tests/integration/server/routers/test_generate_router.py:583: in test_video_enqueue_rejected_when_audio_switch_unsupported
+    assert res.json()["detail"] == i18n_message(
+E   AssertionError: assert 'Alibaba Mode...and try again' == '阿里百炼/万相 2.7 ...and try again'
+E     
+E     - 阿里百炼/万相 2.7 图生视频 always produces audio and cannot be muted; turn the audio switch back on in settings and try again
+E     ? ^^^^
+E     + Alibaba Model Studio/万相 2.7 图生视频 always produces audio and cannot be muted; turn the audio switch back on in settings and try again
+E     ? ^^^^^^^^^^^^^^^^^^^^
+----------------------------- Captured stderr call -----------------------------
+2026-11-07 19:47:25 [INFO] httpx: HTTP Request: POST http://testserver/api/v1/projects/demo/generate/video/E1S01 "HTTP/1.1 400 Bad Request"
+------------------------------ Captured log call -------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/api/v1/projects/demo/generate/video/E1S01 "HTTP/1.1 400 Bad Request"
+____ TestProjectsRouter.test_update_scene_supports_character_and_clue_refs _____
+tests/integration/server/routers/test_projects_script_edit_endpoints.py:318: in test_update_scene_supports_character_and_clue_refs
+    assert "配置文本供应商" in gen_overview_no_provider.json()["detail"]
+E   AssertionError: assert '配置文本供应商' in 'Please configure a text provider first: add at least one provider in Settings → Providers'
+----------------------------- Captured stderr call -----------------------------
+2026-11-07 19:47:29 [INFO] httpx: HTTP Request: PATCH http://testserver/api/v1/projects/ready/script-scenes/001 "HTTP/1.1 200 OK"
+2026-11-07 19:47:29 [WARNING] server.routers.projects: 生成概述参数错误: name=bad (source missing)
+2026-11-07 19:47:29 [INFO] httpx: HTTP Request: POST http://testserver/api/v1/projects/bad/generate-overview "HTTP/1.1 400 Bad Request"
+2026-11-07 19:47:29 [WARNING] server.routers.projects: 生成概述配置错误: name=no-provider (未找到可用的 text 供应商)
+2026-11-07 19:47:29 [INFO] httpx: HTTP Request: POST http://testserver/api/v1/projects/no-provider/generate-overview "HTTP/1.1 400 Bad Request"
+------------------------------ Captured log call -------------------------------
+INFO     httpx:_client.py:1025 HTTP Request: PATCH http://testserver/api/v1/projects/ready/script-scenes/001 "HTTP/1.1 200 OK"
+WARNING  server.routers.projects:projects.py:2122 生成概述参数错误: name=bad (source missing)
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/api/v1/projects/bad/generate-overview "HTTP/1.1 400 Bad Request"
+WARNING  server.routers.projects:projects.py:2093 生成概述配置错误: name=no-provider (未找到可用的 text 供应商)
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/api/v1/projects/no-provider/generate-overview "HTTP/1.1 400 Bad Request"
+__ test_prompt_preview_renders_draft_with_projected_references_without_saving __
+tests/integration/server/routers/test_reference_videos_router.py:2065: in test_prompt_preview_renders_draft_with_projected_references_without_saving
+    assert any("limit of 1" in warning for warning in body["warnings"])
+E   assert False
+E    +  where False = any(<generator object test_prompt_preview_renders_draft_with_projected_references_without_saving.<locals>.<genexpr> at 0x122a6a8e0>)
+----------------------------- Captured stderr call -----------------------------
+2026-11-07 19:47:49 [INFO] lib.project.project_manager: 已同步剧集信息: Episode 1 - E1
+2026-11-07 19:47:49 [INFO] httpx: HTTP Request: POST http://testserver/api/v1/projects/demo/reference-videos/episodes/1/units "HTTP/1.1 201 Created"
+2026-11-07 19:47:49 [INFO] httpx: HTTP Request: POST http://testserver/api/v1/projects/demo/reference-videos/episodes/1/units/E1U1/prompt-preview "HTTP/1.1 200 OK"
+------------------------------ Captured log call -------------------------------
+INFO     lib.project.project_manager:project_manager.py:1349 已同步剧集信息: Episode 1 - E1
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/api/v1/projects/demo/reference-videos/episodes/1/units "HTTP/1.1 201 Created"
+INFO     httpx:_client.py:1025 HTTP Request: POST http://testserver/api/v1/projects/demo/reference-videos/episodes/1/units/E1U1/prompt-preview "HTTP/1.1 200 OK"
+_ TestReferenceVideoPromptAuthoringEnforcement.test_confirm_tool_materializes_the_script_authoring_reads _
+tests/integration/server/services/project/test_script_review.py:1646: in test_confirm_tool_materializes_the_script_authoring_reads
+    assert "内容确认" in refused.problem.detail
+E   AssertionError: assert '内容确认' in '⏸️ Episode (id=1) has no formal script; confirm a script plan or write a blank script before authoring prompts（formal_script_missing）。'
+E    +  where '⏸️ Episode (id=1) has no formal script; confirm a script plan or write a blank script before authoring prompts（formal_script_missing）。' = ToolProblem(code='operation_not_admitted', detail='⏸️ Episode (id=1) has no formal script; confirm a script plan or wr...n=<GenerationAction.FIX_INPUT: 'fix_input'>, params={'operation': 'author_prompts', 'reason': 'formal_script_missing'}).detail
+E    +    where ToolProblem(code='operation_not_admitted', detail='⏸️ Episode (id=1) has no formal script; confirm a script plan or wr...n=<GenerationAction.FIX_INPUT: 'fix_input'>, params={'operation': 'author_prompts', 'reason': 'formal_script_missing'}) = ToolOutcome(value=None, problem=ToolProblem(code='operation_not_admitted', detail='⏸️ Episode (id=1) has no formal scr...=<GenerationAction.FIX_INPUT: 'fix_input'>, params={'operation': 'author_prompts', 'reason': 'formal_script_missing'})).problem
+----------------------------- Captured stderr call -----------------------------
+2026-11-07 19:48:09 [INFO] lib.project.project_manager: 添加角色: 阿离
+2026-11-07 19:48:09 [INFO] lib.project.project_manager: 添加角色: 裴与
+------------------------------ Captured log call -------------------------------
+INFO     lib.project.project_manager:project_manager.py:2658 添加角色: 阿离
+INFO     lib.project.project_manager:project_manager.py:2658 添加角色: 裴与
+_ TestDeclarativeVideoBackend.test_template_failure_keeps_its_detail_locale_neutral _
+tests/unit/lib/custom_provider/test_declarative_video_backend.py:883: in test_template_failure_keeps_its_detail_locale_neutral
+    assert str(caught.value) == "enum_maps.duration has no entry for '5'"
+E   assert "enum_maps.du...on 缺少 '5' 的映射" == "enum_maps.du...entry for '5'"
+E     
+E     - enum_maps.duration has no entry for '5'
+E     + enum_maps.duration 缺少 '5' 的映射
+____ TestRouteSkeletonGate.test_unit_script_on_storyboard_route_is_rejected ____
+tests/unit/lib/script/test_script_skeleton.py:182: in test_unit_script_on_storyboard_route_is_rejected
+    assert "Script skeleton" in str(exc.value)
+E   AssertionError: assert 'Script skeleton' in '脚本骨架与项目生成模式不符：项目生成模式是分镜图生视频（storyboard），要求 segments（分镜）骨架，当前脚本是 video_units（视频单元）骨架。请重跑分集拆分（script_plan）重新拆分该集，再重新生成脚本。该脚本仍可查看、编辑与导出。'
+E    +  where '脚本骨架与项目生成模式不符：项目生成模式是分镜图生视频（storyboard），要求 segments（分镜）骨架，当前脚本是 video_units（视频单元）骨架。请重跑分集拆分（script_plan）重新拆分该集，再重新生成脚本。该脚本仍可查看、编辑与导出。' = str(SkeletonRouteMismatchError())
+E    +    where SkeletonRouteMismatchError() = <ExceptionInfo SkeletonRouteMismatchError() tblen=2>.value
+_ TestRouteSkeletonGate.test_storyboard_route_rejects_script_without_any_skeleton_array _
+tests/unit/lib/script/test_script_skeleton.py:203: in test_storyboard_route_rejects_script_without_any_skeleton_array
+    assert "no skeleton array at all" in str(exc.value)
+E   AssertionError: assert 'no skeleton array at all' in '脚本骨架与项目生成模式不符：项目生成模式是分镜图生视频（storyboard），要求 segments（分镜）骨架，当前脚本没有任何骨架数组。请重跑分集拆分（script_plan）重新拆分该集，再重新生成脚本。该脚本仍可查看、编辑与导出。'
+E    +  where '脚本骨架与项目生成模式不符：项目生成模式是分镜图生视频（storyboard），要求 segments（分镜）骨架，当前脚本没有任何骨架数组。请重跑分集拆分（script_plan）重新拆分该集，再重新生成脚本。该脚本仍可查看、编辑与导出。' = str(SkeletonRouteMismatchError())
+E    +    where SkeletonRouteMismatchError() = <ExceptionInfo SkeletonRouteMismatchError() tblen=2>.value
+_ TestRouteSkeletonGate.test_reference_route_rejects_script_without_any_skeleton_array _
+tests/unit/lib/script/test_script_skeleton.py:212: in test_reference_route_rejects_script_without_any_skeleton_array
+    assert "no skeleton array at all" in str(exc.value)
+E   AssertionError: assert 'no skeleton array at all' in '脚本骨架与项目生成模式不符：项目生成模式是参考生视频（reference_video），要求 video_units（视频单元）骨架，当前脚本没有任何骨架数组。请调用 generate_script_plan 重新拆分该集，再重新生成脚本。该脚本仍可查看、编辑与导出。'
+E    +  where '脚本骨架与项目生成模式不符：项目生成模式是参考生视频（reference_video），要求 video_units（视频单元）骨架，当前脚本没有任何骨架数组。请调用 generate_script_plan 重新拆分该集，再重新生成脚本。该脚本仍可查看、编辑与导出。' = str(SkeletonRouteMismatchError())
+E    +    where SkeletonRouteMismatchError() = <ExceptionInfo SkeletonRouteMismatchError() tblen=2>.value
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /Users/pablo.carminatti.br/Projects/ArcReelBR/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+tests/integration/lib/artifacts/test_artifact_manifest_storage.py::test_project_adapter_persists_deterministic_utf8_and_skips_unchanged_write
+  /Users/pablo.carminatti.br/.local/share/uv/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/contextlib.py:144: SAWarning: Skipped unsupported reflection of expression-based index idx_tasks_dedupe_active
+    next(self.gen)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 25 durations =============================
+7.70s call     tests/integration/server/agent_runtime/test_event_log_session_flow.py::TestQueuedMessages::test_queued_idempotency_and_replays_survive_many_later_sends
+2.20s call     tests/integration/lib/artifacts/test_artifact_manifest_storage.py::test_project_adapter_rejects_runtime_fifo_without_blocking[.arcreel_artifacts.json]
+2.09s call     tests/integration/lib/artifacts/test_artifact_manifest_storage.py::test_project_adapter_rejects_runtime_fifo_without_blocking[.artifact_manifest.lock]
+1.34s call     tests/unit/server/routers/test_custom_providers_api.py::TestConnectionTest::test_connection_failure
+0.76s setup    tests/integration/lib/artifacts/test_artifact_manifest_storage.py::test_project_adapter_persists_deterministic_utf8_and_skips_unchanged_write
+0.65s call     tests/integration/server/services/project/test_project_archive_service.py::TestProjectArchiveService::test_export_waits_for_a_formal_commit_before_snapshotting
+0.43s call     tests/integration/server/services/project/test_project_archive_service.py::TestProjectArchiveService::test_uploaded_bgm_round_trips_through_archive_with_a_current_claim[current]
+0.42s call     tests/integration/server/routers/test_provider_models_api.py::test_custom_discovery_matches_entries_and_infers_default_endpoints
+0.42s call     tests/integration/server/services/project/test_project_archive_service.py::TestProjectArchiveService::test_uploaded_bgm_round_trips_through_archive_with_a_current_claim[full]
+0.39s call     tests/integration/server/services/project/test_project_archive_service.py::TestProjectArchiveService::test_rendered_artifacts_stay_out_of_the_archive_and_read_missing_after_import
+0.36s call     tests/integration/server/services/project/test_project_archive_service.py::TestProjectArchiveService::test_edit_timelines_round_trip_through_archive[full]
+0.35s call     tests/integration/server/services/project/test_project_archive_service.py::TestProjectArchiveService::test_edit_timelines_round_trip_through_archive[current]
+0.35s call     tests/integration/server/services/project/test_script_review.py::TestErrors::test_agent_draft_keeps_formal_plan_readonly_until_discarded[narration]
+0.35s call     tests/integration/server/services/project/test_script_review.py::TestConfirmMaterializesScript::test_acknowledged_overwrite_moves_old_entries_to_the_project_trash
+0.28s call     tests/integration/server/routers/test_files_router.py::TestFilesRouter::test_upload_rejects_unsafe_name_for_every_type
+0.27s call     tests/integration/server/services/project/test_project_archive_service.py::test_an_archive_exported_at_schema_18_keeps_storyboards_and_grids_current_after_import
+0.27s call     tests/integration/server/routers/test_generate_router.py::TestAdStoryboardRegeneration::test_ad_shot_storyboard_enqueue_success
+0.26s call     tests/unit/server/routers/test_custom_providers_api.py::TestResolutionField::test_full_update_clears_resolution_to_null
+0.25s setup    tests/integration/server/media_tools/test_videos.py::test_generate_videos_refuses_a_malformed_request_before_enqueuing[tier-string]
+0.25s call     tests/integration/server/services/project/test_project_archive_service.py::TestProjectArchiveService::test_official_round_trip_preserves_a_stale_typed_audio_claim
+0.25s call     tests/integration/server/routers/test_files_router.py::TestFilesRouter::test_draft_content_fallback_when_mode_mismatches_file
+0.24s setup    tests/integration/server/routers/test_provider_models_api.py::test_user_added_video_model_overrides_take_effect_at_runtime
+0.24s call     tests/integration/server/services/project/test_project_archive_service.py::TestProjectArchiveService::test_current_export_keeps_selected_typed_snapshot_for_import_activation
+0.23s call     tests/integration/server/agent_runtime/test_event_log_session_flow.py::TestQueuedMessages::test_retry_of_an_accepted_message_whose_entry_failed_to_record_is_refused_not_resent
+0.23s call     tests/integration/server/routers/test_provider_models_api.py::test_image_reference_override_rejects_invalid_values[False-True]
+=========================== short test summary info ============================
+FAILED tests/integration/server/agent_toolset/test_promote_draft.py::test_generate_episode_script_preserves_editable_draft_without_violations
+FAILED tests/integration/server/agent_toolset/test_text_generation.py::test_generate_episode_script_without_formal_script_is_refused
+FAILED tests/integration/server/agent_toolset/test_text_generation.py::test_generate_episode_script_without_pending_entries_says_how_to_rewrite[narration-\u91cd\u8dd1\u811a\u672c\u89c4\u5212]
+FAILED tests/integration/server/media_tools/test_videos.py::test_generate_videos_rejects_mismatched_unit_script_on_storyboard_route[episode]
+FAILED tests/integration/server/media_tools/test_videos.py::test_generate_videos_rejects_mismatched_unit_script_on_storyboard_route[scene]
+FAILED tests/integration/server/media_tools/test_videos.py::test_generate_videos_rejects_mismatched_unit_script_on_storyboard_route[all]
+FAILED tests/integration/server/media_tools/test_videos.py::test_generate_videos_rejects_mismatched_unit_script_on_storyboard_route[selected]
+FAILED tests/integration/server/routers/test_generate_router.py::TestGenerateRouter::test_storyboard_refuses_a_pending_image_prompt_before_enqueue
+FAILED tests/integration/server/routers/test_generate_router.py::TestGenerateRouter::test_video_refuses_a_pending_video_prompt_before_enqueue
+FAILED tests/integration/server/routers/test_generate_router.py::TestGenerateRouter::test_video_enqueue_bucket_capability_error_returns_400
+FAILED tests/integration/server/routers/test_generate_router.py::TestGenerateRouter::test_video_enqueue_rejected_when_audio_switch_unsupported[post_production]
+FAILED tests/integration/server/routers/test_generate_router.py::TestGenerateRouter::test_video_enqueue_rejected_when_audio_switch_unsupported[use_tts]
+FAILED tests/integration/server/routers/test_projects_script_edit_endpoints.py::TestProjectsRouter::test_update_scene_supports_character_and_clue_refs
+FAILED tests/integration/server/routers/test_reference_videos_router.py::test_prompt_preview_renders_draft_with_projected_references_without_saving
+FAILED tests/integration/server/services/project/test_script_review.py::TestReferenceVideoPromptAuthoringEnforcement::test_confirm_tool_materializes_the_script_authoring_reads
+FAILED tests/unit/lib/custom_provider/test_declarative_video_backend.py::TestDeclarativeVideoBackend::test_template_failure_keeps_its_detail_locale_neutral
+FAILED tests/unit/lib/script/test_script_skeleton.py::TestRouteSkeletonGate::test_unit_script_on_storyboard_route_is_rejected
+FAILED tests/unit/lib/script/test_script_skeleton.py::TestRouteSkeletonGate::test_storyboard_route_rejects_script_without_any_skeleton_array
+FAILED tests/unit/lib/script/test_script_skeleton.py::TestRouteSkeletonGate::test_reference_route_rejects_script_without_any_skeleton_array
+19 failed, 1946 passed, 2 warnings in 151.42s (0:02:31)

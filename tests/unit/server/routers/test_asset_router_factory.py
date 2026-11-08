@@ -17,9 +17,9 @@ from tests.auth_deps import AUTH_DEPENDENCIES
 from tests.factories import make_translator
 from tests.fakes import FakeProjectAssetMutationMixin, use_project_manager
 
-# Default-locale fallback 500 text: tests do not override get_translator, so endpoints use DEFAULT_LOCALE("zh"),
-# matching make_translator()'s default locale.
-_INTERNAL_ERROR_DETAIL = make_translator()("internal_server_error")
+# Default-locale fallback 500 text: tests do not override get_translator, so endpoints use DEFAULT_LOCALE("en"),
+# explicitly matching the English presentation default.
+_INTERNAL_ERROR_DETAIL = make_translator("en")("internal_server_error")
 
 _NAME_NFC = unicodedata.normalize("NFC", "Hiếu")
 _NAME_NFD = unicodedata.normalize("NFD", "Hiếu")

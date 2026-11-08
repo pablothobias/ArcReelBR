@@ -1,4 +1,4 @@
-// Brand configuration — single source of truth for product naming.
+// Brand configuration: single source of truth for product naming and owner-supplied metadata.
 // Override at build time via Vite env vars
 // (VITE_BRAND_NAME / VITE_BRAND_TAGLINE / VITE_BRAND_DESCRIPTION).
 //
@@ -19,10 +19,10 @@ function fallback(value: string | undefined, defaultValue: string): string {
 
 export const BRAND = {
   name: fallback(env.VITE_BRAND_NAME, "ArcReel"),
-  tagline: fallback(env.VITE_BRAND_TAGLINE, "Agent 驱动的 AI 视频创作工作台"),
+  tagline: fallback(env.VITE_BRAND_TAGLINE, "Agent-powered AI video creation workspace"),
   description: fallback(
     env.VITE_BRAND_DESCRIPTION,
-    "AI 视频创作工作台，统一管理项目、脚本、分镜、视频生成与 Agent 对话。",
+    "An AI video creation workspace for projects, scripts, storyboards, video generation and Agent conversations.",
   ),
 } as const;
 

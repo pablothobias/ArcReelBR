@@ -1,0 +1,114 @@
+{
+  "backend_text_owner": [
+    "uv",
+    "run",
+    "python",
+    "-m",
+    "pytest",
+    "tests/integration/server/agent_toolset/test_text_generation.py",
+    "tests/integration/server/agent_toolset/test_promote_draft.py",
+    "tests/integration/server/agent_toolset/test_draft_tools.py",
+    "tests/integration/server/agent_toolset/test_split_reference_video_units.py",
+    "tests/unit/server/test_tool_runtime.py",
+    "tests/integration/server/test_tool_runtime_entry.py",
+    "tests/integration/server/test_tool_runtime_source_writes.py",
+    "tests/integration/server/test_tool_runtime_batches.py",
+    "tests/integration/server/test_tool_runtime_episode_planning.py",
+    "tests/integration/lib/script/test_script_generator.py",
+    "tests/integration/lib/script/test_script_generator_ad_whole_generation.py",
+    "tests/integration/lib/script/test_script_generator_ad_prompt_authoring.py",
+    "tests/integration/lib/script/test_script_generator_reference_branch.py",
+    "tests/integration/lib/script/test_script_generator_incremental.py",
+    "-q",
+    "--tb=short"
+  ],
+  "backend_video_owner_final": [
+    "uv",
+    "run",
+    "python",
+    "-m",
+    "pytest",
+    "tests/unit/lib/generation/test_generation_result.py",
+    "tests/unit/server/media_tools/test_context.py",
+    "tests/unit/server/services/admission/test_video_quote.py",
+    "tests/integration/server/media_tools/test_videos.py",
+    "-q",
+    "--tb=short"
+  ],
+  "frontend_unchanged_serial_failure_files": {
+    "cwd": "frontend",
+    "argv": [
+      "pnpm",
+      "exec",
+      "vitest",
+      "run",
+      "src/components/canvas/timeline/ScriptReviewGate.test.tsx",
+      "src/components/canvas/timeline/ShotDetail.ad.test.tsx",
+      "src/components/canvas/timeline/ShotDetail.duration.test.tsx",
+      "src/components/pages/settings/CustomProviderForm.comfyui.test.tsx",
+      "src/components/pages/settings/endpoints/EndpointsSection.comfyui.test.tsx",
+      "src/components/pages/settings/endpoints/EndpointsSection.market.test.tsx",
+      "src/components/pages/settings/endpoints/EndpointsSection.share.test.tsx",
+      "src/components/pages/settings/endpoints/EndpointsSection.test.tsx",
+      "src/components/pages/settings/market/MarketSection.test.tsx",
+      "--maxWorkers=1"
+    ],
+    "note": "Same nine affected files and flags; file ordering normalized for reproduction."
+  },
+  "frontend_focused": {
+    "cwd": "frontend",
+    "argv": [
+      "pnpm",
+      "exec",
+      "vitest",
+      "run",
+      "src/i18n/initialization.test.ts",
+      "src/branding.test.ts"
+    ]
+  },
+  "frontend_production_build": {
+    "cwd": "frontend",
+    "argv": [
+      "pnpm",
+      "build"
+    ],
+    "node_version": "24.22.2"
+  },
+  "backend_static": [
+    [
+      "uv",
+      "run",
+      "basedpyright",
+      "--warnings"
+    ],
+    [
+      "uv",
+      "run",
+      "ruff",
+      "check",
+      "<changed Python paths>"
+    ],
+    [
+      "uv",
+      "run",
+      "ruff",
+      "format",
+      "--check",
+      "<changed Python paths>"
+    ],
+    [
+      "uv",
+      "run",
+      "python",
+      "scripts/audit_tests.py",
+      "--check"
+    ],
+    [
+      "uv",
+      "run",
+      "python",
+      "scripts/audit_conventions.py",
+      "--check"
+    ]
+  ]
+}

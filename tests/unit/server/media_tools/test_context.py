@@ -24,7 +24,9 @@ import pytest
 def test_validate_script_filename_rejects_paths(bad: str) -> None:
     from server.media_tools.context import validate_script_filename
 
-    with pytest.raises(ValueError, match=r"script (文件名不能为空|必须是纯文件名，禁止路径分隔符)"):
+    with pytest.raises(
+        ValueError, match=r"script (filename must not be empty|must be a bare filename without path separators)"
+    ):
         validate_script_filename(bad)
 
 
@@ -34,7 +36,7 @@ def test_validate_script_filename_rejects_non_string_agent_args(bad: object) -> 
 
     from server.media_tools.context import validate_script_filename
 
-    with pytest.raises(ValueError, match="script 文件名不能为空"):
+    with pytest.raises(ValueError, match="script filename must not be empty"):
         validate_script_filename(bad)
 
 

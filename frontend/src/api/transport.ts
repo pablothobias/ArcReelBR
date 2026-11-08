@@ -7,6 +7,7 @@ import { getToken, clearToken } from "@/utils/auth";
 import type { SseStreamError } from "@/utils/sse-stream";
 import { isDemoProject } from "@/onboarding/demo-project";
 import i18n from "@/i18n";
+import { normalizeLanguage } from "@/i18n/locale";
 import {
   AgentFailureError,
   ApiRequestError,
@@ -118,13 +119,13 @@ export function withAuth(endpoint: string, options: RequestInit = {}): RequestIn
     headers.set("Authorization", `Bearer ${token}`);
   }
   // Add Accept-Language header based on current i18n language
-  headers.set("Accept-Language", i18n.language || "zh");
+  headers.set("Accept-Language", normalizeLanguage(i18n.language));
   return { ...options, headers };
 }
 
 /** SSE connection headers: share credentials/language with {@link withAuth}, reading them anew before every reconnect. */
 export function sseHeaders(): HeadersInit {
-  const headers: Record<string, string> = { "Accept-Language": i18n.language || "zh" };
+  const headers: Record<string, string> = { "Accept-Language": normalizeLanguage(i18n.language) };
   const token = getToken();
   if (token) {
     headers.Authorization = `Bearer ${token}`;

@@ -277,10 +277,10 @@ class TestReport:
         path = quarantine_path(tmp_path, 2, QUARANTINE_KIND_SCRIPT_PLAN)
         text = render_report(path, QUARANTINE_KIND_SCRIPT_PLAN, [_violation()], episode=2)
         assert str(path) in text
-        assert "按报告字段路径修复" in text
+        assert "repair the field paths listed in the report" in text
         assert "content.units[i]" in text
         assert 'promote_draft({"episode_id": 2, "doc_type": "reference_script_plan", "base_revision":' in text
-        assert "无轮次上限" in text
+        assert "no round limit" in text
 
     def test_report_numbers_each_violation_with_its_class(self):
         text = render_violation_report([_violation("unregistered_asset"), _violation("too_many_shots", "unit E1U02")])

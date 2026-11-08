@@ -523,7 +523,10 @@ def test_the_rendered_summary_spells_out_item_warnings() -> None:
 
     text = render_generation_result(builder.build())
 
-    assert "✓ E1S02 → storyboards/scene_E1S02.png\n    ⚠️ 参考图数量 8 超出 viduq2 上限 7，已取前 7 张" in text
+    assert (
+        "✓ E1S02 → storyboards/scene_E1S02.png\n    ⚠️ Reference image count 8 exceeds viduq2 limit of 7, kept the first 7"
+        in text
+    )
     assert "ref_too_many_images" not in text
 
 
@@ -679,7 +682,7 @@ def test_the_rendered_text_is_only_a_projection_of_the_payload() -> None:
 
     text = render_generation_result(result, log=["注意"])
 
-    assert "成功 1 件、失败 1 件、受阻 0 件、复用 1 件" in text
+    assert "1 succeeded, 1 failed, 0 blocked, 1 reused" in text
     assert "注意" in text
     for unit_id in ("A", "B", "C"):
         assert unit_id in text
@@ -716,10 +719,10 @@ def test_rendered_summary_uses_product_language_not_raw_enums() -> None:
     assert "GenerationProblemCode" not in text
     assert "GenerationAction" not in text
 
-    assert "需修正输入" in text
-    assert "等待进行中任务完成" in text
-    assert "比当前内容旧" in text
-    assert "视频生成" in text
+    assert "Fix input" in text
+    assert "Wait for running tasks to finish" in text
+    assert "older than current content" in text
+    assert "Video generation" in text
 
 
 def test_every_machine_identifier_has_a_product_language_label() -> None:
@@ -757,7 +760,7 @@ def test_every_generation_entry_point_has_a_product_language_label() -> None:
         builder.succeed("E1S01", task_id="t1", artifact_path="videos/E1S01.mp4")
         text = render_generation_result(builder.build())
 
-        assert text.startswith(f"{label}：")
+        assert text.startswith(f"{label}:")
         assert operation not in text
 
 
@@ -768,4 +771,4 @@ def test_the_summary_header_names_the_operation_in_product_language() -> None:
     text = render_generation_result(builder.build())
 
     assert "generate_videos" not in text
-    assert text.startswith("视频生成：")
+    assert text.startswith("Video generation:")

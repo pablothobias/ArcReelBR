@@ -15,12 +15,14 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from arcreel_market_core.validation_messages import ValidationMessage
-from lib.i18n import DEFAULT_LOCALE, _
+from lib.i18n import _
 
 
 def default_translate(key: str, **kwargs: Any) -> str:
     """Translator for the default language (Chinese)."""
-    return _(key, locale=DEFAULT_LOCALE, **kwargs)
+    # Internal comparisons and legacy location parsing consume this rendering.
+    # Request boundaries supply their own presentation translator.
+    return _(key, locale="zh", **kwargs)
 
 
 @dataclass

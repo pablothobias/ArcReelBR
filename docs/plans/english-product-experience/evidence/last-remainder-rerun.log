@@ -1,0 +1,39 @@
+........................................................................ [ 63%]
+.........................................                                [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /Users/pablo.carminatti.br/Projects/ArcReelBR/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_fetch_reference_split_caps_returns_declared_slots
+  /Users/pablo.carminatti.br/.local/share/uv/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/contextlib.py:144: SAWarning: Skipped unsupported reflection of expression-based index idx_tasks_dedupe_active
+    next(self.gen)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 25 durations =============================
+1.02s setup    tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_fetch_reference_split_caps_returns_declared_slots
+0.53s call     tests/unit/server/routers/test_generate_router_voice_sample.py::TestConfirmCharacterVoiceSample::test_confirm_waits_for_video_selection_before_replacing_reference_audio
+0.15s call     tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_rejects_braces_in_description
+0.07s setup    tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_no_source
+0.07s call     tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_happy_derives_structure
+0.07s call     tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_rejects_duration_off_reference_tier
+0.07s call     tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_rejects_unregistered_asset
+0.06s call     tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_issues_unit_ids_after_the_highest_used_number
+0.06s call     tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_derives_dialogue_without_reference_image
+0.06s call     tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_locates_the_unit_when_its_i2v_tiers_are_unknown
+0.06s call     tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_buckets_a_reference_without_usable_image_as_i2v[unclaimed]
+0.06s setup    tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_reports_soft_violations_alongside_the_violation_report
+0.06s call     tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_counts_this_episodes_new_scenes_as_scene_references
+0.05s call     tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_names_units_without_scene_reference
+0.05s setup    tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_dry_run
+0.05s call     tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_keeps_voice_warnings_on_per_image_backend
+0.05s setup    tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_rejects_dialogue_overload
+0.05s call     tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_accepts_source_text_substring
+0.05s teardown tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_rejects_empty_units
+0.05s call     tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_reports_soft_violations_alongside_the_violation_report
+0.05s call     tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_buckets_a_reference_without_usable_image_as_i2v[absent]
+0.05s call     tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_rejects_non_verbatim_source_text
+0.05s call     tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_accepts_wide_tier_without_references
+0.05s call     tests/integration/server/agent_toolset/test_split_reference_video_units.py::test_split_reference_video_units_rejects_dialogue_overload
+0.05s setup    tests/integration/server/agent_toolset/test_promote_draft.py::test_promote_narration_script_plan_returns_a_receipt_with_statistics
+113 passed, 2 warnings in 6.79s

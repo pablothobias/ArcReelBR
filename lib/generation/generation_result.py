@@ -1070,40 +1070,40 @@ _STATE_MARKS: dict[GenerationItemState, str] = {
 }
 
 _ACTION_LABELS: dict[GenerationAction, str] = {
-    GenerationAction.RETRY: "可重试",
-    GenerationAction.FIX_INPUT: "需修正输入",
-    GenerationAction.GENERATE_DEPENDENCY: "需先生成依赖",
-    GenerationAction.WAIT_FOR_TASK: "等待进行中任务完成",
-    GenerationAction.REPLAN_UNIT: "需重新规划内容",
-    GenerationAction.CONFIRM_REQUEST_DURATION: "需确认时长档位",
-    GenerationAction.CONFIGURE_PROVIDER: "需配置供应商",
-    GenerationAction.REPAIR_ARTIFACT_STATE: "需修复产物状态",
-    GenerationAction.RETRY_ARTIFACT_DOWNLOAD: "需重试下载，不必重新生成",
-    GenerationAction.RETRY_PROJECT_MIGRATION: "需重试项目迁移",
+    GenerationAction.RETRY: "Retry available",
+    GenerationAction.FIX_INPUT: "Fix input",
+    GenerationAction.GENERATE_DEPENDENCY: "Generate dependencies first",
+    GenerationAction.WAIT_FOR_TASK: "Wait for running tasks to finish",
+    GenerationAction.REPLAN_UNIT: "Replan content",
+    GenerationAction.CONFIRM_REQUEST_DURATION: "Confirm duration tier",
+    GenerationAction.CONFIGURE_PROVIDER: "Configure provider",
+    GenerationAction.REPAIR_ARTIFACT_STATE: "Repair artifact state",
+    GenerationAction.RETRY_ARTIFACT_DOWNLOAD: "Retry download without regenerating",
+    GenerationAction.RETRY_PROJECT_MIGRATION: "Retry project migration",
     GenerationAction.NONE: "",
 }
 
 _ARTIFACT_STATUS_LABELS: dict[ArtifactStatus, str] = {
-    ArtifactStatus.CURRENT: "与当前内容一致",
-    ArtifactStatus.STALE: "比当前内容旧",
-    ArtifactStatus.MISSING: "缺失",
-    ArtifactStatus.BLOCKED: "不可用",
+    ArtifactStatus.CURRENT: "matches current content",
+    ArtifactStatus.STALE: "older than current content",
+    ArtifactStatus.MISSING: "missing",
+    ArtifactStatus.BLOCKED: "unavailable",
 }
 
 #: Product-language names for generation entries. Summaries omit machine tool names, retained only in structured
 #: ``generation_result`` ``operation``. Unregistered entries use neutral wording, never raw tool names;
 #: tests guard complete registrations.
 _OPERATION_LABELS: dict[str, str] = {
-    "generate_assets": "资产图生成",
-    "generate_storyboards": "分镜图生成",
-    "generate_grid": "多宫格分镜生成",
-    "generate_narration_audio": "旁白配音生成",
-    "edit_images": "图片编辑",
-    "generate_videos": "视频生成",
-    "render_final_cut": "成片渲染",
-    "export_jianying_draft": "剪映草稿导出",
+    "generate_assets": "Asset image generation",
+    "generate_storyboards": "Storyboard image generation",
+    "generate_grid": "Multi-grid storyboard generation",
+    "generate_narration_audio": "Narration audio generation",
+    "edit_images": "Image editing",
+    "generate_videos": "Video generation",
+    "render_final_cut": "Final-cut rendering",
+    "export_jianying_draft": "Jianying draft export",
 }
-_FALLBACK_OPERATION_LABEL = "生成"
+_FALLBACK_OPERATION_LABEL = "Generation"
 
 
 def render_generation_result(
@@ -1126,11 +1126,11 @@ def render_generation_result(
 
     operation_label = _OPERATION_LABELS.get(result.operation, _FALLBACK_OPERATION_LABEL)
     header = (
-        f"{operation_label}：成功 {len(result.succeeded)} 件、"
-        f"失败 {len(result.failed)} 件、受阻 {len(result.blocked)} 件"
+        f"{operation_label}: {len(result.succeeded)} succeeded, "
+        f"{len(result.failed)} failed, {len(result.blocked)} blocked"
     )
     if result.skipped:
-        header += f"、复用 {len(result.skipped)} 件"
+        header += f", {len(result.skipped)} reused"
     lines = [header, *log]
     for item in result.items:
         mark = _STATE_MARKS[item.state]
@@ -1139,7 +1139,7 @@ def render_generation_result(
             if item.artifact_path:
                 line += f" → {item.artifact_path}"
             if item.artifact_status is ArtifactStatus.STALE:
-                line += "（任务成功，但产物已不匹配当前依据）"
+                line += " (task succeeded, but the artifact no longer matches its current basis)"
         else:
             problem = item.problem
             assert problem is not None
@@ -1148,14 +1148,14 @@ def render_generation_result(
             if action_label:
                 line += f" → {action_label}"
             if item.provider_checkpoint is not None and item.provider_checkpoint.submitted:
-                line += "（供应商已提交，可恢复）"
+                line += " (submitted to provider; resumable)"
         for warning in item.warnings:
             line += f"\n    ⚠️ {translate(warning.key, **warning.params)}"
         lines.append(line)
     for entry in result.skipped:
         label = _ARTIFACT_STATUS_LABELS.get(entry.artifact_status, "") if entry.artifact_status is not None else ""
-        suffix = f"（{label}）" if label else ""
-        lines.append(f"  ↺ {entry.unit_id}: 复用现有产物{suffix}")
+        suffix = f" ({label})" if label else ""
+        lines.append(f"  ↺ {entry.unit_id}: reuse existing artifact{suffix}")
     return "\n".join(lines)
 
 

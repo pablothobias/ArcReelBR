@@ -1,7 +1,8 @@
 import { createRoot } from "react-dom/client";
 import { AppRoutes } from "./router";
 import { useAuthStore } from "@/stores/auth-store";
-import { i18nReady } from "@/i18n";
+import i18n, { i18nReady } from "@/i18n";
+import { normalizeLanguage } from "@/i18n/locale";
 import { BRAND, BRAND_DOCUMENT_TITLE } from "@/branding";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { initTheme } from "@/theme";
@@ -23,6 +24,10 @@ const metaDescription = document.querySelector<HTMLMetaElement>('meta[name="desc
 if (metaDescription) {
   metaDescription.content = BRAND.description;
 }
+document.documentElement.lang = normalizeLanguage(i18n.language);
+i18n.on("languageChanged", (language) => {
+  document.documentElement.lang = normalizeLanguage(language);
+});
 
 initTheme();
 

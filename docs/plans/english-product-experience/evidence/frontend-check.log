@@ -1,0 +1,804 @@
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies", "pnpm.overrides". See https://pnpm.io/settings for the new home of each setting.
+
+> arcreel-frontend@0.35.0 check /Users/pablo.carminatti.br/Projects/ArcReelBR/frontend
+> pnpm typecheck && pnpm lint && pnpm knip && vitest run
+
+
+> arcreel-frontend@0.35.0 typecheck /Users/pablo.carminatti.br/Projects/ArcReelBR/frontend
+> tsc --noEmit && tsc --noEmit -p e2e
+
+
+> arcreel-frontend@0.35.0 lint /Users/pablo.carminatti.br/Projects/ArcReelBR/frontend
+> eslint .
+
+
+> arcreel-frontend@0.35.0 knip /Users/pablo.carminatti.br/Projects/ArcReelBR/frontend
+> knip
+
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - `__dirname` (vitest.config.ts:5:36). Use `import.meta.dirname` instead
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - `__dirname` (vitest.config.ts:5:36). Use `import.meta.dirname` instead
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - `__dirname` (vitest.config.ts:5:36). Use `import.meta.dirname` instead
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+ RUN  v4.1.12 /Users/pablo.carminatti.br/Projects/ArcReelBR/frontend
+
+Not implemented: navigation to another Document
+ ❯ |vm| src/components/pages/settings/CustomProviderForm.comfyui.test.tsx (31 tests | 1 failed) 64825ms
+     × drops the capability override when the row is re-pointed onto ComfyUI 5290ms
+ ❯ |vm| src/components/pages/settings/market/MarketSection.test.tsx (47 tests | 1 failed) 79361ms
+       × filters by installation records, opens an installed endpoint and opens details from the card 1211ms
+ ❯ |vm| src/components/pages/settings/endpoints/EndpointsSection.test.tsx (27 tests | 6 failed) 77826ms
+     × carries the server's wrapped definition when the picked file is a raw ComfyUI workflow 5669ms
+     × splits the rail into my endpoints and built-in ones, code-implemented endpoints included 6226ms
+     × prefills a new endpoint from the image example template and saves it as an image definition 5079ms
+     × leaves the dialog standing when the pasted text is not JSON, so it can be fixed in place 6106ms
+     × imports a declarative definition pasted into the dialog, not just an uploaded file 6001ms
+     × keeps the import dialog from being cancelled while the definition is being saved 5686ms
+Not implemented: navigation to another Document
+ ❯ |vm| src/components/pages/settings/endpoints/EndpointsSection.comfyui.test.tsx (17 tests | 10 failed) 87419ms
+       × keeps the delete action so an imported endpoint can still be removed 5345ms
+       × updates a market-installed workflow and replaces its draft (re-imported: false) 5879ms
+       × updates a market-installed workflow and replaces its draft (re-imported: true) 5079ms
+       × keeps another endpoint's re-import draft when a market update replaces this one 5113ms
+       × takes a raw workflow from the import dialog into the binding editor instead of saving it 7912ms
+       × falls back to the first endpoint after discarding a newly imported workflow 6933ms
+       × takes a workflow pasted into the dialog down the same path as an uploaded one 5582ms
+       × asks a raw workflow what it produces and re-wraps it under the answer 5190ms
+       × re-imports onto the endpoint the user is looking at, not the one a stale draft came from 5471ms
+       × asks before switching away from a workflow endpoint with unsaved edits 5486ms
+ ❯ |vm| src/components/pages/settings/endpoints/EndpointsSection.share.test.tsx (8 tests | 1 failed) 23706ms
+     × shows local diagnostics first and updates the 'declarative' status badge 5380ms
+ ❯ |vm| src/components/canvas/timeline/ScriptReviewGate.test.tsx (51 tests | 1 failed) 35188ms
+     × turns read-only when a save is refused because the episode was confirmed meanwhile 1710ms
+ ❯ |vm| src/components/pages/settings/endpoints/EndpointsSection.market.test.tsx (11 tests | 1 failed) 33791ms
+       × opens the install dialog in update mode from the update action 5197ms
+ ❯ |vm| src/components/canvas/timeline/ShotDetail.ad.test.tsx (13 tests | 1 failed) 20866ms
+     × 广告片段仍可编辑台词：添加后随保存提交 5452ms
+ ❯ |vm| src/components/canvas/timeline/ShotDetail.duration.test.tsx (15 tests | 1 failed) 23130ms
+     × 重选的时长进入未保存修改，保存时写回 5451ms
+Not implemented: navigation to another Document
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 23 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |vm| src/components/canvas/timeline/ScriptReviewGate.test.tsx > ScriptReviewGate > turns read-only when a save is refused because the episode was confirmed meanwhile
+TestingLibraryElementError: Found multiple elements with the role "textbox"
+
+Here are the matching elements:
+
+Ignored nodes: comments, script, style
+[36m<textarea[39m
+  [33maria-label[39m=[32m"画外音"[39m
+  [33mclass[39m=[32m"relative flex field-sizing-content max-h-[40cqh] w-full resize-none overflow-y-auto rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/20 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/40 dark:bg-input/12 dark:disabled:bg-input/32 min-h-8"[39m
+  [33mdata-slot[39m=[32m"textarea"[39m
+  [33mplaceholder[39m=[32m"画外音旁白"[39m
+[36m>[39m
+  [0m三年后。[0m
+[36m</textarea>[39m
+
+Ignored nodes: comments, script, style
+[36m<input[39m
+  [33maria-invalid[39m=[32m"false"[39m
+  [33maria-label[39m=[32m"角色"[39m
+  [33mclass[39m=[32m"h-8 min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/20 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/40 md:text-sm dark:bg-input/12 dark:disabled:bg-input/32 w-28"[39m
+  [33mdata-slot[39m=[32m"input"[39m
+  [33mid[39m=[32m"base-ui-_r_3f_"[39m
+  [33mplaceholder[39m=[32m"角色"[39m
+  [33mvalue[39m=[32m"阿离"[39m
+[36m/>[39m
+
+Ignored nodes: comments, script, style
+[36m<textarea[39m
+  [33maria-label[39m=[32m"台词"[39m
+  [33mclass[39m=[32m"relative flex field-sizing-content max-h-[40cqh] w-full resize-none overflow-y-auto rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/20 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/40 dark:bg-input/12 dark:disabled:bg-input/32 min-h-8"[39m
+  [33mdata-slot[39m=[32m"textarea"[39m
+  [33mplaceholder[39m=[32m"角色台词"[39m
+[36m>[39m
+  [0m我的本地编辑[0m
+[36m</textarea>[39m
+
+Ignored nodes: comments, script, style
+[36m<textarea[39m
+  [33maria-label[39m=[32m"原文锚（仅供追溯，不朗读）"[39m
+  [33mclass[39m=[32m"relative flex field-sizing-content min-h-16 max-h-[40cqh] w-full resize-none overflow-y-auto rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/20 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/40 dark:bg-input/12 dark:disabled:bg-input/32"[39m
+  [33mdata-slot[39m=[32m"textarea"[39m
+  [33mplaceholder[39m=[32m"逐字原文摘录，供追溯对照"[39m
+[36m>[39m
+  [0m三年后，阿离立于屋檐下：你终于回来了。[0m
+[36m</textarea>[39m
+
+(If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"mx-auto flex w-full max-w-240 flex-col gap-3"[39m
+    [36m>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"sticky top-0 z-sticky flex flex-wrap items-center justify-between gap-x-3 gap-y-2 rounded-lg border border-border bg-card px-3.5 py-2.5"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex min-w-0 items-center gap-2"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-clock size-4 shrink-0 text-warn"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"24"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"24"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<circle[39m
+              [33mcx[39m=[32m"12"[39m
+              [33mcy[39m=[32m"12"[39m
+              [33mr[39m=[32m"10"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M12 6v6l4 2"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex min-w-0 flex-col"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"text-sm font-medium text-foreground"[39m
+            [36m>[39m
+              [0m待确认[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"text-xs text-muted-foreground"[39m
+            [36m>[39m
+              [0m检查内容后完成确认，放行视觉生成。[0m
+            [36m</span>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex flex-wrap items-center gap-2"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 h-7 gap-1 rounded-[min(var(--radius-md),12px)] px-2.5 text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5"[39m
+            [33mdata-base-ui-tooltip-trigger[39m=[32m""[39m
+            [33mdata-slot[39m=[32m"tooltip-trigger"[39m
+            [33mid[39m=[32m"base-ui-_r_2j_"[39m
+            [33mtabindex[39m=[32m"0"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-file-plus-corner lucide-file-plus-2"[39m
+              [33mdata-icon[39m=[32m"inline-start"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M11.35 22H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.706.706l3.588 3.588A2.4 2.4 0 0 1 20 8v5.35"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M14 2v5a1 1 0 0 0 1 1h5"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M14 19h6"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M17 16v6"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [0m从空白开始[0m
+          [36m</button>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"inline-flex cursor-not-allowed opacity-50"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-describedby[39m=[32m"_r_2l_"[39m
+              [33maria-disabled[39m=[32m"true"[39m
+              [33mclass[39m=[32m"group/button inline-flex shrink-0 items-center justify-center border bg-clip-padding font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/12 dark:hover:bg-input/20 h-7 gap-1 rounded-[min(var(--radius-md),12px)] px-2.5 text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5"[39m
+              [33mdata-slot[39m=[32m"button"[39m
+              [33mtabindex[39m=[32m"0"[39m
+              [33mtitle[39m=[32m"有未保存的修改，请先保存再重新规划"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"lucide lucide-rotate-ccw"[39m
+                [33mdata-icon[39m=[32m"inline-start"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"24"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"24"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M3 3v5h5"[39m
+                [36m/>[39m
+   ...
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"mx-auto flex w-full max-w-240 flex-col gap-3"[39m
+      [36m>[39m
+        [36m<header[39m
+          [33mclass[39m=[32m"sticky top-0 z-sticky flex flex-wrap items-center justify-between gap-x-3 gap-y-2 rounded-lg border border-border bg-card px-3.5 py-2.5"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex min-w-0 items-center gap-2"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-clock size-4 shrink-0 text-warn"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"12"[39m
+                [33mcy[39m=[32m"12"[39m
+                [33mr[39m=[32m"10"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M12 6v6l4 2"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex min-w-0 flex-col"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"text-sm font-medium text-foreground"[39m
+              [36m>[39m
+                [0m待确认[0m
+              [36m</span>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"text-xs text-muted-foreground"[39m
+              [36m>[39m
+                [0m检查内容后完成确认，放行视觉生成。[0m
+              [36m</span>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex flex-wrap items-center gap-2"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 h-7 gap-1 rounded-[min(var(--radius-md),12px)] px-2.5 text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5"[39m
+              [33mdata-base-ui-tooltip-trigger[39m=[32m""[39m
+              [33mdata-slot[39m=[32m"tooltip-trigger"[39m
+              [33mid[39m=[32m"base-ui-_r_2j_"[39m
+              [33mtabindex[39m=[32m"0"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"lucide lucide-file-plus-corner lucide-file-plus-2"[39m
+                [33mdata-icon[39m=[32m"inline-start"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"24"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"24"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M11.35 22H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.706.706l3.588 3.588A2.4 2.4 0 0 1 20 8v5.35"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M14 2v5a1 1 0 0 0 1 1h5"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M14 19h6"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M17 16v6"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [0m从空白开始[0m
+            [36m</button>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"inline-flex cursor-not-allowed opacity-50"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-describedby[39m=[32m"_r_2l_"[39m
+                [33maria-disabled[39m=[32m"true"[39m
+                [33mclass[39m=[32m"group/button inline-flex shrink-0 items-center justify-center border bg-clip-padding font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/12 dark:hover:bg-input/20 h-7 gap-1 rounded-[min(var(--radius-md),12px)] px-2.5 text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5"[39m
+                [33mdata-slot[39m=[32m"button"[39m
+                [33mtabindex[39m=[32m"0"[39m
+                [33mtitle[39m=[32m"有未保存的修改，请先保存再重新规划"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33maria-hidden[39m=[32m"true"[39m
+                  [33mclass[39m=[32m"lucide lucide-rotate-ccw"[39m
+                  [33mdata-icon[39m=[32m"inline-start"[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mheight[39m=[32m"24"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"2"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"24"[39m
+                  [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+                [36m>[39m
+  ...
+ ❯ waitForWrapper node_modules/.pnpm/@testing-library+dom@10.4.1/node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ src/components/canvas/timeline/ScriptReviewGate.test.tsx:214:11
+    212|     fireEvent.click(await screen.findByText("修复后保存"));
+    213|
+    214|     await waitFor(() => expect(screen.queryByRole("textbox")).not.toBe…
+       |           ^
+    215|     expect(screen.getByText("你终于回来了。")).toBeInTheDocument();
+    216|     expect(screen.queryByText("修复后保存")).not.toBeInTheDocument();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/23]⎯
+
+ FAIL  |vm| src/components/canvas/timeline/ShotDetail.ad.test.tsx > ShotDetail 广告/短片 > 广告片段仍可编辑台词：添加后随保存提交
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/components/canvas/timeline/ShotDetail.ad.test.tsx:69:3
+     67|   });
+     68|
+     69|   it("广告片段仍可编辑台词：添加后随保存提交", () => {
+       |   ^
+     70|     const onUpdatePrompt = vi.fn();
+     71|     renderDetail({ onUpdatePrompt });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/23]⎯
+
+ FAIL  |vm| src/components/canvas/timeline/ShotDetail.duration.test.tsx > ShotDetail 时长候选与越界提示 > 重选的时长进入未保存修改，保存时写回
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/components/canvas/timeline/ShotDetail.duration.test.tsx:90:3
+     88|   });
+     89|
+     90|   it("重选的时长进入未保存修改，保存时写回", async () => {
+       |   ^
+     91|     const onUpdatePrompt = saved();
+     92|     renderDetail({ onUpdatePrompt });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/23]⎯
+
+ FAIL  |vm| src/components/pages/settings/CustomProviderForm.comfyui.test.tsx > CustomProviderForm（comfyui 协议） > drops the capability override when the row is re-pointed onto ComfyUI
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/components/pages/settings/CustomProviderForm.comfyui.test.tsx:239:3
+    237|   });
+    238|
+    239|   it("drops the capability override when the row is re-pointed onto Co…
+       |   ^
+    240|     // ComfyUI capabilities derive from bindings; the protocol disable…
+    241|     // Hidden overrides leave old values invisible/uneditable, exposed…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/23]⎯
+
+ FAIL  |vm| src/components/pages/settings/endpoints/EndpointsSection.comfyui.test.tsx > EndpointsSection > ComfyUI endpoints > keeps the delete action so an imported endpoint can still be removed
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/components/pages/settings/endpoints/EndpointsSection.comfyui.test.tsx:107:5
+    105|     });
+    106|
+    107|     it("keeps the delete action so an imported endpoint can still be r…
+       |     ^
+    108|       const remove = vi.spyOn(API, "deleteCustomEndpoint").mockResolve…
+    109|       renderSection("section=endpoints&endpoint=ce-8");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/23]⎯
+
+ FAIL  |vm| src/components/pages/settings/endpoints/EndpointsSection.comfyui.test.tsx > EndpointsSection > ComfyUI endpoints > updates a market-installed workflow and replaces its draft (re-imported: false)
+ FAIL  |vm| src/components/pages/settings/endpoints/EndpointsSection.comfyui.test.tsx > EndpointsSection > ComfyUI endpoints > updates a market-installed workflow and replaces its draft (re-imported: true)
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/components/pages/settings/endpoints/EndpointsSection.comfyui.test.tsx:222:27
+    220|     }
+    221|
+    222|     it.each([false, true])("updates a market-installed workflow and re…
+       |                           ^
+    223|       const { installed, entryResponse, updated, installResult } = mar…
+    224|       vi.mocked(API.listCustomEndpoints).mockResolvedValue({ endpoints…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/23]⎯
+
+ FAIL  |vm| src/components/pages/settings/endpoints/EndpointsSection.comfyui.test.tsx > EndpointsSection > ComfyUI endpoints > keeps another endpoint's re-import draft when a market update replaces this one
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/components/pages/settings/endpoints/EndpointsSection.comfyui.test.tsx:265:5
+    263|     });
+    264|
+    265|     it("keeps another endpoint's re-import draft when a market update …
+       |     ^
+    266|       // Updates replace only market-installed endpoints; retain other…
+    267|       const { installed, entryResponse, updated, installResult } = mar…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/23]⎯
+
+ FAIL  |vm| src/components/pages/settings/endpoints/EndpointsSection.comfyui.test.tsx > EndpointsSection > ComfyUI endpoints > takes a raw workflow from the import dialog into the binding editor instead of saving it
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/components/pages/settings/endpoints/EndpointsSection.comfyui.test.tsx:290:5
+    288|     });
+    289|
+    290|     it("takes a raw workflow from the import dialog into the binding e…
+       |     ^
+    291|       const workflow = { "9": { class_type: "SaveVideo", inputs: { fps…
+    292|       const wrapped: ComfyuiEndpointDefinition = {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/23]⎯
+
+ FAIL  |vm| src/components/pages/settings/endpoints/EndpointsSection.comfyui.test.tsx > EndpointsSection > ComfyUI endpoints > falls back to the first endpoint after discarding a newly imported workflow
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/components/pages/settings/endpoints/EndpointsSection.comfyui.test.tsx:319:5
+    317|     });
+    318|
+    319|     it("falls back to the first endpoint after discarding a newly impo…
+       |     ^
+    320|       const workflow = { "9": { class_type: "SaveVideo", inputs: { fps…
+    321|       const wrapped: ComfyuiEndpointDefinition = {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/23]⎯
+
+ FAIL  |vm| src/components/pages/settings/endpoints/EndpointsSection.comfyui.test.tsx > EndpointsSection > ComfyUI endpoints > takes a workflow pasted into the dialog down the same path as an uploaded one
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/components/pages/settings/endpoints/EndpointsSection.comfyui.test.tsx:378:5
+    376|     });
+    377|
+    378|     it("takes a workflow pasted into the dialog down the same path as …
+       |     ^
+    379|       const workflow = { "9": { class_type: "SaveVideo", inputs: { fps…
+    380|       const wrapped: ComfyuiEndpointDefinition = {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/23]⎯
+
+ FAIL  |vm| src/components/pages/settings/endpoints/EndpointsSection.comfyui.test.tsx > EndpointsSection > ComfyUI endpoints > asks a raw workflow what it produces and re-wraps it under the answer
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/components/pages/settings/endpoints/EndpointsSection.comfyui.test.tsx:405:5
+    403|     });
+    404|
+    405|     it("asks a raw workflow what it produces and re-wraps it under the…
+       |     ^
+    406|       const workflow = { "9": { class_type: "SaveImage", inputs: {} } …
+    407|       const validate = vi.spyOn(API, "validateCustomEndpoint").mockRes…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/23]⎯
+
+ FAIL  |vm| src/components/pages/settings/endpoints/EndpointsSection.comfyui.test.tsx > EndpointsSection > ComfyUI endpoints > re-imports onto the endpoint the user is looking at, not the one a stale draft came from
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/components/pages/settings/endpoints/EndpointsSection.comfyui.test.tsx:492:5
+    490|     });
+    491|
+    492|     it("re-imports onto the endpoint the user is looking at, not the o…
+       |     ^
+    493|       // Holding endpoint A's unsaved draft while reimporting on B mus…
+    494|       // workflow onto A, an overwrite nobody requested.
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/23]⎯
+
+ FAIL  |vm| src/components/pages/settings/endpoints/EndpointsSection.comfyui.test.tsx > EndpointsSection > ComfyUI endpoints > asks before switching away from a workflow endpoint with unsaved edits
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/components/pages/settings/endpoints/EndpointsSection.comfyui.test.tsx:532:5
+    530|     });
+    531|
+    532|     it("asks before switching away from a workflow endpoint with unsav…
+       |     ^
+    533|       const { location } = renderSection("section=endpoints&endpoint=c…
+    534|       await screen.findByText("1 个节点");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/23]⎯
+
+ FAIL  |vm| src/components/pages/settings/endpoints/EndpointsSection.market.test.tsx > EndpointsSection > market integration > opens the install dialog in update mode from the update action
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/components/pages/settings/endpoints/EndpointsSection.market.test.tsx:85:5
+     83|     });
+     84|
+     85|     it("opens the install dialog in update mode from the update action…
+       |     ^
+     86|       withInstallation({ state: "update_available" });
+     87|       const entry: MarketEntry = {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/23]⎯
+
+ FAIL  |vm| src/components/pages/settings/endpoints/EndpointsSection.share.test.tsx > EndpointsSection · share to official market > shows local diagnostics first and updates the 'declarative' status badge
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/components/pages/settings/endpoints/EndpointsSection.share.test.tsx:57:27
+     55|   });
+     56|
+     57|   it.each([MINE, comfyui])("shows local diagnostics first and updates …
+       |                           ^
+     58|     vi.spyOn(API, "getOfficialService").mockResolvedValue(OFFICIAL_ON);
+     59|     vi.spyOn(API, "listMarketSubmissions").mockResolvedValue({ submiss…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/23]⎯
+
+ FAIL  |vm| src/components/pages/settings/endpoints/EndpointsSection.test.tsx > EndpointsSection > carries the server's wrapped definition when the picked file is a raw ComfyUI workflow
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/components/pages/settings/endpoints/EndpointsSection.test.tsx:64:3
+     62|   beforeEach(stubEndpointsSection);
+     63|
+     64|   it("carries the server's wrapped definition when the picked file is …
+       |   ^
+     65|     const workflow = { "9": { class_type: "SaveVideo", inputs: { fps: …
+     66|     const validate = vi.spyOn(API, "validateCustomEndpoint").mockResol…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/23]⎯
+
+ FAIL  |vm| src/components/pages/settings/endpoints/EndpointsSection.test.tsx > EndpointsSection > splits the rail into my endpoints and built-in ones, code-implemented endpoints included
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/components/pages/settings/endpoints/EndpointsSection.test.tsx:94:3
+     92|   });
+     93|
+     94|   it("splits the rail into my endpoints and built-in ones, code-implem…
+       |   ^
+     95|     renderSection();
+     96|     const list = await screen.findByRole("navigation");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/23]⎯
+
+ FAIL  |vm| src/components/pages/settings/endpoints/EndpointsSection.test.tsx > EndpointsSection > prefills a new endpoint from the image example template and saves it as an image definition
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/components/pages/settings/endpoints/EndpointsSection.test.tsx:166:3
+    164|   });
+    165|
+    166|   it("prefills a new endpoint from the image example template and save…
+       |   ^
+    167|     const create = vi.spyOn(API, "createCustomEndpoint").mockResolvedV…
+    168|     renderSection("section=endpoints&endpoint=new");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/23]⎯
+
+ FAIL  |vm| src/components/pages/settings/endpoints/EndpointsSection.test.tsx > EndpointsSection > leaves the dialog standing when the pasted text is not JSON, so it can be fixed in place
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/components/pages/settings/endpoints/EndpointsSection.test.tsx:250:3
+    248|   });
+    249|
+    250|   it("leaves the dialog standing when the pasted text is not JSON, so …
+       |   ^
+    251|     const pushToast = vi.spyOn(useAppStore.getState(), "pushToast");
+    252|     const validate = vi.spyOn(API, "validateCustomEndpoint").mockResol…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[19/23]⎯
+
+ FAIL  |vm| src/components/pages/settings/endpoints/EndpointsSection.test.tsx > EndpointsSection > imports a declarative definition pasted into the dialog, not just an uploaded file
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/components/pages/settings/endpoints/EndpointsSection.test.tsx:268:3
+    266|   });
+    267|
+    268|   it("imports a declarative definition pasted into the dialog, not jus…
+       |   ^
+    269|     const definition = makeDefinition({ meta: { name: "Pasted API", au…
+    270|     const validate = vi.spyOn(API, "validateCustomEndpoint").mockResol…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[20/23]⎯
+
+ FAIL  |vm| src/components/pages/settings/endpoints/EndpointsSection.test.tsx > EndpointsSection > keeps the import dialog from being cancelled while the definition is being saved
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/components/pages/settings/endpoints/EndpointsSection.test.tsx:283:3
+    281|   });
+    282|
+    283|   it("keeps the import dialog from being cancelled while the definitio…
+       |   ^
+    284|     const definition = makeDefinition({ meta: { name: "Pasted API", au…
+    285|     let finish: (value: CustomEndpointInfo) => void = () => {};
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[21/23]⎯
+
+ FAIL  |vm| src/components/pages/settings/market/MarketSection.test.tsx > MarketSection > browse > filters by installation records, opens an installed endpoint and opens details from the card
+TestingLibraryElementError: Unable to find role="article"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"flex flex-col gap-6"[39m
+    [36m>[39m
+      [36m<h2[39m
+        [33mclass[39m=[32m"text-lg font-medium"[39m
+      [36m>[39m
+        [0m市场[0m
+      [36m</h2>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"group/tabs flex gap-2 data-horizontal:flex-col"[39m
+        [33mdata-activation-direction[39m=[32m"none"[39m
+        [33mdata-orientation[39m=[32m"horizontal"[39m
+        [33mdata-slot[39m=[32m"tabs"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"border-b border-border"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"group/tabs-list inline-flex w-fit items-center justify-center rounded-lg p-[3px] text-muted-foreground group-data-horizontal/tabs:h-8 group-data-vertical/tabs:h-fit group-data-vertical/tabs:flex-col data-[variant=line]:rounded-none gap-1 bg-transparent"[39m
+            [33mdata-activation-direction[39m=[32m"none"[39m
+            [33mdata-orientation[39m=[32m"horizontal"[39m
+            [33mdata-slot[39m=[32m"tabs-list"[39m
+            [33mdata-variant[39m=[32m"line"[39m
+            [33mrole[39m=[32m"tablist"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-controls[39m=[32m"base-ui-_r_n4_"[39m
+              [33maria-disabled[39m=[32m"false"[39m
+              [33maria-selected[39m=[32m"true"[39m
+              [33mclass[39m=[32m"relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-1.5 py-0.5 text-sm font-medium whitespace-nowrap text-muted-foreground transition-all group-data-vertical/tabs:w-full group-data-vertical/tabs:justify-start hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 has-data-[icon=inline-end]:pr-1 has-data-[icon=inline-start]:pl-1 aria-disabled:pointer-events-none aria-disabled:opacity-50 dark:hover:text-foreground group-data-[variant=default]/tabs-list:data-active:shadow-sm group-data-[variant=line]/tabs-list:data-active:shadow-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 group-data-[variant=line]/tabs-list:bg-transparent group-data-[variant=line]/tabs-list:data-active:bg-transparent dark:group-data-[variant=line]/tabs-list:data-active:border-transparent dark:group-data-[variant=line]/tabs-list:data-active:bg-transparent data-active:bg-background data-active:text-foreground dark:data-active:border-input dark:data-active:bg-input/12 dark:data-active:text-foreground after:absolute after:bg-foreground after:opacity-0 after:transition-opacity group-data-horizontal/tabs:after:inset-x-0 group-data-horizontal/tabs:after:bottom-[-5px] group-data-horizontal/tabs:after:h-0.5 group-data-vertical/tabs:after:inset-y-0 group-data-vertical/tabs:after:-right-1 group-data-vertical/tabs:after:w-0.5 group-data-[variant=line]/tabs-list:data-active:after:opacity-100"[39m
+              [33mdata-activation-direction[39m=[32m"none"[39m
+              [33mdata-active[39m=[32m""[39m
+              [33mdata-composite-item-active[39m=[32m""[39m
+              [33mdata-orientation[39m=[32m"horizontal"[39m
+              [33mdata-slot[39m=[32m"tabs-trigger"[39m
+              [33mid[39m=[32m"base-ui-_r_n1_"[39m
+              [33mrole[39m=[32m"tab"[39m
+              [33mtabindex[39m=[32m"0"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0m浏览[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-disabled[39m=[32m"false"[39m
+              [33maria-selected[39m=[32m"false"[39m
+              [33mclass[39m=[32m"relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-1.5 py-0.5 text-sm font-medium whitespace-nowrap text-muted-foreground transition-all group-data-vertical/tabs:w-full group-data-vertical/tabs:justify-start hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 has-data-[icon=inline-end]:pr-1 has-data-[icon=inline-start]:pl-1 aria-disabled:pointer-events-none aria-disabled:opacity-50 dark:hover:text-foreground group-data-[variant=default]/tabs-list:data-active:shadow-sm group-data-[variant=line]/tabs-list:data-active:shadow-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 group-data-[variant=line]/tabs-list:bg-transparent group-data-[variant=line]/tabs-list:data-active:bg-transparent dark:group-data-[variant=line]/tabs-list:data-active:border-transparent dark:group-data-[variant=line]/tabs-list:data-active:bg-transparent data-active:bg-background data-active:text-foreground dark:data-active:border-input dark:data-active:bg-input/12 dark:data-active:text-foreground after:absolute after:bg-foreground after:opacity-0 after:transition-opacity group-data-horizontal/tabs:after:inset-x-0 group-data-horizontal/tabs:after:bottom-[-5px] group-data-horizontal/tabs:after:h-0.5 group-data-vertical/tabs:after:inset-y-0 group-data-vertical/tabs:after:-right-1 group-data-vertical/tabs:after:w-0.5 group-data-[variant=line]/tabs-list:data-active:after:opacity-100"[39m
+              [33mdata-activation-direction[39m=[32m"none"[39m
+              [33mdata-orientation[39m=[32m"horizontal"[39m
+              [33mdata-slot[39m=[32m"tabs-trigger"[39m
+              [33mid[39m=[32m"base-ui-_r_n2_"[39m
+              [33mrole[39m=[32m"tab"[39m
+              [33mtabindex[39m=[32m"-1"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0m我的分享[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-controls[39m=[32m"base-ui-_r_nd_"[39m
+              [33maria-disabled[39m=[32m"false"[39m
+              [33maria-selected[39m=[32m"false"[39m
+              [33mclass[39m=[32m"relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-1.5 py-0.5 text-sm font-medium whitespace-nowrap text-muted-foreground transition-all group-data-vertical/tabs:w-full group-data-vertical/tabs:justify-start hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 has-data-[icon=inline-end]:pr-1 has-data-[icon=inline-start]:pl-1 aria-disabled:pointer-events-none aria-disabled:opacity-50 dark:hover:text-foreground group-data-[variant=default]/tabs-list:data-active:shadow-sm group-data-[variant=line]/tabs-list:data-active:shadow-none [&_svg]:p...
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"flex flex-col gap-6"[39m
+    [36m>[39m
+      [36m<h2[39m
+        [33mclass[39m=[32m"text-lg font-medium"[39m
+      [36m>[39m
+        [0m市场[0m
+      [36m</h2>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"group/tabs flex gap-2 data-horizontal:flex-col"[39m
+        [33mdata-activation-direction[39m=[32m"none"[39m
+        [33mdata-orientation[39m=[32m"horizontal"[39m
+        [33mdata-slot[39m=[32m"tabs"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"border-b border-border"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"group/tabs-list inline-flex w-fit items-center justify-center rounded-lg p-[3px] text-muted-foreground group-data-horizontal/tabs:h-8 group-data-vertical/tabs:h-fit group-data-vertical/tabs:flex-col data-[variant=line]:rounded-none gap-1 bg-transparent"[39m
+            [33mdata-activation-direction[39m=[32m"none"[39m
+            [33mdata-orientation[39m=[32m"horizontal"[39m
+            [33mdata-slot[39m=[32m"tabs-list"[39m
+            [33mdata-variant[39m=[32m"line"[39m
+            [33mrole[39m=[32m"tablist"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-controls[39m=[32m"base-ui-_r_n4_"[39m
+              [33maria-disabled[39m=[32m"false"[39m
+              [33maria-selected[39m=[32m"true"[39m
+              [33mclass[39m=[32m"relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-1.5 py-0.5 text-sm font-medium whitespace-nowrap text-muted-foreground transition-all group-data-vertical/tabs:w-full group-data-vertical/tabs:justify-start hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 has-data-[icon=inline-end]:pr-1 has-data-[icon=inline-start]:pl-1 aria-disabled:pointer-events-none aria-disabled:opacity-50 dark:hover:text-foreground group-data-[variant=default]/tabs-list:data-active:shadow-sm group-data-[variant=line]/tabs-list:data-active:shadow-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 group-data-[variant=line]/tabs-list:bg-transparent group-data-[variant=line]/tabs-list:data-active:bg-transparent dark:group-data-[variant=line]/tabs-list:data-active:border-transparent dark:group-data-[variant=line]/tabs-list:data-active:bg-transparent data-active:bg-background data-active:text-foreground dark:data-active:border-input dark:data-active:bg-input/12 dark:data-active:text-foreground after:absolute after:bg-foreground after:opacity-0 after:transition-opacity group-data-horizontal/tabs:after:inset-x-0 group-data-horizontal/tabs:after:bottom-[-5px] group-data-horizontal/tabs:after:h-0.5 group-data-vertical/tabs:after:inset-y-0 group-data-vertical/tabs:after:-right-1 group-data-vertical/tabs:after:w-0.5 group-data-[variant=line]/tabs-list:data-active:after:opacity-100"[39m
+              [33mdata-activation-direction[39m=[32m"none"[39m
+              [33mdata-active[39m=[32m""[39m
+              [33mdata-composite-item-active[39m=[32m""[39m
+              [33mdata-orientation[39m=[32m"horizontal"[39m
+              [33mdata-slot[39m=[32m"tabs-trigger"[39m
+              [33mid[39m=[32m"base-ui-_r_n1_"[39m
+              [33mrole[39m=[32m"tab"[39m
+              [33mtabindex[39m=[32m"0"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0m浏览[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-disabled[39m=[32m"false"[39m
+              [33maria-selected[39m=[32m"false"[39m
+              [33mclass[39m=[32m"relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-1.5 py-0.5 text-sm font-medium whitespace-nowrap text-muted-foreground transition-all group-data-vertical/tabs:w-full group-data-vertical/tabs:justify-start hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 has-data-[icon=inline-end]:pr-1 has-data-[icon=inline-start]:pl-1 aria-disabled:pointer-events-none aria-disabled:opacity-50 dark:hover:text-foreground group-data-[variant=default]/tabs-list:data-active:shadow-sm group-data-[variant=line]/tabs-list:data-active:shadow-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 group-data-[variant=line]/tabs-list:bg-transparent group-data-[variant=line]/tabs-list:data-active:bg-transparent dark:group-data-[variant=line]/tabs-list:data-active:border-transparent dark:group-data-[variant=line]/tabs-list:data-active:bg-transparent data-active:bg-background data-active:text-foreground dark:data-active:border-input dark:data-active:bg-input/12 dark:data-active:text-foreground after:absolute after:bg-foreground after:opacity-0 after:transition-opacity group-data-horizontal/tabs:after:inset-x-0 group-data-horizontal/tabs:after:bottom-[-5px] group-data-horizontal/tabs:after:h-0.5 group-data-vertical/tabs:after:inset-y-0 group-data-vertical/tabs:after:-right-1 group-data-vertical/tabs:after:w-0.5 group-data-[variant=line]/tabs-list:data-active:after:opacity-100"[39m
+              [33mdata-activation-direction[39m=[32m"none"[39m
+              [33mdata-orientation[39m=[32m"horizontal"[39m
+              [33mdata-slot[39m=[32m"tabs-trigger"[39m
+              [33mid[39m=[32m"base-ui-_r_n2_"[39m
+              [33mrole[39m=[32m"tab"[39m
+              [33mtabindex[39m=[32m"-1"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0m我的分享[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-controls[39m=[32m"base-ui-_r_nd_"[39m
+              [33maria-disabled[39m=[32m"false"[39m
+              [33maria-selected[39m=[32m"false"[39m
+              [33mclass[39m=[32m"relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-1.5 py-0.5 text-sm font-medium whitespace-nowrap text-muted-foreground transition-all group-data-vertical/tabs:w-full group-data-vertical/tabs:justify-start hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 has-data-[icon=inline-end]:pr-1 has-data-[icon=inline-start]:pl-1 aria-disabled:pointer-events-none aria-disabled:opacity-50 dark:hover:text-foreground group-data-[variant=default]/tabs-list:data-active:shadow-sm group-data-[variant=line]/tabs-list:data-active:shadow-none [&_svg]:p...
+ ❯ waitForWrapper node_modules/.pnpm/@testing-library+dom@10.4.1/node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/.pnpm/@testing-library+dom@10.4.1/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/components/pages/settings/market/MarketSection.test.tsx:331:20
+    329|       vi.spyOn(API, "listCustomEndpoints").mockResolvedValue({ endpoin…
+    330|       const location = renderMarket();
+    331|       await screen.findAllByRole("article");
+       |                    ^
+    332|
+    333|       await userEvent.click(screen.getByRole("switch", { name: "只看已安装"…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22/23]⎯
+
+
+ Test Files  9 failed | 296 passed (305)
+      Tests  23 failed | 4038 passed (4061)
+   Start at  19:39:58
+   Duration  213.03s (transform 154.35s, setup 136.89s, import 291.71s, tests 1336.95s, environment 98.09s)
+
+ ELIFECYCLE  Command failed with exit code 1.

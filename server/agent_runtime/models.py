@@ -6,6 +6,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel
 
+from lib.i18n import DEFAULT_LOCALE
+
 SessionStatus = Literal["idle", "running", "completed", "error", "interrupted", "closed"]
 
 
@@ -52,6 +54,8 @@ class QueuedMessage:
     cli_uuid: str
     content: str | list[dict[str, Any]] = ""
     """Message content delivered to the CLI. Resend unchanged when resending an unsent message, sending immediately, or requeueing after CLI discard."""
+    reply_locale: str = DEFAULT_LOCALE
+    """Presentation locale accepted with the message; preserved on retries and queued resends."""
     client_key: str | None = None
     state: QueuedMessageState = "queued"
     withdrawal: WithdrawalIntent | Literal["send_now"] | None = None

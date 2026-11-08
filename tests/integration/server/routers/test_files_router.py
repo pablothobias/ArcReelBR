@@ -23,9 +23,9 @@ from lib.artifacts.artifact_manifest import (
 from lib.backends.providers import CallPurpose
 from lib.episode.episode_sources import whole_source_files
 from lib.i18n.en import assets as en_assets
+from lib.i18n.en import errors as en_errors
 from lib.i18n.vi import assets as vi_assets
 from lib.i18n.zh import assets as zh_assets
-from lib.i18n.zh import errors as zh_errors
 from lib.project import project_trash
 from lib.project.project_schema import CURRENT_PROJECT_SCHEMA_VERSION
 from lib.prompts.prompt_templates.builtin import builtin_templates
@@ -232,7 +232,7 @@ class TestFilesRouter:
             pm.get_project_path("demo"), RuntimeError("step failed"), schema_version=CURRENT_PROJECT_SCHEMA_VERSION
         )
         before = pm.load_project("demo")
-        refusal = zh_errors.MESSAGES[MIGRATION_FAILURE_CODE].split("{")[0]
+        refusal = en_errors.MESSAGES[MIGRATION_FAILURE_CODE].split("{")[0]
 
         with client:
             responses = [
@@ -271,7 +271,7 @@ class TestFilesRouter:
             )
 
         assert resp.status_code == 400
-        assert resp.json()["detail"] == zh_errors.MESSAGES["source_name_reserved"]
+        assert resp.json()["detail"] == en_errors.MESSAGES["source_name_reserved"]
         assert not (pm.get_project_path("demo") / "source" / "episode_3.txt").exists()
         assert pm.load_project("demo")["episodes"][0]["source_origin"] == "none"
 
@@ -302,7 +302,7 @@ class TestFilesRouter:
             resp = client.delete("/api/v1/projects/demo/source/episode_1.txt")
 
         assert resp.status_code == 409
-        assert resp.json()["detail"] == zh_errors.MESSAGES["episode_source_derived"]
+        assert resp.json()["detail"] == en_errors.MESSAGES["episode_source_derived"]
         assert (source_dir / "episode_1.txt").read_text(encoding="utf-8") == "甲乙"
         assert pm.load_project("demo") == before
 
@@ -333,7 +333,7 @@ class TestFilesRouter:
             )
 
         assert upload.status_code == 422
-        assert upload.json()["detail"] == zh_errors.MESSAGES["episode_source_empty"]
+        assert upload.json()["detail"] == en_errors.MESSAGES["episode_source_empty"]
         assert pm.load_project("demo")["episodes"] == []
 
     def test_whole_source_uploads_are_appended_to_the_file_list(self, tmp_path, monkeypatch):
@@ -351,7 +351,7 @@ class TestFilesRouter:
             assert client.delete("/api/v1/projects/demo/source/第2章.txt").status_code == 200
 
         assert reserved.status_code == 400
-        assert reserved.json()["detail"] == zh_errors.MESSAGES["source_name_reserved"]
+        assert reserved.json()["detail"] == en_errors.MESSAGES["source_name_reserved"]
         assert not (pm.get_project_path("demo") / "source" / "episode_3.txt").exists()
         assert pm.load_project("demo")["whole_source_files"] == [{"source_file": "source/第1章.txt"}]
 
@@ -479,7 +479,7 @@ class TestFilesRouter:
                 files={"file": ("chapter.txt", BytesIO(b"hello"), "text/plain")},
             )
             assert resp.status_code == 404
-            assert resp.json()["detail"] == zh_errors.MESSAGES["project_not_found"].format(name="demo")
+            assert resp.json()["detail"] == en_errors.MESSAGES["project_not_found"].format(name="demo")
 
     def test_source_upload_loader_file_missing_with_project_intact_stays_generic(self, tmp_path, monkeypatch):
         client, _ = _client(monkeypatch, tmp_path)
@@ -496,7 +496,7 @@ class TestFilesRouter:
                 files={"file": ("chapter.txt", BytesIO(b"hello"), "text/plain")},
             )
             assert resp.status_code == 404
-            assert resp.json()["detail"] == zh_errors.MESSAGES["resource_not_found"]
+            assert resp.json()["detail"] == en_errors.MESSAGES["resource_not_found"]
 
     def test_upload_assets_and_drafts(self, tmp_path, monkeypatch):
         client, pm = _client(monkeypatch, tmp_path)
@@ -710,7 +710,7 @@ class TestFilesRouter:
         with client:
             resp = client.post("/api/v1/projects/demo/upload/bgm", files={"file": (filename, content, "audio/wav")})
             assert resp.status_code == 400
-            assert resp.json()["detail"] == zh_errors.MESSAGES[message_key].format(**params)
+            assert resp.json()["detail"] == en_errors.MESSAGES[message_key].format(**params)
         assert "bgm" not in pm.load_project("demo")
 
     def test_bgm_list_of_unknown_project_is_404(self, tmp_path, monkeypatch):
@@ -761,7 +761,7 @@ class TestFilesRouter:
                 files={"file": ("alice_voice.wav", oversized, "audio/wav")},
             )
             assert resp.status_code == 400
-            assert resp.json()["detail"] == zh_errors.MESSAGES["upload_too_large"].format(max_mb=15)
+            assert resp.json()["detail"] == en_errors.MESSAGES["upload_too_large"].format(max_mb=15)
 
     def test_character_audio_ref_rejects_duration_out_of_range(self, tmp_path, monkeypatch):
         client, pm = _client(monkeypatch, tmp_path)
@@ -771,7 +771,7 @@ class TestFilesRouter:
                 files={"file": ("alice_voice.wav", wav_bytes(1), "audio/wav")},
             )
             assert resp.status_code == 400
-            assert resp.json()["detail"] == zh_errors.MESSAGES["audio_duration_out_of_range"].format(
+            assert resp.json()["detail"] == en_errors.MESSAGES["audio_duration_out_of_range"].format(
                 min_seconds=2, max_seconds=10
             )
             assert pm.load_project("demo")["characters"]["Alice"].get("reference_audio", "") == ""
@@ -1242,7 +1242,7 @@ class TestFilesRouter:
                         files={"file": payloads.get(upload_type, default_payload)},
                     )
                     assert resp.status_code == 400, (upload_type, unsafe, resp.status_code)
-                    assert resp.json()["detail"] == zh_assets.MESSAGES["asset_invalid_name"].format(name=unsafe)
+                    assert resp.json()["detail"] == en_assets.MESSAGES["asset_invalid_name"].format(name=unsafe)
 
             # Traversal names must create no files inside/outside projects or alter existing contents.
             assert _snapshot() == before
@@ -1346,7 +1346,7 @@ class TestFilesRouter:
             )
             assert resp.status_code == 400
             # Use whole-MB limits so message max_mb is meaningful to users.
-            assert resp.json()["detail"] == zh_errors.MESSAGES["upload_too_large"].format(max_mb=1)
+            assert resp.json()["detail"] == en_errors.MESSAGES["upload_too_large"].format(max_mb=1)
 
     def test_source_decode_and_draft_mode_helpers(self, tmp_path, monkeypatch):
         client, pm = _client(monkeypatch, tmp_path)
@@ -1770,7 +1770,7 @@ class TestFilesRouter:
             assert change["action"] == "created"
             assert change["episode"] == 1
             assert change["important"] is True
-            assert "分镜拆分" in change["label"]
+            assert "Segment splitting" in change["label"]
 
             mock_emit.reset_mock()
 
@@ -1977,7 +1977,7 @@ class TestPublicFileRouteServesMediaOnly:
 
     def test_non_media_file_and_missing_file_share_not_found_response(self, tmp_path, monkeypatch):
         client, _ = _client(monkeypatch, tmp_path)
-        not_found = zh_errors.MESSAGES["file_not_found"]
+        not_found = en_errors.MESSAGES["file_not_found"]
 
         with client:
             existing = client.get("/api/v1/files/demo/project.json")
@@ -2505,7 +2505,7 @@ class TestFilesUnexpectedErrorsMapTo500:
         assert "AI Studio/Gemini 3.1 Flash Lite" in detail
         assert "vision" in detail
         # Default zh without Accept-Language uses Chinese translations, never __str__ English technical errors.
-        assert "不支持图像输入" in detail
+        assert "does not support image input" in detail
 
     def test_upload_style_image_backend_value_error_maps_to_500_not_leaked(self, tmp_path, monkeypatch):
         """Nonvision backend-construction ValueError, such as credential files lacking project_id, never leaks unchanged as 400."""

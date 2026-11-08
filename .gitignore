@@ -103,3 +103,4 @@ mutants/
 # Keep the maintenance-language policy linked from AGENTS.md in the repository,
 # including when a developer's global ignore excludes new ADR files.
 !docs/adr/0121-english-maintenance-language-preserves-localization-and-contracts.md
+!docs/adr/0122-english-product-defaults-preserve-project-language.md

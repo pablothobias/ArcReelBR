@@ -395,7 +395,7 @@ async def test_split_reference_video_units_rejects_duration_off_reference_tier(
     out = await run_rv_split(fake_ctx, monkeypatch, [rv_unit("@[张三] 起身", duration=4)])
     assert out.problem is not None
     text = said(out)
-    assert "生效档位" in text
+    assert "effective tiers" in text
     assert "[8]" in text
     # Off-tier content also becomes repairable drafts, like other Agent-fixable violations.
     assert not rv_script_plan_path(fake_ctx).exists()
@@ -462,7 +462,7 @@ async def test_split_reference_video_units_rejects_out_of_enum_duration(
     rv_source(fake_ctx)
     out = await run_rv_split(fake_ctx, monkeypatch, [rv_unit("@[张三] 起身", duration=5)])
     assert out.problem is not None
-    assert "script_plan 拆分内容结构校验失败" in said(out)
+    assert "split script_plan content structure validation failed" in said(out)
     assert not rv_script_plan_path(fake_ctx).exists()
 
 
@@ -551,8 +551,8 @@ async def test_split_reference_video_units_surfaces_tolerated_voice_warnings(
     assert out.problem is None, out
     assert rv_script_plan_path(fake_ctx).exists()
     text = said(out)
-    assert "降级提示" in text
-    assert "未设置参考音频" in text
+    assert "Fallback notices" in text
+    assert "has no reference audio" in text
 
 
 async def test_split_reference_video_units_names_units_without_scene_reference(
@@ -572,7 +572,7 @@ async def test_split_reference_video_units_names_units_without_scene_reference(
     # Receipts locate server-issued IDs; fixtures already used 1.
     assert "unit E1U3：" in text
     assert "unit E1U2：" not in text
-    assert "未引用场景" in text
+    assert "references no scene" in text
 
 
 async def test_split_reference_video_units_counts_this_episodes_new_scenes_as_scene_references(
@@ -613,8 +613,8 @@ async def test_split_reference_video_units_reports_soft_violations_alongside_the
     assert out.problem is not None
     text = said(out)
     assert "未登记" in text
-    assert "降级提示" in text
-    assert "未引用场景" in text
+    assert "Fallback notices" in text
+    assert "references no scene" in text
     assert "unit E1U02：" in text
     assert not rv_script_plan_path(fake_ctx).exists()
 
@@ -646,4 +646,4 @@ async def test_split_reference_video_units_keeps_voice_warnings_on_per_image_bac
     )
 
     assert out.problem is None, out
-    assert "参考音频最多 1 段" in said(out)
+    assert "At most 1 reference audio clips" in said(out)

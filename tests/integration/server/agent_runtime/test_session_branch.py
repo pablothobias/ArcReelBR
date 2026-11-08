@@ -503,3 +503,27 @@ async def test_new_session_event_log_is_rebuilt_from_the_copied_transcript(branc
 
     entries = await event_log.list_entries(branched.session_id, tmp_path)
     assert [entry["type"] for entry in entries] == ["user", "assistant"]
+
+
+async def test_branch_backfill_keeps_user_content_without_application_language_context(branching):
+    from server.agent_runtime.conversation_language import conversation_language_block
+
+    service, _, store, log_store, session_id, tmp_path = branching
+    key = {"project_key": make_project_key(tmp_path), "session_id": session_id}
+    messages = await store.load(key)
+    assert messages is not None
+    first = messages[0]
+    quoted = conversation_language_block("ru", "user-quoted-identity")
+    original = [quoted, {"type": "text", "text": "保留原文"}]
+    first["message"]["content"] = [conversation_language_block("en", first["uuid"]), *original]
+    await store.delete(key)
+    await store.append(key, messages)
+
+    branched = await service.branch(session_id, SECOND_USER_ENTRY)
+    event_log = EventLogService(log_store, SdkTranscriptAdapter(store=store))
+    await event_log.ensure_backfilled(branched.session_id, tmp_path)
+    entries = await event_log.list_entries(branched.session_id, tmp_path)
+    assert [e["type"] for e in entries] == ["user", "assistant"]
+    assert entries[0]["content"] == original
+    assert entries[1]["content"] == [{"type": "text", "text": "在"}]
+    assert entries[0]["uuid"] == first["uuid"]

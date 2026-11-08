@@ -541,7 +541,7 @@ class TestImportRouting:
         resp = endpoints_client.put(f"/api/v1/custom-endpoints/{created['id']}", json=comfyui_endpoint_definition())
 
         assert resp.status_code == 422
-        assert "演示视频模型（供应商 中转站）" in resp.json()["detail"]
+        assert "演示视频模型 (provider 中转站)" in resp.json()["detail"]
         assert "demo-video" not in resp.json()["detail"]
         assert endpoints_client.get(f"/api/v1/custom-endpoints/{created['id']}").json()["kind"] == "declarative"
 
@@ -578,7 +578,7 @@ class TestImportRouting:
         resp = endpoints_client.put(f"/api/v1/custom-endpoints/{created['id']}", json=comfyui_endpoint_definition())
 
         assert resp.status_code == 422
-        assert "演示视频模型（供应商 中转站）" in resp.json()["detail"]
+        assert "演示视频模型 (provider 中转站)" in resp.json()["detail"]
         assert "demo-video" not in resp.json()["detail"]
         assert endpoints_client.get(f"/api/v1/custom-endpoints/{created['id']}").json()["media_type"] == "image"
 

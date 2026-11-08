@@ -42,9 +42,9 @@ def test_total_covers_the_priced_units_and_the_unpriced_ones_are_counted() -> No
     assert payload["unpriced_count"] == 2
     assert [unit.unpriced for unit in sheet.units] == [False, True, False, True]
     summary = sheet.summary()
-    assert "预计合计：0.75 USD（仅含已定价的单元）" in summary
-    assert "另有 2 个单元未定价" in summary
-    assert "未定价（原因：missing_rate）" in summary
+    assert "Estimated total: 0.75 USD (priced units only)" in summary
+    assert "Another 2 units are unpriced" in summary
+    assert "Unpriced (reason: missing_rate)" in summary
 
 
 def test_no_total_is_given_when_no_unit_is_priced() -> None:
@@ -52,7 +52,7 @@ def test_no_total_is_given_when_no_unit_is_priced() -> None:
 
     assert sheet.estimated_total is None
     assert sheet.unpriced_count == 1
-    assert "1 个单元未定价，无法给出合计" in sheet.summary()
+    assert "1 units are unpriced, so no total is available" in sheet.summary()
 
 
 def test_a_unit_that_cannot_be_quoted_at_all_is_unpriced_too() -> None:
@@ -62,7 +62,7 @@ def test_a_unit_that_cannot_be_quoted_at_all_is_unpriced_too() -> None:
     assert unquoted.unpriced is True
     assert sheet.unpriced_count == 1
     assert sheet.estimated_total == {"USD": pytest.approx(1.0)}
-    assert "未定价（无法为这次请求报价）" in sheet.summary()
+    assert "Unpriced (cannot quote this request)" in sheet.summary()
 
 
 def test_reused_and_blocked_units_are_neither_priced_nor_unpriced() -> None:
@@ -74,7 +74,7 @@ def test_reused_and_blocked_units_are_neither_priced_nor_unpriced() -> None:
 
     assert sheet.unpriced_count == 0
     assert sheet.estimated_total == {"USD": pytest.approx(2.0)}
-    assert "未定价" not in sheet.summary()
+    assert "Unpriced" not in sheet.summary()
 
 
 def test_a_sheet_with_nothing_to_charge_has_an_empty_total() -> None:
@@ -128,4 +128,4 @@ def test_confirmation_text_tells_the_agent_which_units_in_a_tier_are_unpriced() 
 
     text = "\n".join(_confirmation_lines(admission))
 
-    assert "8s 档位 × 2：E1U1、E1U2；合计 0.8 USD（仅含已定价的 unit）；其中 1 个 unit 未定价，费用未知" in text
+    assert "8s tier × 2：E1U1、E1U2; total 0.8 USD (priced units only); 1 units are unpriced, with unknown cost" in text

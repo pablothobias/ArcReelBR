@@ -993,7 +993,7 @@ class TestDuplicateModelIdRejected:
             },
         )
         assert resp.status_code == 422
-        assert "重复" in resp.json()["detail"]
+        assert "Duplicate" in resp.json()["detail"]
 
 
 class TestFullUpdateProvider:
@@ -1207,7 +1207,7 @@ class TestDuplicateDefaultRejected:
             },
         )
         assert resp.status_code == 422
-        assert "默认模型" in resp.json()["detail"]
+        assert "default model" in resp.json()["detail"]
 
     def test_single_default_per_type_allowed(self, custom_providers_client: TestClient):
         """One default per distinct media_type expects successful 201."""
@@ -1832,7 +1832,7 @@ class TestDiscoverAnthropic:
         """Missing request api_key and database credentials returns 400."""
         resp = custom_providers_client.post("/api/v1/custom-providers/discover-anthropic", json={})
         assert resp.status_code == 400
-        # i18n defaults to zh.
+        # i18n defaults to English.
         assert "API Key" in resp.json()["detail"]
 
     async def test_whitespace_only_api_key_falls_back_to_stored(

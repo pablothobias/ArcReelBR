@@ -3,6 +3,9 @@ import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import resourcesToBackend from 'i18next-resources-to-backend';
 import { BRAND } from '@/branding';
+import { DEFAULT_LANGUAGE, SUPPORTED_LANGUAGES, supportedLanguage, type SupportedLanguage } from './locale';
+
+export { SUPPORTED_LANGUAGES, type SupportedLanguage } from './locale';
 
 // Load i18n namespaces on demand:
 // Vite import.meta.glob creates a separate chunk for each (lang, ns) file at build time;
@@ -14,9 +17,6 @@ const loaders = import.meta.glob<{ default: Record<string, string> }>(
 function pathFor(lang: string, ns: string): string {
   return `./${lang}/${ns}.ts`;
 }
-
-export const SUPPORTED_LANGUAGES = ['zh', 'en', 'vi', 'ru'] as const;
-export type SupportedLanguage = typeof SUPPORTED_LANGUAGES[number];
 
 export const LANGUAGE_DISPLAY_LABELS: Record<SupportedLanguage, string> = {
   zh: '中文',
@@ -67,9 +67,7 @@ export const i18nReady = i18n
     resourcesToBackend(async (lang: string, ns: string) => {
       const loader = loaders[pathFor(lang, ns)];
       if (!loader) {
-        // LanguageDetector may resolve regional BCP47 codes such as zh-CN / en-GB;
-        // i18next first requests the full code, then falls back to zh/en. This is expected,
-        // so it must not become an exception. Return an empty object to let i18next follow its fallback chain.
+        // Unknown namespaces continue through the English fallback chain.
         console.warn(`i18n: no resource for ${pathFor(lang, ns)}, falling back`);
         return {};
       }
@@ -80,8 +78,20 @@ export const i18nReady = i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    fallbackLng: 'zh',
+    fallbackLng: DEFAULT_LANGUAGE,
     supportedLngs: SUPPORTED_LANGUAGES,
+    load: 'languageOnly',
+    // Select the saved locale synchronously, before any REST/SSE headers are built.
+    // Resource loading remains asynchronous and i18nReady gates the initial render.
+    initAsync: false,
+    detection: {
+      // In-app selections are cached in localStorage. Preserve existing supported
+      // cookies and session storage next; URL, navigator and html hints do not
+      // configure fresh clients.
+      order: ['localStorage', 'cookie', 'sessionStorage'],
+      caches: ['localStorage'],
+      convertDetectedLanguage: (language) => supportedLanguage(language) ?? language,
+    },
     debug: false,
     interpolation: { escapeValue: false },
     defaultNS: 'common',

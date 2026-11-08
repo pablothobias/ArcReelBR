@@ -48,3 +48,16 @@ class TestValidationResult:
             valid=True, warning_messages=[ValidationMessage("val_missing_field", {"field": "id"})]
         )
         assert result.render_warnings(_translator("en")) == ["Missing required field: id"]
+
+
+def test_english_presentation_preserves_legacy_validation_locations():
+    from lib.i18n import DEFAULT_LOCALE
+    from lib.script.script_batch_edit import _validation_location
+
+    assert DEFAULT_LOCALE == "en"
+    structured = ValidationMessage("val_missing_field", {"field": "segments[0].title"})
+    literal = ValidationMessage.literal("segments[0].title: 保留历史诊断")
+    assert _validation_location(structured).path == ("segments", 0, "title")
+    assert _validation_location(literal).path == ("segments", 0, "title")
+    assert structured.render(default_translate) == "缺少必填字段：segments[0].title"
+    assert structured.render(_translator(DEFAULT_LOCALE)) == "Missing required field: segments[0].title"

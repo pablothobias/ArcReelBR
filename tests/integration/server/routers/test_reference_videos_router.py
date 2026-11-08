@@ -943,7 +943,7 @@ def test_precheck_empty_duration_metadata_returns_structured_blocker(
         "action": "configure_video_model",
         "message": i18n_message(
             "reference_supported_durations_missing",
-            **make_display_names().apply({"provider": "fake", "model": "fake-model"}),
+            **make_display_names("en").apply({"provider": "fake", "model": "fake-model"}),
         ),
     }
 
@@ -2062,7 +2062,7 @@ def test_prompt_preview_renders_draft_with_projected_references_without_saving(
     assert "@图片2" not in body["text"]
     assert "<酒馆> 门口，<张三> 推开门。" in body["text"]
     assert body["references"] == [{"type": "scene", "name": "酒馆", "path": "scenes/酒馆.png"}]
-    assert any("上限 1" in warning for warning in body["warnings"])
+    assert any("1 image limit" in warning for warning in body["warnings"])
     saved = reference_videos_client.get("/api/v1/projects/demo/reference-videos/episodes/1/units").json()
     assert saved["units"][0]["text"] == "镜头1：@张三 推门"
 
@@ -2103,7 +2103,7 @@ def test_prompt_preview_empty_draft_does_not_fall_back_to_saved_text(reference_v
     )
     assert response.status_code == 200
     assert response.json()["text"] is None
-    assert response.json()["unavailable"] == "该单元还没有填写正文"
+    assert response.json()["unavailable"] == "This unit has no body text yet"
 
 
 @pytest.mark.parametrize("suffix", ["/episodes/2/units/E1U1", "/episodes/1/units/missing"])
@@ -2161,7 +2161,7 @@ def test_prompt_preview_binds_only_available_audio_from_projected_voice_capabili
     assert "Voice characteristics: 低沉" in body["text"]
     assert "暖色电影质感" in body["text"]
     assert ("@音频1" in body["text"]) is audio_exists
-    assert any("音频当前不可用" in warning for warning in body["warnings"]) is not audio_exists
+    assert any("it is currently unavailable" in warning for warning in body["warnings"]) is not audio_exists
 
 
 def _bucket_facts() -> dict[str, Any]:

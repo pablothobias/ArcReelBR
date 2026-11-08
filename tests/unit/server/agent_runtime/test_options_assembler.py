@@ -180,7 +180,15 @@ async def test_build_adds_keep_alive_hook_with_can_use_tool(tmp_path: Path) -> N
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
     ("locale", "language"),
-    [("zh", "中文"), ("en", "English"), ("vi", "Tiếng Việt"), ("ru", "Русский"), ("xx", "中文")],
+    [
+        ("zh", "中文"),
+        ("en", "English"),
+        ("vi", "Tiếng Việt"),
+        ("ru", "Русский"),
+        ("xx", "English"),
+        ("en-US", "English"),
+        ("zh-CN", "中文"),
+    ],
 )
 async def test_build_system_prompt_renders_language_rule_for_locale(tmp_path: Path, locale: str, language: str) -> None:
     """Appended system prompts render locale language rules and contain only language rules, project context and user-memory sections."""
@@ -192,8 +200,12 @@ async def test_build_system_prompt_renders_language_rule_for_locale(tmp_path: Pa
     options = await assembler.build("demo", locale=locale)
     append = options.system_prompt["append"]
 
-    assert f"- **You must answer the user in {language}**:" in append
-    assert f"- **Prompts use {language}**:" in append
+    assert f"answer the user in {language} by default" in append
+    assert "<arcreel-conversation-language message-id=" in append
+    assert "Creative-content language is independent" in append
+    assert "including their defaults when source language is missing or unknown" in append
+    assert "selected workflow/tool's prompt-language requirements" in append
+    assert options.system_prompt["snapshot"] is False
     assert [line for line in append.splitlines() if line.startswith("## ")] == [
         "## Language rules",
         "## Current project context",

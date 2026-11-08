@@ -1,0 +1,71 @@
+........................................................................ [ 18%]
+..............F....................F.................................... [ 37%]
+........................................................................ [ 56%]
+........................................................................ [ 75%]
+........................................................................ [ 94%]
+......................                                                   [100%]
+=================================== FAILURES ===================================
+_______ test_promote_drama_script_plan_returns_a_receipt_with_statistics _______
+tests/integration/server/agent_toolset/test_promote_draft.py:1088: in test_promote_drama_script_plan_returns_a_receipt_with_statistics
+    assert "1 个分镜" in message
+E   AssertionError: assert '1 个分镜' in '✅ Normalized script promoted and saved (structured content): drafts/episode_1/script_plan_normalized_script.json\n📊 Generation statistics: 1 shots'
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:52:18 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+----------------------------- Captured stderr call -----------------------------
+2026-11-07 19:52:18 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-ca4af6ede3)
+------------------------------ Captured log call -------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-ca4af6ede3)
+_____ test_promote_narration_script_plan_returns_a_receipt_with_statistics _____
+tests/integration/server/agent_toolset/test_promote_draft.py:1519: in test_promote_narration_script_plan_returns_a_receipt_with_statistics
+    assert "1 个分镜" in message
+E   AssertionError: assert '1 个分镜' in '✅ Narration/commentary shots promoted and saved (structured script_plan): drafts/episode_1/script_plan_segments.json\n📊 Generation statistics: 1 shots / 7 characters, estimated total duration 4 seconds; 0 segment_break markers'
+---------------------------- Captured stderr setup -----------------------------
+2026-11-07 19:52:21 [INFO] lib.generation.generation_worker: Worker 初始容量表: {}
+------------------------------ Captured log setup ------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:483 Worker 初始容量表: {}
+----------------------------- Captured stderr call -----------------------------
+2026-11-07 19:52:21 [INFO] lib.generation.generation_worker: 获得 worker lease (owner=worker-455d7329a3)
+------------------------------ Captured log call -------------------------------
+INFO     lib.generation.generation_worker:generation_worker.py:604 获得 worker lease (owner=worker-455d7329a3)
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /Users/pablo.carminatti.br/Projects/ArcReelBR/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+tests/unit/lib/script/test_draft_quarantine.py::TestEnvelope::test_write_read_roundtrip_preserves_content_violations_and_meta
+  /Users/pablo.carminatti.br/.local/share/uv/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/contextlib.py:144: SAWarning: Skipped unsupported reflection of expression-based index idx_tasks_dedupe_active
+    next(self.gen)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 25 durations =============================
+0.91s setup    tests/unit/lib/script/test_draft_quarantine.py::TestEnvelope::test_write_read_roundtrip_preserves_content_violations_and_meta
+0.53s call     tests/unit/server/routers/test_generate_router_voice_sample.py::TestConfirmCharacterVoiceSample::test_confirm_waits_for_video_selection_before_replacing_reference_audio
+0.25s call     tests/integration/server/routers/test_reference_videos_router.py::test_prompt_preview_renders_draft_with_projected_references_without_saving
+0.21s call     tests/integration/server/agent_toolset/test_text_generation.py::test_get_video_capabilities_reports_endpoint_fixed_per_bucket[i2v]
+0.19s call     tests/integration/server/agent_toolset/test_promote_draft.py::test_promote_draft_reports_broken_outer_shape[units_removed]
+0.15s call     tests/integration/server/services/project/test_script_review.py::TestReferenceVideoPromptAuthoringEnforcement::test_confirm_tool_materializes_the_script_authoring_reads
+0.13s call     tests/integration/server/agent_toolset/test_promote_draft.py::test_split_reference_video_units_clears_stale_quarantine_on_success
+0.10s setup    tests/integration/server/agent_toolset/test_draft_tools.py::test_open_draft_rejects_non_reference_episode
+0.10s setup    tests/integration/server/agent_toolset/test_draft_tools.py::test_open_draft_records_base_fingerprint
+0.09s setup    tests/integration/server/agent_toolset/test_draft_tools.py::test_discard_draft_moves_project_activity_forward
+0.09s setup    tests/integration/server/agent_toolset/test_text_generation.py::test_get_video_capabilities_reports_endpoint_fixed_per_bucket[r2v]
+0.09s setup    tests/integration/server/routers/test_reference_videos_router.py::test_prompt_preview_renders_draft_with_projected_references_without_saving
+0.09s call     tests/integration/server/agent_toolset/test_promote_draft.py::test_promote_draft_waits_for_file_lock_without_blocking_event_loop
+0.09s setup    tests/integration/server/agent_toolset/test_draft_tools.py::test_open_draft_returns_drama_scenes
+0.08s setup    tests/integration/server/agent_toolset/test_draft_tools.py::test_open_draft_returns_existing_drama_draft
+0.08s call     tests/integration/server/agent_toolset/test_text_generation.py::test_generate_episode_script_unit_rejected_before_the_model_is_an_input_problem
+0.08s setup    tests/integration/server/agent_toolset/test_text_generation.py::test_get_video_capabilities_reports_endpoint_fixed_per_bucket[i2v]
+0.08s call     tests/integration/server/agent_toolset/test_promote_draft.py::test_promote_draft_rejects_stale_draft_revision
+0.08s call     tests/integration/server/agent_toolset/test_promote_draft.py::test_promote_receipt_names_units_without_scene_reference
+0.08s setup    tests/integration/server/agent_toolset/test_promote_draft.py::test_writing_reference_script_plan_clears_stale_prompt_authoring_quarantine
+0.08s call     tests/integration/server/agent_toolset/test_draft_tools.py::test_open_draft_returns_existing_draft_without_clobbering
+0.08s setup    tests/integration/server/agent_toolset/test_promote_draft.py::test_promote_narration_script_plan_keeps_segment_ids_past_99
+0.08s call     tests/integration/server/agent_toolset/test_promote_draft.py::test_promote_draft_reports_promotion_not_split
+0.08s setup    tests/integration/server/agent_toolset/test_text_generation.py::test_generate_episode_script_forwards_instructions
+0.08s call     tests/integration/server/agent_toolset/test_promote_draft.py::test_cancelled_reference_script_plan_promotion_finishes_commit_and_cleanup
+=========================== short test summary info ============================
+FAILED tests/integration/server/agent_toolset/test_promote_draft.py::test_promote_drama_script_plan_returns_a_receipt_with_statistics
+FAILED tests/integration/server/agent_toolset/test_promote_draft.py::test_promote_narration_script_plan_returns_a_receipt_with_statistics
+2 failed, 380 passed, 2 warnings in 28.03s

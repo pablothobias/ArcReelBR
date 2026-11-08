@@ -510,7 +510,7 @@ async def _promote_reference_script_plan(
         render_soft_violation_lines(
             [replace(soft, item_id=unit_ids[soft.item_index]) for soft in revalidation.soft_violations]
         ),
-        action="晋升",
+        action="promoted",
     )
 
 
@@ -760,7 +760,7 @@ async def _promote_drama_script_plan(
     return drama_script_plan_result_text(
         script_plan_path.relative_to(project_path),
         raw_scenes if isinstance(raw_scenes, list) else [],
-        action="晋升",
+        action="promoted",
     )
 
 
@@ -955,7 +955,7 @@ async def _promote_narration_script_plan(
     return narration_script_plan_result_text(
         script_plan_path.relative_to(project_path),
         raw_segments if isinstance(raw_segments, list) else [],
-        action="晋升",
+        action="promoted",
     )
 
 

@@ -15,7 +15,7 @@ from server.tool_runtime import ToolOutcome, ToolProblem
 
 def tool_error(name: str, exc: BaseException, log: list[str] | None = None) -> ToolOutcome[Any]:
     """Return a typed handler failure for host adapters to encode."""
-    msg = f"{name} 失败: {exc}"
+    msg = f"{name} failed: {exc}"
     text = "\n".join([msg, *log]) if log else msg
     return ToolOutcome(problem=ToolProblem("internal_error", text))
 
@@ -91,9 +91,9 @@ def validate_script_filename(value: str) -> str:
     including a ``scripts/`` prefix or ``..`` segments — is rejected.
     """
     if not is_str(value) or not value:
-        raise ValueError("script 文件名不能为空")
+        raise ValueError("script filename must not be empty")
     if "/" in value or "\\" in value or value in (".", ".."):
-        raise ValueError(f"script 必须是纯文件名，禁止路径分隔符: {value!r}")
+        raise ValueError(f"script must be a bare filename without path separators: {value!r}")
     return value
 
 

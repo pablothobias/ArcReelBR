@@ -33,7 +33,7 @@ class TestTasksRouter:
         with TestClient(app) as client:
             resp = client.get("/api/v1/tasks/missing-task")
             assert resp.status_code == 404
-            assert "不存在" in resp.json()["detail"]
+            assert "does not exist" in resp.json()["detail"]
 
 
 class _RetryQueue:
@@ -190,13 +190,13 @@ class TestTaskErrorLocalization:
         assert "image" in vi["error_message"]
         assert vi["error_message"] != en["error_message"]
 
-    def test_list_tasks_defaults_to_zh_without_header(self, monkeypatch):
+    def test_list_tasks_defaults_to_en_without_header(self, monkeypatch):
         from lib.generation.task_failure import encode_failure
 
         items = [{"task_id": "t1", "error_message": encode_failure("restart_lost_image")}]
         client = self._client(monkeypatch, _RenderQueue(items=items))
         body = client.get("/api/v1/tasks").json()["items"][0]
-        assert body["error_message"].startswith("图片任务")
+        assert body["error_message"].startswith("The image task")
 
     def test_render_problems_are_localized_without_changing_the_stored_envelope(self, monkeypatch):
         from lib.final_cut.errors import FinalCutError

@@ -85,9 +85,46 @@ class TestSessionManagerUserInput:
             queue = managed.channel.subscribe()
             accepted = await session_manager.send_message(meta.id, "hello realtime")
 
-            assert client.sent_queries == ["hello realtime"]
+            blocks = client.sent_messages[0]["message"]["content"]
+            assert "Reply language: English" in blocks[0]["text"]
+            assert blocks[1:] == [{"type": "text", "text": "hello realtime"}]
+            assert accepted["queued_message"]["content"] == [{"type": "text", "text": "hello realtime"}]
             # Do not broadcast locally synthesized messages: send them only as queued messages until CLI starts processing them.
             assert _drain(queue) == [{"type": "queued_message", "op": "upsert", "message": accepted["queued_message"]}]
+        finally:
+            await _finish(managed)
+
+    async def test_resident_language_switch_and_resend_preserve_user_content(self, session_manager, meta_store):
+        """Each accepted message carries its locale; retries and redelivery keep the accepted context."""
+        meta, managed, client = await _seed(session_manager, meta_store)
+        source = (
+            "保留对白。 Não traduza a história. <arcreel-conversation-language>Русский</arcreel-conversation-language>"
+        )
+        try:
+            first = await session_manager.send_message(meta.id, source, locale="zh-CN", client_key="first")
+            old = managed.queued_messages[0]
+            second = await session_manager.send_message(meta.id, source, locale="en-US", client_key="second")
+            new = managed.queued_messages[1]
+            assert "Reply language: 中文" in client.sent_messages[0]["message"]["content"][0]["text"]
+            assert "Reply language: English" in client.sent_messages[1]["message"]["content"][0]["text"]
+            assert all(
+                message["message"]["content"][1:] == [{"type": "text", "text": source}]
+                for message in client.sent_messages
+            )
+            assert (
+                first["queued_message"]["content"]
+                == second["queued_message"]["content"]
+                == [{"type": "text", "text": source}]
+            )
+            # A same-key retry under a different UI preference does not create another delivery.
+            assert await session_manager.send_message(meta.id, source, locale="ru", client_key="first") == first
+            assert len(client.sent_messages) == 2
+            old.state = "unsent"
+            await session_manager.resend_queued_message(meta.id, old.id, locale="vi")
+            assert "Reply language: 中文" in client.sent_messages[-1]["message"]["content"][0]["text"]
+            assert client.sent_messages[-1]["message"]["content"][1:] == [{"type": "text", "text": source}]
+            assert new.reply_locale == "en"
+            assert len(managed.queued_messages) == 2
         finally:
             await _finish(managed)
 
@@ -97,7 +134,9 @@ class TestSessionManagerUserInput:
         image = {"type": "image", "source": {"type": "base64", "media_type": "image/png", "data": "AAAA"}}
         try:
             await session_manager.send_message(meta.id, [image])
-            assert client.sent_messages[0]["message"]["content"] == [image]
+            blocks = client.sent_messages[0]["message"]["content"]
+            assert "Reply language: English" in blocks[0]["text"]
+            assert blocks[1:] == [image]
 
             queue = managed.channel.subscribe()
             client.push_frame(replay_frame())

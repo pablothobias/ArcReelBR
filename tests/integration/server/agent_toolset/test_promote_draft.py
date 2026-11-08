@@ -12,6 +12,7 @@ from typing import Any
 import pytest
 
 from lib.generation.video_request_facts import VideoRequestFactsFailure
+from lib.i18n.en import errors as en_errors
 from lib.project.project_manager import ProjectManager
 from lib.script import script_review
 from lib.script.draft_quarantine import (
@@ -513,7 +514,7 @@ async def test_promote_draft_reports_promotion_not_split(fake_ctx: ToolHarness, 
     out = await promote_reference_draft(fake_ctx)
 
     assert out.problem is None, out
-    assert "晋升" in said(out)
+    assert "promoted" in said(out)
 
 
 def _rv_scenes(fake_ctx: ToolHarness, scenes: dict[str, Any]) -> None:
@@ -545,7 +546,7 @@ async def test_promote_draft_report_names_units_without_scene_reference(fake_ctx
     assert out.problem is not None
     text = said(out)
     assert "unregistered_asset" in text
-    assert "未引用场景" in text
+    assert "references no scene" in text
     assert "unit E1U01：" in text
     # Soft violations stay outside blocking draft entries; combining them would make nonempty-means-block turn notices into hard violations.
     assert [v["code"] for v in read_rv_quarantine(fake_ctx)["violations"]] == ["unregistered_asset"]
@@ -562,7 +563,7 @@ async def test_promote_draft_report_silent_when_every_unit_references_a_scene(
     out = await promote_reference_draft(fake_ctx)
 
     assert out.problem is not None
-    assert "未引用场景" not in said(out)
+    assert en_errors.MESSAGES["ref_warn_unit_without_scene"] not in said(out)
 
 
 async def test_promote_receipt_names_units_without_scene_reference(fake_ctx: ToolHarness, monkeypatch) -> None:
@@ -576,8 +577,8 @@ async def test_promote_receipt_names_units_without_scene_reference(fake_ctx: Too
     assert out.problem is None, out
     assert not rv_quarantine_path(fake_ctx).exists()
     text = draft_of(out)["message"]
-    assert "降级提示" in text
-    assert "未引用场景" in text
+    assert "Fallback notices" in text
+    assert "references no scene" in text
     # Locate receipts by server-issued IDs; fixtures already used ID 1.
     assert "unit E1U3：" in text
     assert "unit E1U2：" not in text
@@ -592,7 +593,7 @@ async def test_promote_receipt_silent_when_every_unit_references_a_scene(fake_ct
     out = await promote_reference_draft(fake_ctx)
 
     assert out.problem is None, out
-    assert "未引用场景" not in draft_of(out)["message"]
+    assert en_errors.MESSAGES["ref_warn_unit_without_scene"] not in draft_of(out)["message"]
 
 
 async def test_cancelled_reference_script_plan_promotion_finishes_commit_and_cleanup(
@@ -990,7 +991,7 @@ async def test_generate_episode_script_blocked_by_prompt_authoring_draft(fake_ct
 
     out = await run_declared_tool("generate_episode_script", fake_ctx, {"episode_id": 1})
     assert out.problem is not None
-    assert "待处理的提示词编写草稿" in said(out)
+    assert "has a prompt-authoring draft to resolve" in said(out)
     assert "promote_draft" in said(out)
 
 
@@ -1017,9 +1018,9 @@ async def test_generate_episode_script_preserves_editable_draft_without_violatio
     out = await run_declared_tool("generate_episode_script", fake_ctx, {"episode_id": 1})
     assert out.problem is not None
     text = said(out)
-    assert "这是可编辑草稿" in text
-    assert "保留已有修改" in text
-    assert "按草稿内 violations" not in text
+    assert "This draft is editable" in text
+    assert "preserve existing edits" in text
+    assert "draft violations locations" not in text
 
 
 async def test_generate_episode_script_quarantine_precedes_missing_formal_script(fake_ctx: ToolHarness) -> None:
@@ -1031,8 +1032,8 @@ async def test_generate_episode_script_quarantine_precedes_missing_formal_script
     out = await run_declared_tool("generate_episode_script", fake_ctx, {"episode_id": 1})
     assert out.problem is not None
     text = said(out)
-    assert "待处理的提示词编写草稿" in text
-    assert "尚无正式脚本" not in text
+    assert "has a prompt-authoring draft to resolve" in text
+    assert en_errors.MESSAGES["operation_formal_script_missing"].format(where="") not in text
 
 
 async def test_generate_episode_script_ignores_quarantine_after_mode_switch(fake_ctx: ToolHarness) -> None:
@@ -1043,7 +1044,7 @@ async def test_generate_episode_script_ignores_quarantine_after_mode_switch(fake
     out = await run_declared_tool("generate_episode_script", fake_ctx, {"episode_id": 1})
     assert out.problem is not None
     # Ordinary missing-formal-script checks block, not reference-route drafts.
-    assert "待处理的提示词编写草稿" not in said(out)
+    assert en_errors.MESSAGES["operation_prompt_authoring_draft_pending"].format(where="") not in said(out)
 
 
 # ---------------------------------------------------------------------------
@@ -1084,8 +1085,8 @@ async def test_promote_drama_script_plan_returns_a_receipt_with_statistics(fake_
 
     assert out.problem is None, out
     message = draft_of(out)["message"]
-    assert "规范化剧本晋升" in message
-    assert "1 个分镜" in message
+    assert "Normalized script promoted" in message
+    assert "1 shots" in message
 
 
 async def test_promote_drama_script_plan_reports_schema_breach_without_writing(fake_ctx: ToolHarness) -> None:
@@ -1469,7 +1470,7 @@ async def test_promote_narration_script_plan_names_source_scope_on_coverage_viol
     text = said(out)
     assert out.problem is not None
     assert "[novel_text_coverage]" in text
-    assert "源文件 source/episode_2.txt" in text
+    assert "source file source/episode_2.txt" in text
     assert "patch_draft" in text
 
     refreshed = draft_of(await open_nr_for_edit(fake_ctx))
@@ -1515,9 +1516,9 @@ async def test_promote_narration_script_plan_returns_a_receipt_with_statistics(f
 
     assert out.problem is None, out
     message = draft_of(out)["message"]
-    assert "旁白/解说分镜晋升" in message
-    assert "1 个分镜" in message
-    assert "segment_break 标记" in message
+    assert "Narration/commentary shots promoted" in message
+    assert "1 shots" in message
+    assert "segment_break markers" in message
 
 
 async def test_promote_narration_script_plan_keeps_segment_ids_past_99(fake_ctx: ToolHarness) -> None:

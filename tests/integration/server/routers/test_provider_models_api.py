@@ -1037,7 +1037,7 @@ async def test_manual_entry_rejects_a_name_the_catalog_already_has(
     resp = models_client.patch(url, json={"new_entry": clash})
 
     assert resp.status_code == 422
-    assert resp.json()["detail"] == "模型目录中已有这个模型，请直接选择。"
+    assert resp.json()["detail"] == "The model catalog already has this model. Select it instead."
     assert (
         models_client.patch(url, json={"new_entry": {**_NEW_IMAGE, "facts": {"text_to_image": "x"}}}).status_code == 422
     )

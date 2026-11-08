@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { useAuthStore } from "@/stores/auth-store";
 import { safeReturnPath } from "@/utils/safe-url";
 import { BRAND } from "@/branding";
+import { normalizeLanguage } from "@/i18n/locale";
 import type { LoginResponse, ErrorResponse } from "@/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,7 +38,7 @@ export function LoginPage() {
       const resp = await fetch("/api/v1/auth/token", {
         method: "POST",
         headers: {
-          "Accept-Language": i18n.language || "zh",
+          "Accept-Language": normalizeLanguage(i18n.language),
         },
         body,
       });
