@@ -1,0 +1,46 @@
+# Consolidated audiovisual evidence review
+
+Date: 2026-11-08. This review combines saved observations into seven source-linked, per-axis records, followed by one explicitly authorized blind local recognition of the existing decoded AAC input. No provider request, upload, timeline edit or production mutation was performed. [Machine-readable review](consolidated-review.json) retains media, recognition, alignment, cue, contact-sheet and signal hashes. Its `private:` prefix resolves under `/tmp/arcreel-goal-state/`; private media is not published.
+
+## Input binding and decisions
+
+Every current recognition WAV was hashed against the frozen WhisperX input manifest before reading its saved recognition. The report preserves recognized text, including punctuation, separately from intended words. Comparisons ignore punctuation/case but preserve Portuguese accents and word order. Word alignment follows recognized text, without proving the words or establishing gold word boundaries.
+
+The `good.wav` WhisperX result is **not** substituted for the AAC audio in any MP4. The recognition WAV hashes differ: good speech `fb4f7de5…37ec8`; decoded AAC from good/delayed video `a92c8ad0…51bf0`. To resolve this specific gap, one new local WhisperX run used the actual decoded AAC WAV. Both saved good/delayed decoded WAVs were hash-verified identical before reusing that result. No result is attributed to the identity/story video by recipe or filename. Both MP4 records retain their historical base-model `pano` observation separately.
+
+Before inference, `aac-positive-qualification/frozen-input-model-config.json` froze the input, source videos, runner, existing checkpoint bytes/revisions, package lock and prior configuration. A one-case derivative of the previously working runner loaded the installed models only, with CPU int8, four threads, batch one, Portuguese, null initial prompt/prefix/hotwords and no previous-text conditioning. It read neither the expected-context file nor expected words. Native network was denied with `sandbox-exec`, offline flags set, and ONNX telemetry disabled before imports. No downloads or paid service were used. One ASR input plus recognized-text-only alignment completed; the process exited **0** in 11.03 seconds with zero Python network attempts. Raw output recognizes “Bom dia, Ana. O pão acabou, mas o café está quentinho.” The raw ASR envelope is 0.034–4.414 seconds; word alignment has no gold boundary annotations. The longer decoded PCM duration, 9.024 seconds, is preserved rather than silently truncated to the 9-second video. Private raw results, exact command, exit and configuration are linked by hash in the JSON.
+
+| Source/context | Direct observations and decision | Unresolved axes |
+| --- | --- | --- |
+| Known-good `good.wav`, fixture-local `E1U01` | Saved WhisperX recognizes the complete intended “Bom dia, Ana! O pão acabou, mas o café está quentinho.” Normalized words agree. Consistent for this spoken-content control only. | Subjective delivery; timing accuracy without boundary annotations; audio-only input has no visual or mouth evidence. |
+| Wrong-speech WAV, fixture-local `E1U01` | Saved WhisperX recognizes “Boa noite, Bruno. A porta ficou aberta e o cachorro fugiu.” This contradicts the intended greeting/Ana/bread/coffee utterance. Reject the speech-content control. Preserve the intended words. | Raw aligned final word exceeds decoded duration by 0.4375 ms; do not silently clamp it or call the timing gold. |
+| Digital-silence WAV, fixture-local `E1U01` | All PCM bytes zero; saved WhisperX has no segments. Reject missing expected speech. Prior model music/speech claims are contradicted by actual PCM. | Silence is not evidence of a voice, acting or audiovisual synchronization. |
+| `good-av.mp4`, fixture-local `E1U01` | Exact decoded-AAC recognition now retains all intended words. Actual sheet shows ANA/blue/white handled mug. Caption visible at 0.120, 3.720, 4.280 s; absent at 4.320, 6.720, 8.960 s. Cue 0.10–4.32 overlaps the new 0.034–4.414 ASR envelope. | Coarse timing only: cue ends 94 ms before the estimated ASR endpoint, without gold word timing. Static drawing has no facial motion. No overall audiovisual quality pass. |
+| `subtitle-delayed.mp4`, fixture-local `E1U01` | Exact same decoded-PCM hash permits the single new recognition result here too. Caption absent at 0.000, 3.720, 4.960 s; visible at 5.000, 6.720, 8.960 s. Cue 5.00–9.00 has no overlap with the new 0.034–4.414 speech envelope. Reject visible subtitle timing. | Word-boundary accuracy is not calibrated. Historical `pano` remains recorded, not rewritten. |
+| `identity-story-error.mp4`, fixture-local `E1U01` | Actual sheet shows BRUNO/red/brown square box instead of reference ANA/blue/white handled mug; caption still addresses Ana and coffee. Reject the demonstrated symbolic character/costume/prop/story mismatch. | No real-person identity or acting claim; no new transcript attributed to this exact video. |
+| Native H3 sample, formal `E1U1` | Saved full-file PCM recognition is “Bom dia! O café está pronto!” and matches the frozen formal utterance. Source MP4 hash matches the existing extraction receipt. Consistent spoken words on this sample. | PCM duration is 5.184 s versus container 5.167 s, explicitly retained. Original lip-sync, intended performance and real identity continuity remain unestablished. The no-subtitles sample variant is not a captioned pilot. |
+
+These are separate axis decisions. Missing evidence never becomes a passing result. Static/freeze signals are expected for the drawing controls and do not establish a production defect. The symbolic reference and actual contact sheets were viewed again for this consolidation.
+
+## Corrections and actual operation context
+
+For wrong/missing speech, preserve the intended Portuguese; for the identity/story defect, preserve the approved ANA/blue/mug reference. Reject the defective candidate and reuse a verified correct existing version where available. Otherwise request bounded regeneration through existing `generate_videos` admission, with current quote/approval and attempt history. Do not rewrite the approved script to match erroneous generated media.
+
+The synthetic ID `E1U01` comes from the local expected-context JSON. It is **not** an existing ArcReel formal target. Those controls have no registered project, candidate version, timeline or clip ID. The JSON marks their production actions `blocked_missing_formal_context` and lists the exact required bindings, rather than inventing executable IDs or dispatching a replacement.
+
+The subtitle defect specifically requires changing cue 5.00–9.00 toward the intended 0.10–4.32 envelope while keeping audio, video and words fixed. This is not a per-word timing prescription. Existing `lib/edit_timeline/operations.py` supports clip trim/move/hold, source volume, narration placement and BGM operations, but no independent subtitle-cue retiming. Moving the whole clip preserves its internal delay. The report marks this correction `unsupported_subtitle_only_operation`; a production occurrence requires a narrow correction in the existing subtitle pipeline, not a second subtitle system.
+
+Actual formal context exists for the H3 sample: project `br-capability-sample-9-20261108`, script `episode_1.json`, unit `E1U1`, timeline `tl-0dd0f11d`, observed revision 1 and clip `c1`. The following existing-tool argument shapes were validated against their actual request models, without executing them:
+
+```json
+{"tool":"read_timeline","arguments":{"timeline":"tl-0dd0f11d"}}
+{"tool":"generate_videos","arguments":{"script":"episode_1.json","target":{"scope":"selected","ids":["E1U1"]},"preview":true}}
+```
+
+Project context is supplied separately. Re-read the current revision before any edit. The second operation is preview-only and grants no generation permission. There is no demonstrated H3 clip trim/volume defect or verified alternative version to justify a mutating command; no fabricated correction is proposed merely to demonstrate an API call.
+
+## Synchrony and the bounded claim
+
+The [relative-shift exercise](syncnet-local-qualification.md) and [negative controls](syncnet-negative-controls.md) are separate evidence, not an acceptance threshold. Independent review verified four decoded 100-frame videos, four 64,000-sample PCM windows, frozen hashes, exact baseline reproduction and the padding-free scoring indices. None of the three negatives outranked the unlabelled baseline by the predeclared scalar ordering. Silence gives a flat curve and arbitrary tie offset; a static face still produces substantial confidence and a search-boundary minimum. Neither value establishes lip matching.
+
+This consolidation demonstrates concrete per-segment rejection and insufficient-evidence decisions using actual files, not a generic model verdict. It preserves existing rendering/subtitle tools and prior approved evaluation costs. It does not establish universal audiovisual accuracy, calibrated lip-sync, real-person continuity, subjective voice/acting acceptance or the reference-led pilot. Those properties must be assessed on their actual production material rather than inferred from these controls. No human final-review workflow is substituted for Codex direction.

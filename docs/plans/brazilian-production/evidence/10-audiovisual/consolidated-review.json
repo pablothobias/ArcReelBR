@@ -1,0 +1,999 @@
+{
+  "status": "consolidated_existing_evidence_no_automatic_AV_pass",
+  "date": "2026-11-08",
+  "paid_calls": 0,
+  "production_mutations": 0,
+  "expected_fixture_context": {
+    "path": "private:/audio/expected.json",
+    "sha256": "65c0330c8f770cc7d894fe7cf89a37df83be0042f6d6199e222362dfba7b58ff",
+    "role": "fixture-local intended words/ID only"
+  },
+  "whisperx_input_manifest": {
+    "path": "private:/local-av-qualification/input-manifest.json",
+    "sha256": "15069959805bf9df9ac31312de30ef8107d638d51d28b688cb1e8579ea7902f6",
+    "role": "frozen exact recognition inputs"
+  },
+  "reference": {
+    "path": "private:/audio/reference.png",
+    "sha256": "86550aa1c33e3f559eb81dc50c9b53510563312fbd78457298b3f9c3df32cf27",
+    "role": "symbolic ANA/blue/white mug"
+  },
+  "records": [
+    {
+      "case": "good-speech",
+      "media": {
+        "path": "private:/audio/good.wav",
+        "sha256": "fb4f7de5eee89d4b84cfbe9aaebf5a0b19c36f234686a7e2e2aa43510b937ec8",
+        "role": "exact WAV supplied to saved WhisperX; current hash matches frozen input manifest"
+      },
+      "fixture_segment": "E1U01",
+      "segment_identity_scope": "synthetic expected-context ID only, not an ArcReel formal target",
+      "intended_words": "Bom dia, Ana! O pão acabou, mas o café está quentinho.",
+      "recognized_text": "Bom dia, Ana. O pão acabou, mas o café está quentinho.",
+      "recognition_media_binding": "exact current WAV SHA matches input-manifest; no transfer to AAC/MPEG media by filename or shared recipe",
+      "raw_recognition": {
+        "path": "private:/local-av-qualification/results/good-speech-raw-asr.json",
+        "sha256": "2bd4f6976da89f07b8d59e441e4de4b27a7850007997f75bfc7868d6ba3b1e9c",
+        "role": "saved actual WhisperX output, no new inference"
+      },
+      "alignment": {
+        "path": "private:/local-av-qualification/results/good-speech-aligned.json",
+        "sha256": "cd1bccc1d08a68cdd1675437ece63ddd0a051762ebc2a0fce5f87f43aaa85d62",
+        "role": "saved alignment of recognized text only"
+      },
+      "reported_words": [
+        {
+          "word": "Bom",
+          "start": 0.074,
+          "end": 0.235,
+          "score": 0.834
+        },
+        {
+          "word": "dia,",
+          "start": 0.315,
+          "end": 0.535,
+          "score": 0.918
+        },
+        {
+          "word": "Ana.",
+          "start": 0.796,
+          "end": 1.117,
+          "score": 0.947
+        },
+        {
+          "word": "O",
+          "start": 1.337,
+          "end": 1.377,
+          "score": 0.47
+        },
+        {
+          "word": "pão",
+          "start": 1.558,
+          "end": 1.758,
+          "score": 0.742
+        },
+        {
+          "word": "acabou,",
+          "start": 1.819,
+          "end": 2.3,
+          "score": 0.93
+        },
+        {
+          "word": "mas",
+          "start": 2.56,
+          "end": 2.741,
+          "score": 0.833
+        },
+        {
+          "word": "o",
+          "start": 2.821,
+          "end": 2.861,
+          "score": 0.999
+        },
+        {
+          "word": "café",
+          "start": 2.961,
+          "end": 3.322,
+          "score": 0.949
+        },
+        {
+          "word": "está",
+          "start": 3.383,
+          "end": 3.643,
+          "score": 0.988
+        },
+        {
+          "word": "quentinho.",
+          "start": 3.703,
+          "end": 4.345,
+          "score": 0.847
+        }
+      ],
+      "raw_timestamp_overruns": [],
+      "pcm": {
+        "duration_seconds": 4.345,
+        "all_zero": false
+      },
+      "axes": {
+        "spoken_content": {
+          "status": "consistent_scoped",
+          "detail": "Normalized recognized words equal intended words."
+        },
+        "speech_presence": {
+          "status": "observed_signal",
+          "detail": "Nonzero PCM; not alone proof of speech."
+        },
+        "word_timing": {
+          "status": "insufficient_ground_truth",
+          "detail": "Alignment is recognized-text-only, not gold boundaries; raw overrun retained."
+        },
+        "visible_subtitles": {
+          "status": "not_applicable",
+          "detail": "Audio-only evidence does not establish burned subtitles."
+        },
+        "identity_story": {
+          "status": "not_applicable",
+          "detail": "Audio-only does not establish identity or story visuals."
+        },
+        "lip_sync": {
+          "status": "not_applicable",
+          "detail": "No mouth-video input for this WAV recognition."
+        },
+        "voice_acting": {
+          "status": "insufficient_evidence",
+          "detail": "Words/PCM do not establish subjective voice performance."
+        }
+      },
+      "decision": "consistent_for_spoken_words_only",
+      "automatic_quality_pass": false,
+      "formal_context": null,
+      "correction": {
+        "status": "blocked_missing_formal_context",
+        "required_bindings": [
+          "actual ArcReel project and formal unit ID (E1U01 here is fixture-only)",
+          "current candidate version/history and authoritative job state",
+          "current quote and separate attempt allowance if regeneration needed"
+        ],
+        "intent": "No correction for an unproven defect."
+      }
+    },
+    {
+      "case": "wrong-speech",
+      "media": {
+        "path": "private:/audiovisual-research/case-1ea5cb52ec97/actual-audio.wav",
+        "sha256": "2ad8bc1cad6d99ba85843d6902a70556a8a62b83ec50724aed77518d0723d59d",
+        "role": "exact WAV supplied to saved WhisperX; current hash matches frozen input manifest"
+      },
+      "fixture_segment": "E1U01",
+      "segment_identity_scope": "synthetic expected-context ID only, not an ArcReel formal target",
+      "intended_words": "Bom dia, Ana! O pão acabou, mas o café está quentinho.",
+      "recognized_text": "Boa noite, Bruno. A porta ficou aberta e o cachorro fugiu.",
+      "recognition_media_binding": "exact current WAV SHA matches input-manifest; no transfer to AAC/MPEG media by filename or shared recipe",
+      "raw_recognition": {
+        "path": "private:/local-av-qualification/results/wrong-speech-raw-asr.json",
+        "sha256": "21c0d6a0b4b291e157630ee9ac1e5d627f98aab4fe94b8c992a448a102e5617f",
+        "role": "saved actual WhisperX output, no new inference"
+      },
+      "alignment": {
+        "path": "private:/local-av-qualification/results/wrong-speech-aligned.json",
+        "sha256": "8177d8adc8d5bcd8d17476ff4e27c6fddb37c8d1cf274ff61f92ec5ce41da55d",
+        "role": "saved alignment of recognized text only"
+      },
+      "reported_words": [
+        {
+          "word": "Boa",
+          "start": 0.074,
+          "end": 0.315,
+          "score": 0.864
+        },
+        {
+          "word": "noite,",
+          "start": 0.375,
+          "end": 0.736,
+          "score": 0.943
+        },
+        {
+          "word": "Bruno.",
+          "start": 1.077,
+          "end": 1.498,
+          "score": 0.845
+        },
+        {
+          "word": "A",
+          "start": 1.759,
+          "end": 1.799,
+          "score": 0.999
+        },
+        {
+          "word": "porta",
+          "start": 1.899,
+          "end": 2.24,
+          "score": 0.905
+        },
+        {
+          "word": "ficou",
+          "start": 2.3,
+          "end": 2.661,
+          "score": 0.867
+        },
+        {
+          "word": "aberta",
+          "start": 2.721,
+          "end": 3.162,
+          "score": 0.945
+        },
+        {
+          "word": "e",
+          "start": 3.222,
+          "end": 3.303,
+          "score": 0.885
+        },
+        {
+          "word": "o",
+          "start": 3.363,
+          "end": 3.423,
+          "score": 0.66
+        },
+        {
+          "word": "cachorro",
+          "start": 3.483,
+          "end": 3.884,
+          "score": 0.888
+        },
+        {
+          "word": "fugiu.",
+          "start": 4.065,
+          "end": 4.566,
+          "score": 1.0
+        }
+      ],
+      "raw_timestamp_overruns": [
+        {
+          "word": "fugiu.",
+          "start": 4.065,
+          "end": 4.566,
+          "score": 1.0
+        }
+      ],
+      "pcm": {
+        "duration_seconds": 4.5655625,
+        "all_zero": false
+      },
+      "axes": {
+        "spoken_content": {
+          "status": "reject",
+          "detail": "Actual recognized words differ from intended words."
+        },
+        "speech_presence": {
+          "status": "observed_signal",
+          "detail": "Nonzero PCM; not alone proof of speech."
+        },
+        "word_timing": {
+          "status": "insufficient_ground_truth",
+          "detail": "Alignment is recognized-text-only, not gold boundaries; raw overrun retained."
+        },
+        "visible_subtitles": {
+          "status": "not_applicable",
+          "detail": "Audio-only evidence does not establish burned subtitles."
+        },
+        "identity_story": {
+          "status": "not_applicable",
+          "detail": "Audio-only does not establish identity or story visuals."
+        },
+        "lip_sync": {
+          "status": "not_applicable",
+          "detail": "No mouth-video input for this WAV recognition."
+        },
+        "voice_acting": {
+          "status": "insufficient_evidence",
+          "detail": "Words/PCM do not establish subjective voice performance."
+        }
+      },
+      "decision": "reject_expected_speech",
+      "automatic_quality_pass": false,
+      "formal_context": null,
+      "correction": {
+        "status": "blocked_missing_formal_context",
+        "required_bindings": [
+          "actual ArcReel project and formal unit ID (E1U01 here is fixture-only)",
+          "current candidate version/history and authoritative job state",
+          "current quote and separate attempt allowance if regeneration needed"
+        ],
+        "intent": "Preserve intended words/reference; reject defective media, select a verified correct existing version if available, otherwise bounded regeneration through generate_videos. Do not patch approved script to match erroneous output."
+      }
+    },
+    {
+      "case": "silence",
+      "media": {
+        "path": "private:/audio/missing.wav",
+        "sha256": "00ea5c7415d6fd1232a2bb551c00c253f90023abb0775f9d9a3e54d47da9bc9d",
+        "role": "exact WAV supplied to saved WhisperX; current hash matches frozen input manifest"
+      },
+      "fixture_segment": "E1U01",
+      "segment_identity_scope": "synthetic expected-context ID only, not an ArcReel formal target",
+      "intended_words": "Bom dia, Ana! O pão acabou, mas o café está quentinho.",
+      "recognized_text": "",
+      "recognition_media_binding": "exact current WAV SHA matches input-manifest; no transfer to AAC/MPEG media by filename or shared recipe",
+      "raw_recognition": {
+        "path": "private:/local-av-qualification/results/silence-raw-asr.json",
+        "sha256": "aebd56d609d1832ae4b23bef24e8a079bb346c4441d7c294ba5e1d413e28867c",
+        "role": "saved actual WhisperX output, no new inference"
+      },
+      "alignment": {
+        "path": "private:/local-av-qualification/results/silence-aligned.json",
+        "sha256": "aeeb7cae474a26e2539b55c7903e1c6c03f54ad90cb17e5c0814276875357eaf",
+        "role": "saved alignment of recognized text only"
+      },
+      "reported_words": [],
+      "raw_timestamp_overruns": [],
+      "pcm": {
+        "duration_seconds": 4.5,
+        "all_zero": true
+      },
+      "axes": {
+        "spoken_content": {
+          "status": "reject",
+          "detail": "Actual recognized words differ from intended words."
+        },
+        "speech_presence": {
+          "status": "reject",
+          "detail": "Expected speech is absent: all PCM bytes are zero."
+        },
+        "word_timing": {
+          "status": "insufficient_ground_truth",
+          "detail": "Alignment is recognized-text-only, not gold boundaries; raw overrun retained."
+        },
+        "visible_subtitles": {
+          "status": "not_applicable",
+          "detail": "Audio-only evidence does not establish burned subtitles."
+        },
+        "identity_story": {
+          "status": "not_applicable",
+          "detail": "Audio-only does not establish identity or story visuals."
+        },
+        "lip_sync": {
+          "status": "not_applicable",
+          "detail": "No mouth-video input for this WAV recognition."
+        },
+        "voice_acting": {
+          "status": "insufficient_evidence",
+          "detail": "Words/PCM do not establish subjective voice performance."
+        }
+      },
+      "decision": "reject_expected_speech",
+      "automatic_quality_pass": false,
+      "formal_context": null,
+      "correction": {
+        "status": "blocked_missing_formal_context",
+        "required_bindings": [
+          "actual ArcReel project and formal unit ID (E1U01 here is fixture-only)",
+          "current candidate version/history and authoritative job state",
+          "current quote and separate attempt allowance if regeneration needed"
+        ],
+        "intent": "Preserve intended words/reference; reject defective media, select a verified correct existing version if available, otherwise bounded regeneration through generate_videos. Do not patch approved script to match erroneous output."
+      }
+    },
+    {
+      "case": "h3-native",
+      "media": {
+        "path": "private:/media-preflight/native-audio-review/audio.wav",
+        "sha256": "c705192fdaf6cb30338f41809cf0ca04c7ebd83bcb88c0326476edfd65f69c3e",
+        "role": "exact WAV supplied to saved WhisperX; current hash matches frozen input manifest"
+      },
+      "fixture_segment": "E1U1",
+      "segment_identity_scope": "actual formal reference-video unit",
+      "intended_words": "Bom dia! O café está pronto!",
+      "recognized_text": "Bom dia! O café está pronto!",
+      "recognition_media_binding": "exact current WAV SHA matches input-manifest; no transfer to AAC/MPEG media by filename or shared recipe",
+      "raw_recognition": {
+        "path": "private:/local-av-qualification/results/h3-native-raw-asr.json",
+        "sha256": "f389acf03284e991b362888b7ddf0116db622380b3b2bf5bac01d8912d47e0cc",
+        "role": "saved actual WhisperX output, no new inference"
+      },
+      "alignment": {
+        "path": "private:/local-av-qualification/results/h3-native-aligned.json",
+        "sha256": "003df57a9d8b9473feb4d8507367a69e7ad2ab0bad7c76172b93e41dcd4ce253",
+        "role": "saved alignment of recognized text only"
+      },
+      "reported_words": [
+        {
+          "word": "Bom",
+          "start": 0.499,
+          "end": 0.68,
+          "score": 0.777
+        },
+        {
+          "word": "dia!",
+          "start": 0.801,
+          "end": 1.143,
+          "score": 0.95
+        },
+        {
+          "word": "O",
+          "start": 1.345,
+          "end": 1.385,
+          "score": 0.5
+        },
+        {
+          "word": "café",
+          "start": 1.445,
+          "end": 1.748,
+          "score": 0.938
+        },
+        {
+          "word": "está",
+          "start": 1.788,
+          "end": 1.969,
+          "score": 1.0
+        },
+        {
+          "word": "pronto!",
+          "start": 2.07,
+          "end": 2.654,
+          "score": 0.863
+        }
+      ],
+      "raw_timestamp_overruns": [],
+      "pcm": {
+        "duration_seconds": 5.184,
+        "all_zero": false
+      },
+      "axes": {
+        "spoken_content": {
+          "status": "consistent_scoped",
+          "detail": "Normalized recognized words equal intended words."
+        },
+        "speech_presence": {
+          "status": "observed_signal",
+          "detail": "Nonzero PCM; not alone proof of speech."
+        },
+        "word_timing": {
+          "status": "insufficient_ground_truth",
+          "detail": "Alignment is recognized-text-only, not gold boundaries; raw overrun retained."
+        },
+        "visible_subtitles": {
+          "status": "not_requested_sample_variant",
+          "detail": "Actual #9 formal render is no_subtitles; this is not a captioned pilot pass."
+        },
+        "identity_story": {
+          "status": "not_applicable",
+          "detail": "Audio-only does not establish identity or story visuals."
+        },
+        "lip_sync": {
+          "status": "insufficient_evidence",
+          "detail": "Original SyncNet baseline is unlabelled; relative shifts/negatives cannot certify actual synchrony."
+        },
+        "voice_acting": {
+          "status": "insufficient_evidence",
+          "detail": "Words/PCM do not establish subjective voice performance."
+        }
+      },
+      "decision": "consistent_for_spoken_words_only",
+      "automatic_quality_pass": false,
+      "source_video": {
+        "project": "br-capability-sample-9-20261108",
+        "path": "reference_videos/E1U1.mp4",
+        "sha256": "79f540ee9f2258d836d24eac62a9927881d0c8911d151fec87f54c12e2ff58eb",
+        "binding": "existing full-file extraction provenance; PCM5.184s versus container5.167s, no silent remapping of duration"
+      },
+      "formal_context": {
+        "project": "br-capability-sample-9-20261108",
+        "script": "episode_1.json",
+        "unit": "E1U1",
+        "timeline": "tl-0dd0f11d",
+        "revision_observed": 1,
+        "clip": "c1"
+      }
+    },
+    {
+      "case": "good-av",
+      "media": {
+        "path": "private:/audio/good-av.mp4",
+        "sha256": "9df48cfdcd14d71e70df454672f6c2fbc2f98bed0037c62c638e23b7c480cdd0",
+        "role": "exact existing rendered MP4; current hash matches original fixture manifest"
+      },
+      "fixture_segment": "E1U01",
+      "segment_identity_scope": "synthetic expected-context ID only, not formal target",
+      "formal_context": null,
+      "intended_words": "Bom dia, Ana! O pão acabou, mas o café está quentinho.",
+      "rendered_cues": [
+        {
+          "start_microseconds": 100000,
+          "duration_microseconds": 4220000,
+          "text": "Bom dia, Ana! O pão acabou, mas o café está quentinho.",
+          "owner": "native",
+          "speaker": "Ana"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "private:/audio/good-av-sheet-0.jpg",
+          "sha256": "1e3024e66b092b3d7d759da58bc37020483eaf1f3dc952a81bd5f9434e3f3d90",
+          "role": "existing actual frame-contact sheet independently viewed for this consolidation"
+        },
+        {
+          "path": "private:/audio/good-av-cues.json",
+          "sha256": "3cac9346bbb64029108478742fc3c01f7138524ae003bf8b4035773d06f3fdae",
+          "role": "cue metadata is separate from visible-frame evidence"
+        },
+        {
+          "path": "private:/audio/good-av-signals.json",
+          "sha256": "3b365bf5f21059b7e327bdd2235e7bd2854baf2c0bd1379b95c2db1b21b788b0",
+          "role": "existing actual video technical-signal output"
+        }
+      ],
+      "automatic_quality_pass": false,
+      "axes": {
+        "spoken_content": {
+          "status": "consistent_scoped",
+          "detail": "Complete recognized words match intended PTBR on exact decoded AAC hash; historical base-model pano retained separately."
+        },
+        "subtitle_timing": {
+          "status": "consistent_coarse_envelope",
+          "detail": "Caption visible0.120/3.720/4.280, absent4.320/6.720/8.960; cue0.10–4.32 and associated transcript0–4.32s support coarse envelope only. New exact-PCM ASR envelope0.034–4.414s: good cue overlaps, delayed cue has no overlap; these are approximate ASR timings, not gold word timing."
+        },
+        "identity_story": {
+          "status": "consistent_symbolic_only",
+          "detail": "ANA, blue costume and white handled mug match symbolic reference; not real-face identity."
+        },
+        "lip_sync": {
+          "status": "not_assessable",
+          "detail": "Static drawing has no mouth animation."
+        },
+        "voice_acting": {
+          "status": "insufficient_evidence",
+          "detail": "No voice/performance acceptance derived from source synthesis metadata."
+        }
+      },
+      "decision": "consistent_scoped_visual_and_subtitle_envelope_only",
+      "correction": {
+        "status": "blocked_missing_formal_context",
+        "required_bindings": [
+          "actual ArcReel project and formal unit ID (E1U01 here is fixture-only)",
+          "current candidate version/history and authoritative job state",
+          "current quote and separate attempt allowance if regeneration needed"
+        ],
+        "intent": "No correction for an unproven defect."
+      },
+      "historical_recognition": {
+        "engine": "historical whisper.cpp base, not WhisperX",
+        "recognized_text": "Bom dia, Ana, o pano acabou, mas o café está quentinho.",
+        "evidence": {
+          "path": "private:/audio/good-av-review/review.json",
+          "sha256": "0a09f4ebf682a38306e51622a10e9b9c09028fa2eac98b125a13c50e75383a5b",
+          "role": "historical transcript associated with this exact video hash"
+        },
+        "decoded_audio": {
+          "path": "private:/audio/good-av-review/audio.wav",
+          "sha256": "a92c8ad005b30c19b4a1ef414be077cc3635119bf101907961378d1e76751bf0",
+          "role": "existing decoded AAC PCM, distinct from good.wav WhisperX input"
+        },
+        "cross_engine_word_transfer_permitted": false
+      },
+      "recognition": {
+        "engine": "WhisperX3.8.6/faster-whisper-small; exact installed prior config",
+        "recognized_text": "Bom dia, Ana. O pão acabou, mas o café está quentinho.",
+        "audio_media_sha256": "a92c8ad005b30c19b4a1ef414be077cc3635119bf101907961378d1e76751bf0",
+        "evidence": {
+          "path": "private:/local-av-qualification/aac-positive-qualification/results/sample-01-raw-asr.json",
+          "sha256": "cfdb00fdff515a6c08017e62e7a77aa0efd70b9cd30bfc4c2d623de0cc558134",
+          "role": "actual new single blind local ASR on the exact decoded AAC PCM"
+        },
+        "alignment": {
+          "path": "private:/local-av-qualification/aac-positive-qualification/results/sample-01-aligned.json",
+          "sha256": "e3d63f5d7c55b23de6a9d6f3dc1d438220cbe831704879aadfb41ffda4d63a8e",
+          "role": "recognized-text-only alignment, no gold timing"
+        },
+        "same_input_reuse": "good/delayed saved decoded PCM hashes identical; no assumption about identity-story video",
+        "asr_segment_seconds": [
+          [
+            0.034,
+            4.414
+          ]
+        ],
+        "word_times": [
+          {
+            "word": "Bom",
+            "start": 0.074,
+            "end": 0.235,
+            "score": 0.834
+          },
+          {
+            "word": "dia,",
+            "start": 0.315,
+            "end": 0.516,
+            "score": 0.999
+          },
+          {
+            "word": "Ana.",
+            "start": 0.797,
+            "end": 1.119,
+            "score": 0.935
+          },
+          {
+            "word": "O",
+            "start": 1.36,
+            "end": 1.4,
+            "score": 0.8
+          },
+          {
+            "word": "pão",
+            "start": 1.561,
+            "end": 1.782,
+            "score": 0.673
+          },
+          {
+            "word": "acabou,",
+            "start": 1.822,
+            "end": 2.304,
+            "score": 0.909
+          },
+          {
+            "word": "mas",
+            "start": 2.566,
+            "end": 2.746,
+            "score": 0.833
+          },
+          {
+            "word": "o",
+            "start": 2.827,
+            "end": 2.867,
+            "score": 0.999
+          },
+          {
+            "word": "café",
+            "start": 2.967,
+            "end": 3.329,
+            "score": 0.942
+          },
+          {
+            "word": "está",
+            "start": 3.389,
+            "end": 3.651,
+            "score": 0.996
+          },
+          {
+            "word": "quentinho.",
+            "start": 3.711,
+            "end": 4.414,
+            "score": 0.895
+          }
+        ],
+        "decoded_audio": {
+          "path": "private:/audio/good-av-review/audio.wav",
+          "sha256": "a92c8ad005b30c19b4a1ef414be077cc3635119bf101907961378d1e76751bf0",
+          "role": "existing decoded AAC PCM, distinct from good.wav WhisperX input"
+        },
+        "cross_engine_word_transfer_permitted": false
+      }
+    },
+    {
+      "case": "subtitle-delayed",
+      "media": {
+        "path": "private:/audio/subtitle-delayed.mp4",
+        "sha256": "001522cf4e98939458f696cd09fb2460d510168ab9a5369d40e7adb5a56a3b13",
+        "role": "exact existing rendered MP4; current hash matches original fixture manifest"
+      },
+      "fixture_segment": "E1U01",
+      "segment_identity_scope": "synthetic expected-context ID only, not formal target",
+      "formal_context": null,
+      "intended_words": "Bom dia, Ana! O pão acabou, mas o café está quentinho.",
+      "rendered_cues": [
+        {
+          "start_microseconds": 5000000,
+          "duration_microseconds": 4000000,
+          "text": "Bom dia, Ana! O pão acabou, mas o café está quentinho.",
+          "owner": "native",
+          "speaker": "Ana"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "private:/audio/subtitle-delayed-sheet-0.jpg",
+          "sha256": "8bbb6ee489b37116ba3a156fe2d229ccef0337bcd4daa92b75b536695dadcbf5",
+          "role": "existing actual frame-contact sheet independently viewed for this consolidation"
+        },
+        {
+          "path": "private:/audio/subtitle-delayed-cues.json",
+          "sha256": "219ccf5987e84d9addffffd39c5285ef4841fedd94679bedad4d904eacef0701",
+          "role": "cue metadata is separate from visible-frame evidence"
+        },
+        {
+          "path": "private:/audio/subtitle-delayed-signals.json",
+          "sha256": "1f3ae600ad233a374c2e8fbdb8b017c2681c54f2f8da2919f719d52d3b598226",
+          "role": "existing actual video technical-signal output"
+        }
+      ],
+      "automatic_quality_pass": false,
+      "axes": {
+        "spoken_content": {
+          "status": "consistent_scoped",
+          "detail": "Complete recognized words match intended PTBR on exact decoded AAC hash; historical base-model pano retained separately."
+        },
+        "subtitle_timing": {
+          "status": "reject",
+          "detail": "Caption absent0.000/3.720/4.960 and visible5.000/6.720/8.960; no overlap with associated transcript0–4.32s. New exact-PCM ASR envelope0.034–4.414s: good cue overlaps, delayed cue has no overlap; these are approximate ASR timings, not gold word timing."
+        },
+        "identity_story": {
+          "status": "consistent_symbolic_only",
+          "detail": "ANA, blue costume and white handled mug match symbolic reference; not real-face identity."
+        },
+        "lip_sync": {
+          "status": "not_assessable",
+          "detail": "Static drawing has no mouth animation."
+        },
+        "voice_acting": {
+          "status": "insufficient_evidence",
+          "detail": "No voice/performance acceptance derived from source synthesis metadata."
+        }
+      },
+      "decision": "reject_visible_subtitle_delay",
+      "correction": {
+        "status": "unsupported_subtitle_only_operation",
+        "defect": "cue5.00–9.00 occurs after utterance envelope0–4.32",
+        "desired_change": "Retiming the subtitle envelope toward intended0.10–4.32 while preserving both audio/video and words. Not a gold per-word timing instruction.",
+        "existing_operations_checked": "lib/edit_timeline/operations.py: clip trims/moves/holds/source-volume/narration/BGM, no subtitle-cue timing edit. Moving entire clip preserves relative subtitle delay and is not correction.",
+        "missing_context": "This rendered fixture has no formal project/timeline/clip/version, so no executable edit_timeline arguments are invented. A production occurrence needs source-to-cue correction in the existing subtitle pipeline or a narrowly scoped follow-up."
+      },
+      "historical_recognition": {
+        "engine": "historical whisper.cpp base, not WhisperX",
+        "recognized_text": "Bom dia, Ana, o pano acabou, mas o café está quentinho.",
+        "evidence": {
+          "path": "private:/audio/subtitle-delayed-review/review.json",
+          "sha256": "da92d50db69f3853babdd8e9096e4cc7c56bdc7ae34323ce0d9c61b0e046ebab",
+          "role": "historical transcript associated with this exact video hash"
+        },
+        "decoded_audio": {
+          "path": "private:/audio/subtitle-delayed-review/audio.wav",
+          "sha256": "a92c8ad005b30c19b4a1ef414be077cc3635119bf101907961378d1e76751bf0",
+          "role": "existing decoded AAC PCM, distinct from good.wav WhisperX input"
+        },
+        "cross_engine_word_transfer_permitted": false
+      },
+      "recognition": {
+        "engine": "WhisperX3.8.6/faster-whisper-small; exact installed prior config",
+        "recognized_text": "Bom dia, Ana. O pão acabou, mas o café está quentinho.",
+        "audio_media_sha256": "a92c8ad005b30c19b4a1ef414be077cc3635119bf101907961378d1e76751bf0",
+        "evidence": {
+          "path": "private:/local-av-qualification/aac-positive-qualification/results/sample-01-raw-asr.json",
+          "sha256": "cfdb00fdff515a6c08017e62e7a77aa0efd70b9cd30bfc4c2d623de0cc558134",
+          "role": "actual new single blind local ASR on the exact decoded AAC PCM"
+        },
+        "alignment": {
+          "path": "private:/local-av-qualification/aac-positive-qualification/results/sample-01-aligned.json",
+          "sha256": "e3d63f5d7c55b23de6a9d6f3dc1d438220cbe831704879aadfb41ffda4d63a8e",
+          "role": "recognized-text-only alignment, no gold timing"
+        },
+        "same_input_reuse": "good/delayed saved decoded PCM hashes identical; no assumption about identity-story video",
+        "asr_segment_seconds": [
+          [
+            0.034,
+            4.414
+          ]
+        ],
+        "word_times": [
+          {
+            "word": "Bom",
+            "start": 0.074,
+            "end": 0.235,
+            "score": 0.834
+          },
+          {
+            "word": "dia,",
+            "start": 0.315,
+            "end": 0.516,
+            "score": 0.999
+          },
+          {
+            "word": "Ana.",
+            "start": 0.797,
+            "end": 1.119,
+            "score": 0.935
+          },
+          {
+            "word": "O",
+            "start": 1.36,
+            "end": 1.4,
+            "score": 0.8
+          },
+          {
+            "word": "pão",
+            "start": 1.561,
+            "end": 1.782,
+            "score": 0.673
+          },
+          {
+            "word": "acabou,",
+            "start": 1.822,
+            "end": 2.304,
+            "score": 0.909
+          },
+          {
+            "word": "mas",
+            "start": 2.566,
+            "end": 2.746,
+            "score": 0.833
+          },
+          {
+            "word": "o",
+            "start": 2.827,
+            "end": 2.867,
+            "score": 0.999
+          },
+          {
+            "word": "café",
+            "start": 2.967,
+            "end": 3.329,
+            "score": 0.942
+          },
+          {
+            "word": "está",
+            "start": 3.389,
+            "end": 3.651,
+            "score": 0.996
+          },
+          {
+            "word": "quentinho.",
+            "start": 3.711,
+            "end": 4.414,
+            "score": 0.895
+          }
+        ],
+        "decoded_audio": {
+          "path": "private:/audio/subtitle-delayed-review/audio.wav",
+          "sha256": "a92c8ad005b30c19b4a1ef414be077cc3635119bf101907961378d1e76751bf0",
+          "role": "existing decoded AAC PCM, distinct from good.wav WhisperX input"
+        },
+        "cross_engine_word_transfer_permitted": false
+      }
+    },
+    {
+      "case": "identity-story-error",
+      "media": {
+        "path": "private:/audio/identity-story-error.mp4",
+        "sha256": "070433c01ed7d35f1b0229f31f4324eeb76b71581673711fdec110d95d214163",
+        "role": "exact existing rendered MP4; current hash matches original fixture manifest"
+      },
+      "fixture_segment": "E1U01",
+      "segment_identity_scope": "synthetic expected-context ID only, not formal target",
+      "formal_context": null,
+      "intended_words": "Bom dia, Ana! O pão acabou, mas o café está quentinho.",
+      "rendered_cues": [
+        {
+          "start_microseconds": 100000,
+          "duration_microseconds": 4220000,
+          "text": "Bom dia, Ana! O pão acabou, mas o café está quentinho.",
+          "owner": "native",
+          "speaker": "Ana"
+        }
+      ],
+      "evidence": [
+        {
+          "path": "private:/audio/identity-story-error-sheet-0.jpg",
+          "sha256": "671cf0c391482ac5b5c1c4e318322c117298ee6a75ae5c8fa2163a670ee3cc33",
+          "role": "existing actual frame-contact sheet independently viewed for this consolidation"
+        },
+        {
+          "path": "private:/audio/identity-story-error-cues.json",
+          "sha256": "3cac9346bbb64029108478742fc3c01f7138524ae003bf8b4035773d06f3fdae",
+          "role": "cue metadata is separate from visible-frame evidence"
+        },
+        {
+          "path": "private:/audio/identity-story-error-signals.json",
+          "sha256": "3b365bf5f21059b7e327bdd2235e7bd2854baf2c0bd1379b95c2db1b21b788b0",
+          "role": "existing actual video technical-signal output"
+        },
+        {
+          "path": "private:/audio/reference.png",
+          "sha256": "86550aa1c33e3f559eb81dc50c9b53510563312fbd78457298b3f9c3df32cf27",
+          "role": "symbolic intended reference independently viewed"
+        }
+      ],
+      "automatic_quality_pass": false,
+      "axes": {
+        "spoken_content": {
+          "status": "insufficient_evidence",
+          "detail": "No newer recognition is attributed to this exact MP4; visible caption is not spoken-content proof."
+        },
+        "identity_story": {
+          "status": "reject",
+          "detail": "Actual frames show BRUNO/red/brown square box against ANA/blue/white handled mug; visible PTBR caption still addresses Ana/coffee."
+        },
+        "subtitle_timing": {
+          "status": "consistent_coarse_visual_only",
+          "detail": "Caption visible0.120/3.720/4.280 and absent4.320+; no exact-media speech alignment asserted."
+        },
+        "lip_sync": {
+          "status": "not_assessable",
+          "detail": "Static drawing has no mouth animation."
+        },
+        "voice_acting": {
+          "status": "insufficient_evidence",
+          "detail": "Not inferred from drawings or captions."
+        }
+      },
+      "decision": "reject_symbolic_character_costume_prop_story_mismatch",
+      "correction": {
+        "status": "blocked_missing_formal_context",
+        "required_bindings": [
+          "actual ArcReel project and formal unit ID (E1U01 here is fixture-only)",
+          "current candidate version/history and authoritative job state",
+          "current quote and separate attempt allowance if regeneration needed"
+        ],
+        "intent": "Preserve intended words/reference; reject defective media, select a verified correct existing version if available, otherwise bounded regeneration through generate_videos. Do not patch approved script to match erroneous output."
+      }
+    }
+  ],
+  "actual_formal_readonly_actions": [
+    {
+      "project_context": "br-capability-sample-9-20261108",
+      "tool": "read_timeline",
+      "arguments": {
+        "timeline": "tl-0dd0f11d"
+      },
+      "status": "schema-validated not executed; read current revision before any future edit"
+    },
+    {
+      "project_context": "br-capability-sample-9-20261108",
+      "tool": "generate_videos",
+      "arguments": {
+        "script": "episode_1.json",
+        "target": {
+          "scope": "selected",
+          "ids": [
+            "E1U1"
+          ]
+        },
+        "preview": true
+      },
+      "status": "schema-validated preview only, not executed; does not authorize generation"
+    }
+  ],
+  "correction_execution_status": "No mutations: no demonstrated H3 defect justifies editing known formal c1; synthetic controls lack formal targets; exact subtitle-only unsupported correction recorded rather than fake commands.",
+  "scope_limits": [
+    "Consistent scoped evidence is not overall acceptance.",
+    "Synthetic identity/story controls do not establish real human identity continuity.",
+    "No timing-ground-truth or voice/acting acceptance inferred.",
+    "Current SyncNet negative results are reviewed separately; no inferred synchrony threshold."
+  ],
+  "new_local_recognition_inputs": 1,
+  "aac_qualification": {
+    "frozen_plan": {
+      "path": "private:/local-av-qualification/aac-positive-qualification/frozen-input-model-config.json",
+      "sha256": "565c991ea8f0ebe35055de17c30950aa6a1c145ead813997433517b1a6346121",
+      "role": "input/model/config/runner frozen before onecase inference"
+    },
+    "configuration": {
+      "path": "private:/local-av-qualification/aac-positive-qualification/results/configuration.json",
+      "sha256": "e71bb3a469436f7bb67dbdc98620a7328895b106e101728d773c5a6c55cf0507",
+      "role": "actual configuration"
+    },
+    "exit": {
+      "path": "private:/local-av-qualification/aac-positive-qualification/exit.json",
+      "sha256": "0203575cf3503c950db96269a3cbc969950faa9d8bff51c9021f55573d250338",
+      "role": "exit0 and wall runtime11.03s"
+    },
+    "network": {
+      "path": "private:/local-av-qualification/aac-positive-qualification/results/network-audit.json",
+      "sha256": "117de6f90925a38c80e0f4a840f78c817413476211d0127b89f9f74528b3e2a6",
+      "role": "native deny-network command and zero Python network attempts"
+    },
+    "runner": {
+      "path": "private:/local-av-qualification/aac-positive-qualification/run_one.py",
+      "sha256": "595de573b842a268f36da4601edef06628694872b925b2320b44886df5c84437",
+      "role": "single neutral case, no expected words/hotwords read"
+    },
+    "command": {
+      "path": "private:/local-av-qualification/aac-positive-qualification/executed-command.json",
+      "sha256": "df127643d8500c2e6f76e91a1e02854f9869e13582434cdcefddc96abc04bb8f",
+      "role": "native sandbox+minimal offline environment"
+    },
+    "new_provider_calls": 0,
+    "new_downloads": 0,
+    "exit_code": 0,
+    "original_inputs_and_recognition_preserved": true
+  },
+  "new_local_pipeline_executions": 1,
+  "new_local_alignment_inputs": 1,
+  "new_provider_inference_calls": 0
+}
