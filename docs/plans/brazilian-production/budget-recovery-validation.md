@@ -40,6 +40,9 @@ uv run python -m pytest tests/unit/skills/test_direct_brazilian_policy.py tests/
 uv run ruff check .agents/skills/direct-brazilian-production/scripts/policy.py tests/unit/skills/test_direct_brazilian_policy.py tests/integration/skills/test_direct_brazilian_policy_cli.py
 All checks passed
 
+uv run basedpyright .agents/skills/direct-brazilian-production/scripts/policy.py tests/unit/skills/test_direct_brazilian_policy.py tests/integration/skills/test_direct_brazilian_policy_cli.py
+0 errors, 0 warnings, 0 notes
+
 uv run python scripts/audit_tests.py --check --tests tests/unit/skills --tests tests/integration/skills
 0 violations
 

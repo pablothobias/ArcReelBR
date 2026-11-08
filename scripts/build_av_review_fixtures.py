@@ -14,7 +14,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 from lib.final_cut.render_plan import OutputProfile
 from lib.final_cut.subtitles import BurnedSubtitle, ass_document
-from lib.infra.ffmpeg import ffmpeg_executable
+from lib.infra.ffmpeg import ffmpeg_executable, local_file_input
 from lib.infra.media_probe import probe_video_frame_times
 from lib.subtitle_style.font import SUBTITLE_FONT_FILE
 from lib.video_review.contact_sheet import build_contact_sheets
@@ -35,8 +35,7 @@ def build_fixtures(output: Path, good_audio: Path, wrong_audio: Path) -> None:
                 "-nostdin",
                 "-v",
                 "error",
-                "-i",
-                str(source),
+                *local_file_input(source),
                 "-ac",
                 "1",
                 "-ar",
