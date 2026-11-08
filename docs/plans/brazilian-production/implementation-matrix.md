@@ -163,3 +163,10 @@ This is a coordination checkpoint, not production state. ArcReel remains authori
 - Owner requested diagnosis before choosing human review or another evaluator. No alternative has been approved. Offline replay, prompt/schema/request analysis proceeds without new paid calls.
 - #6 remains open. Image transport/encoding/identity was exercised with a tiny synthetic image; actual valid-size AI image is pending. Codex image tool exposes no price/allowance metadata. Nano Banana fallback has missing billable usage and ambiguous retry gaps, recorded in [#14](https://github.com/pablothobias/ArcReelBR/issues/14). No image call authorized or performed.
 - #11 and #12 remain unstarted; Spec #2 stays open. Preexisting local teaching/planning/GLOSSARY changes remain untouched.
+
+## Offline validation and controlled retest preparation
+
+- Integrated offline saved-review validation as `62ec64a23`: separate audio/video contracts, actual modality/duration and all-channel/native-rate float64 PCM evidence, rejected contradictions and immutable raw/input snapshots. No automatic quality pass.
+- 24 focused unit/integration tests, Ruff, basedpyright and test audit passed. Independent replay rejected both failed audio controls while retaining the good fixture and H3 sample as consistent but requiring review. No new inference occurred.
+- The four-case deletion-only same-model diagnostic proposal was independently checked against frozen schema, media, full prompts and reconstructed requests. Proposed ceilings are USD0.01 per case and USD0.04 total; a fresh owner approval is pending. Previous six-call round remains closed. See [controlled retest proposal](evaluation-retest-proposal.md).
+- #10 remains open: this fixes an evidence-validation defect but does not establish reliable perception or explain the provider's generation cause. #6, #11 and #12 remain incomplete; Spec #2 remains open.
