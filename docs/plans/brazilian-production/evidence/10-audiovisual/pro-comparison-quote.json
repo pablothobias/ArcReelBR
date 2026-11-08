@@ -1,0 +1,95 @@
+{
+  "model": "gemini-3.1-pro-preview",
+  "credential_id": 2,
+  "sdk_version": "2.31.0",
+  "actual_inference_calls": 0,
+  "free_count_calls": 3,
+  "approval_received": false,
+  "generation_config": {
+    "max_output_tokens": 2048,
+    "response_mime_type": "application/json",
+    "automatic_function_calling": {
+      "disable": true,
+      "maximum_remote_calls": 10
+    },
+    "thinking_config": {
+      "thinking_level": "LOW"
+    },
+    "automatic_continuation": false
+  },
+  "cases": [
+    {
+      "case": "pro-wrong-speech",
+      "model": "gemini-3.1-pro-preview",
+      "media_sha256": "2ad8bc1cad6d99ba85843d6902a70556a8a62b83ec50724aed77518d0723d59d",
+      "mime_type": "audio/wav",
+      "prompt_sha256": "530b9636520d96536538facb68d1f18989dad6302e86908f9396009081eceaed",
+      "expected_wire_sha256": "77279fecea511a7083344e97bab7258140a2e0cc511e41e9eb4642dd72275626",
+      "counted_entire_input_tokens": 807,
+      "input_cap": 2000,
+      "output_including_thinking_cap": 2048,
+      "audio_body_identical_to_actual_flash": true,
+      "video_fps": null,
+      "video_resolution": null,
+      "video_start": null,
+      "video_end": null
+    },
+    {
+      "case": "pro-silence",
+      "model": "gemini-3.1-pro-preview",
+      "media_sha256": "00ea5c7415d6fd1232a2bb551c00c253f90023abb0775f9d9a3e54d47da9bc9d",
+      "mime_type": "audio/wav",
+      "prompt_sha256": "530b9636520d96536538facb68d1f18989dad6302e86908f9396009081eceaed",
+      "expected_wire_sha256": "c38abd64a3073ae33a424377ca1029e860d0e73af9eacffe46316e63c8ab3913",
+      "counted_entire_input_tokens": 804,
+      "input_cap": 2000,
+      "output_including_thinking_cap": 2048,
+      "audio_body_identical_to_actual_flash": true,
+      "video_fps": null,
+      "video_resolution": null,
+      "video_start": null,
+      "video_end": null
+    },
+    {
+      "case": "pro-h3",
+      "model": "gemini-3.1-pro-preview",
+      "media_sha256": "79f540ee9f2258d836d24eac62a9927881d0c8911d151fec87f54c12e2ff58eb",
+      "mime_type": "video/mp4",
+      "prompt_sha256": "a7d73820a7fc52e04680111eda05678ac960010bef5f8ebabde7c804a1a7809c",
+      "expected_wire_sha256": "ecc11df456736925548167ceefd93067137ad64f587ac0e95218742db46e7889",
+      "counted_entire_input_tokens": 33201,
+      "input_cap": 40000,
+      "output_including_thinking_cap": 2048,
+      "audio_body_identical_to_actual_flash": null,
+      "video_fps": 24,
+      "video_resolution": "HIGH",
+      "video_start": "0s",
+      "video_end": "5s"
+    }
+  ],
+  "pricing": {
+    "currency": "USD",
+    "input_per_million": "2",
+    "output_including_thinking_per_million": "12",
+    "case_ceilings": {
+      "pro-wrong-speech": "0.03",
+      "pro-silence": "0.03",
+      "pro-h3": "0.11"
+    },
+    "round_ceiling": "0.17",
+    "maximum_token_cost": "0.161728",
+    "max_calls": 3,
+    "allow_retries": false,
+    "approval_evidence": null
+  },
+  "private_plan_sha256": "9a6d3cd1f7ac599ce9e5ad31ebe270de25a70464fa6ea44478eeb7c8affed9ac",
+  "discovery_operation": "models.list, selected configured official Google account",
+  "discovered_version": "3.1-pro-preview-01-2026",
+  "source_urls": [
+    "https://ai.google.dev/gemini-api/docs/models/gemini-3.1-pro-preview",
+    "https://ai.google.dev/gemini-api/docs/pricing#gemini-3.1-pro-preview",
+    "https://ai.google.dev/gemini-api/docs/thinking#thinking-levels",
+    "https://ai.google.dev/gemini-api/docs/video-understanding",
+    "https://ai.google.dev/gemini-api/docs/media-resolution"
+  ]
+}
