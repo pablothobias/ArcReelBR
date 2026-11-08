@@ -81,7 +81,7 @@ Sanitized private receipts are under `/tmp/arcreel-goal-state/media-preflight/`:
 
 No file contains provider key values or authentication tokens. Local helper scripts authenticate in memory through the application's normal login endpoint; they retain no access token file. The preflight did not restart either server or modify source code.
 
-Remaining #9 criteria: successful terminal retrieval and reconciliation, actual recorded cost, native audio review, source-dimension probing, existing final-cut render at 1080 × 1920 and actual playback evidence. Google generation is conditional on a genuine image need; it is unnecessary for this initial text-only capability sample.
+At the pre-submission checkpoint, remaining #9 criteria were: successful terminal retrieval and reconciliation, actual recorded cost, native audio review, source-dimension probing, existing final-cut render at 1080 × 1920 and actual playback evidence. Google generation is conditional on a genuine image need; it is unnecessary for this initial text-only capability sample.
 
 
 ## Approved execution checkpoint
@@ -102,3 +102,9 @@ Actual local, unprimed Portuguese Whisper inference returned “Bom dia, o café
 Additional private receipts: `formal-script-verification.json`, `formal-quote-entry.json`, `sample-jobs.json`, `actual-media-and-usage.json`, `actual-dimensions-bundled.json`, `native-final-provider-usage.json`, `submit-log-evidence.json`, `actual-source-sheet-0.jpg`, and `native-audio-review/review.json`. The directing record is `pending-sample-intent.json`; its completed media intent is settled at USD 0.65 with the independent financial audit linked. A persisted `sample_scope_complete_no_further_generation_authorized` pause prevents unused allowance from authorizing another action. No subsequent quality regeneration or new generation has been authorized.
 
 Independent reviewer `implement_ptbr` also decoded the complete source and final video without errors. This confirms actual playable media structure/decoding, while subjective voice, naturalness and lip-sync assessment remains with the separately authorized audiovisual evaluation. The exact financial review summary is retained privately as `independent-financial-audit.json`.
+
+## Final capability-sample acceptance
+
+Independent review confirmed all #9 capability-sample criteria: exact H3 generation, one original provider job, USD0.65 settlement, actual source and output dimensions, complete-file decoding and actual native audiovisual observation. The separately approved Gemini3.8Flash trial received the real MP4 with its native audio; it reported the intended Portuguese words and observed kitchen content. Its positive apparent lip alignment is a fallible model observation, not certified phoneme alignment or #11 quality acceptance.
+
+The evaluator also fabricated visual evidence on audio-only controls and invented speech on digital silence. Those failed controls are preserved in the separate #10 evidence. Ticket #10 and the pilot quality gate therefore remain incomplete even though this bounded technical sample is complete. No further sample generation or evaluation is authorized by the completed records.
