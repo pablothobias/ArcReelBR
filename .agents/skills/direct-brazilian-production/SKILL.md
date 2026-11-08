@@ -19,6 +19,8 @@ Use one local recovery JSON file outside the public repository. Read [recovery f
 
 ## Authorize one action
 
+For the separately approved Pro comparison, use the `pro-comparison-10` branch in [recovery format](references/recovery-format.md). Keep prior evaluation and diagnostic records closed; verify the frozen three-case requests before dispatch.
+
 1. Read current ArcReel workflow, task/batch/provider-checkpoint and artifact-version state. Read existing usage for every preceding submission. Reconcile pending intentions before asking for another generation. A completed job is reused and reviewed; a timeout or absent local reply is not a failed provider submission.
 2. Build a bounded candidate with the existing quote reference and a stable intent/session client key. For a batch, reserve its complete priced target set before any delegation and respect all-or-nothing admission. This helper serializes unresolved submissions; use one candidate representing a fully quoted batch only when its attempt scope is one segment. Otherwise approve and direct individual segment calls from the start, never split an already-admitted batch during recovery.
 3. Run `uv run python .agents/skills/direct-brazilian-production/scripts/policy.py reserve --record /absolute/private/recovery.json --input /absolute/private/action.json`. A successful `reserve_before_delegating` result atomically records the pending reservation **before** sending the instruction. `reconcile_existing` and `reuse_complete` authorize inspection of the existing work, not another submission. `pause` stops dependent new submissions.

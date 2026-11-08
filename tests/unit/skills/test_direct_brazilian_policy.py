@@ -382,3 +382,67 @@ def test_diagnostic_unknown_outcome_keeps_reservation_and_blocks_next_case():
         reserve(diagnostic_record(), diagnostic_action(maximum="0.01001"))
     with pytest.raises(Pause, match="outside the explicitly approved round"):
         reserve(diagnostic_record(), evaluation_action())
+
+
+def pro_comparison_record():
+    state = evaluation_record()
+    state["approval"].update(
+        round="pro-comparison-10",
+        round_limit="0.17",
+        model="gemini-3.1-pro-preview",
+        max_calls=3,
+        per_video={"pro-wrong-speech": "0.03", "pro-silence": "0.03", "pro-h3": "0.11"},
+        user_evidence_ref="chat:explicit-three-case-pro-comparison-approval",
+    )
+    return state
+
+
+def pro_comparison_action(case="pro-wrong-speech", **changes):
+    candidate = action(identifier=case, maximum="0.11" if case == "pro-h3" else "0.03")
+    return {**candidate, "video_id": case, **changes}
+
+
+def test_pro_comparison_reserves_distinct_case_caps_and_closes_without_replacement():
+    state = pro_comparison_record()
+    for case, cost in [("pro-wrong-speech", "0.03"), ("pro-silence", "0.03"), ("pro-h3", "0.11")]:
+        candidate = pro_comparison_action(case)
+        state, decision = reserve(state, candidate)
+        assert decision["decision"] == "reserve_before_delegating"
+        assert decide(state, candidate)["decision"] == "reconcile_existing"
+        state = reconcile(state, observed(case, settled=cost))
+        assert decide(state, candidate)["decision"] == "reuse_complete"
+    assert commitment(state) == _POLICY["Decimal"]("0.17")
+    with pytest.raises(Pause, match="one request per approved artifact"):
+        reserve(state, pro_comparison_action(intent_id="fourth", client_key="fourth", segment_id="changed"))
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("model", "gemini-3.8-flash"),
+        ("round_limit", "0.18"),
+        ("currency", "BRL"),
+        ("max_calls", 4),
+        ("allow_retries", True),
+        ("per_video", {"pro-wrong-speech": "0.11", "pro-silence": "0.03", "pro-h3": "0.03"}),
+    ],
+)
+def test_pro_comparison_rejects_model_or_scope_changes(field, value):
+    state = pro_comparison_record()
+    state["approval"][field] = value
+    with pytest.raises(Pause, match="exact three cases"):
+        reserve(state, pro_comparison_action())
+    assert state["intents"] == []
+
+
+def test_pro_comparison_pending_and_zero_settlement_do_not_authorize_retry():
+    state, _ = reserve(pro_comparison_record(), pro_comparison_action())
+    with pytest.raises(Pause, match="pending"):
+        reserve(state, pro_comparison_action("pro-h3"))
+    state = reconcile(state, observed("pro-wrong-speech", status="failed", settled="0"))
+    with pytest.raises(Pause, match="without retries"):
+        reserve(state, pro_comparison_action(intent_id="retry", client_key="retry", kind="transport_retry"))
+    with pytest.raises(Pause, match="allowance exhausted"):
+        reserve(pro_comparison_record(), pro_comparison_action(maximum="0.03001"))
+    with pytest.raises(Pause, match="outside the explicitly approved round"):
+        reserve(pro_comparison_record(), diagnostic_action())

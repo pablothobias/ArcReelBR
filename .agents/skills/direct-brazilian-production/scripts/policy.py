@@ -21,6 +21,12 @@ EVALUATION_ARTIFACT_LIMITS = {
     "missing-speech-audio": Decimal("0.01"),
 }
 DIAGNOSTIC_CASE_LIMITS = dict.fromkeys(("case-a", "case-b", "case-c", "case-d"), Decimal("0.01"))
+PRO_COMPARISON_MODEL = "gemini-3.1-pro-preview"
+PRO_COMPARISON_LIMITS = {
+    "pro-wrong-speech": Decimal("0.03"),
+    "pro-silence": Decimal("0.03"),
+    "pro-h3": Decimal("0.11"),
+}
 
 
 class Pause(ValueError):
@@ -66,6 +72,18 @@ def approval(record: dict) -> dict:
             or any(amount(approved["per_video"][key]) != limit for key, limit in DIAGNOSTIC_CASE_LIMITS.items())
         ):
             raise Pause("Diagnostic approval must retain the exact four cases, model, USD ceilings and no-retry scope")
+        return approved
+    if approved.get("round") == "pro-comparison-10":
+        if (
+            approved.get("currency") != "USD"
+            or amount(approved.get("round_limit")) != Decimal("0.17")
+            or approved.get("model") != PRO_COMPARISON_MODEL
+            or approved.get("max_calls") != 3
+            or approved.get("allow_retries") is not False
+            or set(approved.get("per_video", {})) != set(PRO_COMPARISON_LIMITS)
+            or any(amount(approved["per_video"][key]) != limit for key, limit in PRO_COMPARISON_LIMITS.items())
+        ):
+            raise Pause("Pro comparison approval must retain the exact three cases, model, USD ceilings and no-retry scope")
         return approved
     if approved.get("round") not in {"sample-9", "pilot-11", "continuity-12"}:
         raise Pause("Choose a separately approved sample, pilot or continuity round")
@@ -131,7 +149,7 @@ def decide(record: dict, action: dict) -> dict:
     # Any unresolved submission in the round may already be charged or producing media.
     if any(item["status"] == "pending" for item in intents):
         raise Pause("Reconcile all pending jobs before authorizing another submission")
-    if approved["round"] in {"evaluation-10", "diagnostic-10"} and (
+    if approved["round"] in {"evaluation-10", "diagnostic-10", "pro-comparison-10"} and (
         action["kind"] != "initial"
         or len(intents) >= approved["max_calls"]
         or any(item["video_id"] == video_id for item in intents)
