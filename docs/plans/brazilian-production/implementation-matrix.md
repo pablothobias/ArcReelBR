@@ -15,8 +15,8 @@ This is a coordination checkpoint, not production state. ArcReel remains authori
 | [#7](https://github.com/pablothobias/ArcReelBR/issues/7) | None | Reference dossier and formal episode handoff | implement_text; independent review implement_ptbr | Closed, remote commit `79e7b798b` | See criterion evidence below |
 | [#8](https://github.com/pablothobias/ArcReelBR/issues/8) | None | Codex directing skill and recovery record | implement_ptbr; independent review implement_mcp | Closed, remote commit `7f704b670` | See criterion evidence below |
 | [#9](https://github.com/pablothobias/ArcReelBR/issues/9) | None | Provider configuration and bounded media sample | implement_mcp; independent review implement_ptbr | Closed, remote commit `fa36d7264` | See criterion evidence below |
-| [#10](https://github.com/pablothobias/ArcReelBR/issues/10) | None | Audiovisual evidence and correction handoff | implement_mcp; independent review implement_ptbr | Bounded review capability verified; publication and closure pending | See criterion evidence below |
-| [#11](https://github.com/pablothobias/ArcReelBR/issues/11) | #10 | Real pilot and delivery | Coordinator, pending scheduling | Pending | See criterion evidence below |
+| [#10](https://github.com/pablothobias/ArcReelBR/issues/10) | None | Audiovisual evidence and correction handoff | implement_mcp; independent review implement_ptbr | Closed, remote evidence `157725366` | See criterion evidence below |
+| [#11](https://github.com/pablothobias/ArcReelBR/issues/11) | None | Real pilot and delivery | Coordinator; implement_mcp; independent implement_ptbr | Transferred and quoted; awaiting pilot spending approval | See criterion evidence below |
 | [#12](https://github.com/pablothobias/ArcReelBR/issues/12) | #11 | Two-episode sample and collection readiness | Coordinator, pending scheduling | Pending | See criterion evidence below |
 
 ## Ticket #3
@@ -222,3 +222,10 @@ This is a coordination checkpoint, not production state. ArcReel remains authori
 
 - #6 closed after remote evidence `670acd0e3` and independent actual-file/currentness/encoder/billing-count checks. This closes the current technical ingestion criteria using the explicitly allowed Nano Banana 2 fallback. It does not approve the sheet's creative suitability for the pilot.
 - [SyncNet negative controls](evidence/10-audiovisual/syncnet-negative-controls.md) used existing media/checkpoint locally, with network denied and no provider charge. Baseline equality and three negatives were independently verified. Silence returned an arbitrary tie-selected offset; a static face still yielded substantial uncalibrated confidence. These observations support abstention, not an automatic synchronization pass.
+
+## Pilot preparation checkpoint
+
+- #10 closed after remote evidence `157725366` and independent checks of all 44 consolidated evidence hashes, exact AAC recognition, formal operation schemas and stated limits.
+- #11 has zero open native blockers and is claimed. Supported export/import preserved the confirmed creative content in the configured local application. A resolution-only project setting selects H3 2K for later 1080 × 1920 delivery. No pilot media or usage was created.
+- [Pilot preflight](pilot-preflight.md) records exact initial target counts and independently verified USD 22.492928 conservative bound. A separate USD 22.50 pilot/round approval was requested, with the first USD 2.04 character stage included. No previous allowance funds this work.
+- #12 and Spec #2 remain open. Actual pilot generation, quality, delivery and recovery are not yet demonstrated. Total recorded generation/evaluation cost remains USD 1.0353255.
