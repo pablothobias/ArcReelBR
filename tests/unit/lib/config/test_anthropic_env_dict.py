@@ -67,7 +67,8 @@ async def test_no_active_credential_returns_empty_strings(monkeypatch: pytest.Mo
     monkeypatch.setattr("lib.config.service.SystemSettingRepository", lambda _s: setting_repo)
 
     built = await build_anthropic_env(session)
-    assert built.pricing == AgentPricing()
+    # No API key anywhere: the CLI uses the local Claude Code login, so Agent turns are priced at zero.
+    assert built.pricing == AgentPricing(multiplier=0.0)
     assert built.env["ANTHROPIC_API_KEY"] == ""
     assert built.env["ANTHROPIC_BASE_URL"] == ""
 
@@ -93,7 +94,10 @@ async def test_no_active_credential_falls_back_to_system_settings(monkeypatch: p
     )
     monkeypatch.setattr("lib.config.service.SystemSettingRepository", lambda _s: setting_repo)
 
-    result = (await build_anthropic_env(session)).env
+    built = await build_anthropic_env(session)
+    # A legacy API key is billed per request, so catalog pricing stays in effect.
+    assert built.pricing == AgentPricing()
+    result = built.env
     assert result["ANTHROPIC_API_KEY"] == "legacy-sk"
     assert result["ANTHROPIC_BASE_URL"] == "https://legacy.anthropic.com"
     assert result["ANTHROPIC_MODEL"] == "claude-legacy-model"

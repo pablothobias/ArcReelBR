@@ -110,10 +110,11 @@ async def build_anthropic_env(session: AsyncSession) -> AnthropicEnv:
         return AnthropicEnv(env=env, pricing=agent_pricing(cred, settings))
 
     # No active credentials: dual-track system_settings fallback.
-    return AnthropicEnv(
-        env={env_key: settings.get(db_key, "").strip() for db_key, env_key in _ANTHROPIC_ENV_MAP.items()},
-        pricing=AgentPricing(),
-    )
+    env = {env_key: settings.get(db_key, "").strip() for db_key, env_key in _ANTHROPIC_ENV_MAP.items()}
+    # Without any API key the SDK CLI authenticates through the host's Claude Code login (subscription),
+    # so Agent tokens are not billed per request: price them at zero instead of catalog list prices.
+    pricing = AgentPricing() if env["ANTHROPIC_API_KEY"] else AgentPricing(multiplier=0.0)
+    return AnthropicEnv(env=env, pricing=pricing)
 
 
 @dataclass
