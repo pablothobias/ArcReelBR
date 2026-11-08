@@ -66,7 +66,7 @@
   },
   "quote_process_normal_catalog_startup_hydrated": true,
   "effective_quote_entry_matches_saved_user_copy": true,
-  "independent_review": "Independent Codex live entry/preservation/official-hash and normally hydrated existing quote-service verification passed; no generation",
+  "independent_review": "passed_read_only_live_entry_preservation_official_snapshot_and_hydrated_service_quote",
   "configuration_provenance": "Local user-entry override verified from official Google sources; no official dataset/snapshot change",
   "technical_limit_quote_not_expected_cost": true,
   "real_project_preview": {
@@ -75,5 +75,9 @@
     "estimated_cost": null,
     "unpriced_count": 0
   },
-  "private_backups_and_restore_plan": "/tmp/arcreel-goal-state/media-preflight/image-override-preparation"
+  "private_backups_and_restore_plan": "/tmp/arcreel-goal-state/media-preflight/image-override-preparation",
+  "sources": [
+    "https://ai.google.dev/gemini-api/docs/models/gemini-3.1-flash-image",
+    "https://ai.google.dev/gemini-api/docs/pricing#gemini-3.1-flash-image"
+  ]
 }
