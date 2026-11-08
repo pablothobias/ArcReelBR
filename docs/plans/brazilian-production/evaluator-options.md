@@ -1,6 +1,6 @@
 # Evaluator option after the failed audio controls
 
-Status: research only. The four-case Flash diagnostic is closed; no alternative-model inference, model-default change or new allowance is authorized. Issue #10 remains open. The owner has not accepted an alternative evaluator or human-assisted final review as the production quality workflow.
+Status: the four-case Flash diagnostic and separately approved three-case Pro comparison are closed. The initial proposal below is retained for provenance; actual results appear at the end. No further inference, model-default change or new allowance is authorized. Issue #10 remains open. The owner has not accepted an alternative evaluator or human-assisted final review as the production quality workflow.
 
 ## Concrete Google-account candidate
 
@@ -38,3 +38,21 @@ Three documented-free `countTokens` requests have now completed against this exa
 | Continue diagnosis without paid inference | Existing captured requests, zero-PCM contradiction, raw response inspection and deterministic guards can reject known unsupported claims | Cannot establish subjective audiovisual quality or prove another model's capability. |
 
 The observed result already supports one narrow conclusion: removing visual root fields alone did not prevent false perception. It does not prove that all Google models fail, identify the provider's internal cause, or justify silently switching models. The next route belongs to the owner's explicit decision after reviewing the options and a frozen quote.
+
+## Separately approved Pro comparison result
+
+The owner subsequently approved “Aprovo a comparação Pro com teto total de US$ 0,17” in question `call_f6a7075bf0194dfca268603fdbe67917`, covering exactly the frozen wrong-speech, silence and H3 cases, with USD 0.03/0.03/0.11 ceilings. Independent review cleared the new policy and private bounded caller before execution. A fresh `pro-comparison-10` record reserved each full ceiling before its sole dispatch. Prior records and model defaults were unchanged.
+
+All three actual serialized bodies matched the frozen hashes. Three unique responses ended `STOP`; each usage settlement was recorded once. There were no retries, extra cases or media-generation calls. The round is closed without a pending request. [Sanitized actual results](evidence/10-audiovisual/pro-comparison-results.json) retain raw semantic responses, IDs, actual wire/media hashes, usage and offline validation. Private full evidence is under `/tmp/arcreel-goal-state/evaluation-diagnosis/pro-options/`.
+
+| Input | Raw observation | Usage-based cost, USD |
+|---|---|---:|
+| Wrong speech | Correct words and synthetic female-voice description, but places the entire sentence within 0.04 seconds and explicitly claims that false file duration; actual WAV duration is 4.5655625 seconds | 0.003806 |
+| Digital silence | No speech claimed this run, but invents classical piano/harpsichord music and refers to a static image despite audio-only zero PCM | 0.002734 |
+| Native H3 clip | Reports only “Bom dia.”, omitting the rest recorded in prior local ASR evidence; claims specific phoneme-mouth correspondence and zero offset without calibrated lip-sync ground truth | 0.069056 |
+
+Total recorded cost: **USD 0.075596**, calculated from actual returned usage at the quoted rates. The unused USD 0.094404 authorizes no further request. No thoughts-token count was reported; prompt plus candidate counts equaled each total. Provider invoices were not independently reconciled.
+
+The same existing offline validator returned `consistent_requires_review` for all three, with no automatic quality pass. Its structured checks did not detect invented music/static-image prose, an in-range but false short speech interval, or an incomplete transcript. This is a concrete limit of those guards, separate from the model's raw observations.
+
+This Pro trial did not establish a reliable replacement evaluator. Unsupported perception persisted on a controlled zero-signal input, and correct recognized words coexisted with erroneous temporal claims. Three single-run cases cannot establish general reliability; the H3 clip supplies no calibrated lip-sync ground truth. Issue #10 remains open, and neither an automatic model substitution nor a human-assisted quality workflow has been accepted as its resolution.

@@ -1,0 +1,232 @@
+{
+  "approval_question": "call_f6a7075bf0194dfca268603fdbe67917",
+  "approval_exact": "Aprovo a comparação Pro com teto total de US$ 0,17",
+  "model": "gemini-3.1-pro-preview",
+  "plan_sha256": "9a6d3cd1f7ac599ce9e5ad31ebe270de25a70464fa6ea44478eeb7c8affed9ac",
+  "currency": "USD",
+  "approved_round": "0.17",
+  "recorded_usage_cost_total": "0.075596",
+  "unused_allowance_authorizes_nothing": "0.094404",
+  "status": "closed_no_pending_no_additional_calls",
+  "actual_calls": 3,
+  "retries": 0,
+  "private_evidence_directory": "/tmp/arcreel-goal-state/evaluation-diagnosis/pro-options",
+  "independent_actual_audit": "Independent Codex exact3wire/media/response-ID/accounting and raw semantic audit passed, no further inference",
+  "cases": [
+    {
+      "case": "pro-wrong-speech",
+      "media_sha256": "2ad8bc1cad6d99ba85843d6902a70556a8a62b83ec50724aed77518d0723d59d",
+      "prompt_sha256": "530b9636520d96536538facb68d1f18989dad6302e86908f9396009081eceaed",
+      "actual_wire_sha256": "77279fecea511a7083344e97bab7258140a2e0cc511e41e9eb4642dd72275626",
+      "matches_frozen_wire": true,
+      "response_id": "EazwaqOpCPD9wbUPlMiFqAk",
+      "model_version": "gemini-3.1-pro-preview",
+      "finish_reasons": [
+        "STOP"
+      ],
+      "usage_metadata": {
+        "candidates_token_count": 188,
+        "prompt_token_count": 775,
+        "prompt_tokens_details": [
+          {
+            "modality": "AUDIO",
+            "token_count": 115
+          },
+          {
+            "modality": "TEXT",
+            "token_count": 660
+          }
+        ],
+        "total_token_count": 963
+      },
+      "cost_usd": "0.003806",
+      "raw_semantic_response": {
+        "evidence_status": "observed",
+        "speech": [
+          {
+            "speaker_label": "Unknown",
+            "start_seconds": 0.0,
+            "end_seconds": 0.04,
+            "words_heard": "Boa noite, Bruno. A porta ficou aberta e o cachorro fugiu.",
+            "delivery_observation": "The voice is female, synthesized, and speaks clearly and steadily.",
+            "confidence": 1.0
+          }
+        ],
+        "actual_audio_description": "A single, clear, synthesized female voice speaking Portuguese.",
+        "assessability_limits": [
+          "Audio is extremely short, only 0.04 seconds long, but contains speech.",
+          "Audio-only input; no visual information to assess synchrony or speakers."
+        ]
+      },
+      "offline_validation": {
+        "validation_status": "consistent_requires_review",
+        "findings": [],
+        "requires_reviewer": true,
+        "automatic_quality_pass": false
+      },
+      "media_evidence": {
+        "has_audio": true,
+        "has_video": false,
+        "duration_seconds": 4.5655625,
+        "pcm_state": "nonzero",
+        "decoded_streams": [
+          {
+            "audio_stream": 0,
+            "sample_count_all_channels": 73049,
+            "all_samples_finite": true,
+            "pcm_state": "nonzero",
+            "decoded_sha256": "de1b30c1b84ece339f70a2b4673b5687de68d58a7484389c892cee98012832a6"
+          }
+        ],
+        "findings": []
+      }
+    },
+    {
+      "case": "pro-silence",
+      "media_sha256": "00ea5c7415d6fd1232a2bb551c00c253f90023abb0775f9d9a3e54d47da9bc9d",
+      "prompt_sha256": "530b9636520d96536538facb68d1f18989dad6302e86908f9396009081eceaed",
+      "actual_wire_sha256": "c38abd64a3073ae33a424377ca1029e860d0e73af9eacffe46316e63c8ab3913",
+      "matches_frozen_wire": true,
+      "response_id": "LKzwavPGGfCxuMYPrcru-A4",
+      "model_version": "gemini-3.1-pro-preview",
+      "finish_reasons": [
+        "STOP"
+      ],
+      "usage_metadata": {
+        "candidates_token_count": 99,
+        "prompt_token_count": 773,
+        "prompt_tokens_details": [
+          {
+            "modality": "AUDIO",
+            "token_count": 113
+          },
+          {
+            "modality": "TEXT",
+            "token_count": 660
+          }
+        ],
+        "total_token_count": 872
+      },
+      "cost_usd": "0.002734",
+      "raw_semantic_response": {
+        "evidence_status": "observed",
+        "speech": [],
+        "actual_audio_description": "The audio consists solely of classical instrumental music, specifically a piece played on a piano or harpsichord. There is no speech or other sound effects.",
+        "assessability_limits": [
+          "No speech is present in the audio.",
+          "The image is static, so lip synchrony cannot be assessed."
+        ]
+      },
+      "offline_validation": {
+        "validation_status": "consistent_requires_review",
+        "findings": [],
+        "requires_reviewer": true,
+        "automatic_quality_pass": false
+      },
+      "media_evidence": {
+        "has_audio": true,
+        "has_video": false,
+        "duration_seconds": 4.5,
+        "pcm_state": "zero",
+        "decoded_streams": [
+          {
+            "audio_stream": 0,
+            "sample_count_all_channels": 72000,
+            "all_samples_finite": true,
+            "pcm_state": "zero",
+            "decoded_sha256": "30fafbdc0facf210a26498db982f7ff8ad1e0b9a805816731c72e356a768c162"
+          }
+        ],
+        "findings": []
+      }
+    },
+    {
+      "case": "pro-h3",
+      "media_sha256": "79f540ee9f2258d836d24eac62a9927881d0c8911d151fec87f54c12e2ff58eb",
+      "prompt_sha256": "a7d73820a7fc52e04680111eda05678ac960010bef5f8ebabde7c804a1a7809c",
+      "actual_wire_sha256": "ecc11df456736925548167ceefd93067137ad64f587ac0e95218742db46e7889",
+      "matches_frozen_wire": true,
+      "response_id": "SazwaoT9I5GyytMP7MKtoA4",
+      "model_version": "gemini-3.1-pro-preview",
+      "finish_reasons": [
+        "STOP"
+      ],
+      "usage_metadata": {
+        "candidates_token_count": 327,
+        "prompt_token_count": 32566,
+        "prompt_tokens_details": [
+          {
+            "modality": "VIDEO",
+            "token_count": 31805
+          },
+          {
+            "modality": "TEXT",
+            "token_count": 761
+          }
+        ],
+        "total_token_count": 32893
+      },
+      "cost_usd": "0.069056",
+      "raw_semantic_response": {
+        "evidence_status": "observed",
+        "speech": [
+          {
+            "speaker_label": "Woman",
+            "start_seconds": 0.0,
+            "end_seconds": 0.5,
+            "words_heard": "Bom dia.",
+            "delivery_observation": "Friendly, welcoming, Portuguese.",
+            "confidence": 0.95
+          }
+        ],
+        "actual_audio_description": "A woman says 'Bom dia.'",
+        "actual_visual_description": "A smiling woman stands in a sunny kitchen. She wears a white t-shirt and an orange apron. Her right hand rests near the handle of a silver moka pot emitting steam. Her left hand is near a blue mug and a basket of oranges on a wooden counter. The background shows blue and white patterned tiles, a stove, a window, and some plants. Her mouth movements appear to correspond with the spoken words.",
+        "visible_words": [],
+        "subtitles": [],
+        "audiovisual_synchrony": {
+          "status": "apparently_aligned",
+          "explanation": "The woman's lips form the 'b', 'm', and 'd' shapes at the correct times for 'Bom dia', and the end of her speech matches the end of her visible mouth movement.",
+          "estimated_offset_ms": 0,
+          "confidence": 0.9
+        },
+        "assessability_limits": []
+      },
+      "offline_validation": {
+        "validation_status": "consistent_requires_review",
+        "findings": [],
+        "requires_reviewer": true,
+        "automatic_quality_pass": false
+      },
+      "media_evidence": {
+        "has_audio": true,
+        "has_video": true,
+        "duration_seconds": 5.167,
+        "pcm_state": "nonzero",
+        "decoded_streams": [
+          {
+            "audio_stream": 0,
+            "sample_count_all_channels": 331776,
+            "all_samples_finite": true,
+            "pcm_state": "nonzero",
+            "decoded_sha256": "951dc2105ffa76277e8c96d30ac95264ca70361838ed659649a8598756120b34"
+          }
+        ],
+        "findings": []
+      }
+    }
+  ],
+  "observations": [
+    "Wrong-speech words match the fixture after punctuation normalization, but claimed full duration .04s contradicts actual4.5655625s.",
+    "Silence speech[] but invented piano/harpsichord music and a staticimage despite zeroPCM audio-only evidence.",
+    "H3 response includes only Bom dia, whereas the prior independent local ASR evidence includes Bom dia, o café está pronto.",
+    "H3 apparent0ms synchrony/phoneme claim is not supported by calibrated lip-sync ground truth.",
+    "All three outcomes are consistent_requires_review under the existing deterministic validator; none is automatic quality acceptance. Its structured checks do not validate these free-prose, transcription-completeness or in-range timing claims."
+  ],
+  "limitations": [
+    "One run per input does not establish reliability.",
+    "Audio actual request bodies match prior Flash B/D byte-for-byte; only model endpoint differs. Historical H3 actual transport was not captured.",
+    "Same LOW configuration does not freeze actual reasoning allocation or provider serving state. No thoughts count was reported.",
+    "H3 has no calibrated lip-sync ground truth.",
+    "Usage cost derives from returned token counts and official standard rates, not independently reconciled provider invoices."
+  ]
+}

@@ -177,3 +177,11 @@ This is a coordination checkpoint, not production state. ArcReel remains authori
 - Four actual captured requests matched frozen bodies and source hashes, ran once each, and settled at total USD0.00741600. No pending calls, retries or remaining authorization. Combined H3 plus both evaluation rounds: USD0.82345550 in app-recorded/provider-usage-derived costs, not independently verified invoices.
 - The narrower schema did not prevent invented English speech on identical zero PCM or visual action in free audio prose. Offline validation rejected that actual new failure. The positive wrong-speech transcription is narrow evidence, not subjective quality acceptance.
 - No human-review downgrade or alternate evaluator was selected. #10 remains open pending a sufficiently grounded review workflow; pilot and continuity acceptance remain unproven. A concrete alternative is being researched read-only for comparison.
+
+## Approved Pro comparison checkpoint
+
+- The separately approved three-call Pro comparison completed once per case, with no retries or pending requests. Independent actual-wire/media/hash/response-ID and accounting review passed. Policy is remote in `000036f1b`.
+- Actual usage-based cost was USD 0.075596 against the USD 0.17 ceiling. Combined H3 and all three evaluation rounds total USD 0.89905150, not independently reconciled provider invoices. Unused allowances do not authorize more calls.
+- Pro recognized the wrong-speech words but claimed a false 0.04-second duration, invented music and a static image on digital silence, and omitted part of the H3 utterance while asserting uncalibrated synchrony. See [results and limits](evaluator-options.md) and [sanitized evidence](evidence/10-audiovisual/pro-comparison-results.json).
+- Existing structured guards correctly retain reviewer-required status but do not catch these free-prose and in-range timing errors. No automatic quality pass or model substitution follows. #10, #11, #12 and Spec #2 remain open; human-assisted acceptance has not been selected.
+- Necessary image billing/retry follow-up #14 is under implementation and independent deterministic review. It does not authorize paid image generation or close #6.
