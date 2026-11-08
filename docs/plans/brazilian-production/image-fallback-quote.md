@@ -30,7 +30,7 @@ A documented 1K image consumes 1,120 image tokens, equal to USD 0.0672 at the im
 
 ## Candidate scope and remaining approval
 
-The narrow fallback candidate remains one newly generated 1K square image, text-only, with no reference images, grounding or alternative model. Use existing image-generation tasks and artifact registration/version selection. Verify actual dimensions satisfy H3's 256-pixel minimum after any separately approved generation. No SDK request has been sent for this candidate.
+The current fallback candidate is one newly generated **1K, 16:9 three-view character sheet**, text-only, with no reference images, grounding or alternative model. This supersedes the initial unapproved square-image preference: the existing formal asset-sheet path fixes its canvas to 16:9, so the fixture preserves that supported path. Use existing image-generation tasks and artifact registration/version selection. Verify actual dimensions satisfy H3's 256-pixel minimum after any separately approved generation. No provider request has been sent for this candidate; a construction-only check replaced the SDK boundary without a provider client or network.
 
 This could exercise the project-provider fallback if separately approved. It cannot be described as an image produced by Codex's `image_gen` tool, and does not establish that specific #6 round trip. Available Codex image-tool metadata still supplies no tariff, currency, allowance or usage receipt; its unknown cost is not zero.
 
@@ -41,3 +41,30 @@ Earlier formal pilot preparation referenced five reusable assets plus three stor
 Before #14, the saved exact-model entry contained image-output prices only, and the backend omitted billed input/thinking quantities. Its USD 0.067 1K estimate was therefore not complete. A controlled fake SDK timeout caused five calls through the real retry wrapper, demonstrating ambiguous-resubmission risk without network or generation. There was no supported complete finite quote for that configuration.
 
 [Historical qualification evidence](evidence/06-image-fallback-billing-gap.json) preserves that finding. USD 0.335 or USD 0.336 represented only multiplied output-image components and was never a full quote or approved reserve. The current complete local override, model technical bounds and integrated #14 behavior supersede that original blocker; they do not establish media quality or generation success.
+
+
+## Concrete non-generating formal fixture
+
+A separate production-app fixture, `image-handoff-fixture-6-20261108`, now contains exactly reusable character `Ana` and one formal episode-1 storyboard target `E1S01`. The existing embedded Agent created the character through `patch_project` and authored the script through the configured official-subscription `claude-opus-5-5` backend. Its implementation fixes internal effort to `medium`; selected-model usage is recorded in text ledger entry 16. Subscription telemetry has no invented paid-token charge. The main conversation harness remains unchanged under ADR 0124.
+
+The storyboard has one five-second neutral shot, no dialogue/voiceover, references only Ana, and registers no scene, prop or product assets. No image/video/audio task exists. The sole authoring task completed. Its script SHA-256 is `2f7dc3d635105fd2f86131e0af3844f49dc2840ef874861c5bd30a179aea0e7b`.
+
+The actual authenticated character-batch preview now has **one target `character/Ana`**, no skipped targets, USD 2.031616, `unpriced_count: 0`, and `full_context_output_upper_bound`. This replaces the earlier empty-project preview as evidence of a real target. Actual configuration resolution confirms exact `gemini-aistudio/gemini-3.1-flash-image`, `1K`, `16:9`, zero references. Construction through the existing backend, with only its SDK boundary replaced, confirms one candidate, `IMAGE` response mode and the shared 32,768 output-token cap. This construction check sent no provider request.
+
+The existing prompt builder appends a white-background, three-view layout. Before approval, the embedded Agent corrected only Ana's description from light gray to white, aligning the final character prompt without changing the script or harness. Final rendered prompt SHA-256: `385dd99642c91e4ce889435b71c06db36305635b5bac8ff16a7ab85ca258f720`.
+
+```text
+Asset sheet for character “Ana”.
+
+A fictional adult Brazilian woman named Ana, approximately thirty years old, with medium-brown skin, short curly dark hair, a plain teal T-shirt and dark trousers. Neutral relaxed standing pose, natural proportions, simple studio lighting, and a clean white background. No logos, text, extra people or reference images.
+
+Landscape 16:9 three-view sheet on a pure white background: front / exact side (90° side view) / rear arranged horizontally.
+
+The character must have exactly the same facial and head features, fur or hairstyle, clothing or body markings, body shape, and accessories in all three panels.
+
+Avoid: watermarks, extra text, logos
+```
+
+The exact target/prompt/quote snapshot is `/tmp/arcreel-goal-state/image-fallback-fixture/frozen-target-quote.json`, with the nonempty HTTP preview, construction-only request, session transcript and `recovery.json` beside it. Stable client keys are `image6-formal-preparation-v1` and `image6-background-alignment-v1`; the existing session is completed. Recovery retains null image approval, no paid intentions and no reservation. No new directing-policy branch was added.
+
+A new numeric approval would cover only that single initial character-sheet image at the quoted maximum, not another generated image, quality regeneration, video, pilot or evaluation. Actual source pixel dimensions must be probed after any authorized generation rather than inferred from `1K`. Later reuse of the same image through authenticated character/storyboard uploads and downstream identity/request inspection remains separate validation; the current storyboard image preview correctly reports missing Ana reference media. This preparation does not close #6 or imply that a fallback artifact came from Codex's image-generation tool.
