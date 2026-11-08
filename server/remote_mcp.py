@@ -18,10 +18,12 @@ from starlette.types import ASGIApp, Receive, Scope, Send
 
 from lib.project.project_manager import ProjectManager, get_project_manager
 from lib.script.source_loader import SourceLoader
+from server.agent_runtime.service import AssistantService
 from server.agent_toolset.remote import remote_tools
 from server.agent_toolset.toolset import AGENT_TOOLSET
 from server.auth import API_KEY_PREFIX
 from server.auth import verify_api_key as default_verify_api_key
+from server.session_mcp import default_session_service, session_tools
 from server.tool_runtime import Services
 
 _UNPUBLISHED_ISSUER_URL = AnyHttpUrl("http://localhost/")
@@ -52,6 +54,7 @@ def build_remote_mcp_server(
     projects: ProjectManager | None = None,
     services: Services | None = None,
     token_verifier: TokenVerifier | None = None,
+    session_service_factory: Callable[[], AssistantService] = default_session_service,
 ) -> FastMCP:
     """Build one restart-safe MCP server instance for the host lifespan."""
     if services is not None:
@@ -64,7 +67,10 @@ def build_remote_mcp_server(
 
     return FastMCP(
         "arcreel",
-        tools=remote_tools(AGENT_TOOLSET, projects=projects, services=services),
+        tools=[
+            *remote_tools(AGENT_TOOLSET, projects=projects, services=services),
+            *session_tools(projects=projects, service_factory=session_service_factory),
+        ],
         token_verifier=token_verifier or ArcApiKeyVerifier(),
         # ArcReel accepts only static arc- API keys, with no OAuth authorization server (ADR 0065), and declares no RFC 9728
         # protected-resource metadata: MCP requires metadata to list at least one authorization server, so declaring it would direct discovering clients

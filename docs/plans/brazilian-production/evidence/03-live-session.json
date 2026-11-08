@@ -1,0 +1,90 @@
+{
+  "reconnected_pending_question": true,
+  "cursor_before_answer": 1,
+  "answer": {
+    "status": "accepted",
+    "session_id": "39ce8e27-e82b-467f-a285-ee9d7f99c813",
+    "question_id": "aq_0aa7bde64d504f9ca12f78c6f07c6fc9"
+  },
+  "state": {
+    "session": {
+      "id": "39ce8e27-e82b-467f-a285-ee9d7f99c813",
+      "project_name": "handoff-fixture",
+      "title": "",
+      "status": "completed",
+      "superseded_by": null,
+      "fork_parent_session_id": null,
+      "fork_anchor_uuid": null,
+      "created_at": "2026-11-08T15:37:11.128141",
+      "updated_at": "2026-11-08T15:37:32.019514"
+    },
+    "queued_messages": [],
+    "pending_questions": []
+  },
+  "entries_after_cursor": {
+    "session_id": "39ce8e27-e82b-467f-a285-ee9d7f99c813",
+    "status": "completed",
+    "entries": [
+      {
+        "seq": 2,
+        "type": "user",
+        "subtype": "question_answer",
+        "tool_use_id": "toolu_01DQNmT6TYuSpbJaF9f1HuBC",
+        "content": "Your questions have been answered: \"Which harmless validation marker should I acknowledge?\"=\"Alpha\". You can now continue with these answers in mind.",
+        "is_error": false,
+        "answers": {
+          "Which harmless validation marker should I acknowledge?": "Alpha"
+        },
+        "uuid": "084132aa-a632-403d-82ae-4d90ca3a2825-tr0",
+        "timestamp": "2026-11-08T15:37:31.258260Z"
+      },
+      {
+        "seq": 3,
+        "type": "assistant",
+        "content": [
+          {
+            "text": "Alpha",
+            "type": "text"
+          }
+        ],
+        "message_id": "msg_011Cgqi7Tk3yLw9o2mFjVjRL",
+        "uuid": "c42cc725-8df4-41f5-81f1-ba450f606133",
+        "timestamp": "2026-11-08T15:37:31.972424Z"
+      }
+    ],
+    "draft": null,
+    "draft_rev": 0,
+    "next_after_seq": 3
+  },
+  "duplicate_send_same_receipt": true,
+  "transport": "Official Python MCP client driven by Codex; authenticated Streamable HTTP on isolated local application",
+  "usage": [
+    {
+      "call_type": "text",
+      "model": "claude-opus-5-5",
+      "status": "success",
+      "cost_amount": 0.0,
+      "currency": "USD",
+      "provider": "anthropic",
+      "input_tokens": 76548,
+      "output_tokens": 161,
+      "cache_read_tokens": 51154,
+      "cache_write_5m_tokens": 0,
+      "unpriced_reason": null
+    },
+    {
+      "call_type": "text",
+      "model": "claude-haiku-5-5",
+      "status": "success",
+      "cost_amount": 0.0,
+      "currency": "USD",
+      "provider": "anthropic",
+      "input_tokens": 1364,
+      "output_tokens": 18,
+      "cache_read_tokens": 0,
+      "cache_write_5m_tokens": 0,
+      "unpriced_reason": null
+    }
+  ],
+  "limits": "Recorded zero application cost under subscription is not an external billing statement. No media/provider generation."
+}

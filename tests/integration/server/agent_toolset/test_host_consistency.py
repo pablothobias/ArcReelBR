@@ -83,6 +83,7 @@ from server.agent_toolset.video_versions import SELECT_VIDEO_VERSION
 from server.agent_toolset.workflow_completion import COMPLETE_SCRIPT_PLAN_REBUILD
 from server.remote_mcp import build_remote_mcp_server
 from server.services.project.workflow_planner import WorkflowPlanner
+from server.session_mcp import SESSION_MCP_TOOL_IDS
 from server.tool_runtime import (
     CallerContext,
     GenerationBatchToolRequest,
@@ -368,7 +369,9 @@ async def test_every_tool_both_hosts_expose_is_defined_by_a_declaration(
     remote = {tool.name for tool in await build_remote_mcp_server(services=services).list_tools()}
     declared = {declaration.name for declaration in AGENT_TOOLSET}
 
-    assert embedded == remote == declared == set(ARCREEL_MCP_TOOL_IDS) == set(SAMPLE_ARGUMENTS)
+    assert embedded == remote - SESSION_MCP_TOOL_IDS == declared == set(ARCREEL_MCP_TOOL_IDS) == set(SAMPLE_ARGUMENTS)
+    assert SESSION_MCP_TOOL_IDS.isdisjoint(embedded)
+    assert remote >= SESSION_MCP_TOOL_IDS
 
 
 @_DECLARATIONS

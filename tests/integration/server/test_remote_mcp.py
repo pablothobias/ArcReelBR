@@ -38,6 +38,7 @@ from server.auth import create_download_token, create_token
 from server.cors_config import resolve_cors_policy
 from server.remote_mcp import ArcApiKeyVerifier, RemoteMCPHost, build_remote_mcp_server, mount_remote_mcp
 from server.services.project.workflow_planner import WorkflowPlanner
+from server.session_mcp import SESSION_MCP_TOOL_IDS
 from server.tool_runtime import Services, TextGenerationResult
 from tests.factories import install_current_video, make_test_clip, make_video_request_facts, register_project_sources
 from tests.fakes import refuse_resume_execution
@@ -422,7 +423,7 @@ async def test_remote_mcp_returns_typed_workflow_plan_and_rejects_bad_project(
         "generate_video_selected",
     }
     listed = {tool.name: tool for tool in tools.tools}
-    assert set(listed) == set(ARCREEL_MCP_TOOL_IDS)
+    assert set(listed) == set(ARCREEL_MCP_TOOL_IDS) | SESSION_MCP_TOOL_IDS
     assert migrated | readers | drafts | text_and_script | batches <= listed.keys()
     assert retired.isdisjoint(listed)
     assert all(
