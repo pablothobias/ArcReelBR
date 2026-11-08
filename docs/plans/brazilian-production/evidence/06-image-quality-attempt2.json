@@ -1,0 +1,98 @@
+{
+  "status": "quality_attempt2_completed_closed_pending_owner_review",
+  "approval": {
+    "question": "call_60f4c93791e340348124a57eac6d7938",
+    "reply": "Sim, aprovo US$ 2,04 para essa única nova tentativa",
+    "new_round_limit_usd": "2.04",
+    "old_allowance_reused": false
+  },
+  "project": "image-handoff-fixture-6-20261108",
+  "task_id": "b11de379e3bf45d6997934927d207bb0",
+  "batch_id": "69166bb3947a41c99f7eb9898e0715b9",
+  "ledger_id": 22,
+  "quality_attempt": 2,
+  "target": "character/Ana",
+  "provider": "gemini-aistudio",
+  "model": "gemini-3.1-flash-image",
+  "resolution": "1K",
+  "request_aspect_ratio": "16:9",
+  "reference_count": 0,
+  "prompt_sha256": "6a4b69786bc1306f18ee1d5b24043e663cd4e839d9df1f63238ff60cac835425",
+  "artifact": {
+    "format": "PNG",
+    "dimensions": [
+      1376,
+      768
+    ],
+    "bytes": 1062470,
+    "sha256": "1c3ed5bfce25a3ee8499a7fe4e2182086be897281070c704493ca868d18bf90a",
+    "current_version": 2,
+    "currency": "current",
+    "project_path": "characters/Ana.png",
+    "version_file": "versions/characters/Ana_v2_20261108T150039.png"
+  },
+  "prior_rejected_version1": {
+    "sha256": "798741b81a9b82fff30a40ac312be5cb659739ec217de1092955f06d74a1af25",
+    "bytes_preserved": true,
+    "closed_record_sha256": "be65dc5d9ee410dd27c77525b75831eb0ce6f02848a7a0fc534ad8c677224212",
+    "closed_record_preserved": true,
+    "owner_review": "rejected",
+    "paid_usage_remains_recorded": true
+  },
+  "usage": {
+    "id": 22,
+    "status": "success",
+    "provider": "gemini-aistudio",
+    "model": "gemini-3.1-flash-image",
+    "task_id": "b11de379e3bf45d6997934927d207bb0",
+    "cost_amount": 0.0682895,
+    "currency": "USD",
+    "retry_count": 0,
+    "input_tokens": 259,
+    "output_tokens": 1440,
+    "image_output_tokens": 1120,
+    "text_output_tokens": 320,
+    "provider_usage_metadata": {
+      "candidates_token_count": 1440,
+      "candidates_tokens_details": [
+        {
+          "modality": "IMAGE",
+          "token_count": 1120
+        }
+      ],
+      "prompt_token_count": 259,
+      "prompt_tokens_details": [
+        {
+          "modality": "TEXT",
+          "token_count": 259
+        }
+      ],
+      "total_token_count": 1699
+    }
+  },
+  "cost": {
+    "currency": "USD",
+    "settled_once": "0.0682895",
+    "reserved_maximum": "2.031616",
+    "unused_reservation_released": "1.9633265",
+    "unused_owner_allowance_authorizes_nothing": "1.9717105",
+    "formula": "(259*0.50+1120*60+320*3)/1000000",
+    "independent_all_attempt_audit": "passed_one_newacceptedrequest",
+    "actual_wire_captured": false
+  },
+  "quality_review": {
+    "status": "pending_owner",
+    "observed": "More photographic skin,hair,cloth and true sideprofile thanv1; framingendsatthigh/no kneesorfeet",
+    "fullbody_sheet_claim": false,
+    "automatic_acceptance": false
+  },
+  "additional_generation": 0,
+  "uploads": 0,
+  "manual_version_selection": 0,
+  "downstream_promotion": 0,
+  "session_status": "completed",
+  "current_artifact": "Normalformaloperationactivatedv2; no manualversionselection",
+  "runtime_mime_fix_active_commit": "95cbaf27a",
+  "no_more_calls_authorized": true,
+  "private_evidence_directory": "/tmp/arcreel-goal-state/image-fallback-fixture/realism-proposal"
+}

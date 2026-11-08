@@ -1,6 +1,6 @@
 # Nano Banana 2 fallback quote preflight
 
-Status: [issue #14](https://github.com/pablothobias/ArcReelBR/issues/14) is integrated and closed. The selected image entry now has a reversible local user override with complete token rates and verified technical limits. The existing estimator produces a complete conservative bound. **The sole separately approved fixture image was generated and rejected by the owner as artificial/3D-looking. It is preserved, discarded and not promoted. Its actual cost is settled; no further generation or allowance is authorized.** The earlier unbounded quote and retry finding below are historical, superseded findings.
+Status: [issue #14](https://github.com/pablothobias/ArcReelBR/issues/14) is integrated and closed. The selected image entry now has a reversible local user override with complete token rates and verified technical limits. The existing estimator produces a complete conservative bound. **The first fixture image was rejected and preserved. One separately approved photographic quality retry is now complete and settled; its result awaits owner review and has not been promoted. Neither closed allowance authorizes further generation.** The earlier unbounded quote and retry finding below are historical, superseded findings.
 
 ## Current selected model and configuration
 
@@ -82,7 +82,7 @@ Independent all-attempt billing review verified one selected-model official POST
 
 The directing record settled **USD 0.0679845 once** and released **USD 1.9636315** of the original reservation. Its intent remains `review: rejected`, `discarded: true`, paused with `owner_rejected_image_no_further_action_authorized`. Unused owner allowance is not authority for another call. [Sanitized actual-outcome evidence](evidence/06-image-fixture-outcome.json) preserves these facts. No work remains in flight.
 
-## Separate ungenerated photographic proposal
+## Photographic proposal preparation
 
 Inspection found that this fixture's project style was empty and the approved rendered prompt did not explicitly request photographic realism. This does not establish the model's internal failure cause. Other existing projects were not changed, and no global default or harness fix was introduced.
 
@@ -90,4 +90,17 @@ At the coordinator's explicit instruction, only this fixture's supported project
 
 Actual compiled prompt preview now contains that style and the existing white-background three-view layout. Its new SHA-256 is `6a4b69786bc1306f18ee1d5b24043e663cd4e839d9df1f63238ff60cac835425`. Before/after snapshots, exact new prompt and reversible style payload are kept separately in `/tmp/arcreel-goal-state/image-fallback-fixture/realism-proposal/`. The old frozen approved request and allowance were not repurposed.
 
-Version 1 remains historically selected, but its artifact currency is now **stale** because its style basis changed. It is also independently rejected by the owner. The new prompt is only an ungenerated proposal for review, with no new numeric approval, generation, upload, version selection or downstream preview. Prompt changes cannot by themselves prove a realistic result or satisfy #6.
+At this preparation checkpoint, version 1 remained selected but its artifact currency became **stale** because its style basis changed. It is also independently rejected by the owner. At that checkpoint the new prompt was an ungenerated proposal without a new allowance. The later separate approval and sole quality retry are recorded below; the original allowance was not reused. Prompt changes alone do not prove a realistic result or satisfy #6.
+
+
+## Separately approved photographic quality attempt 2
+
+The owner then approved “Sim, aprovo US$ 2,04 para essa única nova tentativa” in question `call_60f4c93791e340348124a57eac6d7938`. A fresh `image-quality-6` record retained the rejected, settled initial attempt as immutable history and computed **quality attempt 2**. Following independent policy review, integration and an idle-verified restart activating #16's MIME correction, immediate checks confirmed the same Ana identity, current photographic prompt, exact model, 1K/16:9 shape, zero references, unchanged script and no pending job. The explicit named service preview quoted one regeneration at USD 2.031616; the missing-only HTTP preview remained empty because the stale old sheet was still present.
+
+Codex reserved the full quote before one stable-key embedded-Agent instruction. The Agent made one named `generate_assets` call. Task `b11de379e3bf45d6997934927d207bb0`, batch `69166bb3947a41c99f7eb9898e0715b9` and ledger entry 22 completed successfully. Normal formal activation registered version 2; no manual version selection or upload occurred.
+
+Version 2 is **genuine PNG**, 1376 × 768, 1,062,470 bytes, SHA-256 `1c3ed5bfce25a3ee8499a7fe4e2182086be897281070c704493ca868d18bf90a`, with current artifact currency and exact photographic prompt hash `6a4b69786bc1306f18ee1d5b24043e663cd4e839d9df1f63238ff60cac835425`. The rejected historical JPEG version 1 and original closed spending record hashes remain unchanged.
+
+Independent all-attempt review verified exactly one new selected-model HTTP 200 response and measured usage: 259 input tokens, 1,120 image-output tokens and 320 non-image output tokens including thinking. Settled cost is **USD 0.0682895**, recorded once; **USD 1.9633265** of the reservation was released. The two image rounds together cost USD 0.136274, including rejected work. No full actual serialized wire capture is claimed. The new round is closed, has no pending job and grants no replacement or additional call. [Sanitized attempt-2 evidence](evidence/06-image-quality-attempt2.json) retains provenance, billing and history checks.
+
+Root and independent reviewer observe more photographic skin, hair and cloth texture and a true side profile. **The framing ends around the thighs, with no knees or feet; this is not a complete full-body sheet. Owner acceptance remains pending.** There is no automatic quality pass. No storyboard upload, downstream promotion, video, evaluation, pilot or further image was produced. The result remains held for owner review; #6's accepted creative handoff is not established by generation alone.
