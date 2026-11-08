@@ -22,7 +22,7 @@ CONTAINER_HEAD_BYTES = 12
 #: Identify these rather than whitelist video brands, an open set (``isom`` / ``iso2`` /
 #: ``mp41`` / ``mp42`` / ``avc1`` / ``qt`` / ``M4V`` / ``dash`` …, still growing across exporters). Whitelists
 #: would misclassify valid final videos as unknown, worse than missing a HEIC. Brand/MIME mapping reuses
-#: the existing ``data_uri._image_mime_from_bytes`` rules.
+#: outbound-image detection in ``data_uri.image_mime_from_bytes``.
 _ISO_BMFF_IMAGE_BRANDS: Mapping[bytes, str] = {
     b"heic": "image/heic",
     b"heix": "image/heic",

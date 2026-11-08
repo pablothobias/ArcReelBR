@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import asyncio
+from io import BytesIO
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -11,6 +13,13 @@ from PIL import Image as PILImage
 
 from lib.backends.image_backends.base import ImageCapability, ImageGenerationRequest, ReferenceImage
 from tests.unit.lib.backends.write_cancel_gate import WriteGate, cancel_during_write
+
+
+def _image_blob(image):
+    content = BytesIO()
+    image.save(content, format="PNG")
+    return SimpleNamespace(data=content.getvalue())
+
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -115,11 +124,10 @@ class TestGenerate:
         """generate() should call client.aio.models.generate_content and save the image."""
         output_file = tmp_path / "out.png"
 
-        # Mock the response: a part with inline_data that returns a PIL image
+        # The SDK boundary returns encoded image bytes in its inline blob.
         mock_image = PILImage.new("RGB", (100, 100), "red")
         mock_part = MagicMock()
-        mock_part.inline_data = b"fake"
-        mock_part.as_image.return_value = mock_image
+        mock_part.inline_data = _image_blob(mock_image)
 
         mock_response = MagicMock()
         mock_response.parts = [mock_part]
@@ -153,14 +161,16 @@ class TestGenerate:
         gate = WriteGate()
         output_file = tmp_path / "out.png"
 
-        class _BlockingImage:
-            def save(self, path):
+        content = _image_blob(PILImage.new("RGB", (8, 8), "red")).data
+
+        class _BlockingBlob:
+            @property
+            def data(self):
                 gate.block()
-                PILImage.new("RGB", (8, 8), "red").save(path)
+                return content
 
         mock_part = MagicMock()
-        mock_part.inline_data = b"fake"
-        mock_part.as_image.return_value = _BlockingImage()
+        mock_part.inline_data = _BlockingBlob()
         mock_response = MagicMock()
         mock_response.parts = [mock_part]
         backend_aistudio._client.aio.models.generate_content = AsyncMock(return_value=mock_response)
@@ -183,8 +193,7 @@ class TestGenerate:
 
         mock_image = PILImage.new("RGB", (100, 100), "green")
         mock_part = MagicMock()
-        mock_part.inline_data = b"fake"
-        mock_part.as_image.return_value = mock_image
+        mock_part.inline_data = _image_blob(mock_image)
 
         mock_response = MagicMock()
         mock_response.parts = [mock_part]
@@ -211,8 +220,7 @@ class TestGenerate:
             PILImage.new("RGB", (4, 4), "blue").save(ref_path)
             refs.append(ReferenceImage(path=str(ref_path)))
         mock_part = MagicMock()
-        mock_part.inline_data = b"fake"
-        mock_part.as_image.return_value = PILImage.new("RGB", (10, 10), "green")
+        mock_part.inline_data = _image_blob(PILImage.new("RGB", (10, 10), "green"))
         mock_response = MagicMock()
         mock_response.parts = [mock_part]
         backend_aistudio._client.aio.models.generate_content = AsyncMock(return_value=mock_response)

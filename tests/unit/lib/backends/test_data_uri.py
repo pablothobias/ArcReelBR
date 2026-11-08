@@ -28,6 +28,25 @@ class TestFileToDataUri:
 
 
 class TestImageToDataUri:
+    @pytest.mark.parametrize(
+        ("content", "mime"),
+        [
+            (b"\xff\xd8\xffhistorical", "image/jpeg"),
+            (b"GIF89ahistorical", "image/gif"),
+            (b"RIFF\x00\x00\x00\x00WEBPhistorical", "image/webp"),
+            (b"\x00\x00\x00\x18ftypheichistorical", "image/heic"),
+            (b"\x00\x00\x00\x18ftypmif1historical", "image/heif"),
+        ],
+    )
+    def test_historical_image_bytes_override_png_suffix(self, tmp_path: Path, content: bytes, mime: str):
+        path = tmp_path / "historical.png"
+        path.write_bytes(content)
+
+        uri = image_to_data_uri(path, _IMAGE_MIME_TYPES)
+
+        assert uri == f"data:{mime};base64,{base64.b64encode(content).decode('ascii')}"
+        assert path.read_bytes() == content
+
     @pytest.mark.parametrize(("name", "mime"), [("a.JPG", "image/jpeg"), ("b.webp", "image/webp")])
     def test_suffix_lookup_is_case_insensitive(self, tmp_path: Path, name: str, mime: str):
         path = tmp_path / name

@@ -91,6 +91,54 @@ async def test_actual_sdk_response_records_disjoint_usage_and_unrounded_image_co
     assert route.call_count == 1
 
 
+@pytest.mark.parametrize(("source_format", "mode"), [("JPEG", "RGB"), ("PNG", "RGBA")])
+async def test_actual_sdk_image_bytes_become_png_without_losing_alpha(
+    backend, respx_mock, tmp_path, source_format, mode
+):
+    content = io.BytesIO()
+    color = (20, 90, 160, 79) if mode == "RGBA" else (20, 90, 160)
+    Image.new(mode, (4, 4), color).save(content, format=source_format)
+    payload = _payload()
+    payload["candidates"][0]["content"]["parts"] = [
+        {
+            "inlineData": {
+                "mimeType": Image.MIME[source_format],
+                "data": base64.b64encode(content.getvalue()).decode(),
+            }
+        }
+    ]
+    route = respx_mock.post(url__regex=r".*:generateContent$").respond(200, json=payload)
+    output = tmp_path / "formal.png"
+
+    result = await backend.generate(ImageGenerationRequest(prompt="casting sheet", output_path=output))
+
+    assert output.read_bytes().startswith(b"\x89PNG\r\n\x1a\n")
+    with Image.open(output) as image:
+        assert image.format == "PNG"
+        assert image.size == (4, 4)
+        assert image.mode == mode
+        if mode == "RGBA":
+            assert image.getpixel((0, 0)) == color
+    assert result.usage.quantities["image_output_tokens"] == 1120
+    assert route.call_count == 1
+
+
+async def test_invalid_returned_image_retains_usage_without_retry(backend, respx_mock, tmp_path):
+    payload = _payload()
+    payload["candidates"][0]["content"]["parts"][0]["inlineData"]["data"] = base64.b64encode(
+        b"not a decodable image"
+    ).decode()
+    route = respx_mock.post(url__regex=r".*:generateContent$").respond(200, json=payload)
+    output = tmp_path / "invalid.png"
+
+    with pytest.raises(ImageResponseError, match="Invalid image") as caught:
+        await backend.generate(ImageGenerationRequest(prompt="casting sheet", output_path=output))
+
+    assert caught.value.result.usage.quantities["image_output_tokens"] == 1120
+    assert route.call_count == 1
+    assert not output.exists()
+
+
 @pytest.mark.parametrize(
     "change",
     ["absent", "thoughts_and_total_absent", "image_details_absent", "cache_exceeds_prompt", "details_exceed_total"],

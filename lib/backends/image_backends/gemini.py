@@ -37,6 +37,7 @@ from lib.billing.metering import Priced, Usage, price_usage, token_usage
 from lib.config.system_config import resolve_vertex_credentials_path
 from lib.config.url_utils import normalize_base_url
 from lib.infra.async_thread import run_noninterruptible_sync
+from lib.infra.image_utils import convert_image_bytes_to_png
 from lib.infra.logging_utils import format_kwargs_for_log
 
 logger = logging.getLogger(__name__)
@@ -302,12 +303,12 @@ class GeminiImageBackend:
             return img.copy()
 
     @staticmethod
-    def _process_image_response(response, output_path: Path) -> Image.Image:
-        """Parse image-generation responses and save files."""
+    def _process_image_response(response, output_path: Path) -> None:
+        """Decode returned image bytes and persist the canonical PNG artifact."""
         for part in response.parts:
             if part.inline_data is not None:
-                image = part.as_image()
+                content = convert_image_bytes_to_png(part.inline_data.data)
                 output_path.parent.mkdir(parents=True, exist_ok=True)
-                image.save(output_path)
-                return image
+                output_path.write_bytes(content)
+                return
         raise RuntimeError("API 未返回图片")

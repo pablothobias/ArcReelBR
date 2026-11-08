@@ -7,7 +7,6 @@ from dataclasses import replace
 
 import httpx
 import pytest
-from google.genai import types
 from PIL import Image
 from sqlalchemy import select
 
@@ -79,11 +78,14 @@ async def test_existing_image_consumer_uses_quoted_cap_and_settles_discarded_usa
     )
     generator.ledger = Ledger(session_factory=db_factory)
     if outcome == "save_failure":
+        save_image = Image.Image.save
 
-        def failed_save(*_args, **_kwargs):
-            raise OSError("controlled output persistence failure: payload too large")
+        def failed_save(*args, **kwargs):
+            if kwargs.get("format") == "PNG":
+                raise OSError("controlled output persistence failure: payload too large")
+            return save_image(*args, **kwargs)
 
-        monkeypatch.setattr(types.Image, "save", failed_save)
+        monkeypatch.setattr(Image.Image, "save", failed_save)
     references = []
     if outcome == "save_failure":
         reference = project_path / "reference.png"

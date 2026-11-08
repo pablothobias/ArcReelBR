@@ -60,6 +60,7 @@ from lib.backends.backend_runtime import (
     url_origin,
     with_artifact_retry,
 )
+from lib.backends.data_uri import image_mime_from_bytes
 from lib.backends.http_status_errors import redacted_status_error
 from lib.backends.video_backends.metering import video_usage
 from lib.billing.metering import Usage
@@ -474,7 +475,10 @@ class DeclarativeJobEngine[StateT: JobState]:
             or mimetypes.guess_type(path.name)[0]
             or "application/octet-stream"
         )
-        return AssetData(mime, path.read_bytes())
+        content = path.read_bytes()
+        if mime.startswith("image/"):
+            mime = image_mime_from_bytes(content) or mime
+        return AssetData(mime, content)
 
     @classmethod
     def _assets(cls, paths: list[Path] | None) -> list[AssetData] | None:
