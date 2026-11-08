@@ -64,3 +64,9 @@ Polling input is only `{"kind":"poll","intent_id":"..."}`; it requires the recor
 On subscription quota exhaustion, run `pause` with `{"code":"subscription_quota_paused"}`. Explicit resumption uses `resume` with `{"user_evidence_ref":"owner-resume-message","quota_state_ref":"official-current-quota-evidence","quota_available":true}`. This clears the pause only; it does not clear pending jobs or spending. Reconcile those before any new submission.
 
 Keep operational pointers such as `project_ref`, `session_id`, `cursor`, `pending_question_ref`, `next_decision` and the owner's unresolved choice in the surrounding record when useful. Formal project structures and authoritative job/artifact state remain in ArcReel.
+
+## Separately approved audiovisual evaluation
+
+`evaluation-10` is a fixed six-artifact review allowance, independent of production generation rounds. Set `currency` to `USD`, `round_limit` to `0.25`, `model` to `gemini-3.8-flash`, `max_calls` to `6`, and `allow_retries` to `false`. Its compatibility field `per_video` identifies the approved review artifacts: `h3-native-audio-sample: 0.04`, `known-good-av: 0.06`, `subtitle-delayed-av: 0.06`, `identity-story-error-av: 0.06`, `wrong-speech-audio: 0.01`, `missing-speech-audio: 0.01`. Retain the actual separate owner approval and quote references.
+
+Use one initial intention per artifact and reconcile its actual provider response/usage before the next call. Changing segment IDs, a zero settlement, failed requests and verified non-submission do not authorize another request for the same artifact. An existing intent returns its recovery decision rather than another submission. This scope authorizes no media generation, replacement model, extra evaluation or automatic retry. The helper controls only the Codex directing record; the bounded SDK caller must independently verify exact input-token admission caps, output limit, actual media identity and provider/account configuration.

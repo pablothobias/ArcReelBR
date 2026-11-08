@@ -10,6 +10,17 @@ from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any
 
+# This separately approved review round has a fixed six-artifact scope.
+EVALUATION_MODEL = "gemini-3.8-flash"
+EVALUATION_ARTIFACT_LIMITS = {
+    "h3-native-audio-sample": Decimal("0.04"),
+    "known-good-av": Decimal("0.06"),
+    "subtitle-delayed-av": Decimal("0.06"),
+    "identity-story-error-av": Decimal("0.06"),
+    "wrong-speech-audio": Decimal("0.01"),
+    "missing-speech-audio": Decimal("0.01"),
+}
+
 
 class Pause(ValueError):
     """A directing decision requires evidence or explicit owner approval."""
@@ -31,6 +42,18 @@ def approval(record: dict) -> dict:
     approved = record["approval"]
     if not approved.get("user_evidence_ref") or not approved.get("quote_refs"):
         raise Pause("Explicit owner approval and existing quote references are required")
+    if approved.get("round") == "evaluation-10":
+        if (
+            approved.get("currency") != "USD"
+            or amount(approved.get("round_limit")) != Decimal("0.25")
+            or approved.get("model") != EVALUATION_MODEL
+            or approved.get("max_calls") != 6
+            or approved.get("allow_retries") is not False
+            or set(approved.get("per_video", {})) != set(EVALUATION_ARTIFACT_LIMITS)
+            or any(amount(approved["per_video"][key]) != limit for key, limit in EVALUATION_ARTIFACT_LIMITS.items())
+        ):
+            raise Pause("Evaluation approval must retain the exact six targets, model, USD ceilings and no-retry scope")
+        return approved
     if approved.get("round") not in {"sample-9", "pilot-11", "continuity-12"}:
         raise Pause("Choose a separately approved sample, pilot or continuity round")
     videos = approved["per_video"]
@@ -95,6 +118,10 @@ def decide(record: dict, action: dict) -> dict:
     # Any unresolved submission in the round may already be charged or producing media.
     if any(item["status"] == "pending" for item in intents):
         raise Pause("Reconcile all pending jobs before authorizing another submission")
+    if approved["round"] == "evaluation-10" and (
+        action["kind"] != "initial" or len(intents) >= 6 or any(item["video_id"] == video_id for item in intents)
+    ):
+        raise Pause("Evaluation permits one request per approved artifact, six total, without retries")
     history = [
         item
         for item in intents

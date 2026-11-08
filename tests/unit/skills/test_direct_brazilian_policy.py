@@ -206,3 +206,96 @@ def test_new_provider_state_requires_fresh_resubmission_safety_evidence():
     with pytest.raises(Pause, match="recoverable provider work"):
         reserve(state, action("transport", "transport_retry"))
     assert len(state["intents"]) == 1
+
+
+def evaluation_record():
+    return {
+        "approval": {
+            "round": "evaluation-10",
+            "currency": "USD",
+            "round_limit": "0.25",
+            "model": "gemini-3.8-flash",
+            "max_calls": 6,
+            "allow_retries": False,
+            "per_video": {key: str(value) for key, value in _POLICY["EVALUATION_ARTIFACT_LIMITS"].items()},
+            "user_evidence_ref": "chat:explicit-six-evaluation-approval",
+            "quote_refs": ["quote:unit"],
+        },
+        "intents": [],
+    }
+
+
+def evaluation_action(artifact="h3-native-audio-sample", **changes):
+    candidate = action(identifier=artifact, maximum=evaluation_record()["approval"]["per_video"][artifact])
+    return {**candidate, "video_id": artifact, **changes}
+
+
+def test_evaluation_round_admits_exact_six_targets_once_and_reuses_receipts():
+    state = evaluation_record()
+    for artifact in state["approval"]["per_video"]:
+        candidate = evaluation_action(artifact)
+        state, decision = reserve(state, candidate)
+        assert decision["decision"] == "reserve_before_delegating"
+        assert decide(state, candidate)["decision"] == "reconcile_existing"
+        state = reconcile(state, observed(artifact, settled=candidate["maximum"]))
+        assert decide(state, candidate)["decision"] == "reuse_complete"
+    assert len(state["intents"]) == 6
+    assert commitment(state) == _POLICY["Decimal"]("0.24")
+    with pytest.raises(Pause, match="one request per approved artifact"):
+        reserve(state, evaluation_action(intent_id="seventh", client_key="seventh", segment_id="changed"))
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("round_limit", "0.26"),
+        ("currency", "EUR"),
+        ("model", "another-model"),
+        ("max_calls", 7),
+        ("allow_retries", True),
+    ],
+)
+def test_evaluation_scope_cannot_expand_or_substitute_model(field, value):
+    state = evaluation_record()
+    state["approval"][field] = value
+    with pytest.raises(Pause, match="exact six targets"):
+        reserve(state, evaluation_action())
+    assert state["intents"] == []
+
+
+@pytest.mark.parametrize("change", ["missing", "extra", "raised_cap"])
+def test_evaluation_artifact_set_and_per_artifact_caps_are_fixed(change):
+    state = evaluation_record()
+    if change == "missing":
+        state["approval"]["per_video"].pop("known-good-av")
+    elif change == "extra":
+        state["approval"]["per_video"]["extra"] = "0.01"
+    else:
+        state["approval"]["per_video"]["known-good-av"] = "0.07"
+    with pytest.raises(Pause, match="exact six targets"):
+        reserve(state, evaluation_action())
+    assert state["intents"] == []
+
+
+@pytest.mark.parametrize("status", ["complete", "failed", "not_submitted"])
+def test_evaluation_never_retries_an_artifact_after_zero_settlement_or_changed_segment(status):
+    candidate = evaluation_action()
+    state, _ = reserve(evaluation_record(), candidate)
+    state = reconcile(
+        state,
+        observed(
+            candidate["intent_id"], status=status, settled="0", non_submission_evidence_ref="verified:not-submitted"
+        ),
+    )
+    with pytest.raises(Pause, match="one request per approved artifact"):
+        reserve(state, evaluation_action(intent_id="new", client_key="new", segment_id="different"))
+    assert len(state["intents"]) == 1
+
+
+def test_evaluation_pending_reservation_and_per_artifact_limit_stop_independent_dispatch():
+    state, _ = reserve(evaluation_record(), evaluation_action())
+    with pytest.raises(Pause, match="pending"):
+        reserve(state, evaluation_action("known-good-av"))
+    assert commitment(state) == _POLICY["Decimal"]("0.04")
+    with pytest.raises(Pause, match="allowance exhausted"):
+        reserve(evaluation_record(), evaluation_action(maximum="0.04001"))
