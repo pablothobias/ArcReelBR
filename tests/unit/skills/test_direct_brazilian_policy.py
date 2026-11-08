@@ -475,9 +475,7 @@ def test_image_fixture_allows_one_reserved_image_and_never_replacement(status):
     assert decision["decision"] == "reserve_before_delegating"
     assert commitment(state) == _POLICY["Decimal"]("2.031616")
     assert decide(state, candidate)["decision"] == "reconcile_existing"
-    state = reconcile(
-        state, observed(status=status, settled="0", non_submission_evidence_ref="verified:no-submission")
-    )
+    state = reconcile(state, observed(status=status, settled="0", non_submission_evidence_ref="verified:no-submission"))
     for kind in ("initial", "quality_regeneration", "transport_retry"):
         with pytest.raises(Pause, match="without retries"):
             reserve(state, image_fixture_action(intent_id="other", client_key="other", segment_id="changed", kind=kind))
@@ -516,3 +514,125 @@ def test_image_fixture_unknown_outcome_preserves_reservation_and_ceiling():
         reserve(image_fixture_record(), image_fixture_action(maximum="2.040001"))
     with pytest.raises(Pause, match="outside the explicitly approved round"):
         reserve(image_fixture_record(), image_fixture_action(video_id="storyboard/E1S01"))
+
+
+def image_quality_record():
+    state = image_fixture_record()
+    state["approval"].update(
+        round="image-quality-6", reference_count=0, user_evidence_ref="chat:separate-one-quality-attempt-approval"
+    )
+    state.update(
+        project_ref="image-handoff-fixture-6-20261108",
+        frozen_prompt_sha256=_POLICY["ANA_QUALITY_PROMPT_SHA256"],
+        prior_quality_attempt={
+            "round": "image-fixture-6",
+            "record_closed": True,
+            "record_ref": "private:closed-initial-record",
+            "record_sha256": "a" * 64,
+            "video_id": "character/Ana",
+            "segment_id": "character/Ana",
+            "status": "complete",
+            "review": "rejected",
+            "discarded": True,
+            "quality_attempt": 1,
+            "currency": "USD",
+            "settled_amount": "0.0679845",
+            "job_ref": "task:initial",
+            "usage_ref": "ledger:initial",
+            "state_evidence_ref": "state:initial",
+            "review_ref": "owner:rejected",
+        },
+    )
+    return state
+
+
+def image_quality_action(**changes):
+    return image_fixture_action(**{"kind": "quality_regeneration", "segment_id": "character/Ana", **changes})
+
+
+def test_new_image_quality_round_counts_attempt_two_without_rebilling_closed_history():
+    original = image_quality_record()
+    unchanged = copy.deepcopy(original)
+    state, decision = reserve(original, image_quality_action())
+    assert original == unchanged
+    assert decision["quality_attempt"] == 2
+    assert decision["round_commitment"] == "2.031616"
+    assert state["intents"][0]["quality_attempt"] == 2
+    assert state["prior_quality_attempt"] == original["prior_quality_attempt"]
+    assert commitment(state) == _POLICY["Decimal"]("2.031616")
+    assert decide(state, image_quality_action())["decision"] == "reconcile_existing"
+    state = reconcile(state, observed(settled="0.07", review="rejected", review_ref="review:new"))
+    assert commitment(state) == _POLICY["Decimal"]("0.07")
+    assert decide(state, image_quality_action())["decision"] == "reuse_complete"
+    assert state["prior_quality_attempt"]["settled_amount"] == "0.0679845"
+
+
+@pytest.mark.parametrize("status", ["complete", "failed", "not_submitted"])
+def test_new_image_quality_round_never_authorizes_replacement_after_any_settlement(status):
+    state, _ = reserve(image_quality_record(), image_quality_action())
+    state = reconcile(state, observed(status=status, settled="0", non_submission_evidence_ref="verified:not-sent"))
+    for kind in ("initial", "quality_regeneration", "transport_retry"):
+        with pytest.raises(Pause, match="no replacement or retries"):
+            reserve(state, image_quality_action(intent_id="other", client_key="other", kind=kind))
+    assert len(state["intents"]) == 1
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("status", "pending"),
+        ("review", "accepted"),
+        ("discarded", False),
+        ("record_closed", False),
+        ("quality_attempt", 2),
+        ("record_sha256", "not-a-digest"),
+        ("review_ref", ""),
+        ("settled_amount", "0"),
+        ("video_id", "character/Other"),
+        ("record_ref", None),
+    ],
+)
+def test_new_image_quality_round_requires_closed_rejected_initial_usage_evidence(field, value):
+    state = image_quality_record()
+    state["prior_quality_attempt"][field] = value
+    with pytest.raises(Pause):
+        reserve(state, image_quality_action())
+    assert state["intents"] == []
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("model", "different-model"),
+        ("provider", "other-provider"),
+        ("resolution", "2K"),
+        ("aspect_ratio", "1:1"),
+        ("reference_count", 1),
+        ("round_limit", "2.05"),
+        ("max_calls", 2),
+        ("allow_retries", True),
+        ("per_video", {"character/Other": "2.04"}),
+    ],
+)
+def test_new_image_quality_round_rejects_scope_expansion(field, value):
+    state = image_quality_record()
+    state["approval"][field] = value
+    with pytest.raises(Pause, match="exact Ana project"):
+        reserve(state, image_quality_action())
+    assert state["intents"] == []
+
+
+def test_new_image_quality_round_binds_project_prompt_shape_and_full_request_reservation():
+    for field in ("frozen_prompt_sha256", "project_ref"):
+        state = image_quality_record()
+        state[field] = "changed"
+        with pytest.raises(Pause, match="exact Ana project"):
+            reserve(state, image_quality_action())
+    for changes in ({"maximum": "0.01"}, {"segment_id": "other"}, {"kind": "initial"}):
+        with pytest.raises(Pause, match="exact bound"):
+            reserve(image_quality_record(), image_quality_action(**changes))
+    state, _ = reserve(image_quality_record(), image_quality_action())
+    state = reconcile(state, observed(status="failed", settled=None))
+    assert commitment(state) == _POLICY["Decimal"]("2.031616")
+    with pytest.raises(Pause, match="no replacement or retries"):
+        reserve(state, image_quality_action(intent_id="replacement", client_key="replacement"))

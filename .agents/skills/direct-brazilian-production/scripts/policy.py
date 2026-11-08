@@ -27,6 +27,7 @@ PRO_COMPARISON_LIMITS = {
     "pro-silence": Decimal("0.03"),
     "pro-h3": Decimal("0.11"),
 }
+ANA_QUALITY_PROMPT_SHA256 = "6a4b69786bc1306f18ee1d5b24043e663cd4e839d9df1f63238ff60cac835425"
 
 
 class Pause(ValueError):
@@ -83,7 +84,9 @@ def approval(record: dict) -> dict:
             or set(approved.get("per_video", {})) != set(PRO_COMPARISON_LIMITS)
             or any(amount(approved["per_video"][key]) != limit for key, limit in PRO_COMPARISON_LIMITS.items())
         ):
-            raise Pause("Pro comparison approval must retain the exact three cases, model, USD ceilings and no-retry scope")
+            raise Pause(
+                "Pro comparison approval must retain the exact three cases, model, USD ceilings and no-retry scope"
+            )
         return approved
     if approved.get("round") == "image-fixture-6":
         if (
@@ -99,6 +102,52 @@ def approval(record: dict) -> dict:
             or amount(approved["per_video"]["character/Ana"]) != Decimal("2.04")
         ):
             raise Pause("Image fixture approval must retain the exact Ana target, model, shape and USD ceilings")
+        return approved
+    if approved.get("round") == "image-quality-6":
+        if (
+            approved.get("currency") != "USD"
+            or amount(approved.get("round_limit")) != Decimal("2.04")
+            or approved.get("model") != "gemini-3.1-flash-image"
+            or approved.get("provider") != "gemini-aistudio"
+            or approved.get("resolution") != "1K"
+            or approved.get("aspect_ratio") != "16:9"
+            or approved.get("reference_count") != 0
+            or approved.get("max_calls") != 1
+            or approved.get("allow_retries") is not False
+            or set(approved.get("per_video", {})) != {"character/Ana"}
+            or amount(approved["per_video"]["character/Ana"]) != Decimal("2.04")
+            or record.get("project_ref") != "image-handoff-fixture-6-20261108"
+            or record.get("frozen_prompt_sha256") != ANA_QUALITY_PROMPT_SHA256
+        ):
+            raise Pause(
+                "Image quality approval must retain the exact Ana project, prompt, model, shape and USD ceilings"
+            )
+        prior = record.get("prior_quality_attempt", {})
+        if not isinstance(prior, dict):
+            raise Pause("Retain the closed rejected initial image attempt evidence snapshot")
+        digest = prior.get("record_sha256", "")
+        if (
+            prior.get("round") != "image-fixture-6"
+            or prior.get("record_closed") is not True
+            or prior.get("video_id") != "character/Ana"
+            or prior.get("segment_id") != "character/Ana"
+            or prior.get("status") != "complete"
+            or prior.get("review") != "rejected"
+            or prior.get("discarded") is not True
+            or prior.get("quality_attempt") != 1
+            or prior.get("currency") != "USD"
+            or amount(prior.get("settled_amount")) != Decimal("0.0679845")
+            or not all(
+                isinstance(prior.get(key), str) and prior[key].strip()
+                for key in ("record_ref", "job_ref", "usage_ref", "state_evidence_ref", "review_ref")
+            )
+            or not isinstance(digest, str)
+            or len(digest) != 64
+            or any(char not in "0123456789abcdef" for char in digest)
+        ):
+            raise Pause(
+                "Retain the closed rejected initial image attempt and its charged usage, review and record-hash evidence"
+            )
         return approved
     if approved.get("round") not in {"sample-9", "pilot-11", "continuity-12"}:
         raise Pause("Choose a separately approved sample, pilot or continuity round")
@@ -164,6 +213,13 @@ def decide(record: dict, action: dict) -> dict:
     # Any unresolved submission in the round may already be charged or producing media.
     if any(item["status"] == "pending" for item in intents):
         raise Pause("Reconcile all pending jobs before authorizing another submission")
+    if approved["round"] == "image-quality-6" and (
+        action["kind"] != "quality_regeneration"
+        or intents
+        or action["segment_id"] != "character/Ana"
+        or maximum != Decimal("2.031616")
+    ):
+        raise Pause("One newly approved quality request must reserve the exact bound; no replacement or retries")
     if approved["round"] in {"evaluation-10", "diagnostic-10", "pro-comparison-10", "image-fixture-6"} and (
         action["kind"] != "initial"
         or len(intents) >= approved["max_calls"]
@@ -178,6 +234,8 @@ def decide(record: dict, action: dict) -> dict:
         and item["status"] != "not_submitted"
     ]
     latest = history[-1] if history else None
+    if latest is None and approved["round"] == "image-quality-6":
+        latest = record["prior_quality_attempt"]
     kind = action["kind"]
     if kind == "initial":
         if history:
