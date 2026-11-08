@@ -1,0 +1,79 @@
+{
+  "status": "applied_once_read_back_verified_no_generation",
+  "method": "PATCH",
+  "endpoint": "/api/v1/providers/gemini-aistudio/models/gemini-3.1-flash-image",
+  "entry_source": "modified",
+  "technical_facts": {
+    "max_input_tokens": 131072,
+    "max_output_tokens": 32768
+  },
+  "price": {
+    "currency": "USD",
+    "meters": [
+      {
+        "meter": "uncached_input_tokens",
+        "dims": [],
+        "rows": [
+          {
+            "when": {},
+            "price": 0.5
+          }
+        ]
+      },
+      {
+        "meter": "output_tokens",
+        "dims": [],
+        "rows": [
+          {
+            "when": {},
+            "price": 3.0
+          }
+        ]
+      },
+      {
+        "meter": "image_output_tokens",
+        "dims": [],
+        "rows": [
+          {
+            "when": {},
+            "price": 60.0
+          }
+        ]
+      }
+    ]
+  },
+  "preserved_other_facts_names_settings": true,
+  "official_snapshot_unchanged": true,
+  "official_sha256": "8ec1d4808e999e0cf5e6109edbce7647b7a78c51a0d3d2358e7099abee656eae",
+  "before_source": "official",
+  "provider_multiplier": 1.0,
+  "model_multiplier": "1",
+  "conservative_quote_usd": "2.0316160",
+  "single_image_existing_service_preview": {
+    "estimated_cost": {
+      "USD": 2.031616
+    },
+    "unpriced_count": 0,
+    "estimate_basis": "full_context_output_upper_bound"
+  },
+  "real_project_preview_empty_assets": true,
+  "active_tasks_after": 0,
+  "restore_plan_ref": "/tmp/arcreel-goal-state/media-preflight/image-override-preparation/restore-plan.json",
+  "paid_calls": 0,
+  "initial_unhydrated_standalone_preview_not_authoritative": {
+    "estimated_cost": null,
+    "unpriced_count": 1
+  },
+  "quote_process_normal_catalog_startup_hydrated": true,
+  "effective_quote_entry_matches_saved_user_copy": true,
+  "independent_review": "Independent Codex live entry/preservation/official-hash and normally hydrated existing quote-service verification passed; no generation",
+  "configuration_provenance": "Local user-entry override verified from official Google sources; no official dataset/snapshot change",
+  "technical_limit_quote_not_expected_cost": true,
+  "real_project_preview": {
+    "targets": [],
+    "skipped": [],
+    "estimated_cost": null,
+    "unpriced_count": 0
+  },
+  "private_backups_and_restore_plan": "/tmp/arcreel-goal-state/media-preflight/image-override-preparation"
+}
