@@ -1,6 +1,6 @@
 # Controlled same-model audio diagnostic proposal
 
-Status: proposed only, 2026-11-08. No new inference is authorized or dispatched. The earlier six-call evaluation allowance is closed and supplies no allowance for this proposal. This is a small falsifiable follow-up to [the established failures and offline diagnosis](evaluation-diagnosis.md), not a replacement evaluator or a reliability study.
+Status: the separately approved four-case diagnostic completed on 2026-11-08; its outcomes appear below the frozen proposal. No further inference is authorized. The earlier six-call evaluation allowance remains closed. This is a small falsifiable follow-up to [the established failures and offline diagnosis](evaluation-diagnosis.md), not a replacement evaluator or a reliability study.
 
 ## Question and controlled variable
 
@@ -53,3 +53,24 @@ Use an explicitly supplied `httpx.AsyncClient` with transport retries zero and r
 If the original condition no longer reproduces the failure, report non-reproduction. If only the audio-contract condition improves an auditory readout, report a hypothesis-consistent diagnostic observation, not an isolated cause. If failures persist, report that persistence without claiming to have ruled out all framing or media-path explanations. One run per cell supports no statistical reliability estimate, no general video/lip-sync capability conclusion and no automatic acceptance gate. Any further causal probe needs its own design and authorization.
 
 Final treatment schema SHA-256: `11bcf9eb646ef50bd9de62c3cad42509429e0c909f36bc334fa18a367ee0f91f`. Its exact deletion-only diff is recorded privately as `exact-schema-diff.json`; common speech definitions are byte-equivalent after canonical JSON serialization.
+
+## Approved execution and observed results
+
+The owner approved exactly “Sim, aprovo US$ 0,04 para os quatro casos” in question `call_8dbd2f9d4fcf4ac18808e025c157549e`, after this proposal was frozen in `b8a96ad1d`. A fresh `diagnostic-10` recovery record reserved USD 0.01 before each request. Independent Codex review cleared the policy and private bounded caller before dispatch. The historical six-call record remained closed and unchanged.
+
+All four calls ran once in the specified order, using the same configured account and exact model. Actual serialized bodies were captured before forwarding and matched every frozen body hash. Four durable single-forward sentinels exist, all responses ended `STOP`, and all usage was settled. No retries, fifth call or media generation occurred. The record is closed with no pending request. Private wire/response/usage/recovery evidence is under `/tmp/arcreel-goal-state/evaluation-diagnosis/retest-proposal/`; [sanitized results](evidence/10-audiovisual/four-case-diagnostic-results.json) preserve response IDs, usage, hashes and raw semantic observations.
+
+| Case | Raw semantic observation before guards | Recorded usage cost, USD |
+|---|---|---:|
+| A, silence/original | No speech claimed this time, but invented hum/click and a lab-coat/examination-room scene | 0.001548 |
+| B, wrong speech/modality-only | Correct words after punctuation/case normalization; no visual assertion in audio/limits text; labels the synthetic Luciana voice male | 0.00147375 |
+| C, wrong speech/original | Correct words, but invented a visible man, subtitles/timings and an off-camera spatial claim | 0.00336075 |
+| D, silence/modality-only | Invented English speech, “so this is what it looks like on my hand”, plus skincare-product hand actions in the audio description | 0.0010335 |
+
+Total recorded list-price cost from returned usage: **USD 0.007416**. The unused USD 0.032584 authorizes no additional call. No thoughts-token count was reported; input plus candidate counts equaled each response's total count. This is usage-based accounting, not independent invoice verification.
+
+Both silence requests used the identical 4.5-second WAV with 72,000 mono 16-bit samples, all zero, independently rechecked after execution. Therefore D's confident speech claim contradicts the actual signal. Positive visual claims reproduced in the original contract, and visual action leaked into a retained free-text field in the modality-only contract. **Removing those root schema fields alone is insufficient to prevent unsupported semantic claims.** Their mechanical absence is not a successful perception result. A's earlier false-speech failure did not reproduce in this one new call, while false sound and visual claims did.
+
+The same existing offline validator was then applied to all saved outcomes without any provider call: A/C rejected for forbidden audio-only fields; B was `consistent_requires_review`; D rejected for `speech_on_zero_pcm`. A/C's structural rejection is separate from the raw positive unsupported claims above. B's status is not quality acceptance, and free-text claims still require review.
+
+This one run per cell does not establish reliability or a definitive cause. Retained visual vocabulary, stochastic output, unobserved reasoning allocation and provider serving state remain confounds. Explicit HTTPx delivery is controlled across these four calls but was not captured or necessarily identical in the historical six-call run. No general video, identity, acting or lip-sync capability conclusion follows from this diagnostic.

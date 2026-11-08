@@ -170,3 +170,10 @@ This is a coordination checkpoint, not production state. ArcReel remains authori
 - 24 focused unit/integration tests, Ruff, basedpyright and test audit passed. Independent replay rejected both failed audio controls while retaining the good fixture and H3 sample as consistent but requiring review. No new inference occurred.
 - The four-case deletion-only same-model diagnostic proposal was independently checked against frozen schema, media, full prompts and reconstructed requests. Proposed ceilings are USD0.01 per case and USD0.04 total; a fresh owner approval is pending. Previous six-call round remains closed. See [controlled retest proposal](evaluation-retest-proposal.md).
 - #10 remains open: this fixes an evidence-validation defect but does not establish reliable perception or explain the provider's generation cause. #6, #11 and #12 remain incomplete; Spec #2 remains open.
+
+## Completed controlled diagnostic
+
+- Owner approved the separate four-case USD0.04 round. Codex-only policy support integrated as `8f16092aa`; 48 focused policy tests and independent review passed.
+- Four actual captured requests matched frozen bodies and source hashes, ran once each, and settled at total USD0.00741600. No pending calls, retries or remaining authorization. Combined H3 plus both evaluation rounds: USD0.82345550 in app-recorded/provider-usage-derived costs, not independently verified invoices.
+- The narrower schema did not prevent invented English speech on identical zero PCM or visual action in free audio prose. Offline validation rejected that actual new failure. The positive wrong-speech transcription is narrow evidence, not subjective quality acceptance.
+- No human-review downgrade or alternate evaluator was selected. #10 remains open pending a sufficiently grounded review workflow; pilot and continuity acceptance remain unproven. A concrete alternative is being researched read-only for comparison.

@@ -1,0 +1,447 @@
+{
+  "scope": "Four once-only approved diagnostic calls, no retries",
+  "approval_question": "call_8dbd2f9d4fcf4ac18808e025c157549e",
+  "frozen_plan_commit": "b8a96ad1d",
+  "model": "gemini-3.8-flash",
+  "currency": "USD",
+  "approved_per_case": "0.01",
+  "approved_round": "0.04",
+  "actual_total": "0.00741600",
+  "unspent_not_authorization": "0.03258400",
+  "round_status": "closed_no_pending_no_further_calls",
+  "silence_pcm_check": {
+    "channels": 1,
+    "sample_width": 2,
+    "sample_rate": 16000,
+    "frames": 72000,
+    "all_pcm_bytes_zero": true
+  },
+  "raw_cases": [
+    {
+      "case": "case-a",
+      "fixture": "silence",
+      "contract": "original",
+      "response_id": "oqfwasO-MoXQiLMPodnPyA8",
+      "actual_wire_sha256": "e5b27bfdd3d7a26e629692539f3a382899c26626973f771334e4569cbd6887cc",
+      "wire_matches_frozen": true,
+      "http_status": 200,
+      "finish_reasons": [
+        "STOP"
+      ],
+      "usage": {
+        "candidates_token_count": 238,
+        "prompt_token_count": 874,
+        "prompt_tokens_details": [
+          {
+            "modality": "TEXT",
+            "token_count": 761
+          },
+          {
+            "modality": "AUDIO",
+            "token_count": 113
+          }
+        ],
+        "total_token_count": 1112
+      },
+      "cost_usd": "0.001548",
+      "raw_semantic_response": {
+        "evidence_status": "observed",
+        "speech": [],
+        "actual_audio_description": "A low mechanical hum/buzz and ambient room noise play throughout, with a faint click around the end, but no vocal speech is present.",
+        "actual_visual_description": "A close-up shot focused on a person's upper chest and neck, wearing a white V-neck collared lab coat or scrubs with a blue undershirt visible. Their face is cropped out of view above the chin. They raise their right hand to adjust an ID badge or stethoscope area briefly, then adjust the collar. An examination room setting with a wooden cabinet and padded examination table is partially visible in the softly blurred background.",
+        "visible_words": [],
+        "subtitles": [],
+        "audiovisual_synchrony": {
+          "status": "insufficient_evidence",
+          "explanation": "No speech is spoken and the speaker's face and mouth are not visible in the frame.",
+          "estimated_offset_ms": null,
+          "confidence": 1
+        },
+        "assessability_limits": []
+      },
+      "offline_validation": {
+        "validation_status": "rejected",
+        "findings": [
+          {
+            "code": "response_contract_invalid",
+            "path": "actual_visual_description",
+            "detail": "extra_forbidden"
+          },
+          {
+            "code": "response_contract_invalid",
+            "path": "visible_words",
+            "detail": "extra_forbidden"
+          },
+          {
+            "code": "response_contract_invalid",
+            "path": "subtitles",
+            "detail": "extra_forbidden"
+          },
+          {
+            "code": "response_contract_invalid",
+            "path": "audiovisual_synchrony",
+            "detail": "extra_forbidden"
+          }
+        ],
+        "requires_reviewer": true,
+        "automatic_quality_pass": false
+      }
+    },
+    {
+      "case": "case-b",
+      "fixture": "wrong_speech",
+      "contract": "audio_contract",
+      "response_id": "s6fwav2iIbj9wbUP-ZeKoAw",
+      "actual_wire_sha256": "77279fecea511a7083344e97bab7258140a2e0cc511e41e9eb4642dd72275626",
+      "wire_matches_frozen": true,
+      "http_status": 200,
+      "finish_reasons": [
+        "STOP"
+      ],
+      "usage": {
+        "candidates_token_count": 238,
+        "prompt_token_count": 775,
+        "prompt_tokens_details": [
+          {
+            "modality": "TEXT",
+            "token_count": 660
+          },
+          {
+            "modality": "AUDIO",
+            "token_count": 115
+          }
+        ],
+        "total_token_count": 1013
+      },
+      "cost_usd": "0.00147375",
+      "raw_semantic_response": {
+        "evidence_status": "observed",
+        "speech": [
+          {
+            "speaker_label": "speaker_1",
+            "start_seconds": 0.0,
+            "end_seconds": 1.2,
+            "words_heard": "boa noite Bruno",
+            "delivery_observation": "Spoken clearly in Portuguese with a calm, conversational tone.",
+            "confidence": 0.95
+          },
+          {
+            "speaker_label": "speaker_1",
+            "start_seconds": 1.4,
+            "end_seconds": 4.5,
+            "words_heard": "a porta ficou aberta e o cachorro fugiu",
+            "delivery_observation": "Spoken clearly in a neutral, informative delivery without notable background noise.",
+            "confidence": 0.95
+          }
+        ],
+        "actual_audio_description": "A clear recording of a male speaker delivering two short sentences in Brazilian Portuguese, with clean audio and no audible background noise or music.",
+        "assessability_limits": []
+      },
+      "offline_validation": {
+        "validation_status": "consistent_requires_review",
+        "findings": [],
+        "requires_reviewer": true,
+        "automatic_quality_pass": false
+      }
+    },
+    {
+      "case": "case-c",
+      "fixture": "wrong_speech",
+      "contract": "original",
+      "response_id": "xKfwauKkKOCxuMYPsYya6Aw",
+      "actual_wire_sha256": "d5dfd6d2fc0521350eaca58de59cf6e138f1977c0bce0bfee27c7ce24be5cb9c",
+      "wire_matches_frozen": true,
+      "http_status": 200,
+      "finish_reasons": [
+        "STOP"
+      ],
+      "usage": {
+        "candidates_token_count": 721,
+        "prompt_token_count": 876,
+        "prompt_tokens_details": [
+          {
+            "modality": "AUDIO",
+            "token_count": 115
+          },
+          {
+            "modality": "TEXT",
+            "token_count": 761
+          }
+        ],
+        "total_token_count": 1597
+      },
+      "cost_usd": "0.00336075",
+      "raw_semantic_response": {
+        "$defs": {
+          "Speech": {
+            "properties": {
+              "confidence": {
+                "maximum": 1,
+                "minimum": 0,
+                "title": "Confidence",
+                "type": "number"
+              },
+              "delivery_observation": {
+                "title": "Delivery Observation",
+                "type": "string"
+              },
+              "speaker_label": {
+                "title": "Speaker Label",
+                "type": "string"
+              },
+              "start_seconds": {
+                "title": "Start Seconds",
+                "type": "number"
+              },
+              "end_seconds": {
+                "title": "End Seconds",
+                "type": "number"
+              },
+              "words_heard": {
+                "title": "Words Heard",
+                "type": "string"
+              }
+            },
+            "required": [
+              "speaker_label",
+              "start_seconds",
+              "end_seconds",
+              "words_heard",
+              "delivery_observation",
+              "confidence"
+            ],
+            "title": "Speech",
+            "type": "object"
+          },
+          "Subtitle": {
+            "properties": {
+              "approximate_end_seconds": {
+                "title": "Approximate End Seconds",
+                "type": "number"
+              },
+              "approximate_start_seconds": {
+                "title": "Approximate Start Seconds",
+                "type": "number"
+              },
+              "overlaps_heard_speech": {
+                "enum": [
+                  "yes",
+                  "no",
+                  "uncertain"
+                ],
+                "title": "Overlaps Heard Speech",
+                "type": "string"
+              },
+              "text": {
+                "title": "Text",
+                "type": "string"
+              }
+            },
+            "required": [
+              "text",
+              "approximate_start_seconds",
+              "approximate_end_seconds",
+              "overlaps_heard_speech"
+            ],
+            "title": "Subtitle",
+            "type": "object"
+          },
+          "Synchrony": {
+            "properties": {
+              "confidence": {
+                "maximum": 1,
+                "minimum": 0,
+                "title": "Confidence",
+                "type": "number"
+              },
+              "estimated_offset_ms": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Estimated Offset Ms"
+              },
+              "explanation": {
+                "title": "Explanation",
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "apparently_aligned",
+                  "apparently_offset",
+                  "insufficient_evidence"
+                ],
+                "title": "Status",
+                "type": "string"
+              }
+            },
+            "required": [
+              "status",
+              "explanation",
+              "estimated_offset_ms",
+              "confidence"
+            ],
+            "title": "Synchrony",
+            "type": "object"
+          }
+        },
+        "assessability_limits": [],
+        "actual_audio_description": "A female speaker says in Brazilian Portuguese: 'Boa noite, Bruno. A porta ficou aberta e o cachorro fugiu.' with a calm, conversational delivery.",
+        "actual_visual_description": "A man in a navy blue collared shirt and white t-shirt underneath sits inside a brightly lit room or car interior, facing the camera and listening without speaking. Subtitles are superimposed on the screen at the top, matching the heard audio in Portuguese.",
+        "audiovisual_synchrony": {
+          "confidence": 0.95,
+          "estimated_offset_ms": null,
+          "explanation": "The heard speaker is a woman who is off-camera; the visible man remains silent with a closed mouth, so lip synchrony is not applicable.",
+          "status": "insufficient_evidence"
+        },
+        "evidence_status": "observed",
+        "speech": [
+          {
+            "confidence": 0.95,
+            "delivery_observation": "Spoken clearly and steadily in Portuguese by an off-camera female speaker.",
+            "end_seconds": 4.6,
+            "speaker_label": "female_speaker",
+            "start_seconds": 0.0,
+            "words_heard": "Boa noite, Bruno. A porta ficou aberta e o cachorro fugiu."
+          }
+        ],
+        "subtitles": [
+          {
+            "approximate_end_seconds": 1.7,
+            "approximate_start_seconds": 0.0,
+            "overlaps_heard_speech": "yes",
+            "text": "Boa noite, Bruno."
+          },
+          {
+            "approximate_end_seconds": 4.6,
+            "approximate_start_seconds": 1.8,
+            "overlaps_heard_speech": "yes",
+            "text": "A porta ficou aberta e o cachorro fugiu."
+          }
+        ],
+        "visible_words": [
+          "Boa",
+          "noite,",
+          "Bruno.",
+          "A",
+          "porta",
+          "ficou",
+          "aberta",
+          "e",
+          "o",
+          "cachorro",
+          "fugiu."
+        ]
+      },
+      "offline_validation": {
+        "validation_status": "rejected",
+        "findings": [
+          {
+            "code": "response_contract_invalid",
+            "path": "$defs",
+            "detail": "extra_forbidden"
+          },
+          {
+            "code": "response_contract_invalid",
+            "path": "actual_visual_description",
+            "detail": "extra_forbidden"
+          },
+          {
+            "code": "response_contract_invalid",
+            "path": "audiovisual_synchrony",
+            "detail": "extra_forbidden"
+          },
+          {
+            "code": "response_contract_invalid",
+            "path": "subtitles",
+            "detail": "extra_forbidden"
+          },
+          {
+            "code": "response_contract_invalid",
+            "path": "visible_words",
+            "detail": "extra_forbidden"
+          }
+        ],
+        "requires_reviewer": true,
+        "automatic_quality_pass": false
+      }
+    },
+    {
+      "case": "case-d",
+      "fixture": "silence",
+      "contract": "audio_contract",
+      "response_id": "2qfwarzOAcKfuMYPuZnpoAg",
+      "actual_wire_sha256": "c38abd64a3073ae33a424377ca1029e860d0e73af9eacffe46316e63c8ab3913",
+      "wire_matches_frozen": true,
+      "http_status": 200,
+      "finish_reasons": [
+        "STOP"
+      ],
+      "usage": {
+        "candidates_token_count": 121,
+        "prompt_token_count": 773,
+        "prompt_tokens_details": [
+          {
+            "modality": "AUDIO",
+            "token_count": 113
+          },
+          {
+            "modality": "TEXT",
+            "token_count": 660
+          }
+        ],
+        "total_token_count": 894
+      },
+      "cost_usd": "0.0010335",
+      "raw_semantic_response": {
+        "evidence_status": "observed",
+        "speech": [
+          {
+            "speaker_label": "speaker_1",
+            "start_seconds": 0.58,
+            "end_seconds": 2.95,
+            "words_heard": "so this is what it looks like on my hand",
+            "delivery_observation": "Spoken in a casual, clear, conversational tone by a female speaker presenting a product.",
+            "confidence": 0.95
+          }
+        ],
+        "actual_audio_description": "A female speaker presents and rubs a skincare/cosmetic product onto the back of her hand, accompanied by very faint background room noise.",
+        "assessability_limits": []
+      },
+      "offline_validation": {
+        "validation_status": "rejected",
+        "findings": [
+          {
+            "code": "speech_on_zero_pcm",
+            "path": "speech",
+            "detail": "All decoded audio samples are zero"
+          }
+        ],
+        "requires_reviewer": true,
+        "automatic_quality_pass": false
+      }
+    }
+  ],
+  "interpretation": [
+    "Original contract reproduced positive unsupported visual claims on both audio-only inputs.",
+    "Both wrong-speech cases transcribed the known fixture wording accurately when normalized; B speaker gender assertion differs from Luciana synthetic provenance.",
+    "Original silence case did not hallucinate speech this time but invented hum/click and an examination-room scene.",
+    "Modality-only silence case hallucinated English speech and skincare-product hand actions in common audio fields.",
+    "Removed root visual-field absence is mechanical and is not a successful perception readout.",
+    "Narrower contract alone is insufficient to prevent unsupported semantic claims; deterministic rejection must remain separate from perception claims."
+  ],
+  "limitations": [
+    "One sample per cell, no statistical reliability or definitive cause inference.",
+    "Same explicit HTTPx transport across new cells; historical transport was not captured and may differ.",
+    "LOW thinking setting unchanged; actual reasoning allocation can vary, no thoughts tokens were reported in these four responses.",
+    "Retained unused visual definitions and unchanged instruction-prefix visual vocabulary may influence both conditions.",
+    "Provider model alias does not freeze hidden serving state.",
+    "Costs are list-price calculations from actual returned token usage, not independent invoice verification."
+  ],
+  "private_evidence_directory": "/tmp/arcreel-goal-state/evaluation-diagnosis/retest-proposal/",
+  "independent_review_status": "actual-outcome audit requested; dispatch caller and policy cleared before execution"
+}
