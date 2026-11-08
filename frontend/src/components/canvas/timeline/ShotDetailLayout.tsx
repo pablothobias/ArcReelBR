@@ -67,20 +67,20 @@ export function ShotSection({
 }) {
   const titleId = useId();
   const heading = htmlFor ? (
-    <label id={titleId} htmlFor={htmlFor} className="text-xs font-medium text-muted-foreground">
+    <label id={titleId} htmlFor={htmlFor} className="shrink-0 text-xs font-medium text-muted-foreground">
       {title}
     </label>
   ) : (
-    <h3 id={titleId} className="text-xs font-medium text-muted-foreground">
+    <h3 id={titleId} className="shrink-0 text-xs font-medium text-muted-foreground">
       {title}
     </h3>
   );
   return (
     <section aria-labelledby={titleId} className="flex min-w-0 flex-col gap-2">
-      <div className="flex min-h-7 items-center gap-1.5">
+      <div className="flex min-h-7 flex-wrap items-center gap-1.5">
         {icon ? <span className="flex text-muted-foreground">{icon}</span> : null}
         {heading}
-        {actions ? <div className="ml-auto flex items-center gap-1">{actions}</div> : null}
+        {actions ? <div className="ml-auto flex max-w-full flex-wrap items-center gap-1">{actions}</div> : null}
       </div>
       {children}
     </section>

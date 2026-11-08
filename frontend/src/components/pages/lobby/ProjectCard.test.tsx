@@ -34,3 +34,18 @@ describe("ProjectCard poster", () => {
     expect(posterSrc(inline)).toBe(inline);
   });
 });
+
+describe("ProjectCard episode progress", () => {
+  it("reports completed and in-production episodes as text", () => {
+    const item = project(null);
+    item.status = {
+      needs_repair: false,
+      repair_reason: null,
+      assets: {},
+      episodes_summary: { total: 3, scripted: 3, in_production: 1, completed: 1 },
+      source_remaining: false,
+    };
+    const { getByText } = render(<ProjectCard project={item} readOnly />);
+    expect(getByText("已完成 1 / 3 集 · 制作中 1 集")).toBeInTheDocument();
+  });
+});

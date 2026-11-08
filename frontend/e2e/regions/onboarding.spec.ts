@@ -94,7 +94,7 @@ defineRegionScenarios("新手引导", [
     api: UNSEEN,
     ready: tourReady,
     act: async (page) => {
-      await expect(tourTitle(page)).toHaveText("欢迎使用 ArcReel");
+      await expect(tourTitle(page)).toHaveText("欢迎使用 RafaCena");
       await expect(tour(page)).toBeInViewport({ ratio: 1 });
     },
     screenshot: { name: "onboarding-welcome" },
@@ -144,8 +144,8 @@ defineRegionScenarios("新手引导", [
     },
   },
   ...([
-    ["vi", "越南语", "Chào mừng đến với ArcReel"],
-    ["ru", "俄语", "Добро пожаловать в ArcReel"],
+    ["vi", "越南语", "Chào mừng đến với RafaCena"],
+    ["ru", "俄语", "Добро пожаловать в RafaCena"],
   ] as const).map(([locale, label, welcomeTitle]) => ({
     name: `${label}：每一步的气泡都完整落在视口内`,
     path: LOBBY_PATH,
@@ -228,7 +228,7 @@ test("已有新建项目向导时启动引导：焦点只归气泡，结束后�
   }
   await tour(page).locator(".driver-popover-next-btn").focus();
   await page.keyboard.press("Enter");
-  await expect(tourTitle(page)).not.toHaveText("欢迎使用 ArcReel");
+  await expect(tourTitle(page)).not.toHaveText("欢迎使用 RafaCena");
   await expect(wizard).toBeVisible();
 
   await page.keyboard.press("Escape");

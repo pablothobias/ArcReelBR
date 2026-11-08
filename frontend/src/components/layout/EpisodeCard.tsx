@@ -24,7 +24,7 @@ interface EpisodeCardProps {
 
 const STATUS_DOT: Record<string, string> = {
   completed: "bg-good",
-  in_production: "animate-breath bg-primary",
+  in_production: "animate-breath bg-brand-accent",
   scripted: "bg-subtle-foreground",
   draft: "bg-muted-foreground",
   missing: "bg-muted-foreground",

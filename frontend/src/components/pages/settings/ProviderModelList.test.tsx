@@ -131,11 +131,11 @@ describe("ProviderModelList", () => {
 
     const row = (await screen.findByText("Chat Next")).closest("li");
     expect(row).not.toBeNull();
-    expect(within(row!).getByText("需要 ArcReel ≥ 0.36.0")).toBeInTheDocument();
+    expect(within(row!).getByText("需要 RafaCena ≥ 0.36.0")).toBeInTheDocument();
     expect(within(row!).getByRole("switch", { name: /Chat Next/ })).toHaveAttribute("aria-disabled", "true");
     expect(within(row!).queryByRole("button")).not.toBeInTheDocument();
     // Version-compatible rows omit annotations and still open Sheets.
-    expect(screen.getAllByText(/需要 ArcReel/)).toHaveLength(1);
+    expect(screen.getAllByText(/需要 RafaCena/)).toHaveLength(1);
     fireEvent.click(screen.getByText("Chat One"));
     await waitFor(() => expect(getModel).toHaveBeenCalled());
   });

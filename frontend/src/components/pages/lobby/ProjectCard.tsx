@@ -36,7 +36,7 @@ type ProjectCardProps = { project: ProjectSummary } & (
 
 const PROGRESS_DOT: Record<ProjectProgress, string> = {
   empty: "bg-muted-foreground",
-  in_progress: "bg-primary",
+  in_progress: "bg-brand-accent",
   completed: "bg-good",
 };
 
@@ -163,7 +163,7 @@ function EpisodeStrip({ summary }: { summary: ProjectStatus["episodes_summary"] 
             i < summary.completed
               ? "bg-good"
               : i < inProductionEnd
-                ? "bg-primary"
+                ? "bg-brand-accent"
                 : i < scriptedEnd
                   ? "bg-muted-foreground"
                   : "bg-muted",
@@ -180,7 +180,11 @@ function episodesText(status: ProjectStatus | null, progress: ProjectProgress, t
   const episodes = status?.episodes_summary;
   if (!episodes || episodes.total === 0) return t("dashboard:lobby_card_no_episodes");
   if (progress === "completed") return t("dashboard:lobby_card_episode_count", { count: episodes.total });
-  return t("dashboard:lobby_card_progress", { completed: episodes.completed, total: episodes.total });
+  const completed = t("dashboard:lobby_card_progress", { completed: episodes.completed, total: episodes.total });
+  const inProduction = episodes.in_production > 0
+    ? t("dashboard:lobby_card_in_production", { count: episodes.in_production })
+    : null;
+  return [completed, inProduction].filter(Boolean).join(" · ");
 }
 
 function updatedText(lastActivityAt: string | null | undefined, lang: string, t: Translate): string | null {

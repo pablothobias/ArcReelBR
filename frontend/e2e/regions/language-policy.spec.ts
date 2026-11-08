@@ -12,7 +12,7 @@ for (const browserLanguage of ['zh-CN', 'vi-VN', 'ru-RU', 'pt-BR']) {
       await page.goto('/login?lng=zh');
       await expect(page.getByRole('button', { name: 'Login', exact: true })).toBeVisible();
       await expect(page.locator('html')).toHaveAttribute('lang', 'en');
-      await expect(page).toHaveTitle('ArcReel · Agent-powered AI video creation workspace');
+      await expect(page).toHaveTitle('RafaCena · Agent-powered AI video creation workspace');
       await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', 'An AI video creation workspace for projects, scripts, storyboards, video generation and Agent conversations.');
       await page.getByLabel('Username', { exact: true }).fill('disposable');
       await page.getByLabel('Password', { exact: true }).fill('invalid');

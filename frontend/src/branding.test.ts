@@ -17,7 +17,7 @@ describe('brand metadata', () => {
     expect(initial.documentElement.lang).toBe('en');
     expect(initial.title).toBe(BRAND_DOCUMENT_TITLE);
     expect(initial.querySelector('meta[name="description"]')?.getAttribute('content')).toBe(BRAND.description);
-    expect(BRAND_DOCUMENT_TITLE).toBe('ArcReel · Agent-powered AI video creation workspace');
+    expect(BRAND_DOCUMENT_TITLE).toBe('RafaCena · Agent-powered AI video creation workspace');
   });
 
   it('preserves trimmed owner overrides literally and uses defaults for blanks', async () => {
