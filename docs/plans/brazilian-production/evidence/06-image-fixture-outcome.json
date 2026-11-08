@@ -1,0 +1,82 @@
+{
+  "status": "closed_owner_rejected_discarded_not_promoted",
+  "approval": {
+    "question": "call_8270214e39304501a7f6d1f5d53d60a2",
+    "owner_reply": "Sim, aprovo US$ 2,04 para esta amostra",
+    "round_ceiling_usd": "2.04",
+    "scope": "OneinitialAna1K16:9character-sheet,exactgemini-aistudio/gemini-3.1-flash-image,noreferences"
+  },
+  "project": "image-handoff-fixture-6-20261108",
+  "task_id": "0ddb715b6b1b4e20bbbb03b5276a660f",
+  "batch_id": "c2999e34f58644318dde87de5be08023",
+  "ledger_id": 20,
+  "sole_generation_completed": true,
+  "artifact": {
+    "project_path": "characters/Ana.png",
+    "actual_format": "JPEG",
+    "extension_mismatch_preserved": true,
+    "dimensions": [
+      1376,
+      768
+    ],
+    "bytes": 357068,
+    "sha256": "798741b81a9b82fff30a40ac312be5cb659739ec217de1092955f06d74a1af25",
+    "historical_version": 1,
+    "version_file": "versions/characters/Ana_v1_20261108T143753.png",
+    "approved_prompt_sha256": "385dd99642c91e4ce889435b71c06db36305635b5bac8ff16a7ab85ca258f720"
+  },
+  "owner_review": {
+    "decision": "rejected",
+    "reasons": [
+      "3D/artificial appearance",
+      "not realistic"
+    ],
+    "discarded": true,
+    "not_accepted_for_creative_handoff": true
+  },
+  "cost": {
+    "currency": "USD",
+    "input_tokens": 147,
+    "image_output_tokens": 1120,
+    "text_including_thinking_output_tokens": 237,
+    "total_candidate_output_tokens": 1357,
+    "total_tokens": 1504,
+    "recorded_float_amount": 0.06798449999999999,
+    "settled_exact_amount": "0.0679845",
+    "reserved_maximum": "2.031616",
+    "released_unused_reservation": "1.9636315",
+    "unused_owner_allowance_not_authorization": "1.9720155",
+    "settled_once": true,
+    "retry_count": 0,
+    "all_attempt_audit": "IndependentCodex verified sole task/ledger,1officialselectedmodelPOSTHTTP200/noexecutionwindowretry; SDKretryoff/outerverifiedunsentonly",
+    "actual_wire_capture": false
+  },
+  "post_outcome_actions": {
+    "uploads": 0,
+    "version_selections": 0,
+    "downstream_previews_or_promotions": 0,
+    "regenerations": 0,
+    "source_and_version_bytes_preserved": true
+  },
+  "authorized_preparation_only": {
+    "owning_route": "PATCH /api/v1/projects/{name}",
+    "only_project_field_changed": "style",
+    "unsupported_field_not_sent": "style_description",
+    "description_and_script_unchanged": true,
+    "new_style": "Photorealistic live-action human casting-sheet photography captured with a real camera and portrait lens. A real adult person with visible natural skin pores, fine individual hair, subtle natural facial asymmetry, realistic anatomy and authentic woven cloth texture. Soft real studio lighting and natural photographic color. Preserve the same Ana identity and clothing across front, exact side and rear views on a clean white seamless background. Avoid 3D renders, CGI, dolls, plastic or waxy skin, artificial mannequin appearance, illustration, cartoons, digital painting and beauty-filter smoothing.",
+    "old_selected_version_after_style_change": 1,
+    "artifact_currency": "stale",
+    "new_compiled_prompt_sha256": "6a4b69786bc1306f18ee1d5b24043e663cd4e839d9df1f63238ff60cac835425",
+    "old_frozen_approval_reused": false,
+    "new_generation_approval": null,
+    "no_new_provider_call": true
+  },
+  "pause": "owner_rejected_image_no_further_action_authorized",
+  "private_evidence_directory": "/tmp/arcreel-goal-state/image-fallback-fixture",
+  "independent_review": "Billing/actualartifactverified; newstyleproposalreadbackpendingcoordinatorreview",
+  "limits": [
+    "Owner rejected output; generatedartifactdoesnotcomplete#6upload/creativehandoffacceptance.",
+    "Explicitphotographicpromptcorrectionhasnotbeengeneratedanddoesnotprovequality.",
+    "No newimageorhumanassistedpilotreviewisapproved."
+  ]
+}
