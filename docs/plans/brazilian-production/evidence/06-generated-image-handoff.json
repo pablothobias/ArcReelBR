@@ -1,0 +1,192 @@
+{
+  "purpose": "Isolated local technical ingestion and H3 request construction only; no creative acceptance or pilot promotion",
+  "project": "image-handoff-fixture-6-20261108",
+  "origin": "Existing approved Nano Banana 2 fallback, not Codex image_gen",
+  "source_sha256": "1c3ed5bfce25a3ee8499a7fe4e2182086be897281070c704493ca868d18bf90a",
+  "dimensions": [
+    1376,
+    768
+  ],
+  "uploads": [
+    {
+      "path": "/api/v1/projects/image-handoff-fixture-6-20261108/upload/character",
+      "query": {
+        "name": "Ana"
+      },
+      "http_status": 200,
+      "response": {
+        "success": true,
+        "filename": "Ana.png",
+        "path": "characters/Ana.png",
+        "url": "/api/v1/files/image-handoff-fixture-6-20261108/characters/Ana.png"
+      }
+    },
+    {
+      "path": "/api/v1/projects/image-handoff-fixture-6-20261108/shots/E1S01/upload/storyboard",
+      "query": {
+        "script_file": "episode_1.json"
+      },
+      "http_status": 200,
+      "response": {
+        "success": true,
+        "path": "storyboards/scene_E1S01.png",
+        "version": 1,
+        "asset_fingerprints": {
+          "storyboards/scene_E1S01.png": 1794161298895216442
+        }
+      }
+    }
+  ],
+  "assembler_selected_identity": {
+    "logical_type": "character",
+    "logical_id": "Ana",
+    "path": "characters/Ana.png",
+    "content_digest": "1c3ed5bfce25a3ee8499a7fe4e2182086be897281070c704493ca868d18bf90a"
+  },
+  "script_change": {
+    "creative_content_unchanged": true,
+    "only_changed_fields": [
+      "shots[0].generated_assets.storyboard_image",
+      "shots[0].generated_assets.status",
+      "metadata.updated_at"
+    ],
+    "original_file_sha256": "2f7dc3d635105fd2f86131e0af3844f49dc2840ef874861c5bd30a179aea0e7b",
+    "current_file_sha256": "1641f2106921482bd8e93bad26319150a747ec85a783e5b0fdc681577e28492c",
+    "original_reconstruction_matches_frozen_hash": true
+  },
+  "paid_calls": 0,
+  "provider_requests_sent": 0,
+  "pilot_promotion": false,
+  "creative_acceptance": false,
+  "quality_status": "Owner acceptance remains pending; rejected v1 remains discarded; v2 framing limitation retained",
+  "limits": [
+    "Reference_image role is an in-memory supported H3 request probe, not a formal reference-video workflow; storyboard first_frame probe uses actual selected storyboard. No provider request is sent. A three-view sheet is not an approved composition for production.",
+    "The generated sheet is a Nano Banana 2 fallback artifact, not Codex image_gen output. No creative acceptance or production composition approval is implied."
+  ],
+  "source_format": "PNG",
+  "artifact_bytes": 1062470,
+  "previews": [
+    {
+      "resource_type": "characters",
+      "resource_id": "Ana",
+      "manifest_artifact_path": "characters/Ana.png",
+      "currency": "current",
+      "mime_type": "image/png",
+      "encoded_bytes_match_source": true,
+      "provider_role": "reference_image",
+      "request_preview": {
+        "submit": {
+          "method": "POST",
+          "url": "https://api.minimax.io/v2/video_generation",
+          "body": {
+            "model": "MiniMax-H3",
+            "content": [
+              {
+                "type": "text",
+                "text": "{\"action\": \"Ana stands calmly in place, breathing slowly so that her shoulders rise and fall very slightly; she blinks naturally once and her fingers relax a little more at her sides, while the hem of her teal T-shirt stays almost still. The light and the gray background remain steady throughout.\", \"camera_motion\": \"Static\", \"ambiance_audio\": \"Quiet studio room tone with a faint, soft hum of the lighting equipment\", \"dialogue\": []}"
+              },
+              {
+                "type": "image_url",
+                "image_url": {
+                  "url": "<data:image/png;base64, 1062470 bytes>"
+                },
+                "role": "reference_image"
+              }
+            ],
+            "resolution": "2K",
+            "duration": 5,
+            "ratio": "9:16"
+          }
+        },
+        "poll": {
+          "method": "GET",
+          "url": "https://api.minimax.io/v2/query/video_generation/{{ task_id }}",
+          "body": null
+        },
+        "result": null,
+        "conversions": null
+      },
+      "current_version": 3,
+      "version_history": [
+        {
+          "version": 1,
+          "source": null,
+          "content_digest": "798741b81a9b82fff30a40ac312be5cb659739ec217de1092955f06d74a1af25",
+          "is_current": false
+        },
+        {
+          "version": 2,
+          "source": null,
+          "content_digest": "1c3ed5bfce25a3ee8499a7fe4e2182086be897281070c704493ca868d18bf90a",
+          "is_current": false
+        },
+        {
+          "version": 3,
+          "source": "manual_upload",
+          "content_digest": "1c3ed5bfce25a3ee8499a7fe4e2182086be897281070c704493ca868d18bf90a",
+          "is_current": true
+        }
+      ]
+    },
+    {
+      "resource_type": "storyboards",
+      "resource_id": "E1S01",
+      "manifest_artifact_path": "storyboards/scene_E1S01.png",
+      "currency": "current",
+      "mime_type": "image/png",
+      "encoded_bytes_match_source": true,
+      "provider_role": "first_frame",
+      "request_preview": {
+        "submit": {
+          "method": "POST",
+          "url": "https://api.minimax.io/v2/video_generation",
+          "body": {
+            "model": "MiniMax-H3",
+            "content": [
+              {
+                "type": "text",
+                "text": "{\"action\": \"Ana stands calmly in place, breathing slowly so that her shoulders rise and fall very slightly; she blinks naturally once and her fingers relax a little more at her sides, while the hem of her teal T-shirt stays almost still. The light and the gray background remain steady throughout.\", \"camera_motion\": \"Static\", \"ambiance_audio\": \"Quiet studio room tone with a faint, soft hum of the lighting equipment\", \"dialogue\": []}"
+              },
+              {
+                "type": "image_url",
+                "image_url": {
+                  "url": "<data:image/png;base64, 1062470 bytes>"
+                },
+                "role": "first_frame"
+              }
+            ],
+            "resolution": "2K",
+            "duration": 5,
+            "ratio": "adaptive"
+          }
+        },
+        "poll": {
+          "method": "GET",
+          "url": "https://api.minimax.io/v2/query/video_generation/{{ task_id }}",
+          "body": null
+        },
+        "result": null,
+        "conversions": null
+      },
+      "current_version": 1,
+      "version_history": [
+        {
+          "version": 1,
+          "source": "manual_upload",
+          "content_digest": "1c3ed5bfce25a3ee8499a7fe4e2182086be897281070c704493ca868d18bf90a",
+          "is_current": true
+        }
+      ]
+    }
+  ],
+  "preservation": {
+    "generated_version1_sha256": "798741b81a9b82fff30a40ac312be5cb659739ec217de1092955f06d74a1af25",
+    "generated_version2_sha256": "1c3ed5bfce25a3ee8499a7fe4e2182086be897281070c704493ca868d18bf90a",
+    "generated_versions_preserved": true,
+    "both_closed_paid_records_unchanged": true,
+    "all_other_projects_untouched": true
+  },
+  "active_tasks_after": 0,
+  "private_receipt_directory": "/tmp/arcreel-goal-state/image-fallback-fixture/technical-handoff",
+  "no_new_allowance_or_generation_authority": true
+}

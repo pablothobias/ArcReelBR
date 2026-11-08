@@ -77,12 +77,12 @@
     "unused_reservation_released": "1.9633265",
     "unused_owner_allowance_authorizes_nothing": "1.9717105",
     "formula": "(259*0.50+1120*60+320*3)/1000000",
-    "independent_all_attempt_audit": "passed_one_newacceptedrequest",
+    "independent_all_attempt_audit": "passed_one_new_accepted_request",
     "actual_wire_captured": false
   },
   "quality_review": {
     "status": "pending_owner",
-    "observed": "More photographic skin,hair,cloth and true sideprofile thanv1; framingendsatthigh/no kneesorfeet",
+    "observed": "More photographic skin, hair and clothing, with a true side profile compared with version 1; framing ends at the thighs, without knees or feet.",
     "fullbody_sheet_claim": false,
     "automatic_acceptance": false
   },
@@ -91,7 +91,7 @@
   "manual_version_selection": 0,
   "downstream_promotion": 0,
   "session_status": "completed",
-  "current_artifact": "Normalformaloperationactivatedv2; no manualversionselection",
+  "current_artifact": "Normal formal operation activated version 2; no manual version selection.",
   "runtime_mime_fix_active_commit": "95cbaf27a",
   "no_more_calls_authorized": true,
   "private_evidence_directory": "/tmp/arcreel-goal-state/image-fallback-fixture/realism-proposal"
