@@ -40,7 +40,7 @@ protected: false
 ---
 {{ variant("text/drama_script_plan/task", source_kind) }}
 
-**Output language**: natural-language string values must use {{ target_language }}; keep JSON keys / enum values in English. {{ variant("text/drama_script_plan/language_rule", source_kind) }}
+**Output language**: natural-language string values must use {{ target_language | output_language }}; keep JSON keys / enum values in English. {{ variant("text/drama_script_plan/language_rule", source_kind) }}
 **Structural constraints**: response_schema enforces fields / enums / required items; this prompt only explains **how to write each field’s content well**.
 
 {{ partial("shared/pacing/drama") }}

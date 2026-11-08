@@ -22,7 +22,7 @@ from contextlib import AbstractContextManager, ExitStack, asynccontextmanager, c
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, BinaryIO, ClassVar, Literal, TypeGuard, cast
+from typing import TYPE_CHECKING, Any, BinaryIO, ClassVar, TypeGuard, cast
 
 import portalocker
 from pydantic import BaseModel, Field
@@ -67,6 +67,7 @@ from lib.episode.source_kinds import project_overview_source_kind
 from lib.infra.app_data_dir import app_data_dir
 from lib.infra.async_thread import run_sync_transaction
 from lib.infra.content_digest import canonical_json_digest
+from lib.infra.content_language import ContentLanguage, is_brazilian_portuguese
 from lib.infra.data_root_layout import PROJECT_FILENAME, PROJECT_NAME_PATTERN, DataRootLayout, list_project_dirs
 from lib.infra.json_io import atomic_write_bytes, atomic_write_json, load_json, load_json_or_none
 from lib.infra.path_safety import PathTraversalError, safe_join
@@ -279,7 +280,7 @@ class ProjectOverview(BaseModel):
     # language archives LLM output; the sole source of truth is top-level project["source_language"],
     # synchronized by generate_overview on persistence. All measurement/splitting callers read the top-level field;
     # never read overview.language directly.
-    language: Literal["zh", "en", "vi", "ru"] = Field(description="Novel source-language code")
+    language: ContentLanguage = Field(description="Novel source-language code")
 
 
 def _rename_agnostic_errors(
@@ -4182,7 +4183,9 @@ class ProjectManager:
         # Save project.json with RMW under one _project_lock to avoid overwriting concurrent field changes.
         def _mutate(project: dict) -> None:
             project["overview"] = overview_dict
-            project["source_language"] = overview_dict["language"]
+            project["source_language"] = (
+                "pt-BR" if is_brazilian_portuguese(project.get("source_language")) else overview_dict["language"]
+            )
 
         await run_sync_transaction(self.update_project, project_name, _mutate)
 

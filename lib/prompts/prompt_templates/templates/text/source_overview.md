@@ -20,6 +20,6 @@ protected: false
 ---
 {{ variant("text/source_overview/task", source_kind) }}
 
-**Output language**: all string values must use {{ target_language }}; keep JSON keys / enum values in English.
+**Output language**: all string values must use {{ target_language | output_language }}; keep JSON keys / enum values in English.
 
 {{ source_content }}

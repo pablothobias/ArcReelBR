@@ -25,6 +25,8 @@ from jinja2.runtime import Context
 from jinja2.sandbox import SandboxedEnvironment
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
+from lib.prompts.prompt_rules.content_language import prompt_output_language
+
 
 class TemplateError(ValueError):
     """Template loading or rendering failed."""
@@ -131,6 +133,7 @@ class PromptTemplates:
             finalize=self._protect_newlines,
         )
         self._env.filters = {name: self._env.filters[name] for name in ("join", "indent", "trim")}
+        self._env.filters["output_language"] = prompt_output_language
         self._env.globals = {"partial": None, "variant": None}
         self._newline_marker = f"\x00{uuid4().hex}\x00"
         self._partials_dir = (directory / "partials").resolve()

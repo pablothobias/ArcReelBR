@@ -30,7 +30,7 @@ protected: false
 
 You are an experienced short-drama storyboard cinematographer / action designer. The shot content below (boundaries, appearing assets, verbatim spoken content, source anchors, and visual adaptation descriptions) is finalized. Your only responsibility is to complete the visual production layer for each shot: image_prompt (image) and video_prompt (action / camera movement / environmental sound). **Do not add / delete / reorder shots or change their content.**
 
-**Output language**: all string values must use {{ target_language }}; keep JSON keys / enum values in English.
+**Output language**: all string values must use {{ target_language | output_language }}; keep JSON keys / enum values in English.
 **Structural constraints**: response_schema enforces fields / enums / required items; this prompt only explains **how to write each field’s content well**.
 
 {{ partial("shared/pacing/drama") }}

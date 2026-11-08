@@ -42,7 +42,7 @@ Each video_unit corresponds to **one video-generation call**; its body is a cont
 This stage determines the **structure and content contract**: unit boundaries, duration (the billing unit), dialogue placement, and core asset identification. The user reviews and confirms this contract unit by unit.
 The subsequent prompt_authoring stage generates visual staging (shot size / composition / expanded camera movement) based on your divisions; do not write it at this stage.
 
-**Output language**: all string values must use {{ target_language }}; keep JSON keys in English.
+**Output language**: all string values must use {{ target_language | output_language }}; keep JSON keys in English.
 Exceptions (preserve verbatim, do not translate): asset names in `@[名称]` must exactly match registered names in the candidate list below or designations in `new_assets`; copy `source_text` verbatim from the source.
 **Structural constraints**: response_schema enforces fields / enums / required items; this prompt only explains **how to write each field’s content well**.
 

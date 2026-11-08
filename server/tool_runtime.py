@@ -130,6 +130,7 @@ from lib.i18n import _ as i18n_message
 from lib.infra.async_thread import run_sync_transaction
 from lib.infra.async_thread import run_sync_transaction as _run_sync_transaction
 from lib.infra.content_digest import prefixed, prefixed_canonical_json_digest, unprefixed
+from lib.infra.content_language import CONTENT_LANGUAGE_CODES, ContentLanguage, normalize_content_language
 from lib.infra.data_root_layout import DataRootLayout
 from lib.infra.path_safety import safe_join
 from lib.infra.schema_guards import is_str
@@ -1697,6 +1698,9 @@ class CreateProjectToolRequest(BaseModel):
         description="Unique project identifier containing only letters, digits and hyphens; subsequent tools address the project by this identifier"
     )
     title: str = Field(default="", description="User-visible project title")
+    source_language: ContentLanguage | None = Field(
+        default=None, description="Explicit creative content language, independent of interface language"
+    )
     content_mode: ContentMode = Field(
         default="narration",
         description="Content mode: narration for narrated storytelling/commentary, drama for episodic drama, ad for advertisements/short films",
@@ -1852,6 +1856,7 @@ async def create_project(
                 extras={
                     "generation_mode": value.generation_mode,
                     "grid_storyboard": value.grid_storyboard,
+                    **({"source_language": value.source_language} if value.source_language is not None else {}),
                 },
                 target_duration=value.target_duration,
                 brief=value.brief,
@@ -2519,7 +2524,7 @@ PROJECT_SETTINGS = (
 PROJECT_OVERVIEW_FIELDS = ("synopsis", "genre", "theme", "world_setting")
 EPISODE_META_FIELDS = ("title",)
 
-_SOURCE_LANGUAGE_VALUES = ("zh", "en", "vi", "ru")
+_SOURCE_LANGUAGE_VALUES = CONTENT_LANGUAGE_CODES
 _POSITIVE_INT_SETTINGS = (EPISODE_TARGET_UNITS_FIELD,)
 
 
@@ -3466,9 +3471,7 @@ def _coerce_setting_value(key: str, value: Any) -> Any:
             raise ValueError(message)
         return value
     if key == "source_language":
-        if value is not None and (not isinstance(value, str) or value not in _SOURCE_LANGUAGE_VALUES):
-            raise ValueError(f"source_language 必须是 {list(_SOURCE_LANGUAGE_VALUES)} 之一或 null,收到 {value!r}")
-        return value
+        return None if value is None else normalize_content_language(value)
     if key == "brief":
         if value is not None and not isinstance(value, str):
             raise ValueError(f"brief 必须是字符串或 null,收到 {value!r}")

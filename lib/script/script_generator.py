@@ -909,7 +909,7 @@ class ScriptGenerator:
             scenes_content=render_drama_content_for_prompt_authoring(content_scenes),
             episode=episode,
             aspect_ratio=self._resolve_aspect_ratio(),
-            # Output uses project source_language like normalized script_plan, avoiding content/visual language splits in non-Chinese projects.
+            # Project language selects the output policy: Brazilian content keeps Portuguese speech with English visual directions.
             target_language=self.project_json.get("source_language") or "中文",
             characters=characters,
             scenes=scenes,

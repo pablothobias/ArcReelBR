@@ -20,7 +20,8 @@ A line may contain multiple tokens. Only speaker positions within dialogue token
 provides voice only. `@[名称]` outside a dialogue token enters the visual reference images normally, regardless of whether the same line has dialogue.
 
 Structural markers do not change with output language: `@[]` and braces `{}` are syntax recognized by the parser. Preserve these markers exactly
-in projects of every language; only the visual descriptions and dialogue between markers use the project language.
+in projects of every language. Follow the output-language rule for visual descriptions and speech between markers;
+asset names remain exact references, independent of either language.
 
 Hard constraints (any violation rejects the whole output):
 

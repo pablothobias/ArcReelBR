@@ -64,6 +64,7 @@ from lib.infra.async_thread import (
     run_noninterruptible_sync,
     run_sync_transaction,
 )
+from lib.infra.content_language import ContentLanguage
 from lib.infra.data_root_layout import DataRootLayout
 from lib.infra.json_io import domain_error_on_value_error
 from lib.material.formal_objects import formal_commit_on, release_holder
@@ -273,6 +274,7 @@ def _validated_speech_rate(value: float, _t: Translator) -> float:
 
 
 class CreateProjectRequest(BaseModel):
+    source_language: ContentLanguage | None = None
     name: str | None = None
     title: str | None = None
     style: str | None = ""  # Retained but no longer a user entry point.
@@ -328,6 +330,7 @@ class EpisodePatch(BaseModel):
 
 
 class UpdateProjectRequest(BaseModel):
+    source_language: ContentLanguage | None = None
     title: str | None = None
     style: str | None = None
     aspect_ratio: str | None = None
@@ -756,6 +759,8 @@ async def create_project(
             # always persist explicit values, including grid_storyboard false, giving new projects complete v5 shape.
             extras["generation_mode"] = req.generation_mode
             extras["grid_storyboard"] = req.grid_storyboard
+            if req.source_language is not None:
+                extras["source_language"] = req.source_language
             if speech_rate is not None:
                 extras[SPEECH_RATE_FIELD] = speech_rate
             with project_change_source("webui"):
@@ -1048,6 +1053,11 @@ async def update_project(name: str, req: UpdateProjectRequest, _t: Translator):
             def _mutate(project: dict) -> None:
                 # Entire RMW uses one _project_lock, preserving concurrent PATCH/task-writeback updates.
                 is_ad = project.get("content_mode") == "ad"
+                if "source_language" in req.model_fields_set:
+                    if req.source_language is None:
+                        project.pop("source_language", None)
+                    else:
+                        project["source_language"] = req.source_language
                 if req.title is not None:
                     project["title"] = req.title
                 if req.style is not None:

@@ -36,7 +36,7 @@ protected: false
 
 You are an experienced short-video writer and director. Below are existing reference-video units for an advertisement / short film. Write bodies for units marked “【待编写】”; the other units are finalized and provide context only.
 
-**Output language**: all body text uses {{ target_language }}; keep JSON keys in English.
+**Output language**: all body text uses {{ target_language | output_language }}; keep JSON keys in English.
 **Output shape**: output only `{"title": "...", "units": [{"text": "..."}]}`, with exactly {{ pending_count }} `units`, corresponding one-to-one to pending units in their order in the film.
 The system retains or derives unit duration, unit_id, references, generated_assets, and needs_replan; do not output them. `title` is not written back to the script; simply supply a short title.
 

@@ -32,7 +32,7 @@ protected: false
 You are an experienced short-video storyboard writer. Your task is **prompt authoring** for episode {{ episode }} using reference-video generation.
 The script_plan_units table below is the content contract already confirmed by the user. Expand each unit’s body with shot size / composition / camera movement and visual details.
 
-**Output language**: all string values must use {{ target_language }}; keep JSON keys in English.
+**Output language**: all string values must use {{ target_language | output_language }}; keep JSON keys in English.
 **Structural constraints**: response_schema enforces fields / required items; this prompt only explains **how to write the body well**.
 
 # Structure-preservation requirements (any violation rejects the whole output)

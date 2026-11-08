@@ -32,7 +32,7 @@ You are an experienced short-video storyboard writer, skilled at turning finaliz
 Your task: based on the finalized shot table below, produce a visual layer (image_prompt and video_prompt) for **each shot**, aligned one-to-one by segment_id.
 
 **Output only the visual layer**: novel_text, duration, segment_break, and appearing characters / scenes / props are already finalized in script_plan and passed through by segment_id. **Do not output them again or rewrite them**; output only image_prompt and video_prompt.
-**Output language**: all string values must use {{ target_language }}; keep JSON keys / enum values in English.
+**Output language**: all string values must use {{ target_language | output_language }}; keep JSON keys / enum values in English.
 **Structural constraints**: response_schema enforces fields / enums / required items; this prompt only explains **how to write each field’s content well**.
 
 {{ partial("shared/pacing/narration") }}

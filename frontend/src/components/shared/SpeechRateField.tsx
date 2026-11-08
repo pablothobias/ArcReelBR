@@ -9,16 +9,16 @@ import { SPEECH_RATE_MAX, SPEECH_RATE_MIN, isValidSpeechRate } from "./speech-ra
  * seconds, driving minimum-duration guidance, speech-volume hints and subtitle timing. UI entry points are separate,
  * with independent wording to avoid same-name confusion.
  *
- * Unit nouns follow source languages: zh counts characters; en/vi/ru count words, sharing backend ``count_reading_units``
+ * Unit nouns follow source languages: zh counts characters; en/vi/ru/pt-BR count words, sharing backend ``count_reading_units``
  * segmentation criteria. Unknown languages (creation wizards before source_language exists) use neutral Characters or words,
- * explaining pending units: concrete nouns would promise incorrectly. Values entered as characters/second would, after language detection as en/vi/ru,
+ * explaining pending units: concrete nouns would promise incorrectly. Values entered as characters/second would, after language detection as en/vi/ru/pt-BR,
  * be interpreted by the same estimator as words/second, changing meaning without changing numbers.
  */
 
-/** Reading-unit noun i18n keys: words for en/vi/ru, characters for zh, neutral Characters or words when languages are unknown. */
+/** Reading-unit noun i18n keys: words for en/vi/ru/pt-BR, characters for zh, neutral Characters or words when languages are unknown. */
 function readingUnitKey(sourceLanguage?: string | null): string {
-  const code = (sourceLanguage ?? "").trim().toLowerCase();
-  if (code === "en" || code === "vi" || code === "ru") return "reading_unit_word";
+  const code = (sourceLanguage ?? "").trim().replaceAll("_", "-").toLowerCase();
+  if (code === "en" || code === "vi" || code === "ru" || code === "pt-br") return "reading_unit_word";
   if (code === "zh") return "reading_unit_char";
   return "reading_unit_generic";
 }
@@ -31,7 +31,7 @@ function isLanguagePending(sourceLanguage?: string | null): boolean {
 export interface SpeechRateFieldProps {
   value: number | null;
   onChange: (next: number | null) => void;
-  /** Project source_language (zh/en/vi/ru); leave empty during creation before language facts exist. */
+  /** Project source_language (zh/en/vi/ru/pt-BR); leave empty during creation before language facts exist. */
   sourceLanguage?: string | null;
 }
 

@@ -52,7 +52,7 @@ You are an experienced short-video writer and director, skilled at converting a 
 Your task: based on the creative brief below, produce a general short-film shot script approximately {{ target_duration }} seconds long (flat shots[]), as schema-conforming JSON.
 {% endif %}
 
-**Output language**: all string values must use {{ target_language }}; keep JSON keys / enum values in English.
+**Output language**: all string values must use {{ target_language | output_language }}; keep JSON keys / enum values in English.
 **Structural constraints**: response_schema enforces fields / enums / required items; this prompt only explains **how to write each field’s content well**.
 
 # Context

@@ -883,7 +883,7 @@ class TestProjectManager:
         with pytest.raises(EmptySourceError, match=r"source 目录为空"):
             await pm_empty.generate_overview("demo")
 
-    @pytest.mark.parametrize("lang", ["zh", "en", "vi"])
+    @pytest.mark.parametrize("lang", ["zh", "en", "vi", "ru", "pt-BR"])
     @pytest.mark.asyncio
     async def test_generate_overview_source_language_synced(self, tmp_path, monkeypatch, lang):
         pm = ProjectManager(tmp_path / "projects")
@@ -898,6 +898,24 @@ class TestProjectManager:
         overview = await pm.generate_overview("demo")
         assert overview["language"] == lang
         assert pm.load_project("demo")["source_language"] == lang
+
+    @pytest.mark.asyncio
+    async def test_generate_overview_preserves_explicit_brazilian_language(self, tmp_path, monkeypatch):
+        pm = ProjectManager(tmp_path / "projects")
+        pm.create_project("demo")
+        pm.create_project_metadata("demo", "O café", extras={"source_language": "pt-BR"})
+        _write(pm.get_project_path("demo") / "source" / "1.txt", "Ana: Não acredito!")
+        backend = _FakeTextBackend(language="en")
+
+        async def fake_create_backend(*args, **kwargs):
+            return backend, "gemini-aistudio"
+
+        monkeypatch.setattr("lib.backends.text_generator.create_text_backend_for_task", fake_create_backend)
+        overview = await pm.generate_overview("demo")
+        assert overview["language"] == "en"
+        assert pm.load_project("demo")["source_language"] == "pt-BR"
+        assert "English for technical directions" in backend.last_request.prompt
+        assert "Ana: Não acredito!" in backend.last_request.prompt
 
     @pytest.mark.asyncio
     async def test_generate_overview_invalid_language_raises(self, tmp_path, monkeypatch):

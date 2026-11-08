@@ -19,6 +19,12 @@ describe("SpeechRateField", () => {
     expect(screen.getByText("词/秒")).toBeInTheDocument();
   });
 
+  it.each(["pt-BR", "pt-br", "pt_BR", " PT-BR "])("uses word units for %s", (language) => {
+    render(<SpeechRateField value={2.5} onChange={() => {}} sourceLanguage={language} />);
+    expect(screen.getByText("词/秒")).toBeInTheDocument();
+    expect(screen.queryByText(/项目语言还未确定/)).not.toBeInTheDocument();
+  });
+
   it("stays unit-neutral and flags the pending unit while the language is unknown", () => {
     // Concrete units promise incorrectly for unknown languages: entered characters/second become words/second after en/vi detection.
     const { rerender } = render(<SpeechRateField value={null} onChange={() => {}} sourceLanguage={null} />);

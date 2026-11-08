@@ -26,14 +26,14 @@ import re
 # (rare/historical characters and uncommon personal/place names, U+20000-U+323AF).
 _ZH_UNIT_PATTERN = re.compile("[㐀-鿿豈-﫿　-〿＀-￯𠀀-𲎯]")
 
-# Word-counted languages such as en / vi / ru use Unicode word boundaries
+# Word-counted languages such as en / vi / ru / pt-BR use Unicode word boundaries
 # (\w includes Latin and Cyrillic letters under re.UNICODE).
 _LATIN_WORD_PATTERN = re.compile(r"\b\w+\b", re.UNICODE)
 
 
 def _pattern_for(language: str | None) -> re.Pattern[str]:
     code = (language or "").strip().lower()
-    if code in ("en", "vi", "ru"):
+    if code in ("en", "vi", "ru", "pt-br", "pt_br"):
         return _LATIN_WORD_PATTERN
     return _ZH_UNIT_PATTERN
 
@@ -42,7 +42,7 @@ def count_reading_units(text: str, language: str | None) -> int:
     """Count reading units in the source language.
 
     zh: Chinese characters plus CJK punctuation / fullwidth symbols.
-    en / vi / ru: Unicode word-boundary words. Numbers count as words; contractions
+    en / vi / ru / pt-BR: Unicode word-boundary words. Numbers count as words; contractions
         such as "don't" split into ``don`` + ``t``. Counting a contraction as one
         token would require a different regular expression.
     Unknown / None / empty language: use zh for compatibility with older projects
@@ -61,6 +61,8 @@ def reading_unit_noun(language: str | None) -> str:
     updates this function, avoiding per-caller word/character mappings that drift
     from the counter. Prompts use this noun for units per second or per episode.
     """
+    if (language or "").strip().replace("_", "-").lower() == "pt-br":
+        return "words"
     return "词" if _pattern_for(language) is _LATIN_WORD_PATTERN else "字"
 
 

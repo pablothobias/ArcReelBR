@@ -6,7 +6,7 @@ drifting per-caller rate constants. Subtitle timing does not use speech rate.
 
 Rates are reading units per second. Reuse the language-specific units from
 ``lib.infra.text_metrics`` (Chinese characters / CJK punctuation for zh; words
-for en / vi / ru), so units follow the language without separate character rules.
+for en / vi / ru / pt-BR), so units follow the language without separate character rules.
 Rates are adjustable, overridden by ``source_language``, and otherwise fall back
 to defaults. Register new languages only in ``SPEECH_RATE_UPS_BY_LANGUAGE``;
 callers must not hardcode rates.
@@ -28,14 +28,15 @@ from lib.infra.text_metrics import count_reading_units
 #: Missing/unregistered languages use this value, matching the counter's zh fallback.
 DEFAULT_SPEECH_RATE_UPS: float = 5.0
 
-#: Rate overrides keyed by project ``source_language`` (zh / en / vi / ru).
-#: en / vi / ru use words, commonly 2-3 per second; use 2.5. These are not directly
+#: Rate overrides keyed by project ``source_language`` (zh / en / vi / ru / pt-BR).
+#: en / vi / ru / pt-BR use words, commonly 2-3 per second; use 2.5. These are not directly
 #: comparable with zh characters/s, so register rates by language. Adjust estimates to actual speech.
 SPEECH_RATE_UPS_BY_LANGUAGE: dict[str, float] = {
     "zh": 5.0,
     "en": 2.5,
     "vi": 2.5,
     "ru": 2.5,
+    "pt-br": 2.5,
 }
 
 
@@ -106,7 +107,7 @@ def speech_rate_units_per_second(language: str | None = None, override: float | 
         return float(override)
     if not language:
         return DEFAULT_SPEECH_RATE_UPS
-    return SPEECH_RATE_UPS_BY_LANGUAGE.get(language.strip().lower(), DEFAULT_SPEECH_RATE_UPS)
+    return SPEECH_RATE_UPS_BY_LANGUAGE.get(language.strip().replace("_", "-").lower(), DEFAULT_SPEECH_RATE_UPS)
 
 
 def estimate_spoken_seconds(text: str | None, language: str | None = None, override: float | None = None) -> float:
