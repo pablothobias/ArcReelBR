@@ -1,0 +1,30 @@
+{
+  "good.wav": {
+    "bytes": 139118,
+    "sha256": "fb4f7de5eee89d4b84cfbe9aaebf5a0b19c36f234686a7e2e2aa43510b937ec8"
+  },
+  "wrong.aiff": {
+    "bytes": 205436,
+    "sha256": "fdb87963ea3655acccbf4770ef95315f2350ac047dcf9f485b4fbf6c5e9c73a1"
+  },
+  "missing.wav": {
+    "bytes": 144078,
+    "sha256": "00ea5c7415d6fd1232a2bb551c00c253f90023abb0775f9d9a3e54d47da9bc9d"
+  },
+  "good-av.mp4": {
+    "bytes": 67067,
+    "sha256": "9df48cfdcd14d71e70df454672f6c2fbc2f98bed0037c62c638e23b7c480cdd0"
+  },
+  "subtitle-delayed.mp4": {
+    "bytes": 71691,
+    "sha256": "001522cf4e98939458f696cd09fb2460d510168ab9a5369d40e7adb5a56a3b13"
+  },
+  "identity-story-error.mp4": {
+    "bytes": 66566,
+    "sha256": "070433c01ed7d35f1b0229f31f4324eeb76b71581673711fdec110d95d214163"
+  },
+  "ggml-base.bin": {
+    "bytes": 147951465,
+    "sha256": "60ed5bc3dd14eea856493d334349b405782ddcaf0028d4b5df4088345fba2efe"
+  }
+}

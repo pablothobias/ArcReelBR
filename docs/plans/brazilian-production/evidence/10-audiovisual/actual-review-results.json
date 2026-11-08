@@ -1,0 +1,199 @@
+{
+  "status": "partial_capability_validation",
+  "date": "2026-11-08",
+  "whisper_version": "1.9.5",
+  "model": "multilingual ggml-base.bin",
+  "language": "pt",
+  "expected_text_prompt_used": false,
+  "metered_service_calls": 0,
+  "actual_fixture_results": [
+    {
+      "evidence_directory": "wrong-review",
+      "media": "wrong.aiff",
+      "sha256": "fdb87963ea3655acccbf4770ef95315f2350ac047dcf9f485b4fbf6c5e9c73a1",
+      "has_video": false,
+      "duration_seconds": 4.565532879818594,
+      "audio": {
+        "sample_rate": 16000,
+        "duration_seconds": 4.5655625,
+        "peak_amplitude": 0.6461181640625,
+        "rms_amplitude": 0.175838503857416
+      },
+      "findings": [],
+      "segments": [
+        {
+          "segment_id": "E1U01",
+          "expected_text": "Bom dia, Ana! O pão acabou, mas o café está quentinho.",
+          "observed_transcript": "Boa noite, Bruno, a porta ficou aberta e o cachorro fugiu.",
+          "findings": [
+            "transcript_mismatch_requires_listening",
+            "subtitle_timing_evidence_missing"
+          ],
+          "review_status": "requires_review",
+          "transcription_spans": [
+            {
+              "text": " Boa noite, Bruno, a porta ficou aberta e o cachorro fugiu.",
+              "offsets": {
+                "from": 0,
+                "to": 4560
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "evidence_directory": "missing-review",
+      "media": "missing.wav",
+      "sha256": "00ea5c7415d6fd1232a2bb551c00c253f90023abb0775f9d9a3e54d47da9bc9d",
+      "has_video": false,
+      "duration_seconds": 4.5,
+      "audio": {
+        "sample_rate": 16000,
+        "duration_seconds": 4.5,
+        "peak_amplitude": 0.0,
+        "rms_amplitude": 0.0
+      },
+      "findings": [
+        "decoded_audio_is_silent"
+      ],
+      "segments": [
+        {
+          "segment_id": "E1U01",
+          "expected_text": "Bom dia, Ana! O pão acabou, mas o café está quentinho.",
+          "observed_transcript": "[MÚSICA DE FUNDO]",
+          "findings": [
+            "transcript_mismatch_requires_listening",
+            "subtitle_timing_evidence_missing"
+          ],
+          "review_status": "requires_review",
+          "transcription_spans": [
+            {
+              "text": " [MÚSICA DE FUNDO]",
+              "offsets": {
+                "from": 0,
+                "to": 2000
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "evidence_directory": "good-av-review",
+      "media": "good-av.mp4",
+      "sha256": "9df48cfdcd14d71e70df454672f6c2fbc2f98bed0037c62c638e23b7c480cdd0",
+      "has_video": true,
+      "duration_seconds": 9.0,
+      "audio": {
+        "sample_rate": 16000,
+        "duration_seconds": 9.024,
+        "peak_amplitude": 0.65606689453125,
+        "rms_amplitude": 0.1233358775645883
+      },
+      "findings": [],
+      "segments": [
+        {
+          "segment_id": "E1U01",
+          "expected_text": "Bom dia, Ana! O pão acabou, mas o café está quentinho.",
+          "observed_transcript": "Bom dia, Ana, o pano acabou, mas o café está quentinho.",
+          "findings": [
+            "transcript_mismatch_requires_listening"
+          ],
+          "review_status": "requires_review",
+          "transcription_spans": [
+            {
+              "text": " Bom dia, Ana, o pano acabou, mas o café está quentinho.",
+              "offsets": {
+                "from": 0,
+                "to": 4320
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "evidence_directory": "subtitle-delayed-review",
+      "media": "subtitle-delayed.mp4",
+      "sha256": "001522cf4e98939458f696cd09fb2460d510168ab9a5369d40e7adb5a56a3b13",
+      "has_video": true,
+      "duration_seconds": 9.0,
+      "audio": {
+        "sample_rate": 16000,
+        "duration_seconds": 9.024,
+        "peak_amplitude": 0.65606689453125,
+        "rms_amplitude": 0.1233358775645883
+      },
+      "findings": [],
+      "segments": [
+        {
+          "segment_id": "E1U01",
+          "expected_text": "Bom dia, Ana! O pão acabou, mas o café está quentinho.",
+          "observed_transcript": "Bom dia, Ana, o pano acabou, mas o café está quentinho.",
+          "findings": [
+            "transcript_mismatch_requires_listening",
+            "subtitle_has_no_overlap_with_transcribed_speech"
+          ],
+          "review_status": "requires_review",
+          "transcription_spans": [
+            {
+              "text": " Bom dia, Ana, o pano acabou, mas o café está quentinho.",
+              "offsets": {
+                "from": 0,
+                "to": 4320
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "evidence_directory": "independent-subtitle-delayed-review",
+      "media": "subtitle-delayed.mp4",
+      "sha256": "001522cf4e98939458f696cd09fb2460d510168ab9a5369d40e7adb5a56a3b13",
+      "has_video": true,
+      "duration_seconds": 9.0,
+      "audio": {
+        "sample_rate": 16000,
+        "duration_seconds": 9.024,
+        "peak_amplitude": 0.65606689453125,
+        "rms_amplitude": 0.1233358775645883
+      },
+      "findings": [],
+      "segments": [
+        {
+          "segment_id": "E1U01",
+          "expected_text": "Bom dia, Ana! O pão acabou, mas o café está quentinho.",
+          "observed_transcript": "Bom dia, Ana, o pano acabou, mas o café está quentinho.",
+          "findings": [
+            "transcript_mismatch_requires_listening",
+            "subtitle_has_no_overlap_with_transcribed_speech"
+          ],
+          "review_status": "requires_review",
+          "transcription_spans": [
+            {
+              "text": " Bom dia, Ana, o pano acabou, mas o café está quentinho.",
+              "offsets": {
+                "from": 0,
+                "to": 4320
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "visual_review": {
+    "reference": "ANA, blue costume, white mug",
+    "defective": "BRUNO, red costume, brown box",
+    "scope": "Symbolic labels, costume and prop mismatch only; no real facial identity or motion evaluation"
+  },
+  "remaining_evidence": [
+    "Reliable listening and full playback evaluation",
+    "Actual reference-led production footage",
+    "Real human identity and continuity",
+    "Voice quality, acting and lip-sync",
+    "Word-level subtitle alignment"
+  ]
+}
