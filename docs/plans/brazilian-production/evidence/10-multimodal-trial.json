@@ -1,0 +1,222 @@
+{
+  "date_utc": "2026-11-08T16:21:25.422862+00:00",
+  "scope": "Exactly six separately approved characterization requests, one per artifact, no retries.",
+  "approval_evidence_ref": "questioncall_0a0a661fbada4fbe8dcb3a937eac2511",
+  "approved_round_ceiling_usd": "0.25",
+  "model": "gemini-3.8-flash",
+  "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
+  "pricing_usd_per_million": {
+    "uncached_input": "0.75",
+    "cached_input": "0.075",
+    "output_including_thinking": "3.75"
+  },
+  "price_valid_through": "2026-12-31",
+  "video_sampling_fps": 24,
+  "video_media_resolution": "HIGH_per_part",
+  "audio": "Actual original video/audio bytes, not only frames or transcripts.",
+  "requests": [
+    {
+      "artifact": "known-good-av",
+      "blind_case": "case-94e93f95d329",
+      "source_sha256": "9df48cfdcd14d71e70df454672f6c2fbc2f98bed0037c62c638e23b7c480cdd0",
+      "submitted_sha256": "9df48cfdcd14d71e70df454672f6c2fbc2f98bed0037c62c638e23b7c480cdd0",
+      "model": "gemini-3.8-flash",
+      "response_id": "vJ_waoy8NYaqytMPhMan6Qs",
+      "counted_input_tokens": 59694,
+      "input_token_cap": 65000,
+      "output_token_cap_including_thinking": 2048,
+      "actual_input_tokens": 58010,
+      "actual_output_tokens_including_thinking": 371,
+      "provider_thinking_tokens_reported": null,
+      "reported_total_tokens": 58381,
+      "actual_list_cost_usd": "0.04489875",
+      "approved_artifact_ceiling_usd": "0.06",
+      "sdk_attempts": 1,
+      "raw_result_schema_valid": true,
+      "classification": "supported_narrow_observations",
+      "finding": "Correct heard words, symbolic ANA/blue/white-mug appearance and overlapping subtitle envelope. Mouth synchrony correctly unassessable for static drawing.",
+      "provider_response_sha256": "522b0843b0a437a0ee003c46ca38c6e40613296c5e15d6775b64b3f1aefe4b0b",
+      "actual_modality_details": [
+        {
+          "modality": "VIDEO",
+          "token_count": 57249
+        },
+        {
+          "modality": "TEXT",
+          "token_count": 761
+        }
+      ]
+    },
+    {
+      "artifact": "wrong-speech-audio",
+      "blind_case": "case-1ea5cb52ec97",
+      "source_sha256": "fdb87963ea3655acccbf4770ef95315f2350ac047dcf9f485b4fbf6c5e9c73a1",
+      "submitted_sha256": "2ad8bc1cad6d99ba85843d6902a70556a8a62b83ec50724aed77518d0723d59d",
+      "model": "gemini-3.8-flash",
+      "response_id": "7p_waq_lFvTX0_gPj6me2Qw",
+      "counted_input_tokens": 908,
+      "input_token_cap": 2000,
+      "output_token_cap_including_thinking": 2048,
+      "actual_input_tokens": 876,
+      "actual_output_tokens_including_thinking": 596,
+      "provider_thinking_tokens_reported": null,
+      "reported_total_tokens": 1472,
+      "actual_list_cost_usd": "0.002892",
+      "approved_artifact_ceiling_usd": "0.01",
+      "sdk_attempts": 1,
+      "raw_result_schema_valid": true,
+      "classification": "rejected_evaluation_output",
+      "finding": "Actual wrong speech recognized, but outdoor woman, clothing, surroundings and aligned lips fabricated for an audio-only WAV.",
+      "provider_response_sha256": "26ebdc57fe1e75bc3a0a4951020883457b8b582e878b9abd8b7f3240f092df55",
+      "actual_modality_details": [
+        {
+          "modality": "AUDIO",
+          "token_count": 115
+        },
+        {
+          "modality": "TEXT",
+          "token_count": 761
+        }
+      ]
+    },
+    {
+      "artifact": "missing-speech-audio",
+      "blind_case": "case-e66abbbec3e1",
+      "source_sha256": "00ea5c7415d6fd1232a2bb551c00c253f90023abb0775f9d9a3e54d47da9bc9d",
+      "submitted_sha256": "00ea5c7415d6fd1232a2bb551c00c253f90023abb0775f9d9a3e54d47da9bc9d",
+      "model": "gemini-3.8-flash",
+      "response_id": "Z6DwasvKOsehytMPkonlkA4",
+      "counted_input_tokens": 905,
+      "input_token_cap": 2000,
+      "output_token_cap_including_thinking": 2048,
+      "actual_input_tokens": 874,
+      "actual_output_tokens_including_thinking": 233,
+      "provider_thinking_tokens_reported": null,
+      "reported_total_tokens": 1107,
+      "actual_list_cost_usd": "0.00152925",
+      "approved_artifact_ceiling_usd": "0.01",
+      "sdk_attempts": 1,
+      "raw_result_schema_valid": true,
+      "classification": "rejected_evaluation_output",
+      "finding": "Digitally silent audio-only WAV elicited invented English speech, woman/office visuals and aligned lips. Independent PCM and hashes rule out local substitution.",
+      "provider_response_sha256": "6cf733cc30f478da78da9643081ce4f10520f9be3149097d6c594945216cdeda",
+      "actual_modality_details": [
+        {
+          "modality": "TEXT",
+          "token_count": 761
+        },
+        {
+          "modality": "AUDIO",
+          "token_count": 113
+        }
+      ]
+    },
+    {
+      "artifact": "subtitle-delayed-av",
+      "blind_case": "case-26e792eec45f",
+      "source_sha256": "001522cf4e98939458f696cd09fb2460d510168ab9a5369d40e7adb5a56a3b13",
+      "submitted_sha256": "001522cf4e98939458f696cd09fb2460d510168ab9a5369d40e7adb5a56a3b13",
+      "model": "gemini-3.8-flash",
+      "response_id": "haDwatnaH-vJ0_gPl9zS8Ak",
+      "counted_input_tokens": 59694,
+      "input_token_cap": 65000,
+      "output_token_cap_including_thinking": 2048,
+      "actual_input_tokens": 58010,
+      "actual_output_tokens_including_thinking": 498,
+      "provider_thinking_tokens_reported": null,
+      "reported_total_tokens": 58508,
+      "actual_list_cost_usd": "0.045375",
+      "approved_artifact_ceiling_usd": "0.06",
+      "sdk_attempts": 1,
+      "raw_result_schema_valid": true,
+      "classification": "supported_narrow_observations",
+      "finding": "Observed subtitles at5.0–9.0seconds after speech; no overlap and insufficient lip-sync evidence correctly reported.",
+      "provider_response_sha256": "cafc97d7397c7f18b6e1734bcb86355fcc6c931cd89622f1c9f473192a081cfa",
+      "actual_modality_details": [
+        {
+          "modality": "VIDEO",
+          "token_count": 57249
+        },
+        {
+          "modality": "TEXT",
+          "token_count": 761
+        }
+      ]
+    },
+    {
+      "artifact": "identity-story-error-av",
+      "blind_case": "case-76a79ba5ca3e",
+      "source_sha256": "070433c01ed7d35f1b0229f31f4324eeb76b71581673711fdec110d95d214163",
+      "submitted_sha256": "070433c01ed7d35f1b0229f31f4324eeb76b71581673711fdec110d95d214163",
+      "model": "gemini-3.8-flash",
+      "response_id": "1aDwavL8FK6xuMYPvpq-mA4",
+      "counted_input_tokens": 59694,
+      "input_token_cap": 65000,
+      "output_token_cap_including_thinking": 2048,
+      "actual_input_tokens": 58010,
+      "actual_output_tokens_including_thinking": 324,
+      "provider_thinking_tokens_reported": null,
+      "reported_total_tokens": 58334,
+      "actual_list_cost_usd": "0.0447225",
+      "approved_artifact_ceiling_usd": "0.06",
+      "sdk_attempts": 1,
+      "raw_result_schema_valid": true,
+      "classification": "supported_symbolic_discrepancy",
+      "finding": "Observed BRUNO/red/brown object rather than baseline ANA/blue/white mug. Symbolic comparison, not human facial identity validation.",
+      "provider_response_sha256": "9c4550499357664b52c3c6862de82044b68428922a3830b80da32fc35c01b752",
+      "actual_modality_details": [
+        {
+          "modality": "TEXT",
+          "token_count": 761
+        },
+        {
+          "modality": "VIDEO",
+          "token_count": 57249
+        }
+      ]
+    },
+    {
+      "artifact": "h3-native-audio-sample",
+      "blind_case": "case-7612c74001ec",
+      "source_sha256": "79f540ee9f2258d836d24eac62a9927881d0c8911d151fec87f54c12e2ff58eb",
+      "submitted_sha256": "79f540ee9f2258d836d24eac62a9927881d0c8911d151fec87f54c12e2ff58eb",
+      "model": "gemini-3.8-flash",
+      "response_id": "-qDwavq7EpKv5NoPzu_hgAo",
+      "counted_input_tokens": 33201,
+      "input_token_cap": 40000,
+      "output_token_cap_including_thinking": 2048,
+      "actual_input_tokens": 32566,
+      "actual_output_tokens_including_thinking": 586,
+      "provider_thinking_tokens_reported": 246,
+      "reported_total_tokens": 33152,
+      "actual_list_cost_usd": "0.026622",
+      "approved_artifact_ceiling_usd": "0.04",
+      "sdk_attempts": 1,
+      "raw_result_schema_valid": true,
+      "classification": "unverified_subjective_observation",
+      "finding": "Heard intended Portuguese words and described kitchen scene. Reported warm delivery and apparently aligned mouths at0.85 confidence; no calibrated phoneme-sync or acting acceptance follows.",
+      "provider_response_sha256": "3c7c7204eb7a45cb4719ff5ca58e446d1ad2d65bd50ccb0735a375da6061399d",
+      "actual_modality_details": [
+        {
+          "modality": "VIDEO",
+          "token_count": 31805
+        },
+        {
+          "modality": "TEXT",
+          "token_count": 761
+        }
+      ]
+    }
+  ],
+  "request_count": 6,
+  "actual_input_tokens": 208346,
+  "actual_output_tokens_including_thinking": 2608,
+  "actual_list_cost_usd": "0.16603950",
+  "cost_scope": "Computed from provider-reported usage and official list rates; external invoice and account taxes not verified.",
+  "remaining_pending_intents": 0,
+  "reliable_autonomous_acceptance_gate": false,
+  "issue10_status": "open: reliable subjective audiovisual acceptance not demonstrated",
+  "native_sample_not_pilot": true,
+  "private_raw_evidence_root": "/tmp/arcreel-goal-state/audiovisual-research",
+  "further_calls_authorized": false
+}

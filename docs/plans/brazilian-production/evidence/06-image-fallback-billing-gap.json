@@ -1,0 +1,52 @@
+{
+  "classification": "No provider or image-generation tool invocation: controlled fake SDK boundary only",
+  "fake_sdk_attempts_after_ambiguous_timeout": 5,
+  "existing_generate_config": {
+    "responseModalities": [
+      "IMAGE"
+    ],
+    "imageConfig": {
+      "aspectRatio": "1:1",
+      "imageSize": "1K"
+    }
+  },
+  "existing_usage_estimator": {
+    "quantities": {
+      "output_images": 1
+    },
+    "dimensions": {
+      "resolution": "1K"
+    },
+    "text": null
+  },
+  "catalog_output_component_quote": {
+    "amount": 0.067,
+    "currency": "USD"
+  },
+  "full_invoice_quote": "unknown_input_and_thinking_not_accounted",
+  "generated_file_exists": false,
+  "paid_calls": 0,
+  "official_pricing_url": "https://ai.google.dev/gemini-api/docs/pricing#gemini-3.1-flash-image",
+  "exact_model": "gemini-3.1-flash-image",
+  "official_standard_rates_usd_per_million_tokens": {
+    "text_image_input": 0.5,
+    "text_thinking_output": 3,
+    "image_output": 60
+  },
+  "official_1k_image_output_tokens": 1120,
+  "exact_image_output_component_usd": 0.0672,
+  "five_wrapper_attempt_image_output_component_usd": 0.336,
+  "complete_bounded_quote_available": false,
+  "minimum_images_for_current_pilot_structure": {
+    "reusable_character_sheets": 1,
+    "reusable_scene_sheets": 1,
+    "reusable_prop_sheets": 3,
+    "storyboard_images": 3,
+    "total_initial_images": 8,
+    "scope": "Existing three-shot/five-asset formal pilot structure, with no supported verified reference elision assumed"
+  },
+  "single_fixture_scope": "One valid-size 1K image can exercise provider fallback only; it does not validate Codex imagegen-tool output or cover pilot asset production.",
+  "follow_up_issue": "https://github.com/pablothobias/ArcReelBR/issues/14",
+  "approval": "none",
+  "configuration_or_price_mutations": false
+}
