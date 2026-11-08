@@ -33,6 +33,8 @@ def _facts(facts: ModelFacts) -> dict[str, object]:
                 {
                     "max_reference_images": facts.max_reference_images,
                     "output_token_bases": dict(facts.output_token_bases) or None,
+                    "max_input_tokens": facts.max_input_tokens,
+                    "max_output_tokens": facts.max_output_tokens,
                 },
             )
             return raw

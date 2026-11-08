@@ -71,6 +71,10 @@ class Usage:
     quantities: Mapping[str, float] = field(default_factory=dict)
     dimensions: Mapping[str, object] = field(default_factory=dict)
     text: str | None = None
+    #: Required billing measurements known to be unreported; absence is not zero usage.
+    missing_quantities: frozenset[str] = frozenset()
+    #: Presubmission interpretation only; never a claim about measured settlement.
+    estimate_basis: str | None = None
 
 
 def token_usage(
@@ -194,6 +198,8 @@ def price_usage(
         return Unpriced(UnpricedReason.NO_PRICE_TABLE)
     if not table.is_priceable:
         return Unpriced(UnpricedReason.UNRECOGNIZED_TERMS)
+    if usage.missing_quantities:
+        return Unpriced(UnpricedReason.NO_USAGE_ESTIMATE if estimate else UnpricedReason.MISSING_RATE)
     if _unpriced_meter(table, usage):
         return Unpriced(UnpricedReason.MISSING_RATE)
     if not estimate and table.meters and all(_quantity(meter, usage) is None for meter in table.meters):

@@ -39,7 +39,12 @@ def test_dump_does_not_invent_unrecorded_model_facts(factory):
     [
         (
             amphibious_image_entry,
-            {"max_reference_images": 16, "output_token_bases": {"low": 16, "medium": 48, "high": 96}},
+            {
+                "max_reference_images": 16,
+                "output_token_bases": {"low": 16, "medium": 48, "high": 96},
+                "max_input_tokens": 131072,
+                "max_output_tokens": 32768,
+            },
         ),
         (amphibious_image_entry, {"max_reference_images": 0, "image_to_image": False}),
         (
@@ -78,6 +83,14 @@ def test_dump_preserves_optional_model_facts(factory, additions):
     assert dumped["facts"] == raw["facts"]
     assert parse_entry(dumped) == entry
     assert check_entry(dumped) == []
+
+
+@pytest.mark.parametrize("field", ["max_input_tokens", "max_output_tokens"])
+@pytest.mark.parametrize("value", [0, -1, True, 1.5, "32768"])
+def test_image_token_bounds_require_positive_integers(field, value):
+    raw = amphibious_image_entry()
+    raw["facts"][field] = value
+    assert any(field in issue.path for issue in check_entry(raw))
 
 
 def test_dump_preserves_lifecycle_fields():

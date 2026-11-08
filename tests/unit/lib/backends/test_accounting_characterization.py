@@ -40,10 +40,8 @@ from lib.backends.image_backends.base import (
     ImageCapability,
     ImageGenerationRequest,
     ImageGenerationResult,
-    ImageRequestFacts,
     per_image_usage,
 )
-from lib.backends.image_backends.gemini import GeminiImageBackend
 from lib.backends.providers import CallPurpose
 from lib.backends.text_backends.base import (
     TextCapability,
@@ -435,10 +433,10 @@ class TestImageChannel:
                 provider="gemini-aistudio",
                 model="gemini-3-pro-image",
                 result_fields={"usage_tokens": 8},
-                usage_from_request=lambda request: GeminiImageBackend.estimate_usage(
-                    ImageRequestFacts(
-                        model="gemini-3-pro-image", aspect_ratio=request.aspect_ratio, image_size=request.image_size
-                    )
+                usage_from_request=lambda request: per_image_usage(
+                    output_images=1,
+                    input_images=None,
+                    dimensions={"resolution": request.image_size} if request.image_size is not None else {},
                 ),
             ),
         )
@@ -517,18 +515,17 @@ class TestImageChannel:
     async def test_builtin_call_priced_by_resolution_sent_in_request(
         self, tmp_path: Path, acct: _AccountingDb, image_size: str | None, expected_cost: float
     ) -> None:
-        # Report actual image_size resolution using GeminiImageBackend’s helper; pricing follows it,
-        # or default 1K when no resolution was sent.
+        # The protocol fake reports measured image counts, independent of presubmission estimators.
         gen = _media_generator(
             tmp_path,
             acct,
             image_backend=_FakeImageBackend(
                 provider="gemini-aistudio",
                 model="gemini-3-pro-image",
-                usage_from_request=lambda request: GeminiImageBackend.estimate_usage(
-                    ImageRequestFacts(
-                        model="gemini-3-pro-image", aspect_ratio=request.aspect_ratio, image_size=request.image_size
-                    )
+                usage_from_request=lambda request: per_image_usage(
+                    output_images=1,
+                    input_images=None,
+                    dimensions={"resolution": request.image_size} if request.image_size is not None else {},
                 ),
             ),
         )

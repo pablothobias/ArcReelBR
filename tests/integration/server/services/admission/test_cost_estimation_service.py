@@ -1132,7 +1132,7 @@ class TestCostEstimationService:
             "grid_storyboard": True,
             # Explicitly pin resolution-tier-priced models: test pricing follows resolved tiers,
             # never depend on global image defaults coincidentally using tiered pricing.
-            "image_provider_t2i": "gemini-aistudio/gemini-3.1-flash-image",
+            "image_provider_t2i": "agnes/agnes-image-2.5-flash",
             "episodes": [{"episode": 1, "title": "Ep1", "script_file": "ep1.json"}],
         }
         scripts = {"ep1.json": _make_script(1, seg_ids, [6] * 9)}
@@ -1190,7 +1190,7 @@ class TestCostEstimationService:
             "content_mode": "narration",
             "generation_mode": "storyboard",
             # Resolution-tier-priced models make tier differences observable.
-            "image_provider_t2i": "gemini-aistudio/gemini-3.1-flash-image",
+            "image_provider_t2i": "agnes/agnes-image-2.5-flash",
             "episodes": [{"episode": 1, "title": "Ep1", "script_file": "ep1.json"}],
         }
         scripts = {"ep1.json": _make_script(1, seg_ids, [6] * 3)}
@@ -1226,7 +1226,7 @@ class TestCostEstimationService:
             "content_mode": "narration",
             "generation_mode": "storyboard",
             "grid_storyboard": True,
-            "image_provider_t2i": "gemini-aistudio/gemini-3.1-flash-image",
+            "image_provider_t2i": "agnes/agnes-image-2.5-flash",
             "episodes": [{"episode": 1, "title": "Ep1", "script_file": "ep1.json"}],
         }
 
@@ -1412,7 +1412,7 @@ class TestCostEstimationService:
             "title": "Ad",
             "content_mode": "ad",
             "generation_mode": "storyboard",
-            "image_provider_t2i": "gemini-aistudio/gemini-3.1-flash-image",
+            "image_provider_t2i": "agnes/agnes-image-2.5-flash",
             "video_provider_i2v": "gemini-aistudio/veo-3.1-generate-preview",
             "target_duration": 30,
             "episodes": [{"episode": 1, "title": "", "script_file": "ep1.json"}],

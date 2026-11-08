@@ -9,7 +9,7 @@ from collections import Counter
 from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, NamedTuple
 
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
@@ -108,11 +108,21 @@ class BatchCostEstimate:
 
     total: CostBreakdown
     unpriced_count: int
+    estimate_basis: str | None = None
 
     def to_payload(self) -> dict[str, object]:
         """Two fields for batch-preview endpoints; ``estimated_cost`` is ``None`` without any priced items."""
 
-        return {"estimated_cost": self.total or None, "unpriced_count": self.unpriced_count}
+        payload: dict[str, object] = {"estimated_cost": self.total or None, "unpriced_count": self.unpriced_count}
+        if self.estimate_basis is not None:
+            payload["estimate_basis"] = self.estimate_basis
+        return payload
+
+
+class _ImageQuote(NamedTuple):
+    amount: float
+    currency: str
+    estimate_basis: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -233,7 +243,7 @@ def _quote_image(
     image_size: str | None,
     aspect_ratio: str,
     reference_count: int | None,
-) -> tuple[float, str] | None:
+) -> _ImageQuote | None:
     """Estimate one image; ``None`` when unpriced.
 
     Built-ins share settlement's catalog query/calculator, deriving usage from channel request facts.
@@ -256,17 +266,18 @@ def _quote_image(
             provider_multiplier=multiplier,
             estimate=True,
         )
-        return (cost.amount, cost.currency) if isinstance(cost, Priced) else None
+        return _ImageQuote(cost.amount, cost.currency, usage.estimate_basis) if isinstance(cost, Priced) else None
     if price is None:
         return None
+    usage = price.image_usage(facts)
     cost = price.price(
         model=model,
         media_type="image",
-        requests=(price.image_usage(facts),),
+        requests=(usage,),
         provider_multiplier=multiplier,
         estimate=True,
     )
-    return (cost.amount, cost.currency) if isinstance(cost, Priced) else None
+    return _ImageQuote(cost.amount, cost.currency, usage.estimate_basis) if isinstance(cost, Priced) else None
 
 
 def _has_generated_media(project: dict[str, Any], scripts: dict[str, dict[str, Any]]) -> bool:
@@ -527,9 +538,9 @@ class CostEstimationService:
             aspect_ratio=aspect_ratio,
             reference_count=0,
         )
-        grid_quotes: dict[str, tuple[float, str] | None] = {}
+        grid_quotes: dict[str, _ImageQuote | None] = {}
 
-        def _grid_quote(grid_aspect_ratio: str) -> tuple[float, str] | None:
+        def _grid_quote(grid_aspect_ratio: str) -> _ImageQuote | None:
             if grid_aspect_ratio not in grid_quotes:
                 grid_quotes[grid_aspect_ratio] = _quote_image(
                     image_provider,
@@ -641,7 +652,7 @@ class CostEstimationService:
                     indices = range(group_offset, group_offset + n)
                     if quotes and all(quote is not None for quote in quotes):
                         priced = [quote for quote in quotes if quote is not None]
-                        per_scene_cost = round(sum(amount for amount, _ in priced) / n, 6)
+                        per_scene_cost = round(sum(quote[0] for quote in priced) / n, 6)
                         grid_cost_per_index.update(dict.fromkeys(indices, (per_scene_cost, priced[0][1])))
                     elif quotes:
                         grid_unpriced_indices.update(indices)
@@ -1081,6 +1092,7 @@ async def estimate_image_batch_cost(
     counts = Counter(lanes)
     total: CostBreakdown = {}
     unpriced = 0
+    estimate_basis = None
     for lane, count in counts.items():
         quote = await _quote_image_lane(
             project, lane, aspect_ratio=aspect_ratio, resolver=resolver, session_factory=session_factory
@@ -1089,7 +1101,9 @@ async def estimate_image_batch_cost(
             unpriced += count
         else:
             _add_cost(total, quote[0] * count, quote[1])
-    return BatchCostEstimate(total=total, unpriced_count=unpriced)
+            if quote.estimate_basis is not None:
+                estimate_basis = quote.estimate_basis
+    return BatchCostEstimate(total=total, unpriced_count=unpriced, estimate_basis=estimate_basis)
 
 
 async def _quote_image_lane(
@@ -1099,7 +1113,7 @@ async def _quote_image_lane(
     aspect_ratio: str,
     resolver: ConfigResolver,
     session_factory: async_sessionmaker[AsyncSession],
-) -> tuple[float, str] | None:
+) -> _ImageQuote | None:
     """Estimated unit price per image in one lane; ``None`` for unresolved lanes, DB failure, or unpriced calls."""
 
     try:

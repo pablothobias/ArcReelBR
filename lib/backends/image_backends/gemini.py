@@ -8,8 +8,12 @@ import logging
 from pathlib import Path
 from typing import ClassVar
 
+import httpx
 from PIL import Image
+from pydantic import BaseModel
 
+from arcreel_catalog_core import ImageFacts
+from lib.backends.backend_runtime import should_retry_submit
 from lib.backends.gemini_shared import (
     VERTEX_SCOPES,
     RateLimiter,
@@ -24,11 +28,12 @@ from lib.backends.image_backends.base import (
     ImageGenerationRequest,
     ImageGenerationResult,
     ImageRequestFacts,
-    per_image_usage,
+    ImageResponseError,
+    ImageSubmissionAmbiguousError,
 )
 from lib.backends.providers import PROVIDER_GEMINI
 from lib.backends.transport_layer import TransportLayer
-from lib.billing.metering import Usage
+from lib.billing.metering import Priced, Usage, price_usage, token_usage
 from lib.config.system_config import resolve_vertex_credentials_path
 from lib.config.url_utils import normalize_base_url
 from lib.infra.async_thread import run_noninterruptible_sync
@@ -38,6 +43,26 @@ logger = logging.getLogger(__name__)
 
 # Default image model.
 DEFAULT_IMAGE_MODEL = "gemini-3.1-flash-image"
+
+
+def _retry_unsent(exc: Exception) -> bool:
+    return isinstance(exc, httpx.RequestError) and should_retry_submit(exc)
+
+
+def _count(value: object) -> int | None:
+    return value if isinstance(value, int) and not isinstance(value, bool) and value >= 0 else None
+
+
+def _modality_counts(details: object) -> dict[str, int]:
+    if not isinstance(details, list):
+        return {}
+    counts: dict[str, int] = {}
+    for item in details:
+        modality = getattr(item, "modality", None)
+        count = _count(getattr(item, "token_count", None))
+        if isinstance(modality, str) and count is not None:
+            counts[modality] = counts.get(modality, 0) + count
+    return counts
 
 
 class GeminiImageBackend:
@@ -88,12 +113,14 @@ class GeminiImageBackend:
                 project=project_id,
                 location="global",
                 credentials=credentials,
+                http_options=gemini_http_options(None, transport_layer, non_idempotent=True),
             )
         else:
             api_key = resolve_gemini_api_key(api_key)
             effective_base_url = normalize_base_url(base_url)
             self._client = _genai.Client(
-                api_key=api_key, http_options=gemini_http_options(effective_base_url, transport_layer)
+                api_key=api_key,
+                http_options=gemini_http_options(effective_base_url, transport_layer, non_idempotent=True),
             )
 
     @property
@@ -113,22 +140,43 @@ class GeminiImageBackend:
 
     @staticmethod
     def _usage(image_size: str | None) -> Usage:
-        """Report output image counts and requested ``image_size`` resolution, omitted when unsent.
-
-        References bill as input tokens, never image counts, avoiding duplicate metering. Input/thinking
-        tokens are currently absent from price tables and likewise unreported.
-        """
-        return per_image_usage(
-            output_images=1,
-            input_images=None,
-            dimensions={"resolution": image_size} if image_size is not None else None,
+        """Request facts lack input and non-image output quantities; image-only prices are incomplete."""
+        return Usage(
+            dimensions={"resolution": image_size} if image_size is not None else {},
+            missing_quantities=frozenset({"uncached_input_tokens", "output_tokens", "image_output_tokens"}),
         )
 
     @staticmethod
     def estimate_usage(facts: ImageRequestFacts) -> Usage:
-        return GeminiImageBackend._usage(facts.image_size)
+        entry = facts.entry
+        bounds = entry.facts if entry is not None and isinstance(entry.facts, ImageFacts) else None
+        if entry is None or bounds is None or bounds.max_input_tokens is None or bounds.max_output_tokens is None:
+            return GeminiImageBackend._usage(facts.image_size)
+        table = entry.price
+        # A nonmonotonic context-dependent table cannot be bounded from the largest context alone.
+        if table is None or any("context_tier" in meter.dims for meter in table.meters):
+            return GeminiImageBackend._usage(facts.image_size)
+        endpoints = []
+        for image_output in (0, bounds.max_output_tokens):
+            quantities = {
+                "uncached_input_tokens": bounds.max_input_tokens,
+                "image_output_tokens": image_output,
+                "output_tokens": bounds.max_output_tokens - image_output,
+            }
+            if facts.reference_count is not None:
+                quantities["input_images"] = facts.reference_count
+            usage = Usage(
+                quantities=quantities,
+                dimensions={"resolution": facts.image_size} if facts.image_size is not None else {},
+                estimate_basis="full_context_output_upper_bound",
+            )
+            cost = price_usage(table, usage, multiplier=1, estimate=True)
+            if not isinstance(cost, Priced):
+                return GeminiImageBackend._usage(facts.image_size)
+            endpoints.append((cost.amount, usage))
+        return max(endpoints, key=lambda endpoint: endpoint[0])[1]
 
-    @with_retry_async(max_attempts=5, backoff_seconds=(2, 4, 8, 16, 32))
+    @with_retry_async(max_attempts=5, backoff_seconds=(2, 4, 8, 16, 32), retry_if=_retry_unsent)
     async def generate(self, request: ImageGenerationRequest) -> ImageGenerationResult:
         """Generate images asynchronously."""
         # 1. Rate limiting.
@@ -148,7 +196,10 @@ class GeminiImageBackend:
 
         config = self._types.GenerateContentConfig(
             response_modalities=["IMAGE"],
+            candidate_count=1,
+            automatic_function_calling=self._types.AutomaticFunctionCallingConfig(disable=True),
             image_config=self._types.ImageConfig(**image_config_kwargs),
+            max_output_tokens=request.max_output_tokens,
         )
 
         # 4. Call asynchronous API.
@@ -159,19 +210,89 @@ class GeminiImageBackend:
                 {"model": self._image_model, "contents": contents, "image_config": image_config_kwargs}
             ),
         )
-        response = await self._client.aio.models.generate_content(
-            model=self._image_model, contents=contents, config=config
-        )
+        try:
+            response = await self._client.aio.models.generate_content(
+                model=self._image_model, contents=contents, config=config
+            )
+        except (TimeoutError, httpx.RequestError) as exc:
+            if _retry_unsent(exc) or isinstance(exc, (httpx.LocalProtocolError, httpx.UnsupportedProtocol)):
+                raise
+            raise ImageSubmissionAmbiguousError(
+                provider=self.name, result=self._measured_result(None, request)
+            ) from exc
 
         # 5. Parse responses/save.
         # Providers returned: decoding/persistence cannot be interrupted by cancellation, per backend.md postresponse accounting rules.
-        await run_noninterruptible_sync(self._process_image_response, response, request.output_path)
+        result = self._measured_result(response, request)
+        try:
+            await run_noninterruptible_sync(self._process_image_response, response, request.output_path)
+        except Exception as exc:
+            raise ImageResponseError(str(exc), result=result) from exc
+        return result
 
+    def _measured_result(self, response, request: ImageGenerationRequest) -> ImageGenerationResult:
+        metadata = getattr(response, "usage_metadata", None)
+        prompt = _count(getattr(metadata, "prompt_token_count", None))
+        cached = _count(getattr(metadata, "cached_content_token_count", None))
+        candidates = _count(getattr(metadata, "candidates_token_count", None))
+        thoughts = _count(getattr(metadata, "thoughts_token_count", None))
+        total = _count(getattr(metadata, "total_token_count", None))
+        tool_input = _count(getattr(metadata, "tool_use_prompt_token_count", None))
+        # Requests carry no tools; a consistent total can prove an omitted thought quantity.
+        if thoughts is None and total is not None and prompt is not None and candidates is not None:
+            residual = total - prompt - candidates
+            if residual >= 0 and tool_input in (None, 0):
+                thoughts = residual
+        outputs = _modality_counts(getattr(metadata, "candidates_tokens_details", None))
+        inputs = _modality_counts(getattr(metadata, "prompt_tokens_details", None))
+        image_tokens = outputs.get("IMAGE")
+        # A zero candidate total proves there are no response-image tokens; missing details otherwise remain unknown.
+        if image_tokens is None and candidates == 0:
+            image_tokens = 0
+        text_tokens = (
+            candidates - image_tokens + thoughts
+            if candidates is not None
+            and image_tokens is not None
+            and thoughts is not None
+            and candidates >= image_tokens
+            else None
+        )
+        quantities = token_usage(input_tokens=prompt, output_tokens=text_tokens, cache_read_tokens=cached)
+        if image_tokens is not None:
+            quantities["image_output_tokens"] = image_tokens
+        missing = {"uncached_input_tokens", "output_tokens", "image_output_tokens"} - quantities.keys()
+        if prompt is not None and cached is not None and cached > prompt:
+            missing.add("uncached_input_tokens")
+        if candidates is not None and sum(outputs.values()) > candidates:
+            missing.update({"output_tokens", "image_output_tokens"})
+        if tool_input or (
+            total is not None
+            and prompt is not None
+            and candidates is not None
+            and thoughts is not None
+            and total != prompt + candidates + thoughts
+        ):
+            missing.update({"uncached_input_tokens", "output_tokens", "image_output_tokens"})
         return ImageGenerationResult(
             image_path=request.output_path,
             provider=PROVIDER_GEMINI,
             model=self._image_model,
-            usage=self._usage(request.image_size),
+            usage_tokens=total,
+            input_tokens=prompt,
+            output_tokens=candidates + thoughts if candidates is not None and thoughts is not None else None,
+            cache_read_tokens=cached,
+            provider_response={"usage_metadata": metadata.model_dump(mode="json", exclude_none=True)}
+            if isinstance(metadata, BaseModel)
+            else None,
+            image_input_tokens=inputs.get("IMAGE") if sum(inputs.values()) == prompt else None,
+            text_input_tokens=inputs.get("TEXT") if sum(inputs.values()) == prompt else None,
+            image_output_tokens=image_tokens if text_tokens is not None else None,
+            text_output_tokens=text_tokens,
+            usage=Usage(
+                quantities=quantities,
+                dimensions={"resolution": request.image_size} if request.image_size is not None else {},
+                missing_quantities=frozenset(missing),
+            ),
         )
 
     @staticmethod

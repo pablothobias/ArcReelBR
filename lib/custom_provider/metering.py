@@ -78,6 +78,8 @@ def with_image_counts(usage: Usage | None, reference_count: int | None) -> Usage
         quantities={**counts.quantities, **usage.quantities},
         dimensions=dict(usage.dimensions),
         text=usage.text,
+        missing_quantities=usage.missing_quantities,
+        estimate_basis=usage.estimate_basis,
     )
 
 

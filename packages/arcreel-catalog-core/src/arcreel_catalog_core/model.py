@@ -28,6 +28,8 @@ class ImageFacts:
     resolutions: tuple[str, ...] = ()
     max_reference_images: int | None = None
     output_token_bases: Mapping[str, int] = field(default_factory=dict)
+    max_input_tokens: int | None = None
+    max_output_tokens: int | None = None
 
 
 @dataclass(frozen=True)

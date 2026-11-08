@@ -81,6 +81,7 @@ def create_custom_backend(
                 model_id, overrides=capability_overrides, endpoint_kind=spec.kind, entry_binding=entry_binding
             ),
             reference_limit_override=image_reference_override(capability_overrides, endpoint_kind=spec.kind),
+            catalog_entry=model_entry(model_id, spec.media_type, entry_binding),
             entry_reference_limit=entry_reference_limit(
                 model_id, builtin_provider=None, endpoint_kind=spec.kind, entry_binding=entry_binding
             ),

@@ -142,9 +142,10 @@ class TestGenerate:
         assert result.image_path == output_file
         assert result.provider == "gemini"
         assert output_file.exists()
-        # Without image_size, report output counts but no resolution, using price-table defaults.
+        # Missing provider metadata cannot establish the complete billable quantities.
         assert result.usage is not None
-        assert result.usage.quantities == {"output_images": 1}
+        assert result.usage.quantities == {}
+        assert result.usage.missing_quantities == {"uncached_input_tokens", "output_tokens", "image_output_tokens"}
         assert result.usage.dimensions == {}
 
     async def test_save_settles_through_cancellation(self, backend_aistudio, tmp_path):

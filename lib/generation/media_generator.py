@@ -26,6 +26,10 @@ from typing import TYPE_CHECKING, Any, Optional, cast
 
 from PIL import Image
 
+from arcreel_catalog_core import ImageFacts
+from lib.backends.http_status_errors import AmbiguousSubmitError
+from lib.backends.image_backends.base import ImageResponseError
+
 if TYPE_CHECKING:
     from arcreel_market_core.video_backend_contract import VideoGenerationResult
     from lib.asset_library.generation_inputs import ReferenceAssetChoice, ReferenceImageSource
@@ -136,6 +140,8 @@ def _is_413(exc: BaseException) -> bool:
     status extraction). Missing statuses fall back to phrase matching, without bare "413" substrings that could
     falsely match byte counts / request IDs (for example "41300 bytes").
     """
+    if isinstance(exc, (ImageResponseError, AmbiguousSubmitError)):
+        return False
     status = (
         getattr(exc, "status_code", None)
         or getattr(getattr(exc, "response", None), "status_code", None)
@@ -727,10 +733,19 @@ class MediaGenerator:
         # share effective values with orchestration trimming (lib.backends.image_capabilities). Upstream resolver bucket selection uses the same rules;
         # guard actual request shapes here.
         from lib.backends.image_capabilities import gate_image_request
+        from lib.catalog import query as catalog
 
         # Pairing invariants ensure non-None backends have non-None provider_id.
         await gate_image_request(
             self._image_backend, provider_id=cast(str, self._image_provider_id), reference_count=len(ref_images)
+        )
+        image_entry = catalog.provider_model_entry(
+            cast(str, self._image_provider_id), self._image_backend.model, "image"
+        )
+        output_token_cap = (
+            image_entry.facts.max_output_tokens
+            if image_entry is not None and isinstance(image_entry.facts, ImageFacts)
+            else None
         )
 
         # 2. Accounting bracket: entry persists pending; success submits backend results via call.success(result).
@@ -773,6 +788,7 @@ class MediaGenerator:
                             aspect_ratio=aspect_ratio,
                             image_size=image_size,
                             project_name=self.project_name,
+                            max_output_tokens=output_token_cap,
                         )
                     )
 

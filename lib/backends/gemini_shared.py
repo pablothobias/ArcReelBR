@@ -184,7 +184,7 @@ def resolve_gemini_api_key(api_key: str | None = None) -> str:
 
 
 def gemini_http_options(
-    base_url: str | None, transport_layer: TransportLayer | None
+    base_url: str | None, transport_layer: TransportLayer | None, *, non_idempotent: bool = False
 ) -> HttpOptions | HttpOptionsDict | None:
     """AI Studio http_options, containing only nonempty ``base_url`` without injection.
 
@@ -192,14 +192,15 @@ def gemini_http_options(
     ``httpx_async_client``: otherwise aiohttp-installed environments bypass injection through aiohttp.
     The SDK does not close externally supplied clients.
     """
-    if transport_layer is None:
+    if transport_layer is None and not non_idempotent:
         return {"base_url": base_url} if base_url else None
-    from google.genai.types import HttpOptions
+    from google.genai.types import HttpOptions, HttpRetryOptions
 
     return HttpOptions(
         base_url=base_url or None,
-        httpx_client=layer_sync_client(httpx.Client(follow_redirects=True), transport_layer),
-        httpx_async_client=layer_async_client(httpx.AsyncClient(follow_redirects=True), transport_layer),
+        httpx_client=layer_sync_client(httpx.Client(follow_redirects=not non_idempotent), transport_layer),
+        httpx_async_client=layer_async_client(httpx.AsyncClient(follow_redirects=not non_idempotent), transport_layer),
+        retry_options=HttpRetryOptions(attempts=1) if non_idempotent else None,
     )
 
 

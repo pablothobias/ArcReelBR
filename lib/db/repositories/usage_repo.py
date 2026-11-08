@@ -115,6 +115,7 @@ class SettlementInput:
     cache_write_5m_tokens: int | None = None
     cache_write_1h_tokens: int | None = None
     usage: tuple[Usage, ...] = ()
+    provider_response: object | None = None
 
 
 @dataclass(frozen=True)
@@ -303,20 +304,12 @@ class UsageRepository(BaseRepository):
 
         # OpenAI image calls: input_tokens/output_tokens columns represent totals
         # = image_*_tokens + text_*_tokens, retaining compatibility with cross-call_type aggregates.
-        # Resume has no image tokens: has_image_tokens stays False, preserving declared values.
+        # Preserve aggregate input/output independently when that side has no reported modality split.
         input_tokens = settlement.input_tokens
         output_tokens = settlement.output_tokens
-        has_image_tokens = any(
-            t is not None
-            for t in (
-                settlement.image_input_tokens,
-                settlement.image_output_tokens,
-                settlement.text_input_tokens,
-                settlement.text_output_tokens,
-            )
-        )
-        if has_image_tokens:
+        if settlement.image_input_tokens is not None or settlement.text_input_tokens is not None:
             input_tokens = (settlement.image_input_tokens or 0) + (settlement.text_input_tokens or 0)
+        if settlement.image_output_tokens is not None or settlement.text_output_tokens is not None:
             output_tokens = (settlement.image_output_tokens or 0) + (settlement.text_output_tokens or 0)
 
         cost_amount: float | None = 0.0
@@ -419,7 +412,8 @@ class UsageRepository(BaseRepository):
             row=row,
             finished_at=finished_at,
             settlement=settlement,
-            auto_calc=status == CallStatus.SUCCESS and row.status == CallStatus.PENDING,
+            auto_calc=(status == CallStatus.SUCCESS or (status == CallStatus.FAILED and bool(settlement.usage)))
+            and row.status == CallStatus.PENDING,
             base_currency=settlement.currency or "USD",
         )
 
@@ -615,7 +609,7 @@ class UsageRepository(BaseRepository):
             row=row,
             finished_at=finished_at,
             settlement=settlement,
-            auto_calc=status == CallStatus.SUCCESS,
+            auto_calc=status == CallStatus.SUCCESS or (status == CallStatus.FAILED and bool(settlement.usage)),
             base_currency=row.currency or "USD",
         )
 
@@ -647,6 +641,11 @@ class UsageRepository(BaseRepository):
                 error_message=error_truncated,
                 error_code=error_code,
                 error_params=error_params,
+                **(
+                    {"last_provider_response": bound_provider_response(settlement.provider_response)}
+                    if settlement.provider_response is not None
+                    else {}
+                ),
             )
         )
         await self.session.commit()

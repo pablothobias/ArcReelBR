@@ -42,7 +42,7 @@ Dataset versions are UTC timestamps in `YYYY-MM-DDTHH:MM:SSZ` format; string ord
   - Lifecycle describes retirement at the model-maker level and applies to every provider, including custom providers.
 - `facts` holds model facts with different fields per media type:
   - `text`: `image_input`, `structured_output`, `max_output_tokens`;
-  - `image`: `text_to_image`, `image_to_image`, `resolutions` (available resolution tiers), and optional `max_reference_images` and `output_token_bases`;
+  - `image`: `text_to_image`, `image_to_image`, `resolutions` (available resolution tiers), and optional `max_reference_images`, `output_token_bases`, `max_input_tokens` and `max_output_tokens`;
   - `video`: `durations` (available durations, required), `resolutions`, `duration_constraints` (`by_resolution` narrows available durations by resolution, and `with_reference_images` gives allowed durations with reference images), and optional `max_reference_images`, `text_to_video`, `first_frame`, `last_frame`, `reference_audio`, `max_reference_audio_count`, and `max_reference_audio_total_seconds`;
   - `audio`: none.
 - `price` is the price table; omit it when prices are absent.
@@ -53,6 +53,7 @@ For images and videos, absent model-fact fields marked “optional” mean unrec
 - Video `text_to_video`, `first_frame`, `last_frame`, and `reference_audio` are optional booleans indicating acceptance of text-to-video, first frame, last frame, and reference audio respectively. Explicit `false` differs from absence.
 - `max_reference_audio_count` is the reference-audio count limit (nonnegative integer); `max_reference_audio_total_seconds` is the combined duration limit across reference-audio clips (nonnegative finite number in seconds). Explicit `0` differs from absence. If `reference_audio` is `true`, `max_reference_audio_count` cannot be `0`.
 - Image `output_token_bases` maps quality tiers to positive-integer estimation bases, for example `{"low": 16, "medium": 48, "high": 96}`. When unrecorded it is an empty map, omitted when writing. Resolution-tier-to-request-`quality` mapping belongs to endpoint code, not entries.
+- Image `max_input_tokens` and `max_output_tokens` are optional positive-integer technical limits from verified model documentation. They are separate from estimation bases; omitted limits remain unknown. A supported channel can use the same limits for conservative full-context/output quote bounds and the actual request output ceiling.
 
 ### Price tables
 

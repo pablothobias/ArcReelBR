@@ -13,6 +13,7 @@ from arcreel_market_core.video_backend_contract import IMAGE_MIME_TYPES, Provide
 from lib.backends.artifact_download_guard import IMAGE_ARTIFACT_MAX_BYTES, artifact_http_client
 from lib.backends.backend_runtime import stream_to_file
 from lib.backends.data_uri import image_to_data_uri as _image_to_data_uri
+from lib.backends.http_status_errors import AmbiguousSubmitError
 from lib.billing.metering import Usage
 from lib.infra.async_thread import run_noninterruptible_sync
 
@@ -92,6 +93,8 @@ class ImageGenerationRequest:
     image_size: str | None = None
     project_name: str | None = None
     seed: int | None = None
+    #: Optional technical output-token ceiling; callers must verify support for the selected model.
+    max_output_tokens: int | None = None
     #: Provider-response diagnostics like ``VideoGenerationRequest``. Only callers needing stage snapshots
     #: such as endpoint tests supply callbacks. Production image calls keep ``None``.
     on_provider_response: Callable[[ProviderResponseStage, object], Awaitable[None]] | None = None
@@ -140,6 +143,29 @@ class ImageGenerationResult:
     text_input_tokens: int | None = None
     text_output_tokens: int | None = None
     usage: Usage | None = None
+    input_tokens: int | None = None
+    output_tokens: int | None = None
+    cache_read_tokens: int | None = None
+    provider_response: object | None = None
+
+
+class ImageResponseError(RuntimeError):
+    """Received/billable image response failed parsing or persistence; no usable artifact is claimed.
+
+    Preserve its measured result for failed-call accounting without authorizing generation again.
+    """
+
+    def __init__(self, message: str, *, result: ImageGenerationResult) -> None:
+        self.result = result
+        super().__init__(message)
+
+
+class ImageSubmissionAmbiguousError(AmbiguousSubmitError):
+    """Possibly accepted image generation retains unknown usage instead of claiming a zero charge."""
+
+    def __init__(self, *, provider: str, result: ImageGenerationResult) -> None:
+        self.result = result
+        super().__init__(provider=provider)
 
 
 def per_image_usage(

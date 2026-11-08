@@ -39,6 +39,7 @@ from datetime import datetime
 from typing import Any, assert_never
 
 from lib.agent.credential_tiers import AgentPricing
+from lib.backends.image_backends.base import ImageResponseError, ImageSubmissionAmbiguousError
 from lib.backends.providers import CallPurpose, CallStatus, CallType
 from lib.billing.call_failure import CallFailure, classify_call_failure
 from lib.billing.metering import Usage, token_usage
@@ -93,6 +94,10 @@ def _settlement_from_result(call_type: CallType, result: Any, *, usage: Usage | 
     """
     if call_type == "image":
         return SettlementInput(
+            input_tokens=getattr(result, "input_tokens", None),
+            output_tokens=getattr(result, "output_tokens", None),
+            cache_read_tokens=getattr(result, "cache_read_tokens", None),
+            provider_response=getattr(result, "provider_response", None),
             usage_tokens=result.usage_tokens,
             image_input_tokens=result.image_input_tokens,
             image_output_tokens=result.image_output_tokens,
@@ -409,18 +414,27 @@ class Ledger:
         """
         try:
             failure = classify_call_failure(exc)
-            await self._settle(self._write_failed(call_id, failure))
+            settlement = None
+            current: BaseException | None = exc
+            while current is not None:
+                if isinstance(current, (ImageResponseError, ImageSubmissionAmbiguousError)):
+                    settlement = _settlement_from_result("image", current.result)
+                    break
+                current = current.__cause__
+            await self._settle(self._write_failed(call_id, failure, settlement=settlement))
         except Exception:
             logger.exception("ledger 失败分支记账写入自身失败 call_id=%s（原异常照常重抛）", call_id)
             return False
         return True
 
-    async def _write_failed(self, call_id: int, failure: CallFailure) -> None:
+    async def _write_failed(
+        self, call_id: int, failure: CallFailure, *, settlement: SettlementInput | None = None
+    ) -> None:
         async with self._session_factory() as session:
             await UsageRepository(session).finish_call(
                 call_id,
                 status=CallStatus.FAILED,
-                settlement=SettlementInput(),
+                settlement=settlement if settlement is not None else SettlementInput(),
                 error_message=failure.error_message,
                 error_code=failure.error_code,
                 error_params=failure.error_params,

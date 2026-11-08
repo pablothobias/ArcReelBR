@@ -8,7 +8,7 @@ from __future__ import annotations
 from dataclasses import replace
 from typing import cast
 
-from arcreel_catalog_core import CatalogEntry, VideoFacts
+from arcreel_catalog_core import CatalogEntry, ImageFacts, VideoFacts
 from arcreel_market_core.video_backend_contract import (
     VideoBackend,
     VideoCapabilities,
@@ -79,6 +79,7 @@ class CustomImageBackend:
         model_capabilities: frozenset[ImageCapability] | None = None,
         entry_reference_limit: int | None = None,
         reference_limit_override: int | None = None,
+        catalog_entry: CatalogEntry | None = None,
     ) -> None:
         self._provider_id = provider_id
         self._delegate = delegate
@@ -86,6 +87,7 @@ class CustomImageBackend:
         self._model_capabilities = model_capabilities
         self._entry_reference_limit = entry_reference_limit
         self.reference_limit_override = reference_limit_override
+        self._catalog_entry = catalog_entry
 
     def with_model_facts(
         self,
@@ -93,6 +95,7 @@ class CustomImageBackend:
         *,
         entry_reference_limit: int | None,
         reference_limit_override: int | None = None,
+        catalog_entry: CatalogEntry | None = None,
     ) -> CustomImageBackend:
         """Return new instances injecting model-side T2I/I2I/reference maxima, factory-resolved from rows/entries/overrides."""
         return CustomImageBackend(
@@ -102,6 +105,7 @@ class CustomImageBackend:
             model_capabilities=model_capabilities,
             entry_reference_limit=entry_reference_limit,
             reference_limit_override=reference_limit_override,
+            catalog_entry=catalog_entry,
         )
 
     @property
@@ -135,6 +139,10 @@ class CustomImageBackend:
         return await self._delegate.reference_image_limit()
 
     async def generate(self, request: ImageGenerationRequest) -> ImageGenerationResult:
+        if request.max_output_tokens is None and self._catalog_entry is not None:
+            facts = self._catalog_entry.facts
+            if isinstance(facts, ImageFacts):
+                request = replace(request, max_output_tokens=facts.max_output_tokens)
         result = await self._delegate.generate(request)
         # Undeclared metering channels (ComfyUI/declarative images/OpenAI Chat images) report generic counts; preserve built-in
         # measurements and supplement counts, leaving entry price tables to price (docs/adr/0100).
