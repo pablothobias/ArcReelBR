@@ -142,6 +142,7 @@ FAILURE_CODE_KEYS: dict[str, str] = {
     # Deterministic upstream 4xx rejection. provider_reason in params is redacted, truncated upstream text, intentionally excluded from
     # translation templates: never translate it; readers display it unchanged in a separate field.
     "provider_rejected": "task_fail_provider_rejected",
+    "subscription_quota_paused": "subscription_quota_paused",
     "dispatch_provider_requeue_failed": "task_fail_dispatch_provider_requeue_failed",
     # Projects deleted during execution: tasks abandon disk writes; see lib.project.task_project_claim.
     "project_deleted_during_task": "task_fail_project_deleted_during_task",

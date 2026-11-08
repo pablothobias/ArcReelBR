@@ -22,7 +22,12 @@ from lib.artifacts.artifact_manifest import (
 from lib.artifacts.artifact_provenance import ScriptPlanPromptVariant, build_script_plan_request
 from lib.artifacts.formal_write import formal_write_transaction
 from lib.backends.providers import CallPurpose
-from lib.backends.text_backends.base import DEFAULT_MAX_OUTPUT_TOKENS, TextOutputTruncatedError, TextTaskType
+from lib.backends.text_backends.base import (
+    DEFAULT_MAX_OUTPUT_TOKENS,
+    SubscriptionQuotaPaused,
+    TextOutputTruncatedError,
+    TextTaskType,
+)
 from lib.backends.text_backends.base import TextGenerationRequest as BackendTextGenerationRequest
 from lib.backends.text_generator import TextGenerator
 from lib.catalog.errors import ModelNotInCatalogError
@@ -1107,7 +1112,7 @@ async def generate_drama_script_plan(
         return TextGenerationResult(
             drama_script_plan_result_text(script_plan_path.relative_to(project_path), raw_scenes, action="generated")
         )
-    except (TextGenerationError, TextOutputTruncatedError, ModelNotInCatalogError):
+    except (TextGenerationError, TextOutputTruncatedError, ModelNotInCatalogError, SubscriptionQuotaPaused):
         raise
     except VideoRequestFactsError as exc:
         raise VideoRequestFactsUnavailableError(exc.failure) from exc
@@ -1870,7 +1875,7 @@ async def generate_reference_script_plan(
                 action="split",
             )
         )
-    except (TextGenerationError, TextOutputTruncatedError, ModelNotInCatalogError):
+    except (TextGenerationError, TextOutputTruncatedError, ModelNotInCatalogError, SubscriptionQuotaPaused):
         raise
     except VideoRequestFactsError as exc:
         raise VideoRequestFactsUnavailableError(exc.failure) from exc
@@ -2020,7 +2025,7 @@ async def generate_narration_script_plan(
         return TextGenerationResult(
             narration_script_plan_result_text(script_plan_path.relative_to(project_path), raw_segments, action="split")
         )
-    except (TextGenerationError, TextOutputTruncatedError, ModelNotInCatalogError):
+    except (TextGenerationError, TextOutputTruncatedError, ModelNotInCatalogError, SubscriptionQuotaPaused):
         raise
     except VideoRequestFactsError as exc:
         raise VideoRequestFactsUnavailableError(exc.failure) from exc

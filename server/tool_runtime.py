@@ -24,7 +24,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from lib.agent.profile_manifest import ContentMode
 from lib.artifacts.artifact_activation import ArtifactCurrencyResolver, active_artifact_currency_resolver
-from lib.backends.text_backends.base import TextOutputTruncatedError
+from lib.backends.text_backends.base import SubscriptionQuotaPaused, TextOutputTruncatedError
 from lib.catalog.errors import ModelNotInCatalogError
 from lib.config.resolver import ConfigResolver, caps_generation_mode, video_bucket_for_generation_mode
 from lib.db import async_session_factory
@@ -717,8 +717,26 @@ async def _run_text_generation(
         return ToolOutcome(problem=_unexpected_text_failure_problem(f"{operation} failed: {exc}", exc))
 
 
+def _subscription_pause_problem(cause: BaseException) -> ToolProblem | None:
+    """Retain subscription pause identity through consumer exception wrappers."""
+    current: BaseException | None = cause
+    while current is not None:
+        if isinstance(current, SubscriptionQuotaPaused):
+            return ToolProblem(
+                current.code,
+                str(current),
+                action=GenerationAction.NONE,
+                params={"resumable": True},
+            )
+        current = current.__cause__
+    return None
+
+
 def _unexpected_text_failure_problem(detail: str, cause: BaseException) -> ToolProblem:
     """Unexpected generation exception: actual provider content/input rejection maps to rejection (edit input); otherwise retry as task failure, matching image tasks."""
+    pause = _subscription_pause_problem(cause)
+    if pause is not None:
+        return pause
     if is_provider_refusal(cause):
         return ToolProblem("generation_refused", detail)
     return ToolProblem(GenerationProblemCode.TASK_FAILED.value, detail, action=GenerationAction.RETRY)
@@ -2921,6 +2939,9 @@ async def _execute_plan_episodes(
             )
         )
     except Exception as exc:
+        pause = _subscription_pause_problem(exc)
+        if pause is not None:
+            return ToolOutcome(problem=pause)
         # Unexpected exceptions such as provider-call failures share planning's failure code. UI shows generic failure in the user's language; detail retains the reason for the Agent.
         return ToolOutcome(problem=ToolProblem("episode_planning_failed", str(exc) or type(exc).__name__))
     finally:
@@ -3205,6 +3226,9 @@ async def _draft_replan_window(
             )
         )
     except Exception as exc:
+        pause = _subscription_pause_problem(exc)
+        if pause is not None:
+            return ToolOutcome(problem=pause)
         # Unexpected exceptions such as provider-call failures share planning's failure code. UI shows generic failure in the user's language; detail retains the reason for the Agent.
         return ToolOutcome(problem=ToolProblem("episode_planning_failed", str(exc) or type(exc).__name__))
     finally:

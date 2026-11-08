@@ -426,6 +426,16 @@ Consider:
 
 High-reasoning models are not necessarily suitable for every task. Complex content analysis and routine structured transformations can use different models.
 
+### 8.1 Local subscription text channel {#local-subscription-text}
+
+Local production can use the official Claude Agent SDK with an existing Claude Code subscription login. This channel pins Opus 5.5 and medium effort, independently of the Agent conversation model and media-provider credentials. Existing text defaults remain unchanged.
+
+First sign in to the official Claude runtime under the account running ArcReel. Through the global configuration API `PATCH /api/v1/system/config` or project configuration API `PATCH /api/v1/projects/{name}`, set the desired `text_backend_simple`, `text_backend_complex` or `default_text_backend` field to `claude-subscription/claude-opus-5-5`. This local channel is not registered in API-provider model dropdowns. Changing one tier leaves the other tier unchanged; project settings still take priority over global settings.
+
+Each call uses a new isolated working directory without project or user settings, MCP, plugins, skills or production tools. Text, structured output and image inputs use existing local validation. API keys, bearer tokens, endpoint overrides or cloud-provider overrides in the runtime environment stop the operation to avoid separately billed API authentication. Subscription tokens never need to be copied, read or exported.
+
+Usage records retain token counts with an unpriced cost; the SDK's estimated dollar amount is not treated as an actual subscription charge. Exhausted quota exits as a resumable pause. The director should preserve production state and explicitly resume after quota returns. Timeouts, unavailable models and unverified login never trigger automatic retries or paid API fallback. Actual model availability, subscription quota and image understanding require real local validation.
+
 ## 9. TTS Configuration {#tts-providers}
 
 ArcReel's voice-over capability can use DashScope Qwen TTS and qwen-audio TTS, MiniMax Speech, Gemini TTS (AI Studio, Vertex), or a compatible TTS interface.

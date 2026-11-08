@@ -77,6 +77,7 @@ MESSAGES = {
     "task_retry_download_unavailable": "Tác vụ '{id}' hiện không thể thử tải lại",
     # Lý do tác vụ thất bại (GenerationWorker lưu mã lỗi + tham số; tasks API kết xuất theo ngôn ngữ khi đọc)
     "task_fail_provider_unsupported_media": "Nhà cung cấp {provider_id} không hỗ trợ tạo {media_type}",
+    "subscription_quota_paused": "Đã hết hạn mức đăng ký Claude. Giữ nguyên trạng thái sản xuất và tiếp tục rõ ràng sau khi hạn mức được đặt lại. Không chuyển sang API trả phí.",
     "task_fail_provider_rejected": "Nhà cung cấp đã từ chối yêu cầu tạo này (HTTP {status})",
     "task_fail_dispatch_provider_requeue_failed": "Nhà cung cấp tác vụ đã đổi từ {claimed_provider_id} sang {actual_provider_id}, nhưng không thể đưa tác vụ trở lại hàng đợi để nhận khe mới; vui lòng thử lại",
     "task_fail_project_deleted_during_task": "Dự án đã bị xóa trong khi tác vụ đang chạy; kết quả tạo ra không được lưu",

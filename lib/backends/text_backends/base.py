@@ -110,6 +110,19 @@ class StructuredOutputExhaustedError(NonRetryableError):
         super().__init__(f"{provider}/{model} 的结构化输出能力不足：{reason}。请更换文本模型或供应商后重试。")
 
 
+class SubscriptionQuotaPaused(NonRetryableError):
+    """Preserve director state and resume explicitly after subscription quota returns."""
+
+    code = "subscription_quota_paused"
+    resumable = True
+    status_code = 429
+
+    def __init__(self) -> None:
+        super().__init__(
+            "Claude subscription quota is exhausted. Preserve production state and resume after quota resets; no API fallback was attempted."
+        )
+
+
 # Raw-model-output diagnostic log limit: enough to reveal structural issues (prose vs JSON, object vs array,
 # missing fields), without logging entire generated content.
 RAW_OUTPUT_LOG_LIMIT = 500

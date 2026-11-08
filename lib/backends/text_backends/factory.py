@@ -10,6 +10,7 @@ from __future__ import annotations
 from lib.backends.backend_assembly import assemble_backend
 from lib.backends.backend_assembly.assembler import OutputLimitFacts, output_limit_facts
 from lib.backends.text_backends.base import TextBackend, TextTaskType
+from lib.config.claude_subscription import CLAUDE_SUBSCRIPTION_PROVIDER
 from lib.config.resolver import ConfigResolver
 from lib.db import async_session_factory
 
@@ -27,6 +28,10 @@ async def create_text_backend_for_task(
 
     async with resolver.session() as r:
         provider_id, model_id = await r.text_backend_for_task(task_type, project_name)
+        if provider_id == CLAUDE_SUBSCRIPTION_PROVIDER:
+            from lib.backends.text_backends.claude_subscription import ClaudeSubscriptionTextBackend
+
+            return ClaudeSubscriptionTextBackend(model=model_id), provider_id
         backend = await assemble_backend(
             provider_id=provider_id,
             media_type="text",

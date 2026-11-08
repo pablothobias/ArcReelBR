@@ -400,6 +400,16 @@ ArcReel 支持：
 
 高推理模型不一定适合所有任务。可把复杂内容分析和普通结构化转换分给不同模型。
 
+### 8.1 本地订阅文本通道 {#local-subscription-text}
+
+本地生产可通过官方 Claude Agent SDK 使用现有 Claude Code 订阅登录。该通道固定使用 Opus 5.5 和 medium effort，与 Agent 会话模型及媒体供应商凭证分开；不会改变现有文本默认值。
+
+先在运行 ArcReel 的同一账户下完成官方 Claude 登录。通过全局配置 API `PATCH /api/v1/system/config` 或项目配置 API `PATCH /api/v1/projects/{name}`，将 `text_backend_simple`、`text_backend_complex` 或 `default_text_backend` 中需要覆盖的字段设为 `claude-subscription/claude-opus-5-5`。此本地通道不在 API 供应商模型下拉列表中注册。只设置一个层级不会改变另一个层级；项目配置仍优先于全局配置。
+
+每次调用使用新的隔离工作目录，不加载项目或用户设置、MCP、插件、技能或生产工具。支持文本、结构化输出和图像输入；结构化结果仍执行现有本地校验。运行环境若含 API Key、Bearer Token、其他 API 地址或云供应商覆盖配置，调用会停止，避免切换到独立计费的 API。无需复制、读取或导出订阅令牌。
+
+用量记录保存 Token 数量，费用保持未定价，不把 SDK 的估算美元金额作为订阅实际费用。订阅额度耗尽时调用以可恢复暂停状态退出；监督方应保存生产状态，待额度恢复后显式继续。超时、模型不可用或登录无法确认时也不会自动重试或回退到付费 API。实际模型可用性、订阅额度与图像理解质量需通过本地真实调用确认。
+
 ## 9. TTS 配置 {#tts-providers}
 
 ArcReel 的旁白能力可以使用阿里百炼 Qwen TTS 与 qwen-audio TTS、MiniMax 语音、Gemini TTS（AI Studio、Vertex）或兼容的 TTS 接口。

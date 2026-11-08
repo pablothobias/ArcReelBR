@@ -77,6 +77,7 @@ MESSAGES = {
     "task_retry_download_unavailable": "Для задачи «{id}» повторное скачивание сейчас недоступно",
     # Task failure reasons (GenerationWorker stores a code + params; tasks API renders per locale on read)
     "task_fail_provider_unsupported_media": "Провайдер {provider_id} не поддерживает генерацию {media_type}",
+    "subscription_quota_paused": "Квота подписки Claude исчерпана. Сохраните состояние производства и явно возобновите работу после восстановления квоты. Перехода на платный API не было.",
     "task_fail_provider_rejected": "Провайдер отклонил этот запрос на генерацию (HTTP {status})",
     "task_fail_dispatch_provider_requeue_failed": "Провайдер задачи изменился с {claimed_provider_id} на {actual_provider_id}, но задачу не удалось вернуть в очередь за новым слотом. Повторите попытку",
     "task_fail_project_deleted_during_task": "Проект удалён во время выполнения задачи; сгенерированный результат не сохранён",

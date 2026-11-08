@@ -7,6 +7,7 @@ from fastapi.exceptions import RequestValidationError
 
 from lib.catalog import query as catalog
 from lib.catalog.errors import ModelNotInCatalogError
+from lib.config.claude_subscription import CLAUDE_SUBSCRIPTION_PAIR, CLAUDE_SUBSCRIPTION_PROVIDER
 from lib.config.model_setting_keys import MODEL_SETTING_MEDIA_TYPES
 from lib.config.registry import PROVIDER_REGISTRY
 from lib.config.resolver import ConfigResolver, VideoBucketCapabilityError, VideoGenerationType
@@ -108,6 +109,10 @@ def validate_backend_value(value: str, field_name: str) -> None:
             return  # Bare registry ID without a model; downstream fills the global default.
         raise BadRequestError("invalid_backend_format").with_diagnostic(f"field: {field_name}")
     provider_id, model_id = value.split("/", 1)
+    if provider_id == CLAUDE_SUBSCRIPTION_PROVIDER:
+        if value == CLAUDE_SUBSCRIPTION_PAIR and MODEL_SETTING_MEDIA_TYPES.get(field_name) == "text":
+            return
+        raise BadRequestError("invalid_backend_format").with_diagnostic(f"field: {field_name}")
     if provider_id not in PROVIDER_REGISTRY and not provider_id.startswith("custom-"):
         raise BadRequestError("unknown_provider", value=provider_id).with_diagnostic(f"field: {field_name}")
     # Skip this check for unregistered field names; missed registration of new fields passes silently rather than reporting falsely.

@@ -77,6 +77,7 @@ MESSAGES = {
     "task_retry_download_unavailable": "任务 '{id}' 当前不可重试下载",
     # Task failure reasons: GenerationWorker writes codes/parameters; tasks API renders them by language.
     "task_fail_provider_unsupported_media": "供应商 {provider_id} 不支持 {media_type} 生成",
+    "subscription_quota_paused": "Claude 订阅额度已耗尽。请保留生产状态，待额度恢复后显式继续。系统未回退到付费 API。",
     "task_fail_provider_rejected": "供应商拒绝了这次生成请求（HTTP {status}）",
     "task_fail_dispatch_provider_requeue_failed": "任务供应商从 {claimed_provider_id} 变为 {actual_provider_id}，但无法回队重新认领，请重试",
     "task_fail_project_deleted_during_task": "项目已在任务执行期间删除，本次生成结果未保存",
