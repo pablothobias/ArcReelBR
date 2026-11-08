@@ -27,6 +27,8 @@ Use one local recovery JSON file outside the public repository. Read [recovery f
 
 A separately approved `evaluation-10` round is limited to the six named audiovisual artifacts, exact model and USD ceilings in [recovery format](references/recovery-format.md#separately-approved-audiovisual-evaluation). Reserve each artifact once, preserve provider response/usage evidence, and reconcile before the next call. This exception does not change generation-round counts or quality attempts.
 
+A separately approved `diagnostic-10` round uses a fresh recovery record for the four frozen cases in [the diagnostic scope](references/recovery-format.md#separately-approved-four-case-diagnostic). Preserve the closed evaluation record, reserve each case once, and retain its raw request, response and usage evidence before proceeding.
+
 The helper reads and updates only the local directing record. It makes no provider call, controls no worker and enforces no backend cap. Its inputs are evidence snapshots that Codex must verify against the actual approval, current quotes and application state. The arithmetic cannot authenticate an evidence pointer or guarantee a provider's eventual charge. A changed quote, tier, target set or unexpected charge is reviewed against the original allowance before any next submission.
 
 ## Rejection, transport and quota

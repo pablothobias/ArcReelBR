@@ -299,3 +299,86 @@ def test_evaluation_pending_reservation_and_per_artifact_limit_stop_independent_
     assert commitment(state) == _POLICY["Decimal"]("0.04")
     with pytest.raises(Pause, match="allowance exhausted"):
         reserve(evaluation_record(), evaluation_action(maximum="0.04001"))
+
+
+def diagnostic_record():
+    state = evaluation_record()
+    state["approval"].update(
+        round="diagnostic-10",
+        round_limit="0.04",
+        max_calls=4,
+        per_video={key: str(value) for key, value in _POLICY["DIAGNOSTIC_CASE_LIMITS"].items()},
+        user_evidence_ref="chat:explicit-four-case-diagnostic-approval",
+    )
+    return state
+
+
+def diagnostic_action(case="case-a", **changes):
+    candidate = action(identifier=case, maximum="0.01")
+    return {**candidate, "video_id": case, **changes}
+
+
+def test_diagnostic_reserves_four_fixed_cases_once_and_reuses_existing_receipts():
+    state = diagnostic_record()
+    for case in ("case-a", "case-b", "case-c", "case-d"):
+        candidate = diagnostic_action(case)
+        state, decision = reserve(state, candidate)
+        assert decision["decision"] == "reserve_before_delegating"
+        assert decide(state, candidate)["decision"] == "reconcile_existing"
+        state = reconcile(state, observed(case, settled="0.01"))
+        assert decide(state, candidate)["decision"] == "reuse_complete"
+    assert len(state["intents"]) == 4
+    assert commitment(state) == _POLICY["Decimal"]("0.04")
+    with pytest.raises(Pause, match="one request per approved artifact"):
+        reserve(state, diagnostic_action(intent_id="fifth", client_key="fifth", segment_id="different"))
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("round_limit", "0.05"),
+        ("currency", "BRL"),
+        ("model", "another-model"),
+        ("max_calls", 5),
+        ("allow_retries", True),
+        ("per_video", {"case-a": "0.01", "case-b": "0.01", "case-c": "0.01"}),
+        ("per_video", {"case-a": "0.02", "case-b": "0.01", "case-c": "0.01", "case-d": "0.01"}),
+        ("per_video", {"case-a": "0.01", "case-b": "0.01", "case-c": "0.01", "extra": "0.01"}),
+    ],
+)
+def test_diagnostic_approval_cannot_change_fixed_scope_model_or_limits(field, value):
+    state = diagnostic_record()
+    state["approval"][field] = value
+    with pytest.raises(Pause, match="exact four cases"):
+        reserve(state, diagnostic_action())
+    assert state["intents"] == []
+
+
+@pytest.mark.parametrize("status", ["complete", "failed", "not_submitted"])
+def test_diagnostic_case_cannot_be_retried_after_zero_settlement_or_changed_segment(status):
+    state, _ = reserve(diagnostic_record(), diagnostic_action())
+    state = reconcile(
+        state,
+        observed("case-a", status=status, settled="0", non_submission_evidence_ref="verified:not-submitted"),
+    )
+    with pytest.raises(Pause, match="one request per approved artifact"):
+        reserve(state, diagnostic_action(intent_id="replacement", client_key="replacement", segment_id="changed"))
+    assert len(state["intents"]) == 1
+
+
+@pytest.mark.parametrize("kind", ["quality_regeneration", "transport_retry"])
+def test_diagnostic_does_not_admit_quality_or_transport_attempts(kind):
+    with pytest.raises(Pause, match="without retries"):
+        reserve(diagnostic_record(), diagnostic_action(kind=kind))
+
+
+def test_diagnostic_unknown_outcome_keeps_reservation_and_blocks_next_case():
+    state, _ = reserve(diagnostic_record(), diagnostic_action())
+    state = reconcile(state, observed("case-a", status="pending", settled=None))
+    assert commitment(state) == _POLICY["Decimal"]("0.01")
+    with pytest.raises(Pause, match="pending"):
+        reserve(state, diagnostic_action("case-b"))
+    with pytest.raises(Pause, match="allowance exhausted"):
+        reserve(diagnostic_record(), diagnostic_action(maximum="0.01001"))
+    with pytest.raises(Pause, match="outside the explicitly approved round"):
+        reserve(diagnostic_record(), evaluation_action())
