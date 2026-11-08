@@ -1,0 +1,137 @@
+{
+  "fixture": "Existing real authenticated uploads of synthetic PNG, not an AI generation",
+  "paid_provider_calls": 0,
+  "project": "handoff-fixture",
+  "previews": [
+    {
+      "probe": "reusable_asset",
+      "selected_image": {
+        "logical_type": "character",
+        "logical_id": "Ana",
+        "artifact_path": "characters/Ana.png",
+        "currency": "current",
+        "current_version": 1,
+        "source": "manual_upload",
+        "content_digest": "033e5a74f6726960971953f1652a3f9bd9a0115ddd8261db3ca3ec56f275d96d",
+        "byte_length": 233,
+        "width": 64,
+        "height": 96
+      },
+      "production_encoder_data_uri_matches_selected_bytes": true,
+      "outgoing_input_source": "reference_images",
+      "request_preview": {
+        "submit": {
+          "method": "POST",
+          "url": "https://api.minimax.io/v2/video_generation",
+          "body": {
+            "model": "MiniMax-H3",
+            "content": [
+              {
+                "type": "text",
+                "text": "Static medium shot. Ana says: \"Olá, Brasil!\""
+              },
+              {
+                "type": "image_url",
+                "image_url": {
+                  "url": "<data:image/png;base64, 233 bytes>"
+                },
+                "role": "reference_image"
+              }
+            ],
+            "resolution": "2K",
+            "duration": 5,
+            "ratio": "9:16"
+          }
+        },
+        "poll": {
+          "method": "GET",
+          "url": "https://api.minimax.io/v2/query/video_generation/{{ task_id }}",
+          "body": null
+        },
+        "result": null,
+        "conversions": null
+      },
+      "verified_provider_role": "reference_image"
+    },
+    {
+      "probe": "storyboard",
+      "selected_image": {
+        "logical_type": "storyboard",
+        "logical_id": "E1S01",
+        "artifact_path": "storyboards/scene_E1S01.png",
+        "currency": "current",
+        "current_version": 1,
+        "source": "manual_upload",
+        "content_digest": "033e5a74f6726960971953f1652a3f9bd9a0115ddd8261db3ca3ec56f275d96d",
+        "byte_length": 233,
+        "width": 64,
+        "height": 96
+      },
+      "production_encoder_data_uri_matches_selected_bytes": true,
+      "outgoing_input_source": "start_image",
+      "request_preview": {
+        "submit": {
+          "method": "POST",
+          "url": "https://api.minimax.io/v2/video_generation",
+          "body": {
+            "model": "MiniMax-H3",
+            "content": [
+              {
+                "type": "text",
+                "text": "Static medium shot. Ana says: \"Olá, Brasil!\""
+              },
+              {
+                "type": "image_url",
+                "image_url": {
+                  "url": "<data:image/png;base64, 233 bytes>"
+                },
+                "role": "first_frame"
+              }
+            ],
+            "resolution": "2K",
+            "duration": 5,
+            "ratio": "adaptive"
+          }
+        },
+        "poll": {
+          "method": "GET",
+          "url": "https://api.minimax.io/v2/query/video_generation/{{ task_id }}",
+          "body": null
+        },
+        "result": null,
+        "conversions": null
+      },
+      "verified_provider_role": "first_frame"
+    }
+  ],
+  "limits": [
+    "No provider request sent",
+    "No AI image-generation call made",
+    "Reusable-asset probe maps an existing assembler-selected character sheet into the supported H3 reference-image input in memory; it does not mutate the storyboard project into a reference-video project"
+  ],
+  "image_generation_tool_metadata": {
+    "tool": "image_gen__imagegen",
+    "invoked": false,
+    "exposed_return_fields": [
+      "image_url",
+      "output_hint"
+    ],
+    "price_provided": false,
+    "currency_provided": false,
+    "billing_unit_provided": false,
+    "account_allowance_provided": false,
+    "actual_charge_usage_report_provided": false,
+    "quote_status": "unknown_no_numeric_quote",
+    "decision": "Do not infer zero cost or invoke generation without applicable approved usage policy or allowance"
+  },
+  "provider_image_constraint_check": {
+    "source": "https://platform.minimax.io/docs/api-reference/video-generation-v2-create",
+    "minimum_width_and_height": 256,
+    "maximum_width_and_height": 5760,
+    "fixture_width": 64,
+    "fixture_height": 96,
+    "satisfies_provider_dimensions": false,
+    "provider_ready": false,
+    "note": "Deliberately tiny upload fixture proves registered byte/identity/role wiring only; use a valid-size actual AI-produced image for the pending end-to-end test."
+  }
+}

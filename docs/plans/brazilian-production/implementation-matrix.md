@@ -2,7 +2,7 @@
 
 Updated: 2026-11-08. Baseline: `401488f40` on `main`. Spec #2 remains open.
 
-GitHub bodies, comments, assignees, native dependencies and sub-issues were read directly before this checkpoint. Initial state: all ten tickets were open. Current closures and evidence appear below. No paid media/API calls or numerical media allowances. Existing uncommitted teaching/planning material is preserved.
+GitHub bodies, comments, assignees, native dependencies and sub-issues were read directly before this checkpoint. Initial state: all ten tickets were open. Current closures and evidence appear below. No paid media/API calls at the latest pre-submission checkpoint. The owner subsequently approved USD1.95 for the separate #9 capability sample, reserved in private Codex recovery state. Existing uncommitted teaching/planning material is preserved.
 
 This is a coordination checkpoint, not production state. ArcReel remains authoritative for projects, scripts, assets and jobs.
 
@@ -142,10 +142,16 @@ This is a coordination checkpoint, not production state. ArcReel remains authori
 - Production application runs on localhost:5173/API1241. Isolated authenticated validation server runs on1242 with separate data and no media credentials.
 - Exact Opus5.5 medium subscription calls passed structured, image and existing-consumer checks. Production default/simple/complex text settings use `claude-subscription/claude-opus-5-5`.
 - Owner supplied MiniMax and Gemini AIStudio credentials through Settings. Both free connectivity/model-list checks succeeded. Google lists exact `gemini-3.1-flash-image`; MiniMax model-list does not establish H3 entitlement.
-- Existing MiniMax credential now uses the international endpoint with its key preserved. Synced H3 CNY pricing differed from official international USD pricing. Existing settings now use the verified USD override; five-second2K quote is USD0.65, proposed per-video/round ceiling USD1.95 awaits explicit approval. See [media preflight](media-preflight.md).
+- Existing MiniMax credential now uses the international endpoint with its key preserved. Synced H3 CNY pricing differed from official international USD pricing. Existing settings now use the verified USD override; five-second2K quote is USD0.65, per-video/round ceiling USD1.95 explicitly approved and reserved. See [media preflight](media-preflight.md).
 - #6: authenticated synthetic-image upload/version/currentness and prompt preview succeeded, with52 regression tests passing. Actual AI-generated-image round trip and exact downstream request preview remain pending.
 - #7: original reference inspected, silence independently decoded, all30 original hashes preserved. Actual embedded formal handoff has3shots and5registered assets; independent final review passed. Evidence integrated as `79e7b798b`; issue closed.
-- #8: Codex-only policy/recovery integrated as `7f704b670`, independently reviewed,20tests passed, issue closed. No numeric media allowance approved.
+- #8: Codex-only policy/recovery integrated as `7f704b670`, independently reviewed,20tests passed, issue closed. The separate #9 sample allowance is now approved; later rounds remain unapproved.
 - #10: advisory helper/fixtures integrated as `e98612c83`. Local Whisper exposed wrong/missing speech and its own false transcription. Full audiovisual subjective review, playback and lip-sync evidence remain missing. No preventive ElevenLabs integration.
 - Subscription usage is accounted as tokens without invented API charges. No paid media or metered evaluation calls occurred. Sample, pilot and continuity each require separate concrete quotes and explicit numeric allowances.
 - Private runtime/reference evidence remains under `/tmp/arcreel-goal-state/`, outside Git. No native desktop MCP registration, social publishing or unattended supervision claimed.
+
+## Approved sample and evaluation checkpoint
+
+- #9 actual H3 source succeeded: one provider submission, five billed seconds, USD0.65. Existing final-cut rendering produced1080x1920 at30fps. Independent full decode and all-attempt cost reconciliation passed; USD1.30 contingency released and further generation explicitly paused. Subjective audiovisual review remains pending. See [media preflight and execution](media-preflight.md).
+- Owner separately approved six exact Gemini3.8Flash evaluation requests, total USD0.25, with per-artifact ceilings and no retries. Codex-only policy extension passed33tests and independent review, integrated as `973a50c18`. Inference results and actual costs remain to be recorded.
+- Owner reported an incorrect Agent Settings warning while subscription execution worked. Code confirms the UI tests only API-key presence while the runtime supports local Claude login. Separate [issue #13](https://github.com/pablothobias/ArcReelBR/issues/13) records the reproduced readiness defect; no paid Agent API credential is required as a workaround.

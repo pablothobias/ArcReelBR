@@ -1,6 +1,6 @@
 # International media preflight
 
-Issue #9, checked 2026-11-08. Status: provider setup and nonbillable preflight complete; actual sample generation, rendering, playback and actual-cost verification remain pending. No paid generation or evaluation call was made during this preflight.
+Issue #9, checked 2026-11-08. Status: provider setup and preflight complete. The owner subsequently approved USD 1.95 and the single initial H3 sample and formal 1080 × 1920 render succeeded. Independent subjective playback/evaluation remains pending; all-attempt financial reconciliation is complete. The preflight itself made no paid call.
 
 ## Application settings and free connectivity
 
@@ -22,7 +22,7 @@ The existing `quote_video_request_from_price` calculator produced CNY 4.00 for t
 
 ## Bounded sample candidate
 
-Pending intent reference: `sample-9-initial-E1U01-5s-2k-v1`. This is the separate capability sample for #9, not the #11 pilot or #12 continuity sample. It has not been submitted or reserved as approved work.
+Pending intent reference: `sample-9-initial-E1U01-5s-2k-v1`. This is the separate capability sample for #9, not the #11 pilot or #12 continuity sample. The approved initial action is now reserved and submitted under that same intent; no second quality action is authorized.
 
 The existing [H3 API contract](https://platform.minimax.io/docs/api-reference/video-generation-v2-create) supports the exact model at 4–15 seconds and 768P/2K, with a concrete ratio for text-only input. A five-second text-only vertical sample is useful for checking native Portuguese speech, delivery conversion and retrieval, without generating a storyboard or asset image. No Highspeed, Lite, Max, successor image model or native `1080p` tier is substituted.
 
@@ -67,7 +67,7 @@ Polling and downloading the original job do not create a generation or increment
 
 No quality regeneration is included in the pending approval request. A rejected segment remains limited to at most two additional quality generations, each requiring a current quote and sufficient separately approved allowance. The initial-plus-two-quality ceiling combined with three potentially billed submit attempts per action would be USD 5.85, but that is not requested or authorized here. No pilot, continuity sample, collection generation, image call, separate voice integration or new metered evaluator is covered.
 
-The coordinator presented the USD 1.95 per-video and round proposal to the owner; explicit numeric approval was still pending at this checkpoint. The recovery record must retain empty approval evidence and authorize no submission until the actual owner response arrives.
+The owner explicitly approved “Sim, aprovo teto de US$ 1,95 para esta amostra e rodada” in response to question `c31f4d137dd9464a9dc0cb96e71fbdde`. The private recovery record stores this exact response and reference. The policy helper durably reserved the full USD 1.95 before any embedded-Agent dispatch.
 
 ## Private receipts and remaining evidence
 
@@ -81,4 +81,24 @@ Sanitized private receipts are under `/tmp/arcreel-goal-state/media-preflight/`:
 
 No file contains provider key values or authentication tokens. Local helper scripts authenticate in memory through the application's normal login endpoint; they retain no access token file. The preflight did not restart either server or modify source code.
 
-Remaining #9 criteria: explicit numeric owner approval, current formal workflow preview for the eventual sample project, actual exact-H3 entitlement/balance validation through the approved bounded submission, original-job polling and reconciliation, actual recorded cost, native audio review, source-dimension probing, existing final-cut render at 1080 × 1920 and actual playback evidence. Google generation is conditional on a genuine image need; it is unnecessary for this initial text-only capability sample.
+Remaining #9 criteria: successful terminal retrieval and reconciliation, actual recorded cost, native audio review, source-dimension probing, existing final-cut render at 1080 × 1920 and actual playback evidence. Google generation is conditional on a genuine image need; it is unnecessary for this initial text-only capability sample.
+
+
+## Approved execution checkpoint
+
+The separate formal project is `br-capability-sample-9-20261108`. The embedded Agent authored exactly one five-second unit, `E1U1`, in `scripts/episode_1.json` through the existing subscription text backend. Independent comparison verified that its full prompt matches the approved candidate character for character. The canonical directing segment ID `E1U01` maps to this actual unit; its existing intent and attempt count were retained.
+
+The current formal `generate_videos` preview returned `submittable: true`, USD 0.65, zero unpriced items, no problems and `confirmed_request_durations: {}`. The same embedded session then invoked `generate_videos` once for that exact unit. Original task `765eece61cf24e1394829581a6f90e14`, batch `d9db0e69b2fb4f06ba7dff1d18fdd64e`, provider job `461209688465698` succeeded. A persisted execution checkpoint confirms international MiniMax, exact H3, 2K and five seconds. Ledger call 14 is now successful and records USD 0.65, retry count zero and no unpriced reason. The provider final response reports five output seconds, zero input seconds and zero input images. Independent review reconciled the complete create-response log, the unique original job and usage row, retry count zero and the transport ambiguity rules. Exactly one H3 create request completed with HTTP 200; any unlogged connection-establishment retry would be definitely unsent and unbilled. The policy record now settles USD 0.65 and releases USD 1.30 of contingency based on that combined evidence, not the final charge row alone.
+
+The approved plain quotation syntax yields no canonical subtitle utterances in the current reference-video parser. Do not change the prompt, regenerate or invent timestamps to conceal that limitation. The coordinator clarified that burned Portuguese subtitles are mandatory for the #11 pilot; #9 can verify native audio and the existing 1080 × 1920 delivery path using the supported no-subtitles final-cut variant. The original artifact/job stays unchanged, and this precise subtitle gap is carried into #10/#11 preparation.
+
+
+The original selected artifact is `reference_videos/E1U1.mp4`, version 1, current. Existing timeline `tl-0dd0f11d`, revision 1, has one source-volume-1 clip. Existing render task `49ba5e8857da42d88ebb695ef862dcd6` and batch `5119e2806a2e460c952fad6807133d87` succeeded; its artifact is `renders/episode_1/tl-0dd0f11d/final_cut.without_narration.no_subtitles.mp4`, version 1. No alternative rendering pipeline was used.
+
+Independent bundled-ffmpeg probing confirms source H.264 1440 × 2560 at 24 fps with AAC 32 kHz stereo, approximately 5.167 seconds. The existing renderer downscaled it to H.264 1080 × 1920 at 30 fps with AAC 48 kHz stereo, approximately 5.167 seconds. Its duration acceptance check passed without warnings. Existing whole-video technical signals found no black span, freeze or cut. Contact sheets show a woman, kitchen, coffee pot and cup; they do not prove correct voice or lip-sync.
+
+Actual local, unprimed Portuguese Whisper inference returned “Bom dia, o café está pronto.” at approximately 0–2.480 seconds, matching the intended words after punctuation normalization. Decoded PCM RMS was approximately 0.150, so this track is not digitally silent. This supplies real speech/transcription evidence but does not replace listening or a full audiovisual review. Native audio was tested first; no separate voice integration was invoked.
+
+Additional private receipts: `formal-script-verification.json`, `formal-quote-entry.json`, `sample-jobs.json`, `actual-media-and-usage.json`, `actual-dimensions-bundled.json`, `native-final-provider-usage.json`, `submit-log-evidence.json`, `actual-source-sheet-0.jpg`, and `native-audio-review/review.json`. The directing record is `pending-sample-intent.json`; its completed media intent is settled at USD 0.65 with the independent financial audit linked. A persisted `sample_scope_complete_no_further_generation_authorized` pause prevents unused allowance from authorizing another action. No subsequent quality regeneration or new generation has been authorized.
+
+Independent reviewer `implement_ptbr` also decoded the complete source and final video without errors. This confirms actual playable media structure/decoding, while subjective voice, naturalness and lip-sync assessment remains with the separately authorized audiovisual evaluation. The exact financial review summary is retained privately as `independent-financial-audit.json`.
