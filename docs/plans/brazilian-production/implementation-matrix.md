@@ -190,4 +190,4 @@ This is a coordination checkpoint, not production state. ArcReel remains authori
 ## Evaluation research requested by the owner
 
 - After receiving the Pro explanation, the owner requested a dedicated subagent to research existing tools, agents, skills and MCPs and compare integration, licensed adaptation and rejection. This is not acceptance of human-assisted final review.
-- A read-only primary-source research task is active. No installation, new inference, model replacement or new paid evaluation round is authorized by it. Preserve #10 and pilot acceptance as pending while assessing alternatives.
+- The read-only [primary-source comparison](../../research/audiovisual-evaluation-alternatives.md) is complete. It recommends qualifying local WhisperX/SyncNet measurements and, separately, a bounded Pegasus semantic trial if needed. It compares official MCPs/skills and licensed adaptation, and rejects unsuitable licensing or duplicate orchestration. No candidate is qualified by this research; no installation, new inference or model replacement occurred. #10 and pilot acceptance remain pending.
