@@ -11,7 +11,7 @@ interface LobbyGreetingProps {
 }
 
 /**
- * Greeting area: greeting plus purple status, then completion details in secondary color. Play typing once per session, or show all text with reduced motion.
+ * Greeting area: greeting plus brand-colored status, then completion details in secondary color. Play typing once per session, or show all text with reduced motion.
  * Without projects, the status points toward the first work and omits completion details.
  */
 export function LobbyGreeting({
@@ -30,7 +30,7 @@ export function LobbyGreeting({
 
   return (
     <div className="flex flex-col gap-1.5 pb-5">
-      <h1 className="font-editorial text-3xl leading-tight font-normal">
+      <h1 className="font-display text-3xl leading-tight font-bold">
         <Typewriter
           once="lobby-hero"
           segments={[{ text: t(greetingKey) }, { text: status, className: "text-primary" }]}

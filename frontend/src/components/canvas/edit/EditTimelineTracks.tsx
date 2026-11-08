@@ -482,7 +482,7 @@ const SubtitleBlocks = memo(function SubtitleBlocks({
         <span
           key={`${item.start}-${item.text}`}
           title={item.text}
-          className="absolute inset-y-1 left-(--at) flex w-[calc(var(--span)-1px)] items-center overflow-hidden text-ellipsis rounded-xs border border-border bg-muted px-1 text-xs leading-none whitespace-nowrap text-subtle-foreground"
+          className="absolute inset-y-0.5 left-(--at) flex w-[calc(var(--span)-1px)] items-center overflow-hidden text-ellipsis rounded-xs border border-border bg-muted px-1 text-xs leading-none whitespace-nowrap text-subtle-foreground"
           style={
             {
               "--at": percentOf(item.start, duration),
@@ -518,7 +518,7 @@ const BgmBlocks = memo(function BgmBlocks({ items, duration }: { items: readonly
               fadeOut: formatSeconds(item.fadeOut),
             })}
             data-testid={`edit-${item.id}`}
-            className="absolute inset-y-1 left-(--at) flex w-[calc(var(--span)-1px)] items-center overflow-hidden text-ellipsis rounded-xs px-1 text-xs leading-none whitespace-nowrap text-white bgm-fade"
+            className="absolute inset-y-0.5 left-(--at) flex w-[calc(var(--span)-1px)] items-center overflow-hidden text-ellipsis rounded-xs px-1 text-xs leading-none whitespace-nowrap text-white bgm-fade"
             style={
               {
                 "--at": percentOf(item.start, duration),
