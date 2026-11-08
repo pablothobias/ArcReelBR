@@ -81,6 +81,35 @@ clean() {
     LANG="${LANG:-en_US.UTF-8}" TERM="${TERM:-xterm-256color}" PATH="$CLEAN_PATH" "$@"
 }
 
+# Non-fatal warnings for the subscription setup: an Anthropic credential saved in Settings takes
+# precedence over the local Claude Code login and bills the API per request.
+check_subscription_mode() {
+  local data_dir db
+  data_dir="$(grep -E '^ARCREEL_DATA_DIR=' "$ROOT/.env" | tail -1 | cut -d= -f2-)"
+  data_dir="${data_dir%\"}"; data_dir="${data_dir#\"}"
+  data_dir="${data_dir//\$HOME/$HOME}"; data_dir="${data_dir/#\~/$HOME}"
+  db="$data_dir/arcreel.db"
+  if [ -n "$data_dir" ] && [ -f "$db" ]; then
+    # immutable=1 reads the file without creating -shm/-wal files next to it.
+    if (cd "$ROOT" && clean uv run python -I -c '
+import sqlite3, sys
+c = sqlite3.connect("file:" + sys.argv[1] + "?mode=ro&immutable=1", uri=True)
+n = c.execute("select count(*) from agent_anthropic_credentials where is_active = 1").fetchone()[0]
+n += c.execute("select count(*) from system_setting where key = ? and value <> \"\"", ("anthropic_api_key",)).fetchone()[0]
+sys.exit(0 if n else 1)
+' "$db" 2>/dev/null); then
+      echo "run_local: WARNING: an Anthropic API key is configured in Settings; the Agent will bill the API instead of using the Claude Code login." >&2
+    fi
+  fi
+  if command -v claude >/dev/null 2>&1; then
+    claude auth status 2>/dev/null | grep -q '"loggedIn": true' \
+      || echo "run_local: WARNING: Claude Code is not logged in; run 'claude' and /login, or the Agent will fail to start." >&2
+  else
+    echo "run_local: WARNING: 'claude' CLI not found; cannot check the subscription login." >&2
+  fi
+}
+check_subscription_mode
+
 if $SETUP; then
   echo "run_local: uv sync"
   (cd "$ROOT" && clean uv sync)
