@@ -69,7 +69,7 @@ export function AgentConfigTab() {
             t={t}
             i18nKey="arcreel_agent_external_hint"
             components={{
-              guide: <Link href={settingsSectionPath("external-agent")} className="text-primary underline-offset-4 hover:underline" />,
+              guide: <Link href={settingsSectionPath("external-agent")} className="text-primary underline underline-offset-4" />,
             }}
           />
         </p>
@@ -85,7 +85,7 @@ export function AgentConfigTab() {
             templates: (
               <Link
                 href={settingsSectionPath("prompt-templates", { template: AGENT_LANGUAGE_RULE_ID })}
-                className="text-primary underline-offset-4 hover:underline"
+                className="text-primary underline underline-offset-4"
               />
             ),
           }}

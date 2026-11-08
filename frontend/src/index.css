@@ -14,7 +14,7 @@
 }
 
 /* Semantic tokens follow shadcn names: light values in :root, dark values in .dark, mapped to utilities by @theme inline below.
-   - Brand purple has one base, primary; use opacity variants for light fills, borders and selection (bg-primary/15).
+   - The RafaCena teal has one base, primary; use opacity variants for light fills, borders and selection (bg-primary/15).
    - destructive (red) marks danger; warn (amber) warnings/staleness; good completion/availability.
    - Three text tiers: foreground (body) > subtle-foreground (secondary) > muted-foreground (deemphasized);
      muted-foreground exceeds 5:1 against page backgrounds in both modes; do not lower body-text opacity further.
@@ -25,30 +25,32 @@
      color-mix(in oklab, var(--primary) 15%, transparent). */
 :root {
     --radius: 0.625rem;
+    --brand-accent: #F26B3A;
     color-scheme: light;
 
-    --background: oklch(0.985 0.003 265);
-    --foreground: oklch(0.21 0.012 265);
-    --subtle-foreground: oklch(0.40 0.012 265);
+    --background: #FAF6EF;
+    --foreground: #17242B;
+    --subtle-foreground: #53646A;
     --card: oklch(1 0 0);
     --card-foreground: var(--foreground);
     --popover: oklch(1 0 0);
     --popover-foreground: var(--foreground);
-    --primary: oklch(0.50 0.15 295);
-    --primary-foreground: oklch(0.99 0 0);
-    --secondary: oklch(0.945 0.006 265);
+    --primary: #087F73;
+    --primary-hover: #06695F;
+    --primary-foreground: #FFFFFF;
+    --secondary: #F4F7F5;
     --secondary-foreground: var(--foreground);
-    --muted: oklch(0.945 0.006 265);
-    --muted-foreground: oklch(0.52 0.012 265);
-    --accent: oklch(0.94 0.008 265);
+    --muted: #F4F7F5;
+    --muted-foreground: #53646A;
+    --accent: #E1F2EE;
     --accent-foreground: var(--foreground);
-    --destructive: oklch(0.55 0.20 25);
-    --border: oklch(0.88 0.006 265);
-    --input: oklch(0.62 0.008 265);
-    --ring: oklch(0.50 0.15 295);
+    --destructive: #B53E2E;
+    --border: #CCD6D3;
+    --input: #788B88;
+    --ring: #06695F;
 
-    --good: oklch(0.50 0.12 155);
-    --warn: oklch(0.55 0.13 65);
+    --good: #06695F;
+    --warn: #A0470B;
 
     --chart-1: var(--primary);
     --chart-2: var(--good);
@@ -66,7 +68,7 @@
     --asset-scene: oklch(0.50 0.11 165);
     --asset-prop: oklch(0.53 0.12 85);
 
-    --sidebar: oklch(0.965 0.005 265);
+    --sidebar: #F4F7F5;
     --sidebar-foreground: var(--foreground);
     --sidebar-primary: var(--primary);
     --sidebar-primary-foreground: var(--primary-foreground);
@@ -81,8 +83,8 @@
     --episode-lightness: 0.52;
     /* Shadow ink: shadows specify opacity only, choosing ink by mode; light mode uses lighter bluish gray */
     --shadow-ink: oklch(0.35 0.03 265 / 0.4);
-    --glow-primary: oklch(0.80 0.06 295 / 0.25);
-    --glow-secondary: oklch(0.85 0.04 260 / 0.2);
+    --glow-primary: rgb(8 127 115 / 0.08);
+    --glow-secondary: rgb(242 107 58 / 0.05);
     --scrollbar-thumb: oklch(0.70 0.010 265 / 0.6);
     --scrollbar-thumb-hover: oklch(0.58 0.010 265 / 0.75);
     --focus-flash-edge: color-mix(in oklab, var(--primary) 70%, transparent);
@@ -97,8 +99,8 @@
     --z-onboarding: 10000;
 
     /* Motion durations: all UI motion stays below 300ms. fast covers hover/fades; base covers overlay entry/exit and image crossfades. */
-    --duration-fast: 150ms;
-    --duration-base: 200ms;
+    --duration-fast: 120ms;
+    --duration-base: 180ms;
     /* Entry easing: start fast, stop slowly */
     --easing-emphasized: cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -107,30 +109,31 @@
 .dark {
     color-scheme: dark;
 
-    --background: oklch(0.168 0.009 265);
-    --foreground: oklch(0.975 0.004 265);
-    --subtle-foreground: oklch(0.820 0.008 265);
-    --card: oklch(0.182 0.011 270);
+    --background: #17242B;
+    --foreground: #F8F6F0;
+    --subtle-foreground: #D2DEDA;
+    --card: #1E3035;
     --card-foreground: var(--foreground);
     /* Overlay material: opaque surface slightly brighter than cards, one border and overlay shadow, without blur or gradients */
-    --popover: oklch(0.205 0.011 265);
+    --popover: #273B3F;
     --popover-foreground: var(--foreground);
-    --primary: oklch(0.76 0.09 295);
-    --primary-foreground: oklch(0.14 0 0);
-    --secondary: oklch(0.250 0.012 265);
+    --primary: #72D4C0;
+    --primary-hover: #9AE1D3;
+    --primary-foreground: #17242B;
+    --secondary: #304540;
     --secondary-foreground: var(--foreground);
-    --muted: oklch(0.250 0.012 265);
-    --muted-foreground: oklch(0.640 0.010 265);
+    --muted: #304540;
+    --muted-foreground: #B8CAC3;
     /* shadcn accent is the menu-item hover background, not the brand color */
-    --accent: oklch(0.26 0.012 265 / 0.5);
+    --accent: #304540;
     --accent-foreground: var(--foreground);
-    --destructive: oklch(0.70 0.18 25);
-    --border: oklch(0.40 0.012 265 / 0.35);
-    --input: oklch(0.55 0.014 265);
-    --ring: oklch(0.76 0.09 295);
+    --destructive: #FFB6A8;
+    --border: #526660;
+    --input: #839C93;
+    --ring: #72D4C0;
 
-    --good: oklch(0.78 0.10 155);
-    --warn: oklch(0.80 0.12 70);
+    --good: #72D4C0;
+    --warn: #FFBC87;
 
     --chart-1: var(--primary);
     --chart-2: var(--good);
@@ -152,7 +155,7 @@
     --asset-prop: oklch(0.88 0.15 92);
 
     /* sidebar uses the page-background gradient's second color */
-    --sidebar: oklch(0.148 0.009 260);
+    --sidebar: #142126;
     --sidebar-foreground: var(--foreground);
     --sidebar-primary: var(--primary);
     --sidebar-primary-foreground: var(--primary-foreground);
@@ -164,24 +167,24 @@
     /* Modal scrim shared by Dialog, Sheet and onboarding; onboarding/tour.ts passes it to driver.js */
     --scrim: oklch(0.10 0.012 265 / 0.78);
 
-    --episode-lightness: 0.72;
+    --episode-lightness: 0.80;
     --shadow-ink: oklch(0 0 0);
-    --glow-primary: oklch(0.32 0.05 295 / 0.28);
-    --glow-secondary: oklch(0.26 0.04 260 / 0.25);
+    --glow-primary: rgb(8 127 115 / 0.12);
+    --glow-secondary: rgb(242 107 58 / 0.04);
     --scrollbar-thumb: oklch(0.50 0.012 265 / 0.55);
     --scrollbar-thumb-hover: oklch(0.62 0.012 265 / 0.75);
-    --focus-flash-edge: oklch(0.88 0.05 295 / 0.78);
+    --focus-flash-edge: rgb(114 212 192 / 0.78);
 }
 
 
 @theme {
-    /* Fonts: Inter throughout the design; display differs only in size/weight.
+    /* Fonts: Nunito Sans throughout the design; display differs only in size/weight.
        main.tsx self-hosts Latin fonts through @fontsource; Chinese uses system fallbacks without downloading network fonts. */
-    --font-sans: "Inter Variable", system-ui, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-    --font-display: "Inter Variable", system-ui, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    --font-sans: "Nunito Sans Variable", system-ui, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    --font-display: "Nunito Sans Variable", system-ui, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
     --font-mono: "JetBrains Mono Variable", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-    /* Serif: editorial cinematic large titles in the project lobby (Darkroom) only */
-    --font-editorial: "Instrument Serif", "Songti SC", "Noto Serif SC", Georgia, serif;
+    /* The display family matches the body for a consistent RafaCena identity. */
+    --font-editorial: "Nunito Sans Variable", "PingFang SC", "Microsoft YaHei", sans-serif;
 
     /* Opacity pulse for small running-status dots only; global reduced-motion rules below stop it */
     --animate-breath: breath 1.6s ease-in-out infinite;
@@ -200,12 +203,12 @@
 }
 
 @theme inline {
-    /* Nova-derived radius scale: sm 6px, md 8px, lg 10px, xl 14px, 2xl 18px */
+    /* RafaCena radius scale: sm 6px, controls 10px, cards 16px, panels 24px. */
     --radius-sm: calc(var(--radius) * 0.6);
-    --radius-md: calc(var(--radius) * 0.8);
+    --radius-md: var(--radius);
     --radius-lg: var(--radius);
-    --radius-xl: calc(var(--radius) * 1.4);
-    --radius-2xl: calc(var(--radius) * 1.8);
+    --radius-xl: 1rem;
+    --radius-2xl: 1.5rem;
     --radius-3xl: calc(var(--radius) * 2.2);
     --radius-4xl: calc(var(--radius) * 2.6);
 
@@ -217,6 +220,8 @@
     --color-popover: var(--popover);
     --color-popover-foreground: var(--popover-foreground);
     --color-primary: var(--primary);
+    --color-primary-hover: var(--primary-hover);
+    --color-brand-accent: var(--brand-accent);
     --color-primary-foreground: var(--primary-foreground);
     --color-secondary: var(--secondary);
     --color-secondary-foreground: var(--secondary-foreground);
@@ -285,13 +290,10 @@
     isolation: isolate;
 }
 
-/* Global body background: combined radial+linear gradients */
+/* Global body background follows the current theme. */
 
 body {
-    background:
-        radial-gradient(1000px 500px at 8% -10%, var(--glow-primary), transparent 55%),
-        radial-gradient(900px 500px at 98% 110%, var(--glow-secondary), transparent 55%),
-        linear-gradient(180deg, var(--card), var(--sidebar));
+    background: var(--background);
     background-attachment: fixed;
     color: var(--foreground);
     font-family: var(--font-sans);
@@ -341,7 +343,7 @@ body {
     font-family: var(--font-display);
 }
 
-/* Location highlight: notification/production-progress jumps to a storyboard or asset flash three outlines in brand purple, amber and green;
+/* Location highlight: notification/production-progress jumps to a storyboard or asset flash three outlines in brand teal, amber and green;
    hooks/useScrollTarget toggles this class. Global reduced-motion rules above stop at the final, unhighlighted state. */
 @keyframes workspace-focus-flash {
     0%, 32%, 66%, 100% {

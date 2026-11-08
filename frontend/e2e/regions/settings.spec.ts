@@ -201,7 +201,7 @@ defineRegionScenarios("全局设置", [
       const nav = page.getByRole("navigation", { name: "设置" });
       // Recorded environments have neither usable providers nor Agent providers.
       const flagged = nav.getByRole("link").filter({ has: page.getByRole("img", { name: "配置不完整" }) });
-      await expect(flagged).toHaveText(["供应商", "ArcReel Agent"]);
+      await expect(flagged).toHaveText(["供应商", "RafaCena Agent"]);
       await expect(page.getByRole("note", { name: "配置不完整" })).toBeInViewport();
     },
     screenshot: { name: "settings-config-issue-notice", target: (page) => page.getByRole("note", { name: "配置不完整" }) },

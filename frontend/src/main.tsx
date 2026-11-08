@@ -7,10 +7,8 @@ import { BRAND, BRAND_DOCUMENT_TITLE } from "@/branding";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { initTheme } from "@/theme";
 
-import "@fontsource-variable/inter";
+import "@fontsource-variable/nunito-sans";
 import "@fontsource-variable/jetbrains-mono";
-import "@fontsource/instrument-serif/400.css";
-import "@fontsource/instrument-serif/400-italic.css";
 import "driver.js/dist/driver.css";
 
 import "./index.css";

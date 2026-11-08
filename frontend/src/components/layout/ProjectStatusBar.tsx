@@ -112,7 +112,7 @@ function Ring({ done, total }: { done: number; total: number }) {
 function episodeDotClass(episode: EpisodeMeta): string {
   if (episode.status === "completed") return "bg-good";
   if (episodeNeedsUpdate(episode)) return "bg-warn";
-  if (episode.status === "in_production") return "bg-primary";
+  if (episode.status === "in_production") return "bg-brand-accent";
   return "bg-muted-foreground";
 }
 
@@ -326,7 +326,7 @@ function MigrationBar({ projectName, reason }: { projectName: string; reason: st
           </span>
           <ChevronDown aria-hidden className="size-3 text-muted-foreground" />
         </PopoverTrigger>
-        <PopoverContent anchor={anchorRef} className="w-110">
+        <PopoverContent anchor={anchorRef} align="start" className="w-110">
           <div className="flex flex-col gap-2" role="alert">
             <p className="text-xs font-semibold text-foreground">
               {failures > 0 ? t("migration_retry_failed_heading") : t("migration_repair_title")}

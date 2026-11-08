@@ -98,7 +98,7 @@ describe("MarketEntryCard", () => {
     );
 
     const card = screen.getByRole("article", { name: "kling Master" });
-    expect(within(card).getByText("需要 ArcReel ≥ 0.32.0")).toBeInTheDocument();
+    expect(within(card).getByText("需要 RafaCena ≥ 0.32.0")).toBeInTheDocument();
     expect(within(card).getByRole("button", { name: "安装" })).toBeDisabled();
     await userEvent.click(within(card).getByRole("button", { name: "kling Master" }));
     expect(onOpen).toHaveBeenCalledTimes(1);
@@ -116,7 +116,7 @@ describe("MarketEntryCard", () => {
     );
 
     expect(screen.getByRole("button", { name: "安装" })).toBeEnabled();
-    expect(screen.queryByText(/需要 ArcReel/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/需要 RafaCena/)).not.toBeInTheDocument();
   });
 
   it.each([

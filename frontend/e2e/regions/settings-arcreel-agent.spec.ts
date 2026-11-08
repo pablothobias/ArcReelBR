@@ -58,10 +58,10 @@ defineRegionScenarios("全局设置 · ArcReel Agent", [
     path: PATH,
     ready: async (page) => {
       await sectionReady(page);
-      await page.getByText("ArcReel Agent 尚未配置").waitFor();
+      await page.getByText("RafaCena Agent 尚未配置").waitFor();
       await page.getByText(/还没有 Agent 供应商/).waitFor();
     },
-    screenshot: { name: "settings-arcreel-agent", target: (page) => page.getByRole("region", { name: "ArcReel Agent" }) },
+    screenshot: { name: "settings-arcreel-agent", target: (page) => page.getByRole("region", { name: "RafaCena Agent" }) },
   },
   {
     name: "Agent 供应商多且名称长时展开高级运行参数，修改后外壳底行的保存按钮可见可用",

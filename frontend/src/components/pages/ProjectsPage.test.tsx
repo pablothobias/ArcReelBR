@@ -248,7 +248,7 @@ describe("ProjectsPage", () => {
     const halfway = within(list).getByRole("link", { name: /Halfway/ });
     expect(halfway).toHaveAttribute("href", "/app/projects/halfway");
     expect(halfway).toHaveTextContent("制作中");
-    expect(halfway).toHaveTextContent("已完成 1 / 4 集 · 3天前更新");
+    expect(halfway).toHaveTextContent("已完成 1 / 4 集 · 制作中 1 集 · 3天前更新");
 
     const done = within(list).getByRole("link", { name: /Done/ });
     expect(done).toHaveTextContent("已完成");
