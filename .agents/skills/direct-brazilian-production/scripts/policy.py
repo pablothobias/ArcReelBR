@@ -85,6 +85,21 @@ def approval(record: dict) -> dict:
         ):
             raise Pause("Pro comparison approval must retain the exact three cases, model, USD ceilings and no-retry scope")
         return approved
+    if approved.get("round") == "image-fixture-6":
+        if (
+            approved.get("currency") != "USD"
+            or amount(approved.get("round_limit")) != Decimal("2.04")
+            or approved.get("model") != "gemini-3.1-flash-image"
+            or approved.get("provider") != "gemini-aistudio"
+            or approved.get("resolution") != "1K"
+            or approved.get("aspect_ratio") != "16:9"
+            or approved.get("max_calls") != 1
+            or approved.get("allow_retries") is not False
+            or set(approved.get("per_video", {})) != {"character/Ana"}
+            or amount(approved["per_video"]["character/Ana"]) != Decimal("2.04")
+        ):
+            raise Pause("Image fixture approval must retain the exact Ana target, model, shape and USD ceilings")
+        return approved
     if approved.get("round") not in {"sample-9", "pilot-11", "continuity-12"}:
         raise Pause("Choose a separately approved sample, pilot or continuity round")
     videos = approved["per_video"]
@@ -149,7 +164,7 @@ def decide(record: dict, action: dict) -> dict:
     # Any unresolved submission in the round may already be charged or producing media.
     if any(item["status"] == "pending" for item in intents):
         raise Pause("Reconcile all pending jobs before authorizing another submission")
-    if approved["round"] in {"evaluation-10", "diagnostic-10", "pro-comparison-10"} and (
+    if approved["round"] in {"evaluation-10", "diagnostic-10", "pro-comparison-10", "image-fixture-6"} and (
         action["kind"] != "initial"
         or len(intents) >= approved["max_calls"]
         or any(item["video_id"] == video_id for item in intents)

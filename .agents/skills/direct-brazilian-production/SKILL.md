@@ -19,6 +19,8 @@ Use one local recovery JSON file outside the public repository. Read [recovery f
 
 ## Authorize one action
 
+For the separately approved single-image fixture, use `image-fixture-6` in [recovery format](references/recovery-format.md#separately-approved-image-fixture). Verify the frozen Ana target, final prompt, existing quote and current task state before the sole generation; subsequent uploads reuse that same artifact.
+
 For the separately approved Pro comparison, use the `pro-comparison-10` branch in [recovery format](references/recovery-format.md). Keep prior evaluation and diagnostic records closed; verify the frozen three-case requests before dispatch.
 
 1. Read current ArcReel workflow, task/batch/provider-checkpoint and artifact-version state. Read existing usage for every preceding submission. Reconcile pending intentions before asking for another generation. A completed job is reused and reviewed; a timeout or absent local reply is not a failed provider submission.

@@ -446,3 +446,73 @@ def test_pro_comparison_pending_and_zero_settlement_do_not_authorize_retry():
         reserve(pro_comparison_record(), pro_comparison_action(maximum="0.03001"))
     with pytest.raises(Pause, match="outside the explicitly approved round"):
         reserve(pro_comparison_record(), diagnostic_action())
+
+
+def image_fixture_record():
+    state = record()
+    state["approval"].update(
+        round="image-fixture-6",
+        round_limit="2.04",
+        per_video={"character/Ana": "2.04"},
+        model="gemini-3.1-flash-image",
+        provider="gemini-aistudio",
+        resolution="1K",
+        aspect_ratio="16:9",
+        max_calls=1,
+        allow_retries=False,
+    )
+    return state
+
+
+def image_fixture_action(**changes):
+    return {**action(maximum="2.031616"), "video_id": "character/Ana", **changes}
+
+
+@pytest.mark.parametrize("status", ["complete", "failed", "not_submitted"])
+def test_image_fixture_allows_one_reserved_image_and_never_replacement(status):
+    candidate = image_fixture_action()
+    state, decision = reserve(image_fixture_record(), candidate)
+    assert decision["decision"] == "reserve_before_delegating"
+    assert commitment(state) == _POLICY["Decimal"]("2.031616")
+    assert decide(state, candidate)["decision"] == "reconcile_existing"
+    state = reconcile(
+        state, observed(status=status, settled="0", non_submission_evidence_ref="verified:no-submission")
+    )
+    for kind in ("initial", "quality_regeneration", "transport_retry"):
+        with pytest.raises(Pause, match="without retries"):
+            reserve(state, image_fixture_action(intent_id="other", client_key="other", segment_id="changed", kind=kind))
+    assert len(state["intents"]) == 1
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("model", "different-model"),
+        ("provider", "different-provider"),
+        ("resolution", "2K"),
+        ("aspect_ratio", "1:1"),
+        ("round_limit", "2.05"),
+        ("currency", "BRL"),
+        ("max_calls", 2),
+        ("allow_retries", True),
+        ("per_video", {"character/Other": "2.04"}),
+    ],
+)
+def test_image_fixture_rejects_scope_changes(field, value):
+    state = image_fixture_record()
+    state["approval"][field] = value
+    with pytest.raises(Pause, match="exact Ana target"):
+        reserve(state, image_fixture_action())
+    assert state["intents"] == []
+
+
+def test_image_fixture_unknown_outcome_preserves_reservation_and_ceiling():
+    state, _ = reserve(image_fixture_record(), image_fixture_action())
+    state = reconcile(state, observed(status="failed", settled=None))
+    assert commitment(state) == _POLICY["Decimal"]("2.031616")
+    with pytest.raises(Pause, match="without retries"):
+        reserve(state, image_fixture_action(intent_id="replacement", client_key="replacement"))
+    with pytest.raises(Pause, match="allowance exhausted"):
+        reserve(image_fixture_record(), image_fixture_action(maximum="2.040001"))
+    with pytest.raises(Pause, match="outside the explicitly approved round"):
+        reserve(image_fixture_record(), image_fixture_action(video_id="storyboard/E1S01"))
