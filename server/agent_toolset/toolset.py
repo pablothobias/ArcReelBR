@@ -19,6 +19,7 @@ from server.agent_toolset.project_trash import PROJECT_TRASH_TOOLS
 from server.agent_toolset.repair_channel import REPAIR_CHANNEL_TOOLS
 from server.agent_toolset.script_authoring import SCRIPT_AUTHORING_TOOLS
 from server.agent_toolset.script_editing import SCRIPT_EDITING_TOOLS
+from server.agent_toolset.speech_review import SPEECH_REVIEW_TOOLS
 from server.agent_toolset.video_review import VIDEO_REVIEW_TOOLS
 from server.agent_toolset.video_versions import VIDEO_VERSION_TOOLS
 from server.agent_toolset.workflow_access import WORKFLOW_ACCESS_TOOLS
@@ -36,6 +37,7 @@ AGENT_TOOLSET: tuple[AgentToolDeclaration, ...] = (
     *ASSET_LIBRARY_TOOLS,
     *VIDEO_VERSION_TOOLS,
     *VIDEO_REVIEW_TOOLS,
+    *SPEECH_REVIEW_TOOLS,
     *EDIT_TIMELINE_TOOLS,
     *FINAL_CUT_TOOLS,
     *JIANYING_DRAFT_TOOLS,

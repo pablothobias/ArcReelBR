@@ -2522,6 +2522,7 @@ export default {
   'tool_name_split_grids': 'Разбить мультисеточную раскадровку на ячейки',
   'tool_name_generate_videos': 'Сгенерировать видео',
   'tool_name_select_video_version': 'Выбрать версию видео',
+  'tool_name_review_speech': 'Проверить речь и время субтитров',
   'tool_name_inspect_video_units': 'Проверить видеофрагменты',
   'tool_name_inspect_images': 'Проверить изображения',
   'tool_name_create_timeline': 'Создать монтажный таймлайн',

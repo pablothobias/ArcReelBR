@@ -162,6 +162,7 @@ SAMPLE_ARGUMENTS: dict[str, dict[str, Any]] = {
     "complete_script_plan_rebuild": {"episode_id": 1, "expected_stale_script_plan_revision": None},
     "generate_videos": {"script": "episode_1.json", "target": {"scope": "all"}},
     "select_video_version": {"unit_id": "E1S01", "version": 1},
+    "review_speech": {"unit_id": "E1S01", "language": "pt"},
     "inspect_video_units": {"unit_ids": ["E1S01"]},
     "inspect_images": {"resource_type": "character", "ids": ["甲"]},
     "get_provider_asset_links": {"resource_type": "character", "resource_id": "甲"},
@@ -574,6 +575,7 @@ _TIME_DEPENDENT_RESULTS = frozenset({CREATE_PROJECT.name, CREATE_TIMELINE.name})
 # Declarations legitimately returning problems under sample arguments lack required objects/configuration; all others must succeed.
 _PROBLEM_ON_SAMPLE = frozenset(
     {
+        "review_speech",
         "upload_reference",  # The sample character is absent.
         "quote_storyboards",  # The sample episode has no bound formal script.
         GET_VIDEO_CAPABILITIES.name,

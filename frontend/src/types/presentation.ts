@@ -59,7 +59,7 @@ export interface PresentationReadModel {
   subtitles: PresentationSubtitleCue[];
   subtitle_basis: ArtifactBasisDescriptor | null;
   presentation_basis: ArtifactBasisDescriptor | null;
-  timing: "mechanical" | null;
+  timing: "mechanical" | "audio_measured" | null;
   subtitles_adjustable: boolean;
   subtitles_webvtt: string | null;
 }

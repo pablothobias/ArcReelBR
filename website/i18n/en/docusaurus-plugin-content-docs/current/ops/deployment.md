@@ -209,6 +209,28 @@ ArcReel's sandbox requires provider secrets to be absent from the parent process
 
 Non-secret configuration such as `ANTHROPIC_BASE_URL` and model names does not independently cause startup to be rejected, but it is still best managed in the Web UI together with the corresponding credentials.
 
+### Optional local speech review {#local-speech-review}
+
+The embedded Agent and remote MCP tool `review_speech` use local speech recognition to compare actual audio with script text and, when eligible, apply subtitle timing. No paid inference API is called, but dependencies and a model must be provisioned first.
+
+Install the optional dependencies in a source deployment:
+
+```bash
+uv sync --extra speech-review
+```
+
+Separately provision a CTranslate2 model directory supported by faster-whisper. Model files must be complete and readable by the account running ArcReel. Downloading a model is a separate setup step that uses network access and disk space, for example:
+
+```bash
+uv run --extra speech-review python -c 'from huggingface_hub import snapshot_download; snapshot_download("Systran/faster-whisper-small", local_dir="/absolute/path/to/faster-whisper-small")'
+```
+
+Set `ARCREEL_SPEECH_REVIEW_MODEL` in the server environment or the `.env` it loads to the actual absolute model directory, then restart the backend. Replace the example path. The local launcher includes the `speech-review` extra but does not provision a model. Container deployments also need the extra installed in the image and the model mounted at a readable container path; setting the variable alone installs neither dependencies nor model files.
+
+Inspect an existing clip with `review_speech(unit_id, language, apply_timing=false)`; remote MCP also requires `project`. Set `apply_timing=true` only when intending to modify subtitle timing. CPU processing is serialized and each unit is limited to 120 seconds. Review calls do not download models. Missing dependencies or model files produce an unavailable result explaining the cause.
+
+Measured timing is applied only when recognized words fully match, confidence and boundary checks pass, and the audio/text still match the current version. Otherwise existing timing is preserved. Read the result before proceeding through native timeline editing and export. Recognized word boundaries remain model estimates; they do not establish voice identity, acting quality or lip synchronization, and must not be treated as approval of those qualities.
+
 ## 4. Health Checks and Logs {#health-and-logs}
 
 ### 4.1 Health Check {#health-check}

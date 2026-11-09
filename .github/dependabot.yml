@@ -84,6 +84,7 @@ updates:
           - "numpy"
           - "pyjianyingdraft"
           - "imageio-ffmpeg"
+          - "faster-whisper"
         update-types:
           - "minor"
           - "patch"

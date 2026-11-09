@@ -2438,6 +2438,7 @@ export default {
   'tool_name_split_grids': '多宫格分镜切分落格',
   'tool_name_generate_videos': '生成视频',
   'tool_name_select_video_version': '切换视频版本',
+  'tool_name_review_speech': '检查语音与字幕时间',
   'tool_name_inspect_video_units': '查看视频单元画面',
   'tool_name_inspect_images': '查看图片',
   'tool_name_get_provider_asset_links': '查询素材库关联',

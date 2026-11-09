@@ -54,6 +54,11 @@ dependencies = [
     "tos>=2.9.3",
 ]
 
+[project.optional-dependencies]
+speech-review = [
+    "faster-whisper>=1.2.1",
+]
+
 [dependency-groups]
 dev = [
     "pytest>=9.0.2",

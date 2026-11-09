@@ -74,6 +74,7 @@ export const ARCREEL_TOOL_SUMMARIES: Record<string, Summarize> = {
   patch_episode_meta: (i, f) => f.join(f.script(i.script), f.quote(i.value)),
   rename_asset: (i, f) => f.arrow(i.old_name, i.new_name),
   merge_asset: (i, f) => f.arrow(i.source, i.target),
+  review_speech: (i, f) => f.list([i.unit_id]),
   retry_project_migration: () => "",
   patch_episode_script: (i, f) => f.join(f.script(i.script), f.count("tool_summary_operations", i.operations)),
   plan_episodes: () => "",

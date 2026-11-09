@@ -24,6 +24,7 @@ Run one round for each editing request from the user. Every round ends with a de
    - **Inspect visuals**: Base the first round on footage review reports. When the user asks about particular visuals (whether a clip breaks down, where action starts or drags, or which candidate is better), use `mcp__arcreel__inspect_video_units` to inspect the relevant units' contact sheets and judge the images yourself. Contact sheets also label machine signals: BLACK black intervals and FREEZE frozen intervals are suspected defects; confirm visually before deciding whether to trim them. CUT shot changes are structural information, not defects. Signals are only hints; base choices on the visuals.
    - **Pacing**: Decide trims or tail freezes using user-specified intervals or visually determined times. Contact-sheet times and in/out points share the same time axis; place in/out points at the CUT frame or the frame immediately before it, not mid-transition. When trimming black or frozen beginnings or endings, the interval's end is a candidate in-point and its start a candidate out-point.
    - **Connections**: Transitions can be set between adjacent clips. The script's `segment_break` (scene change) can suggest transition placement.
+   - **Speech evidence and subtitles**: Before voice/timing acceptance, call `mcp__arcreel__review_speech` for each selected unit with its spoken language and rendition variant. Compare the blind transcript with canonical speech. When `timing_eligible` is true and timing correction is requested, apply with `apply_timing: true`, then reread the timeline and rerender affected outputs. Keep speech inside trims. Report mismatches, unavailable recognition and muted-track blockers; source text remains edited through the script workflow. Word timing supports subtitle placement, while `lip_sync` and `vocal_performance` remain separate, potentially unassessed findings. Give the footage reviewer the speech report when assessing mouth movement around detected intervals.
    - **Sound**: Adjust original audio volume as requested. For adding, replacing, or adjusting BGM, follow “Add BGM”.
    - **Narration**: If `issues` contains `narration_overrun` or `narration_source_collision`, follow “When narration does not fit”.
    - **Versions**: When the user specifies another video version, or reports or visual inspection show a clearly better candidate, switch directly with `mcp__arcreel__select_video_version` (no permission needed), reread the timeline, and decide trims again.
@@ -35,6 +36,10 @@ Run one round for each editing request from the user. Every round ends with a de
 
    Completion criterion: adjustments were submitted successfully, or it is clear that this round has none to submit.
 5. **Deliver**: Following “Delivery at the end of a round”, deliver the change summary, “Jump here to inspect” links, and a checklist when decisions are pending, together.
+
+## Evidence and subtitle timing
+
+Separate render success from editorial acceptance. `review-footage` establishes visual observations, not audio review. Report the absence of actual-audio verification when it matters to delivery. Native `mechanical` subtitle timing distributes text over the media boundary; it is not measured speech alignment. Timeline trimming does not independently correct subtitle cue bounds. For requested timing correction, use the speech-evidence step above. Unavailable or inconclusive recognition leaves the mechanical draft unchanged; report its blocker. Keep lip synchronization and vocal performance unassessed unless actual audiovisual evidence establishes them.
 
 ## Full first-round review
 

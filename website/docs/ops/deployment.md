@@ -209,6 +209,28 @@ ArcReel 的沙箱要求父进程环境中不保留供应商密钥。以下凭据
 
 `ANTHROPIC_BASE_URL`、模型名等非密钥配置不会单独触发启动拒绝，但仍建议与对应凭据一起在 WebUI 中管理。
 
+### 可选：本地语音复核 {#local-speech-review}
+
+内置 Agent 和远程 MCP 的 `review_speech` 使用本地语音识别，对比实际音频与脚本文字，并在符合条件时写入字幕时间。此功能不调用付费推理 API，但需要预先安装依赖和模型。
+
+在源码部署目录安装可选依赖：
+
+```bash
+uv sync --extra speech-review
+```
+
+另外准备一个 faster-whisper 支持的 CTranslate2 模型目录。模型文件必须完整且运行 ArcReel 的账户可读；下载模型是单独的准备步骤，会使用网络和磁盘空间。例如：
+
+```bash
+uv run --extra speech-review python -c 'from huggingface_hub import snapshot_download; snapshot_download("Systran/faster-whisper-small", local_dir="/absolute/path/to/faster-whisper-small")'
+```
+
+将服务器环境或其读取的 `.env` 中的 `ARCREEL_SPEECH_REVIEW_MODEL` 设为实际模型目录的绝对路径，然后重启后端。示例路径需要替换，不能直接照用。本地启动脚本会包含 `speech-review` extra，但不会准备模型。容器部署还需在镜像中安装 extra、挂载模型目录，并使用容器内可读路径；设置环境变量本身不会安装依赖或模型。
+
+通过 `review_speech(unit_id, language, apply_timing=false)` 检查已有片段；远程 MCP 还需传入 `project`。只有需要修改字幕时间时才设置 `apply_timing=true`。处理在 CPU 上串行执行，单段最多 120 秒；调用期间不下载模型。依赖或模型缺失时，工具返回无法执行的原因。
+
+只有识别文字完全匹配、置信度与时间边界通过检查，且音频和文字仍为当前版本时，才应用测得的字幕时间。不符合条件时保留原字幕时间。先读取工具结果，再使用原生时间线和导出流程。识别出的词边界仍是模型估计，不证明声音身份、表演质量或口型同步；这些项目不能据此标为已通过。
+
 ## 4. 健康检查和日志 {#health-and-logs}
 
 ### 4.1 健康检查 {#health-check}

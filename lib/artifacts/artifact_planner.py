@@ -1635,6 +1635,9 @@ class TargetStatePlanner:
         if frozen_preparation is None or not isinstance(provider_audio_enabled, bool):
             return None
         try:
+            from lib.speech.measured_timing import measured_policy
+
+            timing = measured_policy(subtitle.get("timing_policy"))
             frozen = materialize_speech_presentation(
                 frozen_preparation,
                 variant=variant,
@@ -1642,6 +1645,7 @@ class TargetStatePlanner:
                 narration_audio=frozen_audio,
                 provider_audio_enabled=provider_audio_enabled,
                 subtitle_sentences_prepared=True,
+                timing=timing,
             )
         except (TypeError, ValueError):
             return None
@@ -1686,6 +1690,15 @@ class TargetStatePlanner:
             except (TypeError, ValueError):
                 pass
             else:
+                if timing is not None and timing.source_basis == current.subtitle_basis.digest:
+                    current = materialize_speech_presentation(
+                        admission.preparation,
+                        variant=variant,
+                        video=current_video,
+                        narration_audio=current_audio,
+                        provider_audio_enabled=provider_audio_enabled,
+                        timing=timing,
+                    )
                 current_subtitle = current.subtitle_basis
                 current_presentation = current.presentation_basis
         elif self._records_gaps:

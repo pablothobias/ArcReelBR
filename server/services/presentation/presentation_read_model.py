@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 from collections.abc import Awaitable, Callable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
@@ -24,6 +25,7 @@ from lib.project.project_manager import ProjectManager
 from lib.project.resource_paths import resource_relative_path
 from lib.script.script_editor import resolve_items
 from lib.speech.audio_utils import probe_existing_media_duration_seconds, probe_existing_video_duration_seconds
+from lib.speech.measured_timing import MeasuredSubtitleTiming, measured_policy
 from lib.speech.narration_config import ProjectTtsSettingsResolver
 from lib.speech.narration_delivery import (
     POST_PRODUCTION,
@@ -147,6 +149,7 @@ class PresentationReadModelService:
         variant: RenditionVariant,
         video_version: int | None = None,
         audio_version: int | None = None,
+        measured_timing: MeasuredSubtitleTiming | None = None,
     ) -> MaterializedPresentation:
         for attempt in range(2):
             async with generation_admission_lock(
@@ -162,6 +165,7 @@ class PresentationReadModelService:
                         variant=variant,
                         video_version=video_version,
                         audio_version=audio_version,
+                        measured_timing=measured_timing,
                     )
                 except _PresentationSelectionChanged:
                     if attempt > 0:
@@ -179,6 +183,7 @@ class PresentationReadModelService:
         variant: RenditionVariant,
         video_version: int | None = None,
         audio_version: int | None = None,
+        measured_timing: MeasuredSubtitleTiming | None = None,
         episode_snapshot: _EpisodeSnapshot | None = None,
     ) -> MaterializedPresentation:
         if resource_type not in {"videos", "reference_videos"}:
@@ -288,6 +293,31 @@ class PresentationReadModelService:
             )
         except (TypeError, ValueError) as exc:
             raise PresentationUnavailableError("selected media cannot form the requested presentation") from exc
+        # Measurements are bound to canonical speech and actual media, not mutable filenames.
+        policy = measured_timing
+        if policy is None:
+            subtitle_path, _ = presentation_artifact_paths(selected_video.target.episode, resource_id, variant)
+
+            def read_policy() -> MeasuredSubtitleTiming | None:
+                try:
+                    raw = json.loads(safe_join(project_path, subtitle_path).read_text(encoding="utf-8"))
+                    return measured_policy(raw.get("timing_policy"))
+                except (OSError, ValueError, TypeError, AttributeError):
+                    return None
+
+            policy = await asyncio.to_thread(read_policy)
+        if policy is not None:
+            if policy.source_basis == presentation.subtitle_basis.digest:
+                presentation = materialize_speech_presentation(
+                    admission.preparation,
+                    variant=variant,
+                    video=video_media,
+                    narration_audio=audio_media,
+                    provider_audio_enabled=provider_audio_enabled,
+                    timing=policy,
+                )
+            elif measured_timing is not None:
+                raise PresentationUnavailableError("speech or selected media changed during audio review")
         result = MaterializedPresentation(
             episode=selected_video.target.episode,
             resource_type=resource_type,

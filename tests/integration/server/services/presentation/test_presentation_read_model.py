@@ -1065,3 +1065,46 @@ async def test_legacy_subtitle_policy_is_stale_and_regenerates_as_current(
         .status
         is ArtifactStatus.CURRENT
     )
+
+
+async def test_measured_timing_survives_reads_and_currency_reconstruction(tmp_path: Path) -> None:
+    from lib.speech.measured_timing import MeasuredSubtitleTiming
+
+    pm, project_path, settings = _setup_narrator_project(tmp_path)
+
+    async def probe(_path: Path) -> float:
+        return 6.25
+
+    service = PresentationReadModelService(
+        pm,
+        settings_resolver_factory=lambda _name, _path: _SettingsResolver(settings),
+        duration_probe=probe,
+    )
+    args = {"project_name": "demo", "resource_type": "videos", "resource_id": "E1S01", "variant": "post_production"}
+    original = await service.materialize_unit(**args)
+    intervals = tuple(
+        (1_000_000 + i * 1_000_000, 1_500_000 + i * 1_000_000) for i in range(len(original.presentation.subtitles))
+    )
+    policy = MeasuredSubtitleTiming(original.presentation.subtitle_basis.digest, intervals, "sha256-v1:" + "e" * 64)
+    applied = await service.materialize_unit(**args, measured_timing=policy)
+    reread = await service.materialize_unit(**args)
+    assert reread.presentation.to_dict() == applied.presentation.to_dict()
+    assert reread.presentation.timing == "audio_measured"
+    assert (
+        ArtifactCurrencyResolver(project_path)
+        .compare(
+            ArtifactKey.episode_subtitle(1, "E1S01", "post_production"),
+            artifact_path=reread.subtitle_artifact_path,
+        )
+        .status
+        is ArtifactStatus.CURRENT
+    )
+    script_path = project_path / "scripts/episode_1.json"
+    script = json.loads(script_path.read_text())
+    script["segments"][0]["novel_text"] = "New speech."
+    _write_json(script_path, script)
+    with pytest.raises(PresentationUnavailableError, match="changed during audio review"):
+        await service.materialize_unit(**args, measured_timing=policy)
+    refreshed = await service.materialize_unit(**args)
+    assert refreshed.presentation.timing == "mechanical"
+    assert refreshed.presentation.subtitles[0].text == "New speech."

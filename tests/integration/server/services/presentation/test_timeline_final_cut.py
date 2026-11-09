@@ -110,3 +110,37 @@ async def test_a_corrupted_narration_snapshot_names_the_unit_and_version(tmp_pat
 
     assert caught.value.code == "final_cut_narration_version_corrupted"
     assert (caught.value.params["unit_id"], caught.value.params["version"]) == (unit_id, record["version"])
+
+
+async def test_measured_subtitles_render_only_inside_measured_interval(tmp_path: Path) -> None:
+    from lib.speech.measured_timing import MeasuredSubtitleTiming
+    from server.services.presentation.presentation_read_model import PresentationReadModelService
+
+    pm, project_path = setup_project(tmp_path)
+    timeline_id = await edited_timeline(pm)
+    reader = PresentationReadModelService(pm)
+    original = await reader.materialize_unit(
+        project_name="demo",
+        resource_type="videos",
+        resource_id="E1S01",
+        variant="post_production",
+    )
+    assert len(original.presentation.subtitles) == 1
+    policy = MeasuredSubtitleTiming(
+        original.presentation.subtitle_basis.digest,
+        ((700_000, 1_000_000),),
+        "sha256-v1:" + "e" * 64,
+    )
+    await reader.materialize_unit(
+        project_name="demo",
+        resource_type="videos",
+        resource_id="E1S01",
+        variant="post_production",
+        measured_timing=policy,
+    )
+    result = await _service(pm).render("demo", timeline_id, narration="without_narration", subtitles="burned_subtitles")
+    video = project_path / result.artifact_path
+    # The existing timeline trims 0.5 seconds: source 0.7–1.0 becomes timeline 0.2–0.5.
+    assert _bright_pixels(video, 0.1) == (0, 0)
+    assert _bright_pixels(video, 0.3)[1] > 500
+    assert _bright_pixels(video, 0.7) == (0, 0)

@@ -2660,6 +2660,7 @@ export default {
   'tool_name_split_grids': 'Tách phân cảnh đa lưới vào khung hình',
   'tool_name_generate_videos': 'Tạo video',
   'tool_name_select_video_version': 'Chọn phiên bản video',
+  'tool_name_review_speech': 'Kiểm tra lời nói và thời gian phụ đề',
   'tool_name_inspect_video_units': 'Xem hình ảnh đơn vị video',
   'tool_name_inspect_images': 'Xem ảnh',
   'tool_name_get_provider_asset_links': 'Kiểm tra liên kết thư viện tư liệu',

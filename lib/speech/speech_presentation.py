@@ -207,12 +207,14 @@ class SpeechPresentation:
     subtitles: tuple[SubtitleCue, ...]
     subtitle_basis: ArtifactBasis
     presentation_basis: ArtifactBasis
-    timing: Literal["mechanical"] = "mechanical"
+    timing: Literal["mechanical", "audio_measured"] = "mechanical"
+    timing_policy: dict[str, object] | None = None
     subtitles_adjustable: bool = True
     provenance: Literal["verified"] = "verified"
 
     def subtitle_artifact_dict(self) -> dict[str, object]:
         return {
+            **({"timing_policy": self.timing_policy} if self.timing_policy is not None else {}),
             "schema_version": 1,
             "unit_id": self.unit_id,
             "variant": self.variant,
@@ -398,7 +400,19 @@ def materialize_speech_presentation(
     if narration_audio is not None:
         narration_duration = _duration_microseconds(narration_audio.evidence.actual_duration_seconds)
 
+    from lib.speech.measured_timing import MeasuredSubtitleTiming
+
     timing_adapter = timing or MechanicalSubtitleTiming()
+    if isinstance(timing_adapter, MeasuredSubtitleTiming):
+        baseline = build_mechanical_subtitle_basis(
+            preparation,
+            variant=variant,
+            video=video.evidence,
+            narration_audio=narration_audio.evidence if narration_audio else None,
+            subtitle_sentences_prepared=subtitle_sentences_prepared,
+        )
+        if timing_adapter.source_basis != baseline.digest:
+            raise ValueError("measured timing belongs to different speech or media")
     utterances = project_subtitle_utterances(preparation, subtitle_sentences_prepared=subtitle_sentences_prepared)
     subtitle_boundary = narration_duration if narration_duration is not None else video_duration
     assert subtitle_boundary is not None
@@ -444,6 +458,8 @@ def materialize_speech_presentation(
             if narration_audio is not None and narration_duration is not None
             else None
         ),
+        timing="audio_measured" if isinstance(timing_adapter, MeasuredSubtitleTiming) else "mechanical",
+        timing_policy=timing_adapter.basis_identity if isinstance(timing_adapter, MeasuredSubtitleTiming) else None,
         subtitles=subtitles,
         subtitle_basis=subtitle_basis,
         presentation_basis=presentation_basis,

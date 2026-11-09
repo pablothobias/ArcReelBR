@@ -156,7 +156,7 @@ fi
 echo "run_local: backend auto-reload $($RELOAD && echo on || echo off)"
 
 cd "$ROOT"
-clean uv run uvicorn "${UVICORN_ARGS[@]}" > >(prefix "[api] ") 2>&1 &
+clean uv run --extra speech-review uvicorn "${UVICORN_ARGS[@]}" > >(prefix "[api] ") 2>&1 &
 API_PID=$!
 # Disowned jobs are still stopped by PID/process group, but bash no longer prints "Terminated" notices for them.
 disown "$API_PID"

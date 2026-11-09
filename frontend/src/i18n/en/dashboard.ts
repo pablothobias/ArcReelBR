@@ -2439,6 +2439,7 @@ export default {
   'tool_name_split_grids': 'Split multi-grid storyboard into cells',
   'tool_name_generate_videos': 'Generate videos',
   'tool_name_select_video_version': 'Select video version',
+  'tool_name_review_speech': 'Review speech and subtitle timing',
   'tool_name_inspect_video_units': 'Inspect video units',
   'tool_name_inspect_images': 'Inspect images',
   'tool_name_get_provider_asset_links': 'Check asset library links',
