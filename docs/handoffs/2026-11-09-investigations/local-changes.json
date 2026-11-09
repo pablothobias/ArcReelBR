@@ -1,0 +1,590 @@
+{
+  "captured_at": "2026-11-09T08:28:31.665526-03:00",
+  "checkout": "/Users/pablo.carminatti.br/Projects/ArcReelBR",
+  "branch": "main",
+  "head": "b848b3db0abaf4312b01fc006efeaa7b8d815c83",
+  "scope": "Tracked changes against HEAD and untracked non-ignored files before this handoff. No secret values, file contents or ignored files copied. This manifest is not a backup.",
+  "files": [
+    {
+      "path": ".github/dependabot.yml",
+      "tracked": true,
+      "exists": true,
+      "bytes": 9668,
+      "sha256": "6bebedc276df1f05de7d0a93e003e070b2a5dd37dbd2b065edd397f4693687a1"
+    },
+    {
+      "path": "AGENTS.md",
+      "tracked": true,
+      "exists": true,
+      "bytes": 4980,
+      "sha256": "c904f40b702d1f4af91700e675e156e0ce2fa5464fe4de261af4cff006295072"
+    },
+    {
+      "path": "GLOSSARY.md",
+      "tracked": true,
+      "exists": true,
+      "bytes": 84356,
+      "sha256": "d9b513258b1900d8b8cd4086b6648a051b0e31beb76e2e1744ed7f5744730cf7"
+    },
+    {
+      "path": "MISSION.md",
+      "tracked": false,
+      "exists": true,
+      "bytes": 651,
+      "sha256": "d5a8f0f755d5c68398122f0b6b438b5f11b385208ce9554e80a243e4cc1c069e"
+    },
+    {
+      "path": "RESOURCES.md",
+      "tracked": false,
+      "exists": true,
+      "bytes": 886,
+      "sha256": "58c9ccaad362222c81093caf1d6e488602e63d3ecdc273b5cff0b530f2939aa4"
+    },
+    {
+      "path": "agent_runtime_profile/.claude/agents/review-footage.md",
+      "tracked": true,
+      "exists": true,
+      "bytes": 3983,
+      "sha256": "2abc14652d5295e8ab9f7eeeeddcf325221b32a55672849c25a371335061338b"
+    },
+    {
+      "path": "agent_runtime_profile/.claude/skills/edit-video/SKILL.md",
+      "tracked": true,
+      "exists": true,
+      "bytes": 17504,
+      "sha256": "83b8385bb0b93e47036e253faee4717b5dc4a28f51d73ec008823756ae90c055"
+    },
+    {
+      "path": "agent_runtime_profile/.claude/skills/generate-assets/SKILL.md",
+      "tracked": true,
+      "exists": true,
+      "bytes": 8168,
+      "sha256": "e88b0b0296b1f13d1db2d18e2f63551c4526e4c046e1233f8628d512416e0734"
+    },
+    {
+      "path": "agent_runtime_profile/.claude/skills/video-workflow/SKILL.drama.md",
+      "tracked": true,
+      "exists": true,
+      "bytes": 29535,
+      "sha256": "908fc2d6f6ac187a01084ce160755e471e89d6897007305c0e853423a94070b5"
+    },
+    {
+      "path": "agent_runtime_profile/.claude/skills/video-workflow/SKILL.narration.md",
+      "tracked": true,
+      "exists": true,
+      "bytes": 31251,
+      "sha256": "1865c53087fe9efcb2d74b39de55025df75568e80dd524bab83e6645c76d666f"
+    },
+    {
+      "path": "agent_runtime_profile/CLAUDE.ad.md",
+      "tracked": true,
+      "exists": true,
+      "bytes": 23609,
+      "sha256": "38c171d09146e16e6387019023d6384434baeb739b1370ef305a35e28bb3af9a"
+    },
+    {
+      "path": "agent_runtime_profile/CLAUDE.drama.md",
+      "tracked": true,
+      "exists": true,
+      "bytes": 26380,
+      "sha256": "40e602aef2bac4fde5d3db96facc72cabf1149e736432d58186adb90b209d85e"
+    },
+    {
+      "path": "agent_runtime_profile/CLAUDE.narration.md",
+      "tracked": true,
+      "exists": true,
+      "bytes": 26995,
+      "sha256": "a40ec9450f90c2ebb6b1a5135497d14e82b899e8feddd9efb7d33a9472dc803f"
+    },
+    {
+      "path": "assets/lesson.css",
+      "tracked": false,
+      "exists": true,
+      "bytes": 875,
+      "sha256": "793178c6e5422ff9f45111f8081957d30098a59a782809ffdb0e7ab2f6ac080c"
+    },
+    {
+      "path": "deploy/.env.example",
+      "tracked": true,
+      "exists": true,
+      "bytes": 1078,
+      "sha256": "8a8830a35d6024ad561c549466f73a4539c6e601908bf15d68eb788cbc494a87"
+    },
+    {
+      "path": "docs/plans/brazilian-production/README.md",
+      "tracked": false,
+      "exists": true,
+      "bytes": 14047,
+      "sha256": "42d5394ff148666cfb07906e4e199010a8fa9401725d5ca678751078e6a55f22"
+    },
+    {
+      "path": "docs/plans/brazilian-production/decision-history.md",
+      "tracked": false,
+      "exists": true,
+      "bytes": 13621,
+      "sha256": "aae8f9f84f35948a009b197def0bcc94bb1213fdcc9c4b202131769f81788f59"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/01-control-an-embedded-agent-session-from-codex-through-mcp.md",
+      "tracked": false,
+      "exists": true,
+      "bytes": 989,
+      "sha256": "b196ef12648099e7dc28fa57fe8fa722caa7c4e81513cd8c4cee702db6087894"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/02-run-internal-text-generation-with-opus-5.5-through-the-subscription.md",
+      "tracked": false,
+      "exists": true,
+      "bytes": 1079,
+      "sha256": "226510355e9757ae47ebc10c8939c7b1a5faff78fd8128b9b7bb16219721af8f"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/03-produce-portuguese-content-with-english-technical-prompts.md",
+      "tracked": false,
+      "exists": true,
+      "bytes": 969,
+      "sha256": "d2c42d8f3820ba6a32ac50e17c0716f7e59bf9ab2e26d719e8e6a306f6a84cd9"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/04-register-a-codex-generated-image-as-a-reusable-project-asset.md",
+      "tracked": false,
+      "exists": true,
+      "bytes": 934,
+      "sha256": "08b9f4bc09766976576f1d579c6db1b43e8176a61781d1cba011394336b8961d"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/05-turn-one-verified-reference-and-markdown-request-into-a-production-ready-episode.md",
+      "tracked": false,
+      "exists": true,
+      "bytes": 1347,
+      "sha256": "25cab7b63beacf638061fecc88e01455000cdcb270c3b9a1cb5fd3454ff8dbd0"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/06-apply-spending-and-retry-limits-in-the-codex-directing-workflow.md",
+      "tracked": false,
+      "exists": true,
+      "bytes": 1429,
+      "sha256": "8e3009883ad5727b7719dde32e6a33176632125e94316a1ecec29d71c3749785"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/07-configure-selected-media-providers-and-verify-a-1080p-delivery-path.md",
+      "tracked": false,
+      "exists": true,
+      "bytes": 1405,
+      "sha256": "1be49fbf527c5d4e7fad439a9b00ecb59fb85d242a1f7c1413ba7e4ba5a9371c"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/08-let-codex-inspect-and-judge-actual-video,-speech-and-subtitle-timing.md",
+      "tracked": false,
+      "exists": true,
+      "bytes": 1263,
+      "sha256": "0465d4f58366bb68524fb3e68a9c428a0f331623f87cfda754242561f4485cb2"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/09-deliver-one-reviewed-reference-led-brazilian-pilot-end-to-end.md",
+      "tracked": false,
+      "exists": true,
+      "bytes": 1538,
+      "sha256": "5a885f2fa33efbce647c4b3a29c466c9e47b1268b5fe7dee85a63fc46e3ec3d0"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/10-validate-existing-series-continuity-and-release-bounded-batch-production.md",
+      "tracked": false,
+      "exists": true,
+      "bytes": 1168,
+      "sha256": "6b00468e42b5a8cd0b62c7d21d4655cf4c55df20c0602b548e37cf16b6dee8be"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/README.md",
+      "tracked": false,
+      "exists": true,
+      "bytes": 1911,
+      "sha256": "1a59de366c1953a297b4ddb258d7af248d1b7635e6e314bef78c59540f83f14e"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/manifest.json",
+      "tracked": false,
+      "exists": true,
+      "bytes": 2326,
+      "sha256": "0cdb72e608f5c19312bae224bd0d9ec136aa15d95024096d252eb1ac70ef1bff"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/publication-verification.json",
+      "tracked": false,
+      "exists": true,
+      "bytes": 1682,
+      "sha256": "d9351ac75a421b1dd0eceb2fa6b52a7df738c4908637ca01f0213e7868a25fea"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/published-body-01.md",
+      "tracked": false,
+      "exists": true,
+      "bytes": 1006,
+      "sha256": "1d178c151c0f37b02190a5e279659499601c35d5f37947ec93952ade6543dfc0"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/published-body-02.md",
+      "tracked": false,
+      "exists": true,
+      "bytes": 1096,
+      "sha256": "f298f5806e92584ddbe4f53a04866d702384cfbf05259de3b303dba025f88a6d"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/published-body-03.md",
+      "tracked": false,
+      "exists": true,
+      "bytes": 986,
+      "sha256": "2fe59e749de7e4e4e6c4f510567b20d268ce65bda2bb962e2528f8492342f229"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/published-body-04.md",
+      "tracked": false,
+      "exists": true,
+      "bytes": 951,
+      "sha256": "b79729cdd9aa9f031512a50919de9f9a00ae39daf90c978111c586306e656929"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/published-body-05.md",
+      "tracked": false,
+      "exists": true,
+      "bytes": 1154,
+      "sha256": "fc6bc375ebba2c997c87dfecc047f6299d61727307d3ca89fcb0530aa183c98d"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/published-body-06.md",
+      "tracked": false,
+      "exists": true,
+      "bytes": 1400,
+      "sha256": "14ac78cb19a18c0c42f854659a59b45f3c48ec119037bb3983019407f8b6aa1d"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/published-body-07.md",
+      "tracked": false,
+      "exists": true,
+      "bytes": 1369,
+      "sha256": "c1f551f1973f02c28ca030338ae602a3052d3286557721cb9f17d3d2c669dd11"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/published-body-08.md",
+      "tracked": false,
+      "exists": true,
+      "bytes": 1280,
+      "sha256": "f9111c90bce113303421c304b1c76075a566b7575c8d1c9c8302b7b89d5ba161"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/published-body-09.md",
+      "tracked": false,
+      "exists": true,
+      "bytes": 1230,
+      "sha256": "9e824fc8e8f1ccc034b4e2c7c904f531115f048bfe76960f9bec490d29863fbd"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/published-body-10.md",
+      "tracked": false,
+      "exists": true,
+      "bytes": 1134,
+      "sha256": "27069ba39e750f68ea970753a3e141d5187a8e7e962c5ce57ad4fa43a0a47977"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/published.json",
+      "tracked": false,
+      "exists": true,
+      "bytes": 3548,
+      "sha256": "06a0d878da6b68f5abf709abb8ccf163236ff5e0261cfb3779ab00113294c23c"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/spec.md",
+      "tracked": false,
+      "exists": true,
+      "bytes": 2180,
+      "sha256": "17dc7fd444869d5f334bb357ebdc262f3273c97d053cb0c1914ddca6d57d9962"
+    },
+    {
+      "path": "docs/research/codex-arcreel-delegation.md",
+      "tracked": false,
+      "exists": true,
+      "bytes": 5259,
+      "sha256": "608c8dc00fd711f2743721a408cdba5c5ac6ae1a607d3e7e933e6400846eb89b"
+    },
+    {
+      "path": "docs/testing/native-mcp-production.md",
+      "tracked": false,
+      "exists": true,
+      "bytes": 4639,
+      "sha256": "258dc157b17b57e57d2a4c62f92a045abb66056f035397876a368f153302e148"
+    },
+    {
+      "path": "docs/testing/native-speech-review.md",
+      "tracked": false,
+      "exists": true,
+      "bytes": 4646,
+      "sha256": "c0096ef7157587bdc0b83507d6e1e8dc7caffbd268a545faf27b222f1aa7088c"
+    },
+    {
+      "path": "frontend/src/components/copilot/chat/arcreel-tool-summaries.ts",
+      "tracked": true,
+      "exists": true,
+      "bytes": 4936,
+      "sha256": "f10e138fa78d6e4e775adf7cd99e63192b8823b2c01432934965351080337bbd"
+    },
+    {
+      "path": "frontend/src/i18n/en/dashboard.ts",
+      "tracked": true,
+      "exists": true,
+      "bytes": 266548,
+      "sha256": "8bc34dedf71d555ebbb1669cc89b2fff2cbe3ea5dd86d1d0ae26fe4a2aba74f0"
+    },
+    {
+      "path": "frontend/src/i18n/ru/dashboard.ts",
+      "tracked": true,
+      "exists": true,
+      "bytes": 414784,
+      "sha256": "1d0b937cfa6679d57e0086c4a91254aa4a5a6ede594b90197f9d440f3418b397"
+    },
+    {
+      "path": "frontend/src/i18n/vi/dashboard.ts",
+      "tracked": true,
+      "exists": true,
+      "bytes": 309095,
+      "sha256": "a3f760fb9e544e3e670eeccfb05f27a889fcdd28c6a54cb2985d37144efa3f24"
+    },
+    {
+      "path": "frontend/src/i18n/zh/dashboard.ts",
+      "tracked": true,
+      "exists": true,
+      "bytes": 252821,
+      "sha256": "457fbb2b009f321abd966dee2541a0eaf915c6b568cf0a2503527633ebe88593"
+    },
+    {
+      "path": "frontend/src/types/presentation.ts",
+      "tracked": true,
+      "exists": true,
+      "bytes": 2142,
+      "sha256": "71569fdcf7b769edbaa2b8d13244d2e16a2502fce137e29dce38d40f150caeaf"
+    },
+    {
+      "path": "frontend/vite.config.ts",
+      "tracked": true,
+      "exists": true,
+      "bytes": 1040,
+      "sha256": "addf38058124cd19697ccc27fff55e5931123838f6061399abd0750eb17e754d"
+    },
+    {
+      "path": "lessons/0001-como-funciona-arcreelbr.html",
+      "tracked": false,
+      "exists": true,
+      "bytes": 2904,
+      "sha256": "7ae0ca7d839c7c4f860042edbd79d9e075a30413d67cc93c130ae395e5612961"
+    },
+    {
+      "path": "lib/artifacts/artifact_planner.py",
+      "tracked": true,
+      "exists": true,
+      "bytes": 99618,
+      "sha256": "05edefb7b2099ac99b1492127b0a248aa7283f542203aafa9f957b602e773356"
+    },
+    {
+      "path": "lib/speech/audio_review.py",
+      "tracked": false,
+      "exists": true,
+      "bytes": 7300,
+      "sha256": "c62349e2813fa8d6d4a5428da2e4b70f9c8b2c3cad17587ae6f3df84add79ef2"
+    },
+    {
+      "path": "lib/speech/measured_timing.py",
+      "tracked": false,
+      "exists": true,
+      "bytes": 2763,
+      "sha256": "a8431c1133c6d004edb1d1312a58681a468938bb6d9c6d313d67b3897e6e994b"
+    },
+    {
+      "path": "lib/speech/speech_presentation.py",
+      "tracked": true,
+      "exists": true,
+      "bytes": 19815,
+      "sha256": "eaf6a69657502b59b780df3bda671c4ff0fcb918b6c2316a6a19725c18fa0466"
+    },
+    {
+      "path": "pyproject.toml",
+      "tracked": true,
+      "exists": true,
+      "bytes": 28165,
+      "sha256": "a8ffcb570d1402bd1378b6b8d0ca459d874e8d876bce812f97e86d1549467a6f"
+    },
+    {
+      "path": "reference/0001-mapa-arcreelbr.html",
+      "tracked": false,
+      "exists": true,
+      "bytes": 1329,
+      "sha256": "a68e2591f85a5c284440a596aef9e8b026ceaf03c6ce68e743c11f4744ecde26"
+    },
+    {
+      "path": "scripts/run_local.sh",
+      "tracked": true,
+      "exists": true,
+      "bytes": 7644,
+      "sha256": "7f4ca586c189ee3f3b34c411792f62c1d8318d52b5ddb9970ae64c85fb2fd1b9"
+    },
+    {
+      "path": "server/agent_toolset/media_generation.py",
+      "tracked": true,
+      "exists": true,
+      "bytes": 9366,
+      "sha256": "4295235cb2fcdf8597f7bf447158613bad5abd5459c8d7e1d2ec285515861a31"
+    },
+    {
+      "path": "server/agent_toolset/speech_review.py",
+      "tracked": false,
+      "exists": true,
+      "bytes": 1394,
+      "sha256": "e53d4d89f221a87bccf32c3023c3974679ee7264b4f02f6afa2f82157e54cf3f"
+    },
+    {
+      "path": "server/agent_toolset/toolset.py",
+      "tracked": true,
+      "exists": true,
+      "bytes": 3362,
+      "sha256": "9578012e3b34ea13b8841bc6cec83a375cf5049cfc8341805a3ecb603d923d5a"
+    },
+    {
+      "path": "server/agent_toolset/workflow_access.py",
+      "tracked": false,
+      "exists": true,
+      "bytes": 4752,
+      "sha256": "cf5247bfb942f78f3cebac9f97010c374fb2848d8de2c4d731fe56dba93d5584"
+    },
+    {
+      "path": "server/media_tools/image_edits.py",
+      "tracked": true,
+      "exists": true,
+      "bytes": 15117,
+      "sha256": "847c27d42bace63fb9b219128745a087ec6dccf5c89d7dc0c8225026421217d7"
+    },
+    {
+      "path": "server/media_tools/speech_review.py",
+      "tracked": false,
+      "exists": true,
+      "bytes": 5169,
+      "sha256": "e26e236b9713f76c7abbaed27c461c6cb13dda72ed447a0932a84eb6263095fc"
+    },
+    {
+      "path": "server/media_tools/workflow_access.py",
+      "tracked": false,
+      "exists": true,
+      "bytes": 12575,
+      "sha256": "a3f5d08b4af7764ff663f653522ea1a441c2bf0fb3cb96cde926678faedf1c7b"
+    },
+    {
+      "path": "server/routers/files.py",
+      "tracked": true,
+      "exists": true,
+      "bytes": 71477,
+      "sha256": "41ebb8ba637fa92063c47cf65b917d308bdb400e914db3e86d95fe3e2bede54c"
+    },
+    {
+      "path": "server/routers/projects.py",
+      "tracked": true,
+      "exists": true,
+      "bytes": 103221,
+      "sha256": "81dd000dc7057f711180c5aa0ed5ddfe4096a403f2319ade867b877824ac9bb6"
+    },
+    {
+      "path": "server/services/presentation/presentation_read_model.py",
+      "tracked": true,
+      "exists": true,
+      "bytes": 40848,
+      "sha256": "2d434aeb52772742fab61bde6080ace178bb114bce67c06ea10bc9958b8ea784"
+    },
+    {
+      "path": "server/session_mcp.py",
+      "tracked": true,
+      "exists": true,
+      "bytes": 10125,
+      "sha256": "685edcac91225308da651581902ee43c97b7ac44d3d1a357c39ba5ca4b546c42"
+    },
+    {
+      "path": "tests/integration/server/agent_toolset/test_host_consistency.py",
+      "tracked": true,
+      "exists": true,
+      "bytes": 37940,
+      "sha256": "3b9ee18e6517451428e5a04257e423f63c4c4633aaf6db3b3f31479e6739620a"
+    },
+    {
+      "path": "tests/integration/server/media_tools/test_image_edits.py",
+      "tracked": true,
+      "exists": true,
+      "bytes": 17094,
+      "sha256": "83abaa14ebf756f0551d6cf4f805581d69da54b77914c792e1736b4416421ee8"
+    },
+    {
+      "path": "tests/integration/server/media_tools/test_speech_review.py",
+      "tracked": false,
+      "exists": true,
+      "bytes": 2579,
+      "sha256": "981ddfcb74a93ce41fa603d61a21ffdd8ca466269ba01956f53d6386beff7916"
+    },
+    {
+      "path": "tests/integration/server/routers/test_projects_agent_profile.py",
+      "tracked": true,
+      "exists": true,
+      "bytes": 1683,
+      "sha256": "faf7ab3102c67c7c900142dc9da2b0265ee5af32ab543bee6d5b2b2250c9e7d6"
+    },
+    {
+      "path": "tests/integration/server/routers/test_projects_episodes_patch.py",
+      "tracked": true,
+      "exists": true,
+      "bytes": 12571,
+      "sha256": "1e6bfd1d2cc17133101af70094f8bc76b7d4c548f19f0eda11e70fc4cff49f6a"
+    },
+    {
+      "path": "tests/integration/server/routers/test_projects_error_leakage.py",
+      "tracked": true,
+      "exists": true,
+      "bytes": 17259,
+      "sha256": "e0fa21ed83e4907b76e1d070f50270c20236ea72905769634958e05a9ac943fe"
+    },
+    {
+      "path": "tests/integration/server/services/presentation/test_presentation_read_model.py",
+      "tracked": true,
+      "exists": true,
+      "bytes": 43795,
+      "sha256": "85eeb525ed37353b6da1247c0a37549b19f1c771b5b99640ffb065ee93eef3ee"
+    },
+    {
+      "path": "tests/integration/server/services/presentation/test_timeline_final_cut.py",
+      "tracked": true,
+      "exists": true,
+      "bytes": 6980,
+      "sha256": "02a62862500e50955e9888547e9100ac12407588b22018df27feeba36d8fd770"
+    },
+    {
+      "path": "tests/integration/server/test_session_mcp.py",
+      "tracked": true,
+      "exists": true,
+      "bytes": 9437,
+      "sha256": "1d7289cdf313180db9a3974a5dcd13b029602db3161c12a0f1e2960489fe4134"
+    },
+    {
+      "path": "tests/integration/server/test_workflow_access.py",
+      "tracked": false,
+      "exists": true,
+      "bytes": 7069,
+      "sha256": "f9a417817119172d97210cb8797113e952c737c919bb3c8934ff33f2cd4f4939"
+    },
+    {
+      "path": "tests/unit/lib/speech/test_audio_review.py",
+      "tracked": false,
+      "exists": true,
+      "bytes": 3611,
+      "sha256": "16b2ba9458361b5c412500a943f55028ac775fb317c9fab5306add70bdfb2721"
+    },
+    {
+      "path": "uv.lock",
+      "tracked": true,
+      "exists": true,
+      "bytes": 826866,
+      "sha256": "ae1e81952bda75cac68883be8bdb48c852fd42e4be724ccc72e389493c7ec49b"
+    }
+  ]
+}

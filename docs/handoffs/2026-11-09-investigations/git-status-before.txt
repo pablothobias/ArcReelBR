@@ -1,0 +1,60 @@
+ M .github/dependabot.yml
+ M AGENTS.md
+ M GLOSSARY.md
+ M agent_runtime_profile/.claude/agents/review-footage.md
+ M agent_runtime_profile/.claude/skills/edit-video/SKILL.md
+ M agent_runtime_profile/.claude/skills/generate-assets/SKILL.md
+ M agent_runtime_profile/.claude/skills/video-workflow/SKILL.drama.md
+ M agent_runtime_profile/.claude/skills/video-workflow/SKILL.narration.md
+ M agent_runtime_profile/CLAUDE.ad.md
+ M agent_runtime_profile/CLAUDE.drama.md
+ M agent_runtime_profile/CLAUDE.narration.md
+ M deploy/.env.example
+ M frontend/src/components/copilot/chat/arcreel-tool-summaries.ts
+ M frontend/src/i18n/en/dashboard.ts
+ M frontend/src/i18n/ru/dashboard.ts
+ M frontend/src/i18n/vi/dashboard.ts
+ M frontend/src/i18n/zh/dashboard.ts
+ M frontend/src/types/presentation.ts
+ M frontend/vite.config.ts
+ M lib/artifacts/artifact_planner.py
+ M lib/speech/speech_presentation.py
+ M pyproject.toml
+ M scripts/run_local.sh
+ M server/agent_toolset/media_generation.py
+ M server/agent_toolset/toolset.py
+ M server/media_tools/image_edits.py
+ M server/routers/files.py
+ M server/routers/projects.py
+ M server/services/presentation/presentation_read_model.py
+ M server/session_mcp.py
+ M tests/integration/server/agent_toolset/test_host_consistency.py
+ M tests/integration/server/media_tools/test_image_edits.py
+ M tests/integration/server/routers/test_projects_agent_profile.py
+ M tests/integration/server/routers/test_projects_episodes_patch.py
+ M tests/integration/server/routers/test_projects_error_leakage.py
+ M tests/integration/server/services/presentation/test_presentation_read_model.py
+ M tests/integration/server/services/presentation/test_timeline_final_cut.py
+ M tests/integration/server/test_session_mcp.py
+ M uv.lock
+?? MISSION.md
+?? RESOURCES.md
+?? assets/
+?? docs/handoffs/
+?? docs/plans/brazilian-production/README.md
+?? docs/plans/brazilian-production/decision-history.md
+?? docs/plans/brazilian-production/tickets/
+?? docs/research/codex-arcreel-delegation.md
+?? docs/testing/native-mcp-production.md
+?? docs/testing/native-speech-review.md
+?? lessons/
+?? lib/speech/audio_review.py
+?? lib/speech/measured_timing.py
+?? reference/
+?? server/agent_toolset/speech_review.py
+?? server/agent_toolset/workflow_access.py
+?? server/media_tools/speech_review.py
+?? server/media_tools/workflow_access.py
+?? tests/integration/server/media_tools/test_speech_review.py
+?? tests/integration/server/test_workflow_access.py
+?? tests/unit/lib/speech/test_audio_review.py

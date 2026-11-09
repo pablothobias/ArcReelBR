@@ -1,0 +1,61 @@
+{
+  "captured_at": "2026-11-09T08:32:08.137793-03:00",
+  "baseline_file_drift": [
+    {
+      "path": "frontend/vite.config.ts",
+      "initial_sha256": "addf38058124cd19697ccc27fff55e5931123838f6061399abd0750eb17e754d",
+      "validation_sha256": "11b2a10c345ba1b347ec831dcd1f34d433bc489ef6a5eaca77783329b64c4149",
+      "attribution": "Not edited by this handoff; cause not investigated."
+    }
+  ],
+  "broken_relative_markdown_links": [],
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 11532,
+      "sha256": "8f996b4450ef33fd703c07c41a001b62ac0ff8a5192f9915eb753bf5771c03c7"
+    },
+    {
+      "path": "commit-closeout.md",
+      "bytes": 4542,
+      "sha256": "fadb686491a05f8ba4a956c67ad8571eb315889932b11d6a4538e6bca678c29e"
+    },
+    {
+      "path": "git-diff-stat-before.txt",
+      "bytes": 2439,
+      "sha256": "a562ec768dd2bdc0e9cd4ef95773f9c401b7d914057de64045b8bbf4258e1c31"
+    },
+    {
+      "path": "git-status-before.txt",
+      "bytes": 2469,
+      "sha256": "6d4832a71dc59bd198ec85848243b3f2a96127ed85fd0cdf84159f1e1a1280f3"
+    },
+    {
+      "path": "local-changes.json",
+      "bytes": 19629,
+      "sha256": "664b64a5d93220197d4a9ec614bcdbb451bfff9eed78bf5483572cf96237a3ee"
+    },
+    {
+      "path": "prompt-01-framework-investigation.md",
+      "bytes": 8849,
+      "sha256": "0bd829762ba18c08f9984dc82fe4c2f903bf935df90f1930724ddb70e21bc9fb"
+    },
+    {
+      "path": "prompt-02-configuration-audit.md",
+      "bytes": 8532,
+      "sha256": "0b66a9a493c419f43d1ee27b3ea911b559a5e363ef7b2f24c5e72f0fe8a20e7f"
+    },
+    {
+      "path": "runtime-snapshot.json",
+      "bytes": 8024,
+      "sha256": "2f5dd5e2bab81301a0b6d8c72d30ff12c3af30f94a20238dd3ab48788639bf64"
+    }
+  ],
+  "verification_scope": "Baseline hashes compared, concurrent drift recorded; internal links checked; runtime and final files rechecked via read-only MCP/HTTP/ffprobe. No tests rerun. Manifest excludes itself.",
+  "configuration_mutations": false,
+  "generation_or_inference_requested": false,
+  "git_commit_or_push": false,
+  "closeout_validated_at": "2026-11-09T09:05:55.381108-03:00",
+  "baseline_comparison_is_historical": true,
+  "closeout_broken_relative_links": []
+}

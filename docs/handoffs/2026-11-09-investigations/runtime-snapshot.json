@@ -1,0 +1,287 @@
+{
+  "captured_at": "2026-11-09T08:28:48.293872-03:00",
+  "scope": "Read-only checks of the two test projects; not a system-wide job inventory. No inference or generation invoked.",
+  "projects": {
+    "br-viral-reuniao-impossivel": {
+      "sessions": [
+        {
+          "id": "7409a38e-b7b2-4177-9064-bbaae6585c9a",
+          "project_name": "br-viral-reuniao-impossivel",
+          "title": "Brazilian short film test from The Expert",
+          "status": "completed",
+          "superseded_by": null,
+          "fork_parent_session_id": null,
+          "fork_anchor_uuid": null,
+          "created_at": "2026-11-09T00:07:07.567156",
+          "updated_at": "2026-11-09T10:15:29.072249"
+        }
+      ],
+      "session_pending": [
+        {
+          "id": "7409a38e-b7b2-4177-9064-bbaae6585c9a",
+          "status": "completed",
+          "queued_message_count": 0,
+          "pending_question_count": 0
+        }
+      ],
+      "workflow": {
+        "episode_complete": true,
+        "next_action": {
+          "type": "none",
+          "args": {},
+          "requested_ids": [],
+          "requires_confirmation": false,
+          "reason": "episode has an edit timeline"
+        },
+        "active_tasks": [],
+        "artifacts": {
+          "asset_sheets": {
+            "character": {
+              "current_ids": [
+                "Regina",
+                "Marcos",
+                "Júlio"
+              ],
+              "missing_ids": [],
+              "stale_ids": []
+            },
+            "scene": {
+              "current_ids": [],
+              "missing_ids": [
+                "Glass Meeting Room"
+              ],
+              "stale_ids": []
+            },
+            "prop": {
+              "current_ids": [],
+              "missing_ids": [
+                "Meeting Room Laptop"
+              ],
+              "stale_ids": []
+            },
+            "product": {
+              "current_ids": [],
+              "missing_ids": [],
+              "stale_ids": []
+            }
+          },
+          "script_plan": {
+            "state": "not_applicable"
+          },
+          "script": {
+            "state": "current",
+            "path": "scripts/episode_1.json"
+          },
+          "storyboards": {
+            "current_ids": [
+              "E1S05",
+              "E1S04"
+            ],
+            "missing_ids": [],
+            "stale_ids": [
+              "E1S01",
+              "E1S02",
+              "E1S03"
+            ]
+          },
+          "videos": {
+            "current_ids": [
+              "E1S01",
+              "E1S02",
+              "E1S05",
+              "E1S03",
+              "E1S04"
+            ],
+            "missing_ids": [],
+            "stale_ids": []
+          },
+          "audio": {
+            "state": "not_applicable",
+            "current_ids": [],
+            "missing_ids": [],
+            "stale_ids": []
+          },
+          "edit_timelines": {
+            "timeline_ids": [
+              "tl-99ec13b6"
+            ]
+          }
+        }
+      },
+      "usage": {
+        "recorded_usd": 4.8463545,
+        "records": 23,
+        "next_cursor": null,
+        "unpriced_media_count": 0
+      },
+      "final_file": {
+        "path": "/Users/pablo.carminatti.br/ArcReelData/projects/br-viral-reuniao-impossivel/renders/episode_1/tl-99ec13b6/final_cut.without_narration.burned_subtitles.mp4",
+        "exists": true,
+        "bytes": 8837561,
+        "sha256": "ba2a5c509bc0f95f432914d2ad23774df9150f216c3ebc2ff4281271b07b5b85",
+        "probe": {
+          "programs": [],
+          "stream_groups": [],
+          "streams": [
+            {
+              "codec_name": "h264",
+              "codec_type": "video",
+              "width": 1080,
+              "height": 1920
+            },
+            {
+              "codec_name": "aac",
+              "codec_type": "audio"
+            }
+          ],
+          "format": {
+            "duration": "41.400000",
+            "size": "8837561"
+          }
+        }
+      }
+    },
+    "br-framework-problema-resolvido": {
+      "sessions": [
+        {
+          "id": "699d2985-0cc3-480b-a746-97f9a1d8949b",
+          "project_name": "br-framework-problema-resolvido",
+          "title": "Roteiro Problema resolvido",
+          "status": "completed",
+          "superseded_by": null,
+          "fork_parent_session_id": null,
+          "fork_anchor_uuid": null,
+          "created_at": "2026-11-08T20:47:54.734092",
+          "updated_at": "2026-11-08T23:26:57.077557"
+        }
+      ],
+      "session_pending": [
+        {
+          "id": "699d2985-0cc3-480b-a746-97f9a1d8949b",
+          "status": "completed",
+          "queued_message_count": 0,
+          "pending_question_count": 0
+        }
+      ],
+      "workflow": {
+        "episode_complete": true,
+        "next_action": {
+          "type": "none",
+          "args": {},
+          "requested_ids": [],
+          "requires_confirmation": false,
+          "reason": "episode has an edit timeline"
+        },
+        "active_tasks": [],
+        "artifacts": {
+          "asset_sheets": {
+            "character": {
+              "current_ids": [
+                "Mulher"
+              ],
+              "missing_ids": [],
+              "stale_ids": []
+            },
+            "scene": {
+              "current_ids": [],
+              "missing_ids": [],
+              "stale_ids": [
+                "Home office do apartamento"
+              ]
+            },
+            "prop": {
+              "current_ids": [],
+              "missing_ids": [],
+              "stale_ids": [
+                "Notebook",
+                "Caneca de café"
+              ]
+            },
+            "product": {
+              "current_ids": [],
+              "missing_ids": [],
+              "stale_ids": []
+            }
+          },
+          "script_plan": {
+            "state": "stale",
+            "path": "drafts/episode_1/script_plan_normalized_script.json",
+            "revision": "sha256-v1:5f45e55992f7d9f41d2143783037c387a110899d226a4b6f4f1e5f2e64a0b18c"
+          },
+          "script": {
+            "state": "current",
+            "path": "scripts/episode_1.json"
+          },
+          "storyboards": {
+            "current_ids": [
+              "E1S04"
+            ],
+            "missing_ids": [],
+            "stale_ids": [
+              "E1S05",
+              "E1S06"
+            ]
+          },
+          "videos": {
+            "current_ids": [
+              "E1S04",
+              "E1S05",
+              "E1S06"
+            ],
+            "missing_ids": [],
+            "stale_ids": []
+          },
+          "audio": {
+            "state": "not_applicable",
+            "current_ids": [],
+            "missing_ids": [],
+            "stale_ids": []
+          },
+          "edit_timelines": {
+            "timeline_ids": [
+              "tl-909fe8de"
+            ]
+          }
+        }
+      },
+      "usage": {
+        "recorded_usd": 2.5669145,
+        "records": 25,
+        "next_cursor": null,
+        "unpriced_media_count": 0
+      },
+      "final_file": {
+        "path": "/Users/pablo.carminatti.br/ArcReelData/projects/br-framework-problema-resolvido/renders/episode_1/tl-909fe8de/final_cut.without_narration.burned_subtitles.mp4",
+        "exists": true,
+        "bytes": 4816854,
+        "sha256": "76ccb1fe15f14d9872c0f6294aa6d6baae10830b2a1cf19607593e8871e9a2a2",
+        "probe": {
+          "programs": [],
+          "stream_groups": [],
+          "streams": [
+            {
+              "codec_name": "h264",
+              "codec_type": "video",
+              "width": 1080,
+              "height": 1920
+            },
+            {
+              "codec_name": "aac",
+              "codec_type": "audio"
+            }
+          ],
+          "format": {
+            "duration": "15.333333",
+            "size": "4816854"
+          }
+        }
+      }
+    }
+  },
+  "backend_health": {
+    "status": "ok",
+    "message": "视频项目管理 WebUI 运行正常",
+    "commit": null
+  },
+  "frontend_http_status": 200
+}
