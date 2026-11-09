@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+import os
 from dataclasses import asdict, dataclass
 from typing import Literal
 
@@ -10,6 +11,7 @@ from arcreel_market_core.video_backend_contract import DEFAULT_VIDEO_POLL_TIMEOU
 from lib.agent.credential_tiers import TIERS, AgentPricing, Tier, agent_pricing, tier_models
 from lib.catalog import query as catalog
 from lib.catalog.builtin_models import disabled_builtin_models
+from lib.config.claude_subscription import SubscriptionRouteConflictError, enabled_claude_cloud_routes
 from lib.config.env_keys import ANTHROPIC_ENV_KEYS
 from lib.config.registry import PROVIDER_REGISTRY
 from lib.config.repository import ProviderConfigRepository, SystemSettingRepository
@@ -111,8 +113,9 @@ async def build_anthropic_env(session: AsyncSession) -> AnthropicEnv:
 
     # No active credentials: dual-track system_settings fallback.
     env = {env_key: settings.get(db_key, "").strip() for db_key, env_key in _ANTHROPIC_ENV_MAP.items()}
-    # Without any API key the SDK CLI authenticates through the host's Claude Code login (subscription),
-    # so Agent tokens are not billed per request: price them at zero instead of catalog list prices.
+    if not env["ANTHROPIC_API_KEY"] and (routes := enabled_claude_cloud_routes(os.environ)):
+        raise SubscriptionRouteConflictError(routes)
+    # Local subscription has zero marginal token cost; incompatible inherited cloud selectors are refused.
     pricing = AgentPricing() if env["ANTHROPIC_API_KEY"] else AgentPricing(multiplier=0.0)
     return AnthropicEnv(env=env, pricing=pricing)
 

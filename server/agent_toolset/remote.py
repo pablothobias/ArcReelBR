@@ -37,8 +37,9 @@ PROJECT_PROPERTY: dict[str, Any] = {
 }
 
 LONG_TASK_NOTE = (
-    "\n\nExternal calls do not wait for generation: submission immediately returns a generation_batch handle; "
-    "poll get_generation_batch at its poll_after_seconds interval until done=true, then read the terminal result."
+    "\n\nExternal calls do not wait for submitted generation. When the response contains a generation_batch handle, "
+    "poll get_generation_batch at its poll_after_seconds interval until done=true, then read the terminal result. "
+    "Preview-only responses return immediately without submitting generation; they have no batch to poll."
 )
 
 

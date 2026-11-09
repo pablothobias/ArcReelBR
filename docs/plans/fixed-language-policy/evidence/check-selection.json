@@ -1,0 +1,29 @@
+{
+  "backend": [
+    "tests/unit/lib/prompts",
+    "tests/unit/server/agent_runtime/test_options_assembler.py",
+    "tests/unit/server/agent_runtime/test_session_manager_user_input.py",
+    "tests/unit/lib/agent/test_profile_manifest.py",
+    "tests/unit/lib/agent/test_profile_translation_lifecycle.py",
+    "tests/integration/server/agent_runtime/test_event_log_session_flow.py",
+    "tests/integration/server/agent_runtime/test_session_branch.py",
+    "tests/unit/server/agent_runtime/test_event_log.py",
+    "tests/integration/server/routers/test_projects_agent_profile.py",
+    "tests/integration/server/test_session_mcp.py",
+    "tests/integration/server/agent_toolset/test_host_consistency.py"
+  ],
+  "backend_runner": "PYTHONDONTWRITEBYTECODE=1 PYTHON_DOTENV_DISABLED=1 /Users/pablo.carminatti.br/Projects/ArcReelBR/.venv/bin/python -m pytest -q -p no:cacheprovider",
+  "frontend_focused": "pnpm exec vitest run src/i18n/initialization.test.ts src/components/pages/settings/GeneralSection.test.tsx src/api.test.ts src/utils/sse-stream.test.ts",
+  "frontend_all_initial": "pnpm exec vitest run",
+  "frontend_timeout_diagnosis": "pnpm exec vitest run src/components/pages/settings/endpoints/EndpointsSection.comfyui.test.tsx src/components/pages/settings/endpoints/EndpointsSection.share.test.tsx --maxWorkers=1",
+  "frontend_all_bounded": "pnpm exec vitest run --maxWorkers=4",
+  "pages": "pnpm exec playwright test e2e/regions/language-policy.spec.ts --workers=2",
+  "frontend_types": "pnpm typecheck",
+  "react_doctor": "npx --yes react-doctor@latest --verbose --scope changed",
+  "node": "/Users/pablo.carminatti.br/.nvm/versions/node/v24.22.2/bin/node",
+  "review": {
+    "standards": "No actionable finding in fixed-language delta",
+    "spec": "No actionable contradiction; source/history/native workflow preserved",
+    "limitation": "Read-only source review; no model or ASR validation"
+  }
+}

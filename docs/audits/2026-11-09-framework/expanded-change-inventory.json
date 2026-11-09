@@ -1,0 +1,3458 @@
+{
+  "baseline": "a779b5d51",
+  "head": "1df5ee3b89e865c4193e72d5bbddf64d54b42f0e",
+  "total_paths": 860,
+  "categories": {
+    "production_instructions_and_external_package": 11,
+    "root_assets_and_repository_configuration": 13,
+    "documentation_and_retained_evidence": 121,
+    "frontend_sources_assets_and_configuration": 48,
+    "frontend_visual_snapshots": 490,
+    "tests": 87,
+    "backend_libraries_tools_and_scripts": 85,
+    "public_documentation": 5
+  },
+  "paths": [
+    {
+      "path": ".agents/skills/direct-brazilian-production/SKILL.md",
+      "category": "production_instructions_and_external_package"
+    },
+    {
+      "path": ".agents/skills/direct-brazilian-production/references/recovery-format.md",
+      "category": "production_instructions_and_external_package"
+    },
+    {
+      "path": ".agents/skills/direct-brazilian-production/scripts/policy.py",
+      "category": "production_instructions_and_external_package"
+    },
+    {
+      "path": ".github/dependabot.yml",
+      "category": "root_assets_and_repository_configuration"
+    },
+    {
+      "path": ".gitignore",
+      "category": "root_assets_and_repository_configuration"
+    },
+    {
+      "path": "AGENTS.md",
+      "category": "root_assets_and_repository_configuration"
+    },
+    {
+      "path": "GLOSSARY.md",
+      "category": "root_assets_and_repository_configuration"
+    },
+    {
+      "path": "MISSION.md",
+      "category": "root_assets_and_repository_configuration"
+    },
+    {
+      "path": "RESOURCES.md",
+      "category": "root_assets_and_repository_configuration"
+    },
+    {
+      "path": "agent_runtime_profile/.claude/agents/review-footage.md",
+      "category": "production_instructions_and_external_package"
+    },
+    {
+      "path": "agent_runtime_profile/.claude/skills/edit-video/SKILL.md",
+      "category": "production_instructions_and_external_package"
+    },
+    {
+      "path": "agent_runtime_profile/.claude/skills/generate-assets/SKILL.md",
+      "category": "production_instructions_and_external_package"
+    },
+    {
+      "path": "agent_runtime_profile/.claude/skills/video-workflow/SKILL.drama.md",
+      "category": "production_instructions_and_external_package"
+    },
+    {
+      "path": "agent_runtime_profile/.claude/skills/video-workflow/SKILL.narration.md",
+      "category": "production_instructions_and_external_package"
+    },
+    {
+      "path": "agent_runtime_profile/CLAUDE.ad.md",
+      "category": "production_instructions_and_external_package"
+    },
+    {
+      "path": "agent_runtime_profile/CLAUDE.drama.md",
+      "category": "production_instructions_and_external_package"
+    },
+    {
+      "path": "agent_runtime_profile/CLAUDE.narration.md",
+      "category": "production_instructions_and_external_package"
+    },
+    {
+      "path": "assets/lesson.css",
+      "category": "root_assets_and_repository_configuration"
+    },
+    {
+      "path": "deploy/.env.example",
+      "category": "root_assets_and_repository_configuration"
+    },
+    {
+      "path": "docs/adr/0122-english-product-defaults-preserve-project-language.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/handoffs/2026-11-09-investigations/README.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/handoffs/2026-11-09-investigations/commit-closeout.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/handoffs/2026-11-09-investigations/git-diff-stat-before.txt",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/handoffs/2026-11-09-investigations/git-status-before.txt",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/handoffs/2026-11-09-investigations/handoff-validation.json",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/handoffs/2026-11-09-investigations/local-changes.json",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/handoffs/2026-11-09-investigations/prompt-01-framework-investigation.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/handoffs/2026-11-09-investigations/prompt-02-configuration-audit.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/handoffs/2026-11-09-investigations/restart-verification.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/handoffs/2026-11-09-investigations/runtime-snapshot.json",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/README.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/audiovisual-review.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/budget-recovery-validation.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/decision-history.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/evaluation-diagnosis.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/evaluation-retest-proposal.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/evaluator-options.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/evidence/03-live-session.json",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/evidence/03-session-validation.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/evidence/04-live-text.json",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/evidence/04-text-validation.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/evidence/05-language-validation.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/evidence/06-downstream-preview.json",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/evidence/06-generated-image-handoff.json",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/evidence/06-image-fallback-billing-gap.json",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/evidence/06-image-fixture-outcome.json",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/evidence/06-image-price-configuration.json",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/evidence/06-image-quality-attempt2.json",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/evidence/06-image-upload-local.json",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/evidence/10-audiovisual/README.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/evidence/10-audiovisual/actual-review-results.json",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/evidence/10-audiovisual/consolidated-review.json",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/evidence/10-audiovisual/consolidated-review.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/evidence/10-audiovisual/fixture-manifest.json",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/evidence/10-audiovisual/four-case-diagnostic-results.json",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/evidence/10-audiovisual/pro-comparison-quote.json",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/evidence/10-audiovisual/pro-comparison-results.json",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/evidence/10-audiovisual/syncnet-local-qualification.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/evidence/10-audiovisual/syncnet-negative-controls.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/evidence/10-audiovisual/whisperx-local-qualification.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/evidence/10-multimodal-trial.json",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/evidence/10-multimodal-trial.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/evidence/14-gemini-image-accounting.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/evidence/16-image-mime.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/image-fallback-quote.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/image-handoff.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/implementation-matrix.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/media-preflight.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/offline-review-validation.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/pegasus-optional-trial-preflight.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/pilot-preflight.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/reference-handoff.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/01-control-an-embedded-agent-session-from-codex-through-mcp.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/02-run-internal-text-generation-with-opus-5.5-through-the-subscription.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/03-produce-portuguese-content-with-english-technical-prompts.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/04-register-a-codex-generated-image-as-a-reusable-project-asset.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/05-turn-one-verified-reference-and-markdown-request-into-a-production-ready-episode.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/06-apply-spending-and-retry-limits-in-the-codex-directing-workflow.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/07-configure-selected-media-providers-and-verify-a-1080p-delivery-path.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/08-let-codex-inspect-and-judge-actual-video,-speech-and-subtitle-timing.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/09-deliver-one-reviewed-reference-led-brazilian-pilot-end-to-end.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/10-validate-existing-series-continuity-and-release-bounded-batch-production.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/README.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/manifest.json",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/publication-verification.json",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/published-body-01.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/published-body-02.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/published-body-03.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/published-body-04.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/published-body-05.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/published-body-06.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/published-body-07.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/published-body-08.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/published-body-09.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/published-body-10.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/published.json",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/brazilian-production/tickets/spec.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/README.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/evidence/additional-defaults-initial.log",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/evidence/affected-consumers.log",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/evidence/backend-interrupted.log",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/evidence/backfill-branch.log",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/evidence/browser-bounded.log",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/evidence/browser-interrupted.log",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/evidence/english-login.png",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/evidence/final-audit-conventions.log",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/evidence/final-audit-tests.log",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/evidence/final-doc-conventions.log",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/evidence/final-format.log",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/evidence/final-lint.log",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/evidence/final-selection-command.json",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/evidence/final-selection.log",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/evidence/final-types.log",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/evidence/frontend-build-node22-initial.log",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/evidence/frontend-build-node24.log",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/evidence/frontend-check.log",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/evidence/frontend-vitest-rerun.log",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/evidence/last-remainder-rerun.log",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/evidence/negative-language-assertions-grids.log",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/evidence/negative-language-assertions-promote.log",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/evidence/owner-commands.json",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/evidence/profile-lint.log",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/evidence/react-doctor.log",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/evidence/runtime-initial.log",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/evidence/runtime-locale-validation.log",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/evidence/split-receipts-initial.log",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/evidence/text-final.log",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/evidence/text-owner.log",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/evidence/text-rerun-command.json",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/evidence/video-final.log",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/evidence/video-owner.log",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/partial-backend-diagnostics.json",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/residual-inventory.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/review-and-files.json",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/english-product-experience/validation.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/plans/local-subscription-run.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/research/audiovisual-evaluation-alternatives.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/research/codex-arcreel-delegation.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/testing/native-mcp-production.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "docs/testing/native-speech-review.md",
+      "category": "documentation_and_retained_evidence"
+    },
+    {
+      "path": "frontend/.env.example",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/DESIGN.md",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/ad-project.spec.ts/ad-overview-brief-unsaved.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/ad-project.spec.ts/ad-overview-new-products.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/ad-project.spec.ts/ad-overview-products.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/ad-project.spec.ts/ad-story-setting.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/agent-access.spec.ts/access-token-create.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/agent-access.spec.ts/access-token-created.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/agent-access.spec.ts/access-tokens.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/agent-access.spec.ts/external-agent.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/agent-composer.spec.ts/agent-composer-attachments.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/agent-composer.spec.ts/agent-composer-history.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/agent-composer.spec.ts/agent-composer-question.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/agent-composer.spec.ts/agent-composer-slash.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/agent-memory.spec.ts/agent-memory-delete-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/agent-memory.spec.ts/agent-memory-editor.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/agent-memory.spec.ts/agent-memory-unsaved.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/agent-memory.spec.ts/project-memory.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/agent-messages.spec.ts/agent-messages-editing.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/agent-messages.spec.ts/agent-messages-jump.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/agent-messages.spec.ts/agent-messages-latest.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/agent-session-projection.spec.ts/agent-projection-continued.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/agent-session-projection.spec.ts/agent-projection-failure.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/agent-session-projection.spec.ts/agent-projection-summary.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/agent-work-rows.spec.ts/agent-work-rows-collapsed.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/agent-work-rows.spec.ts/agent-work-rows-subagent.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/asset-editor.spec.ts/asset-editor-create.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/asset-editor.spec.ts/asset-editor-derivative-delete.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/asset-editor.spec.ts/asset-editor-derivative-menu.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/asset-editor.spec.ts/asset-editor-derivatives.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/asset-editor.spec.ts/asset-editor-leave.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/asset-editor.spec.ts/asset-editor-unsaved.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/asset-editor.spec.ts/asset-editor.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/asset-gallery.spec.ts/asset-gallery-delete.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/asset-gallery.spec.ts/asset-gallery-menu.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/asset-gallery.spec.ts/asset-gallery-versions.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/asset-gallery.spec.ts/asset-gallery.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/asset-gallery.spec.ts/asset-viewer-restore.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/asset-gallery.spec.ts/asset-viewer.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/asset-library.spec.ts/asset-library-add-preview.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/asset-library.spec.ts/asset-library-apply.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/asset-library.spec.ts/asset-library-detail.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/asset-library.spec.ts/asset-library-picker.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/asset-library.spec.ts/asset-library.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/auto-textarea.spec.ts/auto-textarea-nine-lines.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/create-project.spec.ts/create-project-ad-duration.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/create-project.spec.ts/create-project-basics.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/create-project.spec.ts/create-project-generation.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/create-project.spec.ts/create-project-style.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/edit-view.spec.ts/edit-render-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/edit-view.spec.ts/edit-view.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/end-frame-picker.spec.ts/end-frame-picker.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/endpoints.spec.ts/endpoints-builtin-detail.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/endpoints.spec.ts/endpoints-delete-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/endpoints.spec.ts/endpoints-detail.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/endpoints.spec.ts/endpoints-import-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/endpoints.spec.ts/endpoints-rail.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/episode-page.spec.ts/episode-page-header.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/episode-page.spec.ts/episode-page-progress-content.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/episode-page.spec.ts/episode-page-progress.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/episodes.spec.ts/episodes-empty.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/episodes.spec.ts/episodes-episode-menu.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/episodes.spec.ts/episodes-manuscript.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/episodes.spec.ts/episodes-plan-popover.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/episodes.spec.ts/episodes-replan.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/episodes.spec.ts/episodes-unregistered.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/export.spec.ts/export-scope-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/file-view.spec.ts/file-view-script.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/file-view.spec.ts/file-view-trash.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/grid-canvas.spec.ts/grid-canvas-failed.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/grid-canvas.spec.ts/grid-canvas-group.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/lobby.spec.ts/lobby-card-menu.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/lobby.spec.ts/lobby-default.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/lobby.spec.ts/lobby-deleted-projects.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/lobby.spec.ts/lobby-empty.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/lobby.spec.ts/lobby-many.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/lobby.spec.ts/lobby-rename-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/login.spec.ts/login.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/market.spec.ts/market-browse.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/market.spec.ts/market-first-visit.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/market.spec.ts/market-install-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/market.spec.ts/market-settings.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/market.spec.ts/market-shared.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/not-found.spec.ts/not-found.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/onboarding.spec.ts/onboarding-demo-agent.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/onboarding.spec.ts/onboarding-demo-badge.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/onboarding.spec.ts/onboarding-demo-section.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/onboarding.spec.ts/onboarding-welcome.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/onboarding.spec.ts/overview-handoff-tip.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/overlays.spec.ts/overlays-action-menu.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/overlays.spec.ts/overlays-export-diagnostics.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/overlays.spec.ts/overlays-toast-over-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/overview.spec.ts/overview-column.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/overview.spec.ts/overview-cost-details.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/overview.spec.ts/overview-cost-unpriced.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/overview.spec.ts/overview-reading-source.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/overview.spec.ts/overview-welcome.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/project-settings.spec.ts/project-settings-agent-reset.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/project-settings.spec.ts/project-settings-basics.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/project-settings.spec.ts/project-settings-models.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/project-settings.spec.ts/project-settings-sidebar.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/project-settings.spec.ts/project-settings-style-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/project-settings.spec.ts/project-settings-voice.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/project-status-bar.spec.ts/project-status-bar-episodes.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/project-status-bar.spec.ts/project-status-bar-migration.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/project-status-bar.spec.ts/project-status-bar-next.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/providers.spec.ts/providers-add-key-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/providers.spec.ts/providers-add-model-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/providers.spec.ts/providers-custom-delete-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/providers.spec.ts/providers-custom-detail.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/providers.spec.ts/providers-custom-endpoint-select.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/providers.spec.ts/providers-custom-model-sheet.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/providers.spec.ts/providers-fetch-models-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/providers.spec.ts/providers-manual-entry-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/providers.spec.ts/providers-model-remove-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/providers.spec.ts/providers-model-restore-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/providers.spec.ts/providers-preset-detail.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/providers.spec.ts/providers-preset-models.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/providers.spec.ts/providers-rail-custom.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/reference-workbench.spec.ts/reference-workbench-remove.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/reference-workbench.spec.ts/reference-workbench.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/script-plan-start.spec.ts/script-plan-replan-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/script-plan-start.spec.ts/script-plan-review.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/script-plan-start.spec.ts/script-plan-start-editing.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/script-plan-start.spec.ts/script-plan-start-running.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/script-plan-start.spec.ts/script-plan-start.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/settings-arcreel-agent.spec.ts/settings-arcreel-agent-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/settings-arcreel-agent.spec.ts/settings-arcreel-agent-providers.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/settings-arcreel-agent.spec.ts/settings-arcreel-agent.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/settings.spec.ts/settings-about-version.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/settings.spec.ts/settings-asset-library-remote.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/settings.spec.ts/settings-config-issue-notice.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/settings.spec.ts/settings-default-models-combobox.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/settings.spec.ts/settings-default-models-empty.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/settings.spec.ts/settings-default-models.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/settings.spec.ts/settings-general.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/settings.spec.ts/settings-prompt-template-detail.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/settings.spec.ts/settings-prompt-templates.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/settings.spec.ts/settings-sidebar.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/shared-components.spec.ts/shared-ad-script-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/shared-components.spec.ts/shared-draft-discard.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/shared-components.spec.ts/shared-draft-repair-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/shared-components.spec.ts/shared-image-viewer.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/shared-components.spec.ts/shared-invalid-draft-bar.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/shared-components.spec.ts/shared-new-assets.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/shared-components.spec.ts/shared-prompt-authoring.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/shared-components.spec.ts/shared-text-task-failure.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/shot-detail.spec.ts/shot-detail-board.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/shot-detail.spec.ts/shot-detail-duration.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/shot-detail.spec.ts/shot-detail-leave-confirm.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/shot-detail.spec.ts/shot-detail-notes.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/shot-detail.spec.ts/shot-detail-refs-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/shot-detail.spec.ts/shot-detail-unsaved.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/shot-detail.spec.ts/shot-detail-versions.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/usage.spec.ts/usage-agent-session-detail.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/usage.spec.ts/usage-detail.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/usage.spec.ts/usage-overview.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/usage.spec.ts/usage-popover.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/usage.spec.ts/usage-records.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/workspace-header.spec.ts/workspace-header-notifications.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/workspace-header.spec.ts/workspace-header-switcher.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/workspace-header.spec.ts/workspace-not-found.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/workspace-shell.spec.ts/workspace-shell-rail.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1024x600/regions/workspace-shell.spec.ts/workspace-shell-sidebar.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/ad-project.spec.ts/ad-overview-brief-unsaved.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/ad-project.spec.ts/ad-overview-new-products.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/ad-project.spec.ts/ad-overview-products.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/ad-project.spec.ts/ad-story-setting.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/agent-access.spec.ts/access-token-create.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/agent-access.spec.ts/access-token-created.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/agent-access.spec.ts/access-tokens.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/agent-access.spec.ts/external-agent.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/agent-composer.spec.ts/agent-composer-attachments.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/agent-composer.spec.ts/agent-composer-history.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/agent-composer.spec.ts/agent-composer-question.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/agent-composer.spec.ts/agent-composer-slash.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/agent-memory.spec.ts/agent-memory-delete-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/agent-memory.spec.ts/agent-memory-editor.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/agent-memory.spec.ts/agent-memory-unsaved.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/agent-memory.spec.ts/project-memory.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/agent-messages.spec.ts/agent-messages-editing.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/agent-messages.spec.ts/agent-messages-jump.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/agent-messages.spec.ts/agent-messages-latest.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/agent-session-projection.spec.ts/agent-projection-continued.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/agent-session-projection.spec.ts/agent-projection-failure.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/agent-session-projection.spec.ts/agent-projection-summary.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/agent-work-rows.spec.ts/agent-work-rows-collapsed.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/agent-work-rows.spec.ts/agent-work-rows-subagent.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/asset-editor.spec.ts/asset-editor-create.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/asset-editor.spec.ts/asset-editor-derivative-delete.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/asset-editor.spec.ts/asset-editor-derivative-menu.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/asset-editor.spec.ts/asset-editor-derivatives.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/asset-editor.spec.ts/asset-editor-leave.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/asset-editor.spec.ts/asset-editor-unsaved.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/asset-editor.spec.ts/asset-editor.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/asset-gallery.spec.ts/asset-gallery-delete.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/asset-gallery.spec.ts/asset-gallery-menu.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/asset-gallery.spec.ts/asset-gallery-versions.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/asset-gallery.spec.ts/asset-gallery.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/asset-gallery.spec.ts/asset-viewer-restore.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/asset-gallery.spec.ts/asset-viewer.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/asset-library.spec.ts/asset-library-add-preview.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/asset-library.spec.ts/asset-library-apply.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/asset-library.spec.ts/asset-library-detail.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/asset-library.spec.ts/asset-library-picker.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/asset-library.spec.ts/asset-library.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/auto-textarea.spec.ts/auto-textarea-nine-lines.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/create-project.spec.ts/create-project-ad-duration.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/create-project.spec.ts/create-project-basics.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/create-project.spec.ts/create-project-generation.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/create-project.spec.ts/create-project-style.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/edit-view.spec.ts/edit-render-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/edit-view.spec.ts/edit-view.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/end-frame-picker.spec.ts/end-frame-picker.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/endpoints.spec.ts/endpoints-builtin-detail.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/endpoints.spec.ts/endpoints-delete-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/endpoints.spec.ts/endpoints-detail.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/endpoints.spec.ts/endpoints-import-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/endpoints.spec.ts/endpoints-rail.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/episode-page.spec.ts/episode-page-header.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/episode-page.spec.ts/episode-page-progress-content.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/episode-page.spec.ts/episode-page-progress.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/episodes.spec.ts/episodes-empty.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/episodes.spec.ts/episodes-episode-menu.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/episodes.spec.ts/episodes-manuscript.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/episodes.spec.ts/episodes-plan-popover.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/episodes.spec.ts/episodes-replan.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/episodes.spec.ts/episodes-unregistered.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/export.spec.ts/export-scope-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/file-view.spec.ts/file-view-script.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/file-view.spec.ts/file-view-trash.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/grid-canvas.spec.ts/grid-canvas-failed.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/grid-canvas.spec.ts/grid-canvas-group.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/light-theme.spec.ts/light-episode.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/light-theme.spec.ts/light-export-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/light-theme.spec.ts/light-lobby.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/light-theme.spec.ts/light-settings-general.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/lobby.spec.ts/lobby-card-menu.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/lobby.spec.ts/lobby-default.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/lobby.spec.ts/lobby-deleted-projects.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/lobby.spec.ts/lobby-empty.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/lobby.spec.ts/lobby-many.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/lobby.spec.ts/lobby-rename-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/login.spec.ts/login.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/market.spec.ts/market-browse.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/market.spec.ts/market-first-visit.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/market.spec.ts/market-install-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/market.spec.ts/market-settings.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/market.spec.ts/market-shared.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/not-found.spec.ts/not-found.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/onboarding.spec.ts/onboarding-demo-agent.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/onboarding.spec.ts/onboarding-demo-badge.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/onboarding.spec.ts/onboarding-demo-section.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/onboarding.spec.ts/onboarding-welcome.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/onboarding.spec.ts/overview-handoff-tip.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/overlays.spec.ts/overlays-action-menu.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/overlays.spec.ts/overlays-export-diagnostics.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/overlays.spec.ts/overlays-toast-over-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/overview.spec.ts/overview-column.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/overview.spec.ts/overview-cost-details.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/overview.spec.ts/overview-cost-unpriced.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/overview.spec.ts/overview-reading-source.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/overview.spec.ts/overview-welcome.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/project-settings.spec.ts/project-settings-agent-reset.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/project-settings.spec.ts/project-settings-basics.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/project-settings.spec.ts/project-settings-models.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/project-settings.spec.ts/project-settings-sidebar.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/project-settings.spec.ts/project-settings-style-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/project-settings.spec.ts/project-settings-voice.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/project-status-bar.spec.ts/project-status-bar-episodes.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/project-status-bar.spec.ts/project-status-bar-migration.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/project-status-bar.spec.ts/project-status-bar-next.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/providers.spec.ts/providers-add-key-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/providers.spec.ts/providers-add-model-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/providers.spec.ts/providers-custom-delete-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/providers.spec.ts/providers-custom-detail.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/providers.spec.ts/providers-custom-endpoint-select.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/providers.spec.ts/providers-custom-model-sheet.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/providers.spec.ts/providers-fetch-models-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/providers.spec.ts/providers-manual-entry-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/providers.spec.ts/providers-model-remove-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/providers.spec.ts/providers-model-restore-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/providers.spec.ts/providers-preset-detail.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/providers.spec.ts/providers-preset-models.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/providers.spec.ts/providers-rail-custom.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/reference-workbench.spec.ts/reference-workbench-remove.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/reference-workbench.spec.ts/reference-workbench.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/script-plan-start.spec.ts/script-plan-replan-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/script-plan-start.spec.ts/script-plan-review.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/script-plan-start.spec.ts/script-plan-start-editing.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/script-plan-start.spec.ts/script-plan-start-running.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/script-plan-start.spec.ts/script-plan-start.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/settings-arcreel-agent.spec.ts/settings-arcreel-agent-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/settings-arcreel-agent.spec.ts/settings-arcreel-agent-providers.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/settings-arcreel-agent.spec.ts/settings-arcreel-agent.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/settings.spec.ts/settings-about-version.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/settings.spec.ts/settings-asset-library-remote.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/settings.spec.ts/settings-config-issue-notice.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/settings.spec.ts/settings-default-models-combobox.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/settings.spec.ts/settings-default-models-empty.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/settings.spec.ts/settings-default-models.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/settings.spec.ts/settings-general.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/settings.spec.ts/settings-prompt-template-detail.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/settings.spec.ts/settings-prompt-templates.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/settings.spec.ts/settings-sidebar.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/shared-components.spec.ts/shared-ad-script-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/shared-components.spec.ts/shared-draft-discard.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/shared-components.spec.ts/shared-draft-repair-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/shared-components.spec.ts/shared-image-viewer.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/shared-components.spec.ts/shared-invalid-draft-bar.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/shared-components.spec.ts/shared-new-assets.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/shared-components.spec.ts/shared-prompt-authoring.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/shared-components.spec.ts/shared-text-task-failure.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/shot-detail.spec.ts/shot-detail-board.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/shot-detail.spec.ts/shot-detail-duration.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/shot-detail.spec.ts/shot-detail-leave-confirm.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/shot-detail.spec.ts/shot-detail-notes.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/shot-detail.spec.ts/shot-detail-refs-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/shot-detail.spec.ts/shot-detail-unsaved.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/shot-detail.spec.ts/shot-detail-versions.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/usage.spec.ts/usage-agent-session-detail.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/usage.spec.ts/usage-detail.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/usage.spec.ts/usage-overview.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/usage.spec.ts/usage-popover.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/usage.spec.ts/usage-records.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/workspace-header.spec.ts/workspace-header-notifications.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/workspace-header.spec.ts/workspace-header-switcher.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/workspace-header.spec.ts/workspace-not-found.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/workspace-shell.spec.ts/workspace-shell-rail.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/1440x900/regions/workspace-shell.spec.ts/workspace-shell-sidebar.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/ad-project.spec.ts/ad-overview-brief-unsaved.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/ad-project.spec.ts/ad-overview-new-products.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/ad-project.spec.ts/ad-overview-products.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/ad-project.spec.ts/ad-story-setting.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/agent-access.spec.ts/access-token-create.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/agent-access.spec.ts/access-token-created.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/agent-access.spec.ts/access-tokens.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/agent-access.spec.ts/external-agent.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/agent-composer.spec.ts/agent-composer-attachments.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/agent-composer.spec.ts/agent-composer-history.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/agent-composer.spec.ts/agent-composer-question.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/agent-composer.spec.ts/agent-composer-slash.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/agent-memory.spec.ts/agent-memory-delete-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/agent-memory.spec.ts/agent-memory-editor.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/agent-memory.spec.ts/agent-memory-unsaved.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/agent-memory.spec.ts/project-memory.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/agent-messages.spec.ts/agent-messages-editing.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/agent-messages.spec.ts/agent-messages-jump.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/agent-messages.spec.ts/agent-messages-latest.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/agent-session-projection.spec.ts/agent-projection-continued.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/agent-session-projection.spec.ts/agent-projection-failure.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/agent-session-projection.spec.ts/agent-projection-summary.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/agent-work-rows.spec.ts/agent-work-rows-collapsed.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/agent-work-rows.spec.ts/agent-work-rows-subagent.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/asset-editor.spec.ts/asset-editor-create.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/asset-editor.spec.ts/asset-editor-derivative-delete.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/asset-editor.spec.ts/asset-editor-derivative-menu.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/asset-editor.spec.ts/asset-editor-derivatives.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/asset-editor.spec.ts/asset-editor-leave.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/asset-editor.spec.ts/asset-editor-unsaved.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/asset-editor.spec.ts/asset-editor.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/asset-gallery.spec.ts/asset-gallery-delete.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/asset-gallery.spec.ts/asset-gallery-menu.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/asset-gallery.spec.ts/asset-gallery-versions.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/asset-gallery.spec.ts/asset-gallery.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/asset-gallery.spec.ts/asset-viewer-restore.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/asset-gallery.spec.ts/asset-viewer.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/asset-library.spec.ts/asset-library-add-preview.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/asset-library.spec.ts/asset-library-apply.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/asset-library.spec.ts/asset-library-detail.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/asset-library.spec.ts/asset-library-picker.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/asset-library.spec.ts/asset-library.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/auto-textarea.spec.ts/auto-textarea-nine-lines.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/create-project.spec.ts/create-project-ad-duration.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/create-project.spec.ts/create-project-basics.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/create-project.spec.ts/create-project-generation.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/create-project.spec.ts/create-project-style.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/edit-view.spec.ts/edit-render-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/edit-view.spec.ts/edit-view.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/end-frame-picker.spec.ts/end-frame-picker.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/endpoints.spec.ts/endpoints-builtin-detail.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/endpoints.spec.ts/endpoints-delete-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/endpoints.spec.ts/endpoints-detail.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/endpoints.spec.ts/endpoints-import-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/endpoints.spec.ts/endpoints-rail.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/episode-page.spec.ts/episode-page-header.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/episode-page.spec.ts/episode-page-progress-content.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/episode-page.spec.ts/episode-page-progress.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/episodes.spec.ts/episodes-empty.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/episodes.spec.ts/episodes-episode-menu.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/episodes.spec.ts/episodes-manuscript.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/episodes.spec.ts/episodes-plan-popover.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/episodes.spec.ts/episodes-replan.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/episodes.spec.ts/episodes-unregistered.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/export.spec.ts/export-scope-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/file-view.spec.ts/file-view-script.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/file-view.spec.ts/file-view-trash.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/grid-canvas.spec.ts/grid-canvas-failed.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/grid-canvas.spec.ts/grid-canvas-group.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/lobby.spec.ts/lobby-card-menu.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/lobby.spec.ts/lobby-default.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/lobby.spec.ts/lobby-deleted-projects.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/lobby.spec.ts/lobby-empty.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/lobby.spec.ts/lobby-many.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/lobby.spec.ts/lobby-rename-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/login.spec.ts/login.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/market.spec.ts/market-browse.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/market.spec.ts/market-first-visit.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/market.spec.ts/market-install-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/market.spec.ts/market-settings.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/market.spec.ts/market-shared.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/not-found.spec.ts/not-found.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/onboarding.spec.ts/onboarding-demo-agent.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/onboarding.spec.ts/onboarding-demo-badge.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/onboarding.spec.ts/onboarding-demo-section.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/onboarding.spec.ts/onboarding-welcome.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/onboarding.spec.ts/overview-handoff-tip.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/overlays.spec.ts/overlays-action-menu.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/overlays.spec.ts/overlays-export-diagnostics.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/overlays.spec.ts/overlays-toast-over-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/overview.spec.ts/overview-column.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/overview.spec.ts/overview-cost-details.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/overview.spec.ts/overview-cost-unpriced.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/overview.spec.ts/overview-reading-source.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/overview.spec.ts/overview-welcome.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/project-settings.spec.ts/project-settings-agent-reset.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/project-settings.spec.ts/project-settings-basics.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/project-settings.spec.ts/project-settings-models.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/project-settings.spec.ts/project-settings-sidebar.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/project-settings.spec.ts/project-settings-style-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/project-settings.spec.ts/project-settings-voice.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/project-status-bar.spec.ts/project-status-bar-episodes.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/project-status-bar.spec.ts/project-status-bar-migration.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/project-status-bar.spec.ts/project-status-bar-next.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/providers.spec.ts/providers-add-key-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/providers.spec.ts/providers-add-model-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/providers.spec.ts/providers-custom-delete-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/providers.spec.ts/providers-custom-detail.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/providers.spec.ts/providers-custom-endpoint-select.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/providers.spec.ts/providers-custom-model-sheet.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/providers.spec.ts/providers-fetch-models-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/providers.spec.ts/providers-manual-entry-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/providers.spec.ts/providers-model-remove-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/providers.spec.ts/providers-model-restore-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/providers.spec.ts/providers-preset-detail.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/providers.spec.ts/providers-preset-models.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/providers.spec.ts/providers-rail-custom.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/reference-workbench.spec.ts/reference-workbench-remove.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/reference-workbench.spec.ts/reference-workbench.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/script-plan-start.spec.ts/script-plan-replan-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/script-plan-start.spec.ts/script-plan-review.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/script-plan-start.spec.ts/script-plan-start-editing.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/script-plan-start.spec.ts/script-plan-start-running.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/script-plan-start.spec.ts/script-plan-start.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/settings-arcreel-agent.spec.ts/settings-arcreel-agent-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/settings-arcreel-agent.spec.ts/settings-arcreel-agent-providers.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/settings-arcreel-agent.spec.ts/settings-arcreel-agent.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/settings.spec.ts/settings-about-version.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/settings.spec.ts/settings-asset-library-remote.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/settings.spec.ts/settings-config-issue-notice.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/settings.spec.ts/settings-default-models-combobox.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/settings.spec.ts/settings-default-models-empty.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/settings.spec.ts/settings-default-models.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/settings.spec.ts/settings-general.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/settings.spec.ts/settings-prompt-template-detail.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/settings.spec.ts/settings-prompt-templates.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/settings.spec.ts/settings-sidebar.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/shared-components.spec.ts/shared-ad-script-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/shared-components.spec.ts/shared-draft-discard.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/shared-components.spec.ts/shared-draft-repair-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/shared-components.spec.ts/shared-image-viewer.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/shared-components.spec.ts/shared-invalid-draft-bar.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/shared-components.spec.ts/shared-new-assets.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/shared-components.spec.ts/shared-prompt-authoring.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/shared-components.spec.ts/shared-text-task-failure.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/shot-detail.spec.ts/shot-detail-board.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/shot-detail.spec.ts/shot-detail-duration.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/shot-detail.spec.ts/shot-detail-leave-confirm.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/shot-detail.spec.ts/shot-detail-notes.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/shot-detail.spec.ts/shot-detail-refs-dialog.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/shot-detail.spec.ts/shot-detail-unsaved.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/shot-detail.spec.ts/shot-detail-versions.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/usage.spec.ts/usage-agent-session-detail.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/usage.spec.ts/usage-detail.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/usage.spec.ts/usage-overview.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/usage.spec.ts/usage-popover.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/usage.spec.ts/usage-records.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/workspace-header.spec.ts/workspace-header-notifications.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/workspace-header.spec.ts/workspace-header-switcher.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/workspace-header.spec.ts/workspace-not-found.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/workspace-shell.spec.ts/workspace-shell-rail.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/__screenshots__/2560x1440/regions/workspace-shell.spec.ts/workspace-shell-sidebar.png",
+      "category": "frontend_visual_snapshots"
+    },
+    {
+      "path": "frontend/e2e/regions/language-policy.spec.ts",
+      "category": "tests"
+    },
+    {
+      "path": "frontend/e2e/regions/onboarding.spec.ts",
+      "category": "tests"
+    },
+    {
+      "path": "frontend/e2e/regions/settings-arcreel-agent.spec.ts",
+      "category": "tests"
+    },
+    {
+      "path": "frontend/e2e/regions/settings.spec.ts",
+      "category": "tests"
+    },
+    {
+      "path": "frontend/e2e/support/test.ts",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/index.html",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/package.json",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/pnpm-lock.yaml",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/public/rafacena-apple-touch-icon.png",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/public/rafacena-favicon-32.png",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/public/rafacena-icon-192.png",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/public/rafacena-icon-512.png",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/public/rafacena-icon-64.png",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/public/rafacena-logo-optimized.webp",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/public/rafacena-logo.png",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/public/rafacena-maskable-192.png",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/public/rafacena-maskable-512.png",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/public/site.webmanifest",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/src/api/transport.ts",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/src/branding-assets.test.ts",
+      "category": "tests"
+    },
+    {
+      "path": "frontend/src/branding.test.ts",
+      "category": "tests"
+    },
+    {
+      "path": "frontend/src/branding.ts",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/src/components/canvas/edit/EditTimelineTracks.tsx",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/src/components/canvas/edit/EditTimelineView.test.tsx",
+      "category": "tests"
+    },
+    {
+      "path": "frontend/src/components/canvas/episodes/ExternalChangeNotice.test.tsx",
+      "category": "tests"
+    },
+    {
+      "path": "frontend/src/components/canvas/episodes/useManualSplit.test.tsx",
+      "category": "tests"
+    },
+    {
+      "path": "frontend/src/components/canvas/timeline/ShotDetailLayout.tsx",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/src/components/copilot/chat/arcreel-tool-summaries.ts",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/src/components/layout/EpisodeCard.tsx",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/src/components/layout/ProjectStatusBar.tsx",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/src/components/pages/AgentConfigTab.test.tsx",
+      "category": "tests"
+    },
+    {
+      "path": "frontend/src/components/pages/AgentConfigTab.tsx",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/src/components/pages/LoginPage.tsx",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/src/components/pages/ProjectsPage.test.tsx",
+      "category": "tests"
+    },
+    {
+      "path": "frontend/src/components/pages/SystemConfigPage.test.tsx",
+      "category": "tests"
+    },
+    {
+      "path": "frontend/src/components/pages/lobby/LobbyGreeting.tsx",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/src/components/pages/lobby/LobbyHeader.tsx",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/src/components/pages/lobby/ProjectCard.test.tsx",
+      "category": "tests"
+    },
+    {
+      "path": "frontend/src/components/pages/lobby/ProjectCard.tsx",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/src/components/pages/settings/ProviderModelList.test.tsx",
+      "category": "tests"
+    },
+    {
+      "path": "frontend/src/components/pages/settings/endpoints/EndpointImportDialog.test.tsx",
+      "category": "tests"
+    },
+    {
+      "path": "frontend/src/components/pages/settings/market/MarketEntryCard.test.tsx",
+      "category": "tests"
+    },
+    {
+      "path": "frontend/src/components/pages/settings/market/MarketInstallDialog.test.tsx",
+      "category": "tests"
+    },
+    {
+      "path": "frontend/src/components/shared/BrandLogo.test.tsx",
+      "category": "tests"
+    },
+    {
+      "path": "frontend/src/components/shared/BrandLogo.tsx",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/src/components/shared/NarrationDeliveryFields.test.tsx",
+      "category": "tests"
+    },
+    {
+      "path": "frontend/src/components/shared/SpeechRateField.test.tsx",
+      "category": "tests"
+    },
+    {
+      "path": "frontend/src/components/shared/SpeechRateField.tsx",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/src/components/ui/button.tsx",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/src/components/ui/input-group.tsx",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/src/components/ui/input.tsx",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/src/components/ui/select.tsx",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/src/i18n/en/assets.ts",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/src/i18n/en/dashboard.ts",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/src/i18n/index.ts",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/src/i18n/initialization.test.ts",
+      "category": "tests"
+    },
+    {
+      "path": "frontend/src/i18n/locale.ts",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/src/i18n/ru/assets.ts",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/src/i18n/ru/dashboard.ts",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/src/i18n/vi/assets.ts",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/src/i18n/vi/dashboard.ts",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/src/i18n/zh/assets.ts",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/src/i18n/zh/dashboard.ts",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/src/index.css",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/src/main.tsx",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/src/onboarding/OnboardingTour.test.tsx",
+      "category": "tests"
+    },
+    {
+      "path": "frontend/src/test/setup.ts",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "frontend/src/types/presentation.ts",
+      "category": "frontend_sources_assets_and_configuration"
+    },
+    {
+      "path": "lessons/0001-como-funciona-arcreelbr.html",
+      "category": "root_assets_and_repository_configuration"
+    },
+    {
+      "path": "lib/artifacts/artifact_planner.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/backends/container_sniff.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/backends/data_uri.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/backends/gemini_shared.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/backends/image_backends/base.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/backends/image_backends/gemini.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/backends/text_backends/base.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/backends/text_backends/claude_subscription.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/backends/text_backends/factory.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/billing/ledger.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/billing/metering.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/config/claude_subscription.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/config/service.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/custom_provider/backends.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/custom_provider/declarative_backend.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/custom_provider/factory.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/custom_provider/metering.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/db/repositories/usage_repo.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/generation/generation_result.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/generation/media_generator.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/generation/task_failure.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/i18n/__init__.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/i18n/en/errors.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/i18n/ru/errors.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/i18n/vi/errors.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/i18n/zh/errors.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/infra/content_language.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/infra/text_metrics.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/infra/validation_messages.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/project/project_manager.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/prompts/prompt_rules/content_language.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/prompts/prompt_templates/engine.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/prompts/prompt_templates/templates/partials/shared/writing_syntax.md",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/prompts/prompt_templates/templates/text/ad_reference_video_prompt_authoring.md",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/prompts/prompt_templates/templates/text/ad_reference_video_script.md",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/prompts/prompt_templates/templates/text/ad_storyboard_prompt_authoring.md",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/prompts/prompt_templates/templates/text/ad_storyboard_script.md",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/prompts/prompt_templates/templates/text/agent_language_rule.md",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/prompts/prompt_templates/templates/text/drama_prompt_authoring.md",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/prompts/prompt_templates/templates/text/drama_script_plan.md",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/prompts/prompt_templates/templates/text/narration_prompt_authoring.md",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/prompts/prompt_templates/templates/text/narration_script_plan.md",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/prompts/prompt_templates/templates/text/reference_video_prompt_authoring.md",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/prompts/prompt_templates/templates/text/reference_video_script_plan.md",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/prompts/prompt_templates/templates/text/source_overview.md",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/script/draft_quarantine.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/script/script_generator.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/speech/audio_review.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/speech/measured_timing.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/speech/speech_presentation.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "lib/speech/speech_rate.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "packages/arcreel-catalog-core/README.md",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "packages/arcreel-catalog-core/src/arcreel_catalog_core/model.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "packages/arcreel-catalog-core/src/arcreel_catalog_core/reading.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "packages/arcreel-catalog-core/src/arcreel_catalog_core/writing.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "packages/arcreel-catalog-core/tests/test_dump_entry.py",
+      "category": "tests"
+    },
+    {
+      "path": "public/agent-installation-guide.md",
+      "category": "root_assets_and_repository_configuration"
+    },
+    {
+      "path": "pyproject.toml",
+      "category": "root_assets_and_repository_configuration"
+    },
+    {
+      "path": "reference/0001-mapa-arcreelbr.html",
+      "category": "root_assets_and_repository_configuration"
+    },
+    {
+      "path": "scripts/build_av_review_fixtures.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "scripts/inspect_audio_evidence.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "scripts/run_local.sh",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "scripts/validate_av_review.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "server/agent_runtime/conversation_language.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "server/agent_runtime/event_log.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "server/agent_runtime/models.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "server/agent_runtime/options_assembler.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "server/agent_runtime/session_manager.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "server/agent_toolset/media_generation.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "server/agent_toolset/speech_review.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "server/agent_toolset/toolset.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "server/agent_toolset/workflow_access.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "server/draft_workflow.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "server/i18n.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "server/media_tools/context.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "server/media_tools/image_edits.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "server/media_tools/speech_review.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "server/media_tools/videos.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "server/media_tools/workflow_access.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "server/remote_mcp.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "server/routers/_validators.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "server/routers/files.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "server/routers/projects.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "server/services/admission/cost_estimation.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "server/services/admission/video_quote.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "server/services/presentation/presentation_read_model.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "server/session_mcp.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "server/text_generation.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "server/tool_runtime.py",
+      "category": "backend_libraries_tools_and_scripts"
+    },
+    {
+      "path": "tests/integration/lib/backends/test_claude_subscription.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/integration/lib/generation/test_gemini_image_billing.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/integration/lib/project/test_project_manager.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/integration/lib/script/test_script_generator_reference_branch.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/integration/scripts/test_inspect_audio_evidence.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/integration/scripts/test_validate_av_review.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/integration/server/agent_runtime/test_event_log_session_flow.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/integration/server/agent_runtime/test_session_branch.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/integration/server/agent_toolset/test_draft_tools.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/integration/server/agent_toolset/test_host_consistency.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/integration/server/agent_toolset/test_promote_draft.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/integration/server/agent_toolset/test_split_reference_video_units.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/integration/server/agent_toolset/test_text_generation.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/integration/server/media_tools/test_image_edits.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/integration/server/media_tools/test_speech_review.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/integration/server/media_tools/test_videos.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/integration/server/routers/test_files_router.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/integration/server/routers/test_generate_router.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/integration/server/routers/test_projects_agent_profile.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/integration/server/routers/test_projects_content_language.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/integration/server/routers/test_projects_episodes_patch.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/integration/server/routers/test_projects_error_leakage.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/integration/server/routers/test_projects_script_edit_endpoints.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/integration/server/routers/test_provider_models_api.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/integration/server/routers/test_reference_videos_router.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/integration/server/services/admission/test_cost_estimation_service.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/integration/server/services/presentation/test_presentation_read_model.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/integration/server/services/presentation/test_timeline_final_cut.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/integration/server/services/project/test_script_review.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/integration/server/test_project_name_validation.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/integration/server/test_remote_mcp.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/integration/server/test_session_mcp.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/integration/server/test_workflow_access.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/integration/skills/test_direct_brazilian_policy_cli.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/unit/lib/backends/image_backends/test_gemini.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/unit/lib/backends/image_backends/test_gemini_billing.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/unit/lib/backends/test_accounting_characterization.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/unit/lib/backends/test_data_uri.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/unit/lib/backends/text_backends/test_claude_subscription.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/unit/lib/config/test_anthropic_env_dict.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/unit/lib/custom_provider/test_declarative_image_mime.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/unit/lib/generation/test_generation_result.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/unit/lib/i18n/test_presentation_locale.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/unit/lib/infra/test_validation_messages.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/unit/lib/prompts/test_brazilian_content.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/unit/lib/script/test_draft_quarantine.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/unit/lib/speech/test_audio_review.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/unit/scripts/test_inspect_audio_evidence.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/unit/scripts/test_validate_av_review.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/unit/server/agent_runtime/test_event_log.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/unit/server/agent_runtime/test_options_assembler.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/unit/server/agent_runtime/test_session_manager.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/unit/server/agent_runtime/test_session_manager_user_input.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/unit/server/media_tools/test_context.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/unit/server/routers/test_asset_router_factory.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/unit/server/routers/test_custom_endpoints_api.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/unit/server/routers/test_custom_providers_api.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/unit/server/routers/test_endpoint_tests_api.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/unit/server/routers/test_generate_router_voice_sample.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/unit/server/routers/test_grids_router.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/unit/server/routers/test_tasks_router.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/unit/server/services/admission/test_video_quote.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/unit/server/test_subscription_text_pause.py",
+      "category": "tests"
+    },
+    {
+      "path": "tests/unit/skills/test_direct_brazilian_policy.py",
+      "category": "tests"
+    },
+    {
+      "path": "uv.lock",
+      "category": "root_assets_and_repository_configuration"
+    },
+    {
+      "path": "website/docs/guide/providers.md",
+      "category": "public_documentation"
+    },
+    {
+      "path": "website/docs/ops/deployment.md",
+      "category": "public_documentation"
+    },
+    {
+      "path": "website/i18n/en/docusaurus-plugin-content-docs/current/guide/providers.md",
+      "category": "public_documentation"
+    },
+    {
+      "path": "website/i18n/en/docusaurus-plugin-content-docs/current/ops/deployment.md",
+      "category": "public_documentation"
+    },
+    {
+      "path": "website/i18n/translation.lock.json",
+      "category": "public_documentation"
+    }
+  ],
+  "coverage_note": "Path inventory, not a claim of semantic review or execution of every listed file. See expanded-scope-review.md for areas actually inspected."
+}

@@ -132,9 +132,9 @@ class EpisodeStoryboardScript:
 
 
 def load_episode_storyboard_script(
-    projects: ProjectManager, project_name: str, episode_id: int
+    projects: ProjectManager, project_name: str, episode_id: int, *, persist_legacy_migrations: bool = True
 ) -> EpisodeStoryboardScript:
-    """Read project/formal script for episode batches and enforce generation-mode/skeleton gates.
+    """Read project/formal script and enforce route gates; quotation can adopt compatibility only in memory.
 
     Raises:
         StoryboardBatchEpisodeNotFound: Episode absent or no formal script.
@@ -151,7 +151,8 @@ def load_episode_storyboard_script(
     # Tasks/deduplication keys use script filenames like single-item generation; the ledger stores paths under ``scripts/``.
     script_file = recorded.removeprefix("scripts/")
     try:
-        script = projects.load_script(project_name, script_file)
+        reader = projects.load_script if persist_legacy_migrations else projects.load_script_readonly
+        script = reader(project_name, script_file)
     except FileNotFoundError as exc:
         raise StoryboardBatchEpisodeNotFound(episode_id) from exc
     ensure_route_skeleton(script, resolve_content_mode(script, project), project.get("generation_mode"))
@@ -374,11 +375,14 @@ async def load_storyboard_image_batch_plan(
     project_name: str,
     episode_id: int,
     user_id: str,
+    persist_legacy_migrations: bool = True,
 ) -> tuple[EpisodeStoryboardScript, StoryboardImageBatchPlan]:
     """Read episode state and plan storyboard images, marking targets already generating."""
 
     def _read() -> tuple[EpisodeStoryboardScript, StoryboardImageBatchPlan]:
-        loaded = load_episode_storyboard_script(projects, project_name, episode_id)
+        loaded = load_episode_storyboard_script(
+            projects, project_name, episode_id, persist_legacy_migrations=persist_legacy_migrations
+        )
         resolver = active_artifact_currency_resolver(loaded.project_path, loaded.project)
         plan = plan_storyboard_image_batch(
             project=loaded.project,

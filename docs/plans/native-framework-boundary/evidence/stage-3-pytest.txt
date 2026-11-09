@@ -1,0 +1,51 @@
+........................................................................ [  5%]
+........................................................................ [ 11%]
+........................................................................ [ 17%]
+........................................................................ [ 23%]
+........................................................................ [ 28%]
+........................................................................ [ 34%]
+........................................................................ [ 40%]
+........................................................................ [ 46%]
+........................................................................ [ 51%]
+........................................................................ [ 57%]
+........................................................................ [ 63%]
+........................................................................ [ 69%]
+........................................................................ [ 74%]
+........................................................................ [ 80%]
+........................................................................ [ 86%]
+........................................................................ [ 92%]
+........................................................................ [ 97%]
+...........................                                              [100%]
+=============================== warnings summary ===============================
+tests/integration/server/test_workflow_access.py::test_settings_persist_and_invalid_settings_leave_project_unchanged
+  /Users/pablo.carminatti.br/.local/share/uv/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/contextlib.py:144: SAWarning: Skipped unsupported reflection of expression-based index idx_tasks_dedupe_active
+    next(self.gen)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 25 durations =============================
+1.39s setup    tests/integration/server/test_workflow_access.py::test_settings_persist_and_invalid_settings_leave_project_unchanged
+1.23s call     tests/integration/server/test_remote_mcp.py::test_text_task_is_shared_by_remote_and_embedded_hosts_and_running_member_is_not_cancellable
+0.56s call     tests/integration/server/test_remote_mcp.py::test_remote_inspect_video_units_returns_contact_sheets_as_image_content
+0.40s call     tests/integration/server/agent_toolset/test_host_consistency.py::test_contact_sheets_reach_both_hosts_as_the_same_image_blocks
+0.32s call     tests/integration/server/services/admission/test_cost_estimation_service.py::TestCostEstimationService::test_reference_estimate_buckets_an_unclaimed_sheet_like_admission_and_execution
+0.29s call     tests/integration/server/media_tools/test_image_edits.py::test_edit_images_build_specs_warnings
+0.28s setup    tests/integration/server/test_remote_mcp.py::test_remote_mcp_accepts_non_loopback_host_header
+0.25s call     tests/integration/server/agent_toolset/test_host_consistency.py::test_both_hosts_expose_the_declared_name_schema_and_description[restore_trash_record]
+0.24s call     tests/integration/server/agent_toolset/test_host_consistency.py::test_both_hosts_expose_the_declared_name_schema_and_description[edit_images]
+0.23s call     tests/integration/server/services/admission/test_cost_estimation_service.py::TestCostEstimationService::test_missing_script_episode_still_gets_history_row
+0.23s setup    tests/integration/server/agent_toolset/test_host_consistency.py::test_remote_project_locating_failures_are_invalid_project[empty-get_project_content]
+0.21s call     tests/integration/server/services/admission/test_cost_estimation_service.py::TestUnpricedCosts::test_missing_local_calls_flags_generated_media_without_call_records[asset-None-True]
+0.21s call     tests/integration/server/services/admission/test_cost_estimation_service.py::TestCostEstimationService::test_reference_video_quote_is_identical_for_tts_and_post_production_projects
+0.19s call     tests/integration/server/services/admission/test_cost_estimation_service.py::TestCostEstimationService::test_video_estimate_uses_request_resolution_and_settlement_pricing[minimax-MiniMax-Hailuo-2.3-1080p-6-False-storyboard]
+0.19s setup    tests/integration/server/test_remote_mcp.py::test_remote_batch_submission_reads_migration_verdict_from_fixture_root
+0.17s call     tests/integration/server/services/admission/test_storyboard_batch.py::test_video_batch_submits_only_the_half_that_has_storyboards
+0.16s setup    tests/integration/server/agent_toolset/test_host_consistency.py::test_remote_project_locating_failures_are_invalid_project[7-patch_draft]
+0.15s call     tests/integration/server/test_remote_mcp.py::test_remote_api_keys_share_the_persisted_single_operator_owner
+0.13s call     tests/integration/server/test_workflow_access.py::test_cost_consultation_adopts_legacy_in_memory_without_writes
+0.13s call     tests/integration/server/test_remote_mcp.py::test_remote_media_submission_returns_complete_durable_batch_and_dedupes
+0.13s setup    tests/integration/server/services/admission/test_cost_estimation_service.py::TestCostEstimationService::test_video_estimate_generate_audio_by_provider[gemini-aistudio/veo-3.1-lite-generate-preview-False-0.05]
+0.13s setup    tests/integration/server/test_workflow_access.py::test_asset_quote_selects_native_targets_without_submitting
+0.12s setup    tests/integration/server/services/admission/test_cost_estimation_service.py::TestCostEstimationService::test_grid_duplicate_ids_across_multiple_grids
+0.12s setup    tests/integration/server/test_workflow_access.py::test_storyboard_edit_preview_preserves_legacy_but_real_edit_still_adopts[True]
+0.12s setup    tests/integration/server/test_remote_mcp.py::test_remote_media_submission_returns_complete_durable_batch_and_dedupes
+1251 passed, 1 warning in 56.06s

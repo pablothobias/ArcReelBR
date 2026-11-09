@@ -1,0 +1,18 @@
+{
+  "head": "1df5ee3b89e865c4193e72d5bbddf64d54b42f0e",
+  "stage7_changed_tracked_paths": [
+    "server/session_mcp.py",
+    "tests/integration/server/test_session_mcp.py"
+  ],
+  "stage7_changed_preexisting_untracked_tests": [
+    "tests/integration/server/agent_runtime/test_subscription_route_pricing.py"
+  ],
+  "other_pre_stage7_tracked_content_unchanged": true,
+  "protected_tracked_entries_identical_to_HEAD": 4736,
+  "protected_regular_files": 4688,
+  "protected_symlinks": 48,
+  "method": "SHA-256 comparison against stage-7 input snapshot; native Git blob hashing against HEAD tree for cumulative protected content, symlink text hashed without following it.",
+  "unexpected_changes": [],
+  "configuration_investigation": "No runtime setting/credential/installed-skill change or import. Read-only tracked source overlap recorded separately.",
+  "commit_created": false
+}

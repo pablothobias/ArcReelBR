@@ -1,0 +1,57 @@
+........................................................................ [  4%]
+........................................................................ [  8%]
+........................................................................ [ 12%]
+........................................................................ [ 16%]
+........................................................................ [ 20%]
+........................................................................ [ 25%]
+........................................................................ [ 29%]
+........................................................................ [ 33%]
+........................................................................ [ 37%]
+........................................................................ [ 41%]
+........................................................................ [ 46%]
+........................................................................ [ 50%]
+........................................................................ [ 54%]
+........................................................................ [ 58%]
+........................................................................ [ 62%]
+........................................................................ [ 67%]
+........................................................................ [ 71%]
+........................................................................ [ 75%]
+........................................................................ [ 79%]
+........................................................................ [ 83%]
+........................................................................ [ 88%]
+........................................................................ [ 92%]
+........................................................................ [ 96%]
+...........................................................              [100%]
+=============================== warnings summary ===============================
+tests/unit/lib/prompts/prompt_rules/test_asset_appearance.py::test_character_names_list_each_form_after_its_ontology
+  /Users/pablo.carminatti.br/.local/share/uv/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/contextlib.py:144: SAWarning: Skipped unsupported reflection of expression-based index idx_tasks_dedupe_active
+    next(self.gen)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 25 durations =============================
+28.07s call     tests/integration/server/agent_runtime/test_event_log_session_flow.py::TestQueuedMessages::test_queued_idempotency_and_replays_survive_many_later_sends
+1.48s setup    tests/unit/lib/prompts/prompt_rules/test_asset_appearance.py::test_character_names_list_each_form_after_its_ontology
+1.04s setup    tests/integration/server/agent_toolset/test_host_consistency.py::test_remote_project_locating_failures_are_invalid_project[absent-get_project_costs]
+0.93s call     tests/integration/server/agent_toolset/test_host_consistency.py::test_contact_sheets_reach_both_hosts_as_the_same_image_blocks
+0.88s setup    tests/integration/server/agent_toolset/test_host_consistency.py::test_embedded_terminal_generation_result_has_the_shape_remote_polling_reads_at_the_terminal_state
+0.68s call     tests/integration/server/agent_toolset/test_host_consistency.py::test_embedded_content_carries_the_same_json_as_remote_structured_content[get_project_costs]
+0.59s call     tests/integration/server/agent_toolset/test_host_consistency.py::test_embedded_content_carries_the_same_json_as_remote_structured_content[confirm_script_review]
+0.52s setup    tests/integration/server/agent_toolset/test_host_consistency.py::test_remote_project_locating_failures_are_invalid_project[../demo-list_bgm]
+0.51s call     tests/integration/server/agent_toolset/test_host_consistency.py::test_embedded_content_carries_the_same_json_as_remote_structured_content[open_draft]
+0.49s call     tests/unit/lib/prompts/prompt_templates/test_builtin.py::test_builtin_shared_partials_are_not_referenced_by_a_single_partial
+0.47s call     tests/integration/server/agent_runtime/test_event_log_session_flow.py::TestSendQueuedMessageNow::test_a_cancel_after_the_agent_took_it_still_sends_it_now
+0.47s setup    tests/integration/server/agent_toolset/test_host_consistency.py::test_remote_project_locating_failures_are_invalid_project[   -plan_episodes]
+0.46s setup    tests/integration/server/agent_toolset/test_host_consistency.py::test_remote_project_locating_failures_are_invalid_project[absent-quote_storyboards]
+0.43s setup    tests/integration/server/agent_toolset/test_host_consistency.py::test_remote_project_locating_failures_are_invalid_project[absent-render_final_cut]
+0.43s setup    tests/integration/server/agent_toolset/test_host_consistency.py::test_remote_project_locating_failures_are_invalid_project[absent-get_project_usage]
+0.39s setup    tests/integration/server/agent_toolset/test_host_consistency.py::test_remote_project_locating_failures_are_invalid_project[-confirm_script_review]
+0.38s setup    tests/unit/server/agent_runtime/test_event_log.py::TestEventLogStore::test_last_entry
+0.38s setup    tests/integration/server/agent_runtime/test_event_log_session_flow.py::TestSendQueuedMessageNow::test_a_cancel_after_the_agent_took_it_still_sends_it_now
+0.38s setup    tests/integration/server/agent_toolset/test_host_consistency.py::test_remote_project_locating_failures_are_invalid_project[empty-get_project_content]
+0.36s setup    tests/integration/server/agent_toolset/test_host_consistency.py::test_remote_project_locating_failures_are_invalid_project[   -discard_draft]
+0.36s call     tests/integration/server/agent_toolset/test_host_consistency.py::test_both_hosts_expose_an_unscoped_declaration_without_project[create_project]
+0.36s setup    tests/integration/server/test_session_mcp.py::test_session_bridge_send_retry_reconnect_questions_cursor_and_interrupt
+0.36s call     tests/integration/server/agent_toolset/test_host_consistency.py::test_embedded_content_carries_the_same_json_as_remote_structured_content[list_pending_assets]
+0.35s call     tests/integration/server/agent_runtime/test_event_log_session_flow.py::TestQueuedMessages::test_retry_of_an_accepted_message_whose_entry_failed_to_record_is_refused_not_resent
+0.35s call     tests/unit/lib/prompts/prompt_templates/test_builtin.py::test_builtin_templates_declare_stage_and_trigger_and_lock_structural_partials
+1715 passed, 1 warning in 182.00s (0:03:02)

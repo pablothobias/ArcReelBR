@@ -1,0 +1,23 @@
+{
+  "protected_tracked_files_checked": 4714,
+  "protected_changes": [],
+  "stage4_changed_paths": [
+    "lib/project/project_manager.py",
+    "server/routers/files.py",
+    "tests/integration/server/test_reference_upload_transaction.py",
+    "docs/testing/native-mcp-production.md",
+    "public/agent-installation-guide.md"
+  ],
+  "changed_existing_project_manager_methods": [
+    "update_character_reference_image"
+  ],
+  "new_project_manager_methods": [
+    "_set_character_reference_image",
+    "install_character_reference_image"
+  ],
+  "existing_transaction_primitive_unchanged": true,
+  "native_deletion_unchanged": true,
+  "native_audio_installer_unchanged": true,
+  "configuration_auth_and_previous_stages_unchanged": true,
+  "stage5_started": false
+}

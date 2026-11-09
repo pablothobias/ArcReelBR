@@ -172,7 +172,7 @@ class TestAssistantRoutes:
         ):
             response = client.post(f"{PREFIX}/sessions/session-1/queued-messages/m-1{path}")
         assert response.status_code == 503
-        assert response.json()["detail"] == make_translator()("session_capacity_exceeded")
+        assert response.json()["detail"] == make_translator("en")("session_capacity_exceeded")
 
         with (
             patch.object(

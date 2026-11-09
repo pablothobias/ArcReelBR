@@ -1,0 +1,50 @@
+........................................................................ [  5%]
+........................................................................ [ 11%]
+........................................................................ [ 17%]
+........................................................................ [ 23%]
+........................................................................ [ 29%]
+........................................................................ [ 35%]
+........................................................................ [ 41%]
+........................................................................ [ 47%]
+........................................................................ [ 53%]
+........................................................................ [ 59%]
+........................................................................ [ 65%]
+........................................................................ [ 71%]
+........................................................................ [ 77%]
+........................................................................ [ 83%]
+........................................................................ [ 89%]
+........................................................................ [ 95%]
+...................................................                      [100%]
+=============================== warnings summary ===============================
+tests/integration/server/media_tools/test_speech_review.py::test_review_applies_timing_and_keeps_evidence_through_native_reader
+  /Users/pablo.carminatti.br/.local/share/uv/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/contextlib.py:144: SAWarning: Skipped unsupported reflection of expression-based index idx_tasks_dedupe_active
+    next(self.gen)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 25 durations =============================
+2.02s call     tests/integration/server/services/presentation/test_timeline_final_cut.py::test_burned_and_clean_final_cuts_are_separate_artifacts_and_only_one_shows_subtitles
+1.92s call     tests/integration/server/services/presentation/test_timeline_final_cut.py::test_narrated_final_cut_mixes_each_narration_from_its_carrying_clip_and_cuts_it_at_the_end
+1.58s call     tests/integration/server/services/presentation/test_timeline_final_cut.py::test_measured_subtitles_render_only_inside_measured_interval
+1.23s setup    tests/integration/server/media_tools/test_speech_review.py::test_review_applies_timing_and_keeps_evidence_through_native_reader
+0.72s call     tests/integration/server/media_tools/test_speech_review.py::test_inspection_materializes_and_preserves_eligible_timing[True-True]
+0.64s call     tests/integration/server/media_tools/test_speech_review.py::test_inspection_materializes_and_preserves_eligible_timing[False-True]
+0.52s call     tests/integration/server/media_tools/test_speech_review.py::test_inspection_materializes_and_preserves_eligible_timing[True-False]
+0.52s call     tests/integration/server/services/presentation/test_timeline_final_cut.py::test_a_corrupted_narration_snapshot_names_the_unit_and_version
+0.46s call     tests/integration/server/media_tools/test_speech_review.py::test_inspection_materializes_and_preserves_eligible_timing[False-False]
+0.36s call     tests/integration/server/services/presentation/test_presentation_read_model.py::test_history_read_does_not_replace_current_presentation_or_manifest
+0.35s call     tests/integration/server/agent_toolset/test_host_consistency.py::test_contact_sheets_reach_both_hosts_as_the_same_image_blocks
+0.34s call     tests/integration/server/services/presentation/test_presentation_read_model.py::test_real_media_presents_without_system_ffmpeg_or_ffprobe[audio_tail-1000000-500000]
+0.33s call     tests/integration/server/services/presentation/test_presentation_read_model.py::test_real_media_presents_without_system_ffmpeg_or_ffprobe[silent_cfr-6000000-4500000]
+0.33s call     tests/integration/server/services/presentation/test_presentation_read_model.py::test_real_media_presents_without_system_ffmpeg_or_ffprobe[silent_vfr-1866667-1000000]
+0.29s call     tests/unit/test_public_contract.py::TestAgentInstallationGuideEndpoint::test_legacy_endpoints_are_not_registered
+0.28s call     tests/integration/server/services/presentation/test_presentation_read_model.py::test_episode_materialization_skips_units_with_only_paid_history
+0.25s call     tests/integration/server/services/presentation/test_presentation_read_model.py::test_episode_materialization_restarts_as_one_snapshot_after_script_edit
+0.21s call     tests/integration/server/services/presentation/test_presentation_read_model.py::test_measured_timing_survives_reads_and_currency_reconstruction
+0.20s call     tests/integration/server/services/presentation/test_presentation_read_model.py::test_episode_tts_materialization_keeps_video_without_selected_narration
+0.20s call     tests/integration/server/services/presentation/test_presentation_read_model.py::test_legacy_subtitle_policy_is_stale_and_regenerates_as_current[Kho\u0302ng sao. \u0110i th\xf4i!-expected_cues2]
+0.20s call     tests/integration/server/services/presentation/test_presentation_read_model.py::test_legacy_subtitle_policy_is_stale_and_regenerates_as_current[\u4e2d\u6587\u3002Hello. Bye-expected_cues1]
+0.19s call     tests/integration/server/agent_toolset/test_host_consistency.py::test_both_hosts_expose_the_declared_name_schema_and_description[release_provider_asset_link]
+0.19s call     tests/integration/server/services/presentation/test_presentation_read_model.py::test_legacy_video_materializes_after_the_provenance_backfill_migration
+0.19s call     tests/integration/server/services/presentation/test_presentation_read_model.py::test_legacy_subtitle_policy_is_stale_and_regenerates_as_current[\u7532\u3002\u4e59\u4e59\u4e59\uff01-expected_cues0]
+0.16s call     tests/integration/server/media_tools/test_speech_review.py::test_review_applies_timing_and_keeps_evidence_through_native_reader
+1203 passed, 1 warning in 41.90s

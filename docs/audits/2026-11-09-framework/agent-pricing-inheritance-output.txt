@@ -1,0 +1,16 @@
+2026-11-09 14:23:23 [WARNING] server.app: frontend/dist/index.html 不存在，跳过前端页面挂载（API 不受影响）
+{'synthetic_cloud_flag': 'CLAUDE_CODE_USE_BEDROCK', 'survives_sdk_environment_merge': True, 'agent_pricing_multiplier': 0.0, 'process_spawned': False}
+.{'synthetic_cloud_flag': 'CLAUDE_CODE_USE_VERTEX', 'survives_sdk_environment_merge': True, 'agent_pricing_multiplier': 0.0, 'process_spawned': False}
+.{'synthetic_cloud_flag': 'CLAUDE_CODE_USE_FOUNDRY', 'survives_sdk_environment_merge': True, 'agent_pricing_multiplier': 0.0, 'process_spawned': False}
+.
+=============================== warnings summary ===============================
+tests/integration/server/test_audit_agent_pricing_tmp.py::test_zero_price_with_inherited_cloud_mode[CLAUDE_CODE_USE_BEDROCK]
+  /Users/pablo.carminatti.br/.local/share/uv/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/contextlib.py:144: SAWarning: Skipped unsupported reflection of expression-based index idx_tasks_dedupe_active
+    next(self.gen)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 25 durations =============================
+1.26s setup    tests/integration/server/test_audit_agent_pricing_tmp.py::test_zero_price_with_inherited_cloud_mode[CLAUDE_CODE_USE_BEDROCK]
+
+(8 durations < 0.005s hidden.  Use -vv to show these durations.)
+3 passed, 1 warning in 1.39s

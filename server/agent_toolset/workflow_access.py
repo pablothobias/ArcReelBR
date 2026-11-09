@@ -34,7 +34,8 @@ WORKFLOW_ACCESS_TOOLS = (
     ToolDeclaration(
         name="configure_project",
         description=(
-            "Update project Settings using the same validated transaction as the Web application. Only supplied fields change. "
+            "Update supported project Settings using the native validated transaction. Only supplied fields change. "
+            "Grid toggles remain user-controlled in Web Settings. "
             "Use for explicit style, model, resolution, voice-binding and delivery requirements before generation. "
             "Modes remain creation-fixed. Do not change the user's requirements or treat a configuration change as regeneration."
         ),
@@ -82,8 +83,8 @@ WORKFLOW_ACCESS_TOOLS = (
         name="get_project_costs",
         description=(
             "Read prospective per-shot costs and recorded actual project costs, using the application's cost estimator. "
-            "Prospective estimates are not submission admission. Use quote_assets/quote_storyboards or generate_videos preview "
-            "before paid actions. Unknown prices are not zero; no generation is performed."
+            "Prospective estimates are not submission admission. "
+            "Unknown prices are not zero; no generation is performed."
         ),
         request_model=NoArguments,
         migration=BLOCKED,

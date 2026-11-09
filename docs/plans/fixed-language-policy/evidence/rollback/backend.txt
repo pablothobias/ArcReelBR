@@ -1,0 +1,62 @@
+........................................................................ [  3%]
+........................................................................ [  7%]
+........................................................................ [ 10%]
+........................................................................ [ 14%]
+........................................................................ [ 17%]
+........................................................................ [ 21%]
+........................................................................ [ 24%]
+........................................................................ [ 28%]
+........................................................................ [ 31%]
+........................................................................ [ 35%]
+........................................................................ [ 38%]
+........................................................................ [ 42%]
+........................................................................ [ 45%]
+........................................................................ [ 49%]
+........................................................................ [ 52%]
+........................................................................ [ 56%]
+........................................................................ [ 60%]
+........................................................................ [ 63%]
+........................................................................ [ 67%]
+........................................................................ [ 70%]
+........................................................................ [ 74%]
+........................................................................ [ 77%]
+........................................................................ [ 81%]
+........................................................................ [ 84%]
+........................................................................ [ 88%]
+........................................................................ [ 91%]
+........................................................................ [ 95%]
+........................................................................ [ 98%]
+.......................                                                  [100%]
+=============================== warnings summary ===============================
+tests/unit/lib/prompts/prompt_rules/test_asset_appearance.py::test_character_names_list_each_form_after_its_ontology
+  /Users/pablo.carminatti.br/.local/share/uv/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/contextlib.py:144: SAWarning: Skipped unsupported reflection of expression-based index idx_tasks_dedupe_active
+    next(self.gen)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 25 durations =============================
+13.71s call     tests/integration/server/agent_runtime/test_event_log_session_flow.py::TestQueuedMessages::test_queued_idempotency_and_replays_survive_many_later_sends
+1.90s call     tests/integration/server/services/presentation/test_timeline_final_cut.py::test_narrated_final_cut_mixes_each_narration_from_its_carrying_clip_and_cuts_it_at_the_end
+1.86s call     tests/integration/server/services/presentation/test_timeline_final_cut.py::test_burned_and_clean_final_cuts_are_separate_artifacts_and_only_one_shows_subtitles
+1.53s setup    tests/unit/lib/prompts/prompt_rules/test_asset_appearance.py::test_character_names_list_each_form_after_its_ontology
+1.48s call     tests/integration/server/services/presentation/test_timeline_final_cut.py::test_measured_subtitles_render_only_inside_measured_interval
+1.26s call     tests/integration/server/test_remote_mcp.py::test_text_task_is_shared_by_remote_and_embedded_hosts_and_running_member_is_not_cancellable
+0.67s call     tests/integration/server/media_tools/test_speech_review.py::test_inspection_materializes_and_preserves_eligible_timing[True-True]
+0.64s call     tests/integration/server/media_tools/test_speech_review.py::test_inspection_materializes_and_preserves_eligible_timing[False-True]
+0.55s call     tests/integration/server/services/presentation/test_timeline_final_cut.py::test_a_corrupted_narration_snapshot_names_the_unit_and_version
+0.50s call     tests/integration/server/media_tools/test_speech_review.py::test_inspection_materializes_and_preserves_eligible_timing[True-False]
+0.49s call     tests/integration/server/agent_toolset/test_host_consistency.py::test_contact_sheets_reach_both_hosts_as_the_same_image_blocks
+0.43s call     tests/integration/server/media_tools/test_speech_review.py::test_inspection_materializes_and_preserves_eligible_timing[False-False]
+0.40s call     tests/unit/lib/prompts/prompt_templates/test_builtin.py::test_builtin_shared_partials_are_not_referenced_by_a_single_partial
+0.39s call     tests/unit/lib/prompts/prompt_templates/test_builtin.py::test_builtin_directory_has_valid_slots_variants_and_template_syntax
+0.36s call     tests/integration/server/test_remote_mcp.py::test_remote_workflow_plan_names_migration_failures_by_project_relative_path[unreadable_record]
+0.36s setup    tests/integration/server/agent_toolset/test_host_consistency.py::test_remote_project_locating_failures_are_invalid_project[absent-generate_episode_script]
+0.33s call     tests/unit/lib/prompts/prompt_templates/test_builtin.py::test_builtin_templates_declare_stage_and_trigger_and_lock_structural_partials
+0.33s call     tests/unit/lib/prompts/prompt_templates/test_builtin.py::test_builtin_applies_to_values_are_real_project_values
+0.31s call     tests/integration/server/test_session_mcp.py::test_session_bridge_send_retry_reconnect_questions_cursor_and_interrupt
+0.31s setup    tests/integration/server/agent_runtime/test_session_branch.py::test_new_session_id_is_a_uuid_the_sdk_accepts
+0.30s setup    tests/integration/lib/generation/test_gemini_image_billing.py::test_existing_image_consumer_uses_quoted_cap_and_settles_discarded_usage[ambiguous]
+0.29s call     tests/integration/server/agent_toolset/test_host_consistency.py::test_both_hosts_expose_the_declared_name_schema_and_description[select_video_version]
+0.28s call     tests/integration/server/test_remote_mcp.py::test_remote_inspect_video_units_returns_contact_sheets_as_image_content
+0.28s call     tests/integration/server/agent_toolset/test_host_consistency.py::test_both_hosts_expose_an_unscoped_declaration_without_project[create_project]
+0.26s setup    tests/integration/server/agent_runtime/test_event_log_session_flow.py::TestUnsentQueuedMessages::test_acting_on_an_unsent_message_while_the_session_reconnects_waits_for_it[delete]
+2039 passed, 1 warning in 112.39s (0:01:52)

@@ -1,0 +1,23 @@
+{
+  "protected_tracked_files_checked": 4711,
+  "protected_changes": [],
+  "stage5_changed_paths": [
+    "lib/config/env_keys.py",
+    "lib/config/claude_subscription.py",
+    "lib/config/service.py",
+    "lib/backends/text_backends/claude_subscription.py",
+    "tests/integration/server/agent_runtime/test_subscription_route_pricing.py",
+    "tests/unit/lib/config/test_claude_subscription_routes.py",
+    "tests/unit/lib/backends/text_backends/test_claude_subscription.py",
+    "docs/testing/native-mcp-production.md",
+    "public/agent-installation-guide.md"
+  ],
+  "config_service_changed_members": [
+    "build_anthropic_env"
+  ],
+  "active_credential_branch_unchanged": true,
+  "subscription_backend_class_unchanged": true,
+  "options_assembler_and_accounting_unchanged": true,
+  "stage6_started": false,
+  "live_scope": "No live settings, credentials, login, host connection, launch environment or production changes."
+}

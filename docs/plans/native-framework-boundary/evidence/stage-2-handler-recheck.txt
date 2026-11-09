@@ -1,0 +1,34 @@
+...............                                                          [100%]
+=============================== warnings summary ===============================
+tests/integration/server/test_workflow_access.py::test_settings_persist_and_invalid_settings_leave_project_unchanged
+  /Users/pablo.carminatti.br/.local/share/uv/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/contextlib.py:144: SAWarning: Skipped unsupported reflection of expression-based index idx_tasks_dedupe_active
+    next(self.gen)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 25 durations =============================
+1.69s setup    tests/integration/server/test_workflow_access.py::test_settings_persist_and_invalid_settings_leave_project_unchanged
+0.18s call     tests/integration/server/test_workflow_access.py::test_usage_is_scoped_paginated_and_does_not_expose_diagnostics
+0.10s call     tests/integration/server/test_workflow_access.py::test_asset_quote_selects_native_targets_without_submitting
+0.10s setup    tests/integration/server/test_workflow_access.py::test_automated_settings_keep_omitted_and_clear_semantics
+0.09s setup    tests/integration/server/test_workflow_access.py::test_reference_upload_uses_native_metadata_without_generating_a_sheet
+0.09s setup    tests/integration/server/test_workflow_access.py::test_asset_quote_selects_native_targets_without_submitting
+0.09s setup    tests/integration/server/test_workflow_access.py::test_effective_configuration_and_unpriced_quote_are_read_only
+0.08s setup    tests/integration/server/test_workflow_access.py::test_settings_handler_revalidates_web_requests_before_writing[True]
+0.08s setup    tests/integration/server/test_workflow_access.py::test_usage_is_scoped_paginated_and_does_not_expose_diagnostics
+0.08s setup    tests/integration/server/test_workflow_access.py::test_reference_rejects_unsafe_or_unconfirmed_input_without_writes[overrides4]
+0.08s setup    tests/integration/server/test_workflow_access.py::test_reference_rejects_unsafe_or_unconfirmed_input_without_writes[overrides0]
+0.08s setup    tests/integration/server/test_workflow_access.py::test_reference_rejects_unsafe_or_unconfirmed_input_without_writes[overrides1]
+0.08s setup    tests/integration/server/test_workflow_access.py::test_settings_handler_revalidates_web_requests_before_writing[None]
+0.07s setup    tests/integration/server/test_workflow_access.py::test_reference_rejects_unsafe_or_unconfirmed_input_without_writes[overrides3]
+0.07s setup    tests/integration/server/test_workflow_access.py::test_reference_rejects_unsafe_or_unconfirmed_input_without_writes[overrides2]
+0.07s setup    tests/integration/server/test_workflow_access.py::test_quotes_report_missing_episode_without_submitting
+0.07s setup    tests/integration/server/test_workflow_access.py::test_settings_handler_revalidates_web_requests_before_writing[False]
+0.07s call     tests/integration/server/test_workflow_access.py::test_effective_configuration_and_unpriced_quote_are_read_only
+0.03s call     tests/integration/server/test_workflow_access.py::test_reference_rejects_unsafe_or_unconfirmed_input_without_writes[overrides2]
+0.02s call     tests/integration/server/test_workflow_access.py::test_automated_settings_keep_omitted_and_clear_semantics
+0.02s call     tests/integration/server/test_workflow_access.py::test_reference_upload_uses_native_metadata_without_generating_a_sheet
+0.01s call     tests/integration/server/test_workflow_access.py::test_quotes_report_missing_episode_without_submitting
+0.01s call     tests/integration/server/test_workflow_access.py::test_settings_persist_and_invalid_settings_leave_project_unchanged
+
+(2 durations < 0.005s hidden.  Use -vv to show these durations.)
+15 passed, 1 warning in 3.40s

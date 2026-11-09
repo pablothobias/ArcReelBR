@@ -1,0 +1,43 @@
+{
+  "head": "1df5ee3b89e865c4193e72d5bbddf64d54b42f0e",
+  "restored_paths_match_pre_language_baseline": [
+    "AGENTS.md",
+    "agent_runtime_profile/.claude/references/generation-modes.md",
+    "agent_runtime_profile/.claude/skills/manage-project/SKILL.md",
+    "agent_runtime_profile/.claude/skills/video-workflow/SKILL.drama.md",
+    "agent_runtime_profile/.claude/skills/video-workflow/SKILL.narration.md",
+    "docs/adr/0122-english-product-defaults-preserve-project-language.md",
+    "frontend/e2e/regions/language-policy.spec.ts",
+    "frontend/src/components/pages/settings/GeneralSection.test.tsx",
+    "frontend/src/components/pages/settings/GeneralSection.tsx",
+    "frontend/src/i18n/index.ts",
+    "frontend/src/i18n/initialization.test.ts",
+    "frontend/src/test/setup.ts",
+    "lib/prompts/prompt_rules/content_language.py",
+    "lib/prompts/prompt_templates/templates/text/agent_language_rule.md",
+    "lib/prompts/prompt_templates/templates/text/source_overview.md",
+    "server/agent_runtime/options_assembler.py",
+    "server/agent_runtime/session_manager.py",
+    "tests/unit/lib/prompts/test_brazilian_content.py",
+    "tests/unit/lib/prompts/test_prompt_builders_script.py",
+    "tests/unit/server/agent_runtime/test_options_assembler.py",
+    "tests/unit/server/agent_runtime/test_session_manager_user_input.py",
+    "public/agent-installation-guide.md"
+  ],
+  "restored_paths_count": 22,
+  "other_tracked_entries_unchanged_during_rollback": 4748,
+  "unexpected_changes": [],
+  "stage0_7_untracked_regressions_unchanged": [
+    "tests/integration/server/agent_runtime/test_subscription_route_pricing.py",
+    "tests/integration/server/test_reference_upload_transaction.py",
+    "tests/unit/lib/config/test_claude_subscription_routes.py"
+  ],
+  "retained_independent_test_correction": "Explicit English expected message in one assertion for two Web route cases; no runtime change.",
+  "public_guide": "Restored exactly to pre-language baseline, preserving all stage0-7 edits.",
+  "documentation": "ADR0123 rejected; prior language report retained as historical; native plan status reconciled without changing past logs.",
+  "generic_chinese_prompt_reference": "Baseline restored; narrowly scoped correction deferred, not implemented.",
+  "configuration": "No settings, credentials, installed skills, media, live application or production records changed.",
+  "commit_created": false,
+  "rechecked_after_all_tests": true,
+  "temporary_frontend_dependency_symlink_removed": true
+}

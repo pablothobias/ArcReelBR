@@ -1,0 +1,491 @@
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+_ test_cloud_route_cannot_reach_zero_price_sdk_spawn[CLAUDE_CODE_USE_BEDROCK] __
+
+args = (['/unused/claude', '--output-format', 'stream-json', '--verbose', '--system-prompt', '', ...],)
+kwargs = {'stdin': -1, 'stdout': -1, 'stderr': None, 'cwd': None, ...}
+
+    async def prevent_spawn(*args, **kwargs):
+        captured.append({key: kwargs["env"].get(key) for key in CLOUD_FLAGS})
+>       raise RuntimeError("Audit process creation prevented")
+E       RuntimeError: Audit process creation prevented
+
+tests/integration/server/agent_runtime/test_subscription_route_pricing.py:28: RuntimeError
+
+The above exception was the direct cause of the following exception:
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x11a598440>
+flag = 'CLAUDE_CODE_USE_BEDROCK'
+
+    @pytest.mark.parametrize("flag", CLOUD_FLAGS)
+    async def test_cloud_route_cannot_reach_zero_price_sdk_spawn(monkeypatch, flag):
+        monkeypatch.setenv(flag, "1")
+        captured = []
+        with pytest.raises(RuntimeError, match="cloud route"):
+            overrides = await load_provider_env_overrides()
+>           await capture_spawn(monkeypatch, overrides, captured)
+
+tests/integration/server/agent_runtime/test_subscription_route_pricing.py:41:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests/integration/server/agent_runtime/test_subscription_route_pricing.py:32: in capture_spawn
+    await transport.connect()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <claude_agent_sdk._internal.transport.subprocess_cli.SubprocessCLITransport object at 0x11b4da300>
+
+    async def connect(self) -> None:
+        """Start subprocess."""
+        if self._process:
+            return
+
+        if self._cli_path is None:
+            self._cli_path = await anyio.to_thread.run_sync(self._find_cli)
+
+        # Validate the resolved CLI before anything is spawned with it --
+        # this guards the version probe below as well as the main spawn.
+        self._reject_windows_batch_cli(self._cli_path)
+
+        if not os.environ.get("CLAUDE_AGENT_SDK_SKIP_VERSION_CHECK"):
+            await self._check_claude_version()
+
+        cmd = self._build_command()
+        try:
+            # Merge environment variables. CLAUDE_CODE_ENTRYPOINT defaults to
+            # sdk-py regardless of inherited process env; options.env can override
+            # it. CLAUDE_AGENT_SDK_VERSION is always set by the SDK.
+            # Filter out CLAUDECODE so SDK-spawned subprocesses don't think
+            # they're running inside a Claude Code parent (see #573).
+            inherited_env = {k: v for k, v in os.environ.items() if k != "CLAUDECODE"}
+            process_env = {
+                **inherited_env,
+                "CLAUDE_CODE_ENTRYPOINT": "sdk-py",
+                **self._options.env,
+                "CLAUDE_AGENT_SDK_VERSION": __version__,
+            }
+
+            # Propagate active OTEL trace context to the CLI so its spans
+            # parent under the caller's distributed trace. No-op if
+            # opentelemetry-api is not installed or there's no active span.
+            try:
+                from opentelemetry import propagate
+
+                carrier: dict[str, str] = {}
+                propagate.inject(carrier)
+                if "traceparent" in carrier:
+                    # Active span present: scrub stale inherited W3C context
+                    # (CI/k8s ambient env) before writing the fresh values, so
+                    # an inherited TRACESTATE isn't paired with a new
+                    # TRACEPARENT. Explicit ClaudeAgentOptions.env always wins.
+                    # Gate on the traceparent key (not carrier truthiness) so a
+                    # baggage-only / non-W3C carrier doesn't scrub a valid
+                    # inherited TRACEPARENT.
+                    for key in ("TRACEPARENT", "TRACESTATE"):
+                        if key not in self._options.env:
+                            process_env.pop(key, None)
+                    for k, v in carrier.items():
+                        key = k.upper()
+                        if key not in self._options.env:
+                            process_env[key] = v
+            except Exception:  # noqa: BLE001 - best-effort tracing must never break connect()
+                logger.debug("OTEL trace context injection failed", exc_info=True)
+
+            # Query waits for the CLI's session_state_changed "idle" before
+            # closing stdin on a run that serves control requests (#1190). Ask
+            # for the frames it drops (sdk_host_only) unless the caller chose
+            # a value, in any case; CLAUDE_CODE_EMIT_SESSION_STATE_EVENTS stays
+            # the caller's own opt-in to seeing them.
+            if not any(
+                key.upper() == _SDK_READS_SESSION_STATE_ENV for key in process_env
+            ):
+                process_env[_SDK_READS_SESSION_STATE_ENV] = "1"
+
+            # Enable file checkpointing if requested
+            if self._options.enable_file_checkpointing:
+                process_env["CLAUDE_CODE_ENABLE_SDK_FILE_CHECKPOINTING"] = "true"
+
+            if self._cwd:
+                process_env["PWD"] = self._cwd
+
+            # Pipe stderr only when the caller registered a callback.
+            stderr_dest = PIPE if self._options.stderr is not None else None
+
+            self._process = await anyio.open_process(
+                cmd,
+                stdin=PIPE,
+                stdout=PIPE,
+                stderr=stderr_dest,
+                cwd=self._cwd,
+                env=process_env,
+                user=self._options.user,
+            )
+            _ACTIVE_CHILDREN.add(self._process)
+
+            if self._process.stdout:
+                self._stdout_stream = TextReceiveStream(self._process.stdout)
+
+            # Setup stderr stream if piped
+            if stderr_dest is PIPE and self._process.stderr:
+                self._stderr_stream = TextReceiveStream(self._process.stderr)
+                # Spawn the stderr reader via spawn_detached (not a manually-
+                # entered TaskGroup) so cleanup has no trio task-affinity —
+                # same pattern as Query._read_task.
+                self._stderr_task = spawn_detached(self._handle_stderr())
+
+            # Setup stdin for streaming (always used now)
+            if self._process.stdin:
+                self._stdin_stream = TextSendStream(self._process.stdin)
+
+            self._ready = True
+
+        except FileNotFoundError as e:
+            # Check if the error comes from the working directory or the CLI
+            if self._cwd and not Path(self._cwd).exists():
+                error = CLIConnectionError(
+                    f"Working directory does not exist: {self._cwd}"
+                )
+                self._exit_error = error
+                raise error from e
+            error = CLINotFoundError(f"Claude Code not found at: {self._cli_path}")
+            self._exit_error = error
+            raise error from e
+        except Exception as e:
+            error = CLIConnectionError(f"Failed to start Claude Code: {e}")
+            self._exit_error = error
+>           raise error from e
+E           claude_agent_sdk._errors.CLIConnectionError: Failed to start Claude Code: Audit process creation prevented
+
+../../../../Projects/ArcReelBR/.venv/lib/python3.12/site-packages/claude_agent_sdk/_internal/transport/subprocess_cli.py:915: CLIConnectionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-09 15:26:32 [WARNING] server.app: frontend/dist/index.html 不存在，跳过前端页面挂载（API 不受影响）
+------------------------------ Captured log setup ------------------------------
+WARNING  server.app:app.py:1003 frontend/dist/index.html 不存在，跳过前端页面挂载（API 不受影响）
+__ test_cloud_route_cannot_reach_zero_price_sdk_spawn[CLAUDE_CODE_USE_VERTEX] __
+
+args = (['/unused/claude', '--output-format', 'stream-json', '--verbose', '--system-prompt', '', ...],)
+kwargs = {'stdin': -1, 'stdout': -1, 'stderr': None, 'cwd': None, ...}
+
+    async def prevent_spawn(*args, **kwargs):
+        captured.append({key: kwargs["env"].get(key) for key in CLOUD_FLAGS})
+>       raise RuntimeError("Audit process creation prevented")
+E       RuntimeError: Audit process creation prevented
+
+tests/integration/server/agent_runtime/test_subscription_route_pricing.py:28: RuntimeError
+
+The above exception was the direct cause of the following exception:
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x11b037bc0>
+flag = 'CLAUDE_CODE_USE_VERTEX'
+
+    @pytest.mark.parametrize("flag", CLOUD_FLAGS)
+    async def test_cloud_route_cannot_reach_zero_price_sdk_spawn(monkeypatch, flag):
+        monkeypatch.setenv(flag, "1")
+        captured = []
+        with pytest.raises(RuntimeError, match="cloud route"):
+            overrides = await load_provider_env_overrides()
+>           await capture_spawn(monkeypatch, overrides, captured)
+
+tests/integration/server/agent_runtime/test_subscription_route_pricing.py:41:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests/integration/server/agent_runtime/test_subscription_route_pricing.py:32: in capture_spawn
+    await transport.connect()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <claude_agent_sdk._internal.transport.subprocess_cli.SubprocessCLITransport object at 0x11b9fc6b0>
+
+    async def connect(self) -> None:
+        """Start subprocess."""
+        if self._process:
+            return
+
+        if self._cli_path is None:
+            self._cli_path = await anyio.to_thread.run_sync(self._find_cli)
+
+        # Validate the resolved CLI before anything is spawned with it --
+        # this guards the version probe below as well as the main spawn.
+        self._reject_windows_batch_cli(self._cli_path)
+
+        if not os.environ.get("CLAUDE_AGENT_SDK_SKIP_VERSION_CHECK"):
+            await self._check_claude_version()
+
+        cmd = self._build_command()
+        try:
+            # Merge environment variables. CLAUDE_CODE_ENTRYPOINT defaults to
+            # sdk-py regardless of inherited process env; options.env can override
+            # it. CLAUDE_AGENT_SDK_VERSION is always set by the SDK.
+            # Filter out CLAUDECODE so SDK-spawned subprocesses don't think
+            # they're running inside a Claude Code parent (see #573).
+            inherited_env = {k: v for k, v in os.environ.items() if k != "CLAUDECODE"}
+            process_env = {
+                **inherited_env,
+                "CLAUDE_CODE_ENTRYPOINT": "sdk-py",
+                **self._options.env,
+                "CLAUDE_AGENT_SDK_VERSION": __version__,
+            }
+
+            # Propagate active OTEL trace context to the CLI so its spans
+            # parent under the caller's distributed trace. No-op if
+            # opentelemetry-api is not installed or there's no active span.
+            try:
+                from opentelemetry import propagate
+
+                carrier: dict[str, str] = {}
+                propagate.inject(carrier)
+                if "traceparent" in carrier:
+                    # Active span present: scrub stale inherited W3C context
+                    # (CI/k8s ambient env) before writing the fresh values, so
+                    # an inherited TRACESTATE isn't paired with a new
+                    # TRACEPARENT. Explicit ClaudeAgentOptions.env always wins.
+                    # Gate on the traceparent key (not carrier truthiness) so a
+                    # baggage-only / non-W3C carrier doesn't scrub a valid
+                    # inherited TRACEPARENT.
+                    for key in ("TRACEPARENT", "TRACESTATE"):
+                        if key not in self._options.env:
+                            process_env.pop(key, None)
+                    for k, v in carrier.items():
+                        key = k.upper()
+                        if key not in self._options.env:
+                            process_env[key] = v
+            except Exception:  # noqa: BLE001 - best-effort tracing must never break connect()
+                logger.debug("OTEL trace context injection failed", exc_info=True)
+
+            # Query waits for the CLI's session_state_changed "idle" before
+            # closing stdin on a run that serves control requests (#1190). Ask
+            # for the frames it drops (sdk_host_only) unless the caller chose
+            # a value, in any case; CLAUDE_CODE_EMIT_SESSION_STATE_EVENTS stays
+            # the caller's own opt-in to seeing them.
+            if not any(
+                key.upper() == _SDK_READS_SESSION_STATE_ENV for key in process_env
+            ):
+                process_env[_SDK_READS_SESSION_STATE_ENV] = "1"
+
+            # Enable file checkpointing if requested
+            if self._options.enable_file_checkpointing:
+                process_env["CLAUDE_CODE_ENABLE_SDK_FILE_CHECKPOINTING"] = "true"
+
+            if self._cwd:
+                process_env["PWD"] = self._cwd
+
+            # Pipe stderr only when the caller registered a callback.
+            stderr_dest = PIPE if self._options.stderr is not None else None
+
+            self._process = await anyio.open_process(
+                cmd,
+                stdin=PIPE,
+                stdout=PIPE,
+                stderr=stderr_dest,
+                cwd=self._cwd,
+                env=process_env,
+                user=self._options.user,
+            )
+            _ACTIVE_CHILDREN.add(self._process)
+
+            if self._process.stdout:
+                self._stdout_stream = TextReceiveStream(self._process.stdout)
+
+            # Setup stderr stream if piped
+            if stderr_dest is PIPE and self._process.stderr:
+                self._stderr_stream = TextReceiveStream(self._process.stderr)
+                # Spawn the stderr reader via spawn_detached (not a manually-
+                # entered TaskGroup) so cleanup has no trio task-affinity —
+                # same pattern as Query._read_task.
+                self._stderr_task = spawn_detached(self._handle_stderr())
+
+            # Setup stdin for streaming (always used now)
+            if self._process.stdin:
+                self._stdin_stream = TextSendStream(self._process.stdin)
+
+            self._ready = True
+
+        except FileNotFoundError as e:
+            # Check if the error comes from the working directory or the CLI
+            if self._cwd and not Path(self._cwd).exists():
+                error = CLIConnectionError(
+                    f"Working directory does not exist: {self._cwd}"
+                )
+                self._exit_error = error
+                raise error from e
+            error = CLINotFoundError(f"Claude Code not found at: {self._cli_path}")
+            self._exit_error = error
+            raise error from e
+        except Exception as e:
+            error = CLIConnectionError(f"Failed to start Claude Code: {e}")
+            self._exit_error = error
+>           raise error from e
+E           claude_agent_sdk._errors.CLIConnectionError: Failed to start Claude Code: Audit process creation prevented
+
+../../../../Projects/ArcReelBR/.venv/lib/python3.12/site-packages/claude_agent_sdk/_internal/transport/subprocess_cli.py:915: CLIConnectionError
+_ test_cloud_route_cannot_reach_zero_price_sdk_spawn[CLAUDE_CODE_USE_FOUNDRY] __
+
+args = (['/unused/claude', '--output-format', 'stream-json', '--verbose', '--system-prompt', '', ...],)
+kwargs = {'stdin': -1, 'stdout': -1, 'stderr': None, 'cwd': None, ...}
+
+    async def prevent_spawn(*args, **kwargs):
+        captured.append({key: kwargs["env"].get(key) for key in CLOUD_FLAGS})
+>       raise RuntimeError("Audit process creation prevented")
+E       RuntimeError: Audit process creation prevented
+
+tests/integration/server/agent_runtime/test_subscription_route_pricing.py:28: RuntimeError
+
+The above exception was the direct cause of the following exception:
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x11b8a56a0>
+flag = 'CLAUDE_CODE_USE_FOUNDRY'
+
+    @pytest.mark.parametrize("flag", CLOUD_FLAGS)
+    async def test_cloud_route_cannot_reach_zero_price_sdk_spawn(monkeypatch, flag):
+        monkeypatch.setenv(flag, "1")
+        captured = []
+        with pytest.raises(RuntimeError, match="cloud route"):
+            overrides = await load_provider_env_overrides()
+>           await capture_spawn(monkeypatch, overrides, captured)
+
+tests/integration/server/agent_runtime/test_subscription_route_pricing.py:41:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests/integration/server/agent_runtime/test_subscription_route_pricing.py:32: in capture_spawn
+    await transport.connect()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <claude_agent_sdk._internal.transport.subprocess_cli.SubprocessCLITransport object at 0x11aea2390>
+
+    async def connect(self) -> None:
+        """Start subprocess."""
+        if self._process:
+            return
+
+        if self._cli_path is None:
+            self._cli_path = await anyio.to_thread.run_sync(self._find_cli)
+
+        # Validate the resolved CLI before anything is spawned with it --
+        # this guards the version probe below as well as the main spawn.
+        self._reject_windows_batch_cli(self._cli_path)
+
+        if not os.environ.get("CLAUDE_AGENT_SDK_SKIP_VERSION_CHECK"):
+            await self._check_claude_version()
+
+        cmd = self._build_command()
+        try:
+            # Merge environment variables. CLAUDE_CODE_ENTRYPOINT defaults to
+            # sdk-py regardless of inherited process env; options.env can override
+            # it. CLAUDE_AGENT_SDK_VERSION is always set by the SDK.
+            # Filter out CLAUDECODE so SDK-spawned subprocesses don't think
+            # they're running inside a Claude Code parent (see #573).
+            inherited_env = {k: v for k, v in os.environ.items() if k != "CLAUDECODE"}
+            process_env = {
+                **inherited_env,
+                "CLAUDE_CODE_ENTRYPOINT": "sdk-py",
+                **self._options.env,
+                "CLAUDE_AGENT_SDK_VERSION": __version__,
+            }
+
+            # Propagate active OTEL trace context to the CLI so its spans
+            # parent under the caller's distributed trace. No-op if
+            # opentelemetry-api is not installed or there's no active span.
+            try:
+                from opentelemetry import propagate
+
+                carrier: dict[str, str] = {}
+                propagate.inject(carrier)
+                if "traceparent" in carrier:
+                    # Active span present: scrub stale inherited W3C context
+                    # (CI/k8s ambient env) before writing the fresh values, so
+                    # an inherited TRACESTATE isn't paired with a new
+                    # TRACEPARENT. Explicit ClaudeAgentOptions.env always wins.
+                    # Gate on the traceparent key (not carrier truthiness) so a
+                    # baggage-only / non-W3C carrier doesn't scrub a valid
+                    # inherited TRACEPARENT.
+                    for key in ("TRACEPARENT", "TRACESTATE"):
+                        if key not in self._options.env:
+                            process_env.pop(key, None)
+                    for k, v in carrier.items():
+                        key = k.upper()
+                        if key not in self._options.env:
+                            process_env[key] = v
+            except Exception:  # noqa: BLE001 - best-effort tracing must never break connect()
+                logger.debug("OTEL trace context injection failed", exc_info=True)
+
+            # Query waits for the CLI's session_state_changed "idle" before
+            # closing stdin on a run that serves control requests (#1190). Ask
+            # for the frames it drops (sdk_host_only) unless the caller chose
+            # a value, in any case; CLAUDE_CODE_EMIT_SESSION_STATE_EVENTS stays
+            # the caller's own opt-in to seeing them.
+            if not any(
+                key.upper() == _SDK_READS_SESSION_STATE_ENV for key in process_env
+            ):
+                process_env[_SDK_READS_SESSION_STATE_ENV] = "1"
+
+            # Enable file checkpointing if requested
+            if self._options.enable_file_checkpointing:
+                process_env["CLAUDE_CODE_ENABLE_SDK_FILE_CHECKPOINTING"] = "true"
+
+            if self._cwd:
+                process_env["PWD"] = self._cwd
+
+            # Pipe stderr only when the caller registered a callback.
+            stderr_dest = PIPE if self._options.stderr is not None else None
+
+            self._process = await anyio.open_process(
+                cmd,
+                stdin=PIPE,
+                stdout=PIPE,
+                stderr=stderr_dest,
+                cwd=self._cwd,
+                env=process_env,
+                user=self._options.user,
+            )
+            _ACTIVE_CHILDREN.add(self._process)
+
+            if self._process.stdout:
+                self._stdout_stream = TextReceiveStream(self._process.stdout)
+
+            # Setup stderr stream if piped
+            if stderr_dest is PIPE and self._process.stderr:
+                self._stderr_stream = TextReceiveStream(self._process.stderr)
+                # Spawn the stderr reader via spawn_detached (not a manually-
+                # entered TaskGroup) so cleanup has no trio task-affinity —
+                # same pattern as Query._read_task.
+                self._stderr_task = spawn_detached(self._handle_stderr())
+
+            # Setup stdin for streaming (always used now)
+            if self._process.stdin:
+                self._stdin_stream = TextSendStream(self._process.stdin)
+
+            self._ready = True
+
+        except FileNotFoundError as e:
+            # Check if the error comes from the working directory or the CLI
+            if self._cwd and not Path(self._cwd).exists():
+                error = CLIConnectionError(
+                    f"Working directory does not exist: {self._cwd}"
+                )
+                self._exit_error = error
+                raise error from e
+            error = CLINotFoundError(f"Claude Code not found at: {self._cli_path}")
+            self._exit_error = error
+            raise error from e
+        except Exception as e:
+            error = CLIConnectionError(f"Failed to start Claude Code: {e}")
+            self._exit_error = error
+>           raise error from e
+E           claude_agent_sdk._errors.CLIConnectionError: Failed to start Claude Code: Audit process creation prevented
+
+../../../../Projects/ArcReelBR/.venv/lib/python3.12/site-packages/claude_agent_sdk/_internal/transport/subprocess_cli.py:915: CLIConnectionError
+=============================== warnings summary ===============================
+tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_cloud_route_cannot_reach_zero_price_sdk_spawn[CLAUDE_CODE_USE_BEDROCK]
+  /Users/pablo.carminatti.br/.local/share/uv/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/contextlib.py:144: SAWarning: Skipped unsupported reflection of expression-based index idx_tasks_dedupe_active
+    next(self.gen)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 25 durations =============================
+1.26s setup    tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_cloud_route_cannot_reach_zero_price_sdk_spawn[CLAUDE_CODE_USE_BEDROCK]
+0.15s setup    tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_cloud_route_cannot_reach_zero_price_sdk_spawn[CLAUDE_CODE_USE_FOUNDRY]
+0.04s setup    tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_cloud_route_cannot_reach_zero_price_sdk_spawn[CLAUDE_CODE_USE_VERTEX]
+0.01s call     tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_cloud_route_cannot_reach_zero_price_sdk_spawn[CLAUDE_CODE_USE_BEDROCK]
+0.01s call     tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_cloud_route_cannot_reach_zero_price_sdk_spawn[CLAUDE_CODE_USE_VERTEX]
+0.01s call     tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_cloud_route_cannot_reach_zero_price_sdk_spawn[CLAUDE_CODE_USE_FOUNDRY]
+
+(3 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_cloud_route_cannot_reach_zero_price_sdk_spawn[CLAUDE_CODE_USE_BEDROCK]
+FAILED tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_cloud_route_cannot_reach_zero_price_sdk_spawn[CLAUDE_CODE_USE_VERTEX]
+FAILED tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_cloud_route_cannot_reach_zero_price_sdk_spawn[CLAUDE_CODE_USE_FOUNDRY]
+3 failed, 2 deselected, 1 warning in 1.75s

@@ -1,0 +1,90 @@
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies", "pnpm.overrides". See https://pnpm.io/settings for the new home of each setting.
+[WebServer] (node:20101) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:20117) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+[WebServer]   - `__dirname` (vite.config.ts:9:36). Use `import.meta.dirname` instead
+[WebServer] Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+[WebServer] [plugin builtin:vite-reporter]
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] (node:20177) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:20186) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+[WebServer]   - `__dirname` (vite.config.ts:9:36). Use `import.meta.dirname` instead
+[WebServer] Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+Running 55 tests using 1 worker
+
+(node:20203) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [1024x600] › e2e/regions/language-policy.spec.ts:10:5 › fresh zh-CN browser › loads English metadata and UI and sends English login requests (995ms)
+  ✓   2 [1024x600] › e2e/regions/language-policy.spec.ts:10:5 › fresh vi-VN browser › loads English metadata and UI and sends English login requests (546ms)
+  ✓   3 [1024x600] › e2e/regions/language-policy.spec.ts:10:5 › fresh ru-RU browser › loads English metadata and UI and sends English login requests (581ms)
+  ✓   4 [1024x600] › e2e/regions/language-policy.spec.ts:10:5 › fresh pt-BR browser › loads English metadata and UI and sends English login requests (514ms)
+  ✓   5 [1024x600] › e2e/regions/language-policy.spec.ts:33:3 › retains saved zh-Hant-TW with normalized document language (439ms)
+  ✓   6 [1024x600] › e2e/regions/language-policy.spec.ts:33:3 › retains saved en-US with normalized document language (421ms)
+  ✓   7 [1024x600] › e2e/regions/language-policy.spec.ts:33:3 › retains saved vi-VN with normalized document language (452ms)
+  ✓   8 [1024x600] › e2e/regions/language-policy.spec.ts:33:3 › retains saved ru-RU with normalized document language (421ms)
+  ✓   9 [1024x600] › e2e/regions/language-policy.spec.ts:42:3 › retains a supported cookie preference after unsupported local storage (421ms)
+  ✓  10 [1024x600] › e2e/regions/language-policy.spec.ts:42:3 › retains a supported sessionStorage preference after unsupported local storage (452ms)
+  ✓  11 [1024x600] › e2e/regions/language-policy.spec.ts:54:1 › updates document language and persisted preference after an explicit UI selection (2.0s)
+(node:20323) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  12 [1280x600] › e2e/regions/language-policy.spec.ts:10:5 › fresh zh-CN browser › loads English metadata and UI and sends English login requests (447ms)
+  ✓  13 [1280x600] › e2e/regions/language-policy.spec.ts:10:5 › fresh vi-VN browser › loads English metadata and UI and sends English login requests (400ms)
+  ✓  14 [1280x600] › e2e/regions/language-policy.spec.ts:10:5 › fresh ru-RU browser › loads English metadata and UI and sends English login requests (410ms)
+  ✓  15 [1280x600] › e2e/regions/language-policy.spec.ts:10:5 › fresh pt-BR browser › loads English metadata and UI and sends English login requests (413ms)
+  ✓  16 [1280x600] › e2e/regions/language-policy.spec.ts:33:3 › retains saved zh-Hant-TW with normalized document language (344ms)
+  ✓  17 [1280x600] › e2e/regions/language-policy.spec.ts:33:3 › retains saved en-US with normalized document language (320ms)
+  ✓  18 [1280x600] › e2e/regions/language-policy.spec.ts:33:3 › retains saved vi-VN with normalized document language (307ms)
+  ✓  19 [1280x600] › e2e/regions/language-policy.spec.ts:33:3 › retains saved ru-RU with normalized document language (323ms)
+  ✓  20 [1280x600] › e2e/regions/language-policy.spec.ts:42:3 › retains a supported cookie preference after unsupported local storage (298ms)
+  ✓  21 [1280x600] › e2e/regions/language-policy.spec.ts:42:3 › retains a supported sessionStorage preference after unsupported local storage (325ms)
+  ✓  22 [1280x600] › e2e/regions/language-policy.spec.ts:54:1 › updates document language and persisted preference after an explicit UI selection (1.2s)
+(node:20468) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  23 [1440x900] › e2e/regions/language-policy.spec.ts:10:5 › fresh zh-CN browser › loads English metadata and UI and sends English login requests (437ms)
+  ✓  24 [1440x900] › e2e/regions/language-policy.spec.ts:10:5 › fresh vi-VN browser › loads English metadata and UI and sends English login requests (398ms)
+  ✓  25 [1440x900] › e2e/regions/language-policy.spec.ts:10:5 › fresh ru-RU browser › loads English metadata and UI and sends English login requests (415ms)
+  ✓  26 [1440x900] › e2e/regions/language-policy.spec.ts:10:5 › fresh pt-BR browser › loads English metadata and UI and sends English login requests (401ms)
+  ✓  27 [1440x900] › e2e/regions/language-policy.spec.ts:33:3 › retains saved zh-Hant-TW with normalized document language (333ms)
+  ✓  28 [1440x900] › e2e/regions/language-policy.spec.ts:33:3 › retains saved en-US with normalized document language (257ms)
+  ✓  29 [1440x900] › e2e/regions/language-policy.spec.ts:33:3 › retains saved vi-VN with normalized document language (310ms)
+  ✓  30 [1440x900] › e2e/regions/language-policy.spec.ts:33:3 › retains saved ru-RU with normalized document language (313ms)
+  ✓  31 [1440x900] › e2e/regions/language-policy.spec.ts:42:3 › retains a supported cookie preference after unsupported local storage (304ms)
+  ✓  32 [1440x900] › e2e/regions/language-policy.spec.ts:42:3 › retains a supported sessionStorage preference after unsupported local storage (307ms)
+  ✓  33 [1440x900] › e2e/regions/language-policy.spec.ts:54:1 › updates document language and persisted preference after an explicit UI selection (1.3s)
+(node:20553) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  34 [1920x1080] › e2e/regions/language-policy.spec.ts:10:5 › fresh zh-CN browser › loads English metadata and UI and sends English login requests (532ms)
+  ✓  35 [1920x1080] › e2e/regions/language-policy.spec.ts:10:5 › fresh vi-VN browser › loads English metadata and UI and sends English login requests (403ms)
+  ✓  36 [1920x1080] › e2e/regions/language-policy.spec.ts:10:5 › fresh ru-RU browser › loads English metadata and UI and sends English login requests (392ms)
+  ✓  37 [1920x1080] › e2e/regions/language-policy.spec.ts:10:5 › fresh pt-BR browser › loads English metadata and UI and sends English login requests (394ms)
+  ✓  38 [1920x1080] › e2e/regions/language-policy.spec.ts:33:3 › retains saved zh-Hant-TW with normalized document language (333ms)
+  ✓  39 [1920x1080] › e2e/regions/language-policy.spec.ts:33:3 › retains saved en-US with normalized document language (268ms)
+  ✓  40 [1920x1080] › e2e/regions/language-policy.spec.ts:33:3 › retains saved vi-VN with normalized document language (327ms)
+  ✓  41 [1920x1080] › e2e/regions/language-policy.spec.ts:33:3 › retains saved ru-RU with normalized document language (330ms)
+  ✓  42 [1920x1080] › e2e/regions/language-policy.spec.ts:42:3 › retains a supported cookie preference after unsupported local storage (342ms)
+  ✓  43 [1920x1080] › e2e/regions/language-policy.spec.ts:42:3 › retains a supported sessionStorage preference after unsupported local storage (288ms)
+  ✓  44 [1920x1080] › e2e/regions/language-policy.spec.ts:54:1 › updates document language and persisted preference after an explicit UI selection (1.3s)
+(node:20618) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  45 [2560x1440] › e2e/regions/language-policy.spec.ts:10:5 › fresh zh-CN browser › loads English metadata and UI and sends English login requests (411ms)
+  ✓  46 [2560x1440] › e2e/regions/language-policy.spec.ts:10:5 › fresh vi-VN browser › loads English metadata and UI and sends English login requests (400ms)
+  ✓  47 [2560x1440] › e2e/regions/language-policy.spec.ts:10:5 › fresh ru-RU browser › loads English metadata and UI and sends English login requests (405ms)
+  ✓  48 [2560x1440] › e2e/regions/language-policy.spec.ts:10:5 › fresh pt-BR browser › loads English metadata and UI and sends English login requests (396ms)
+  ✓  49 [2560x1440] › e2e/regions/language-policy.spec.ts:33:3 › retains saved zh-Hant-TW with normalized document language (321ms)
+  ✓  50 [2560x1440] › e2e/regions/language-policy.spec.ts:33:3 › retains saved en-US with normalized document language (272ms)
+  ✓  51 [2560x1440] › e2e/regions/language-policy.spec.ts:33:3 › retains saved vi-VN with normalized document language (318ms)
+  ✓  52 [2560x1440] › e2e/regions/language-policy.spec.ts:33:3 › retains saved ru-RU with normalized document language (302ms)
+  ✓  53 [2560x1440] › e2e/regions/language-policy.spec.ts:42:3 › retains a supported cookie preference after unsupported local storage (299ms)
+  ✓  54 [2560x1440] › e2e/regions/language-policy.spec.ts:42:3 › retains a supported sessionStorage preference after unsupported local storage (305ms)
+  ✓  55 [2560x1440] › e2e/regions/language-policy.spec.ts:54:1 › updates document language and persisted preference after an explicit UI selection (1.2s)
+
+  55 passed (35.7s)

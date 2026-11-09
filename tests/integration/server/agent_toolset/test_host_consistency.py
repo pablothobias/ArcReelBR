@@ -330,6 +330,73 @@ async def _embedded_listing(seeded_projects: ProjectManager) -> dict[str, types.
     return {tool.name: tool for tool in result.tools}
 
 
+@pytest.mark.parametrize("grid", [True, False, None])
+async def test_both_hosts_reject_user_grid_changes_without_partial_writes(seeded_projects, services, grid):
+    declaration = next(tool for tool in AGENT_TOOLSET if tool.name == "configure_project")
+    seeded_projects.update_project("demo", lambda p: p.update({"grid_storyboard": True, "source_language": "pt-BR"}))
+    project_file = seeded_projects.get_project_path("demo") / "project.json"
+    before = project_file.read_bytes()
+    arguments = {"grid_storyboard": grid, "title": "Must not be applied", "source_language": "en"}
+    embedded = await _call_embedded(declaration, arguments, services)
+    remote = await _call_remote(declaration, {"project": "demo", **arguments}, services)
+    assert embedded.isError is remote.isError is True
+    assert remote.structuredContent is not None
+    assert remote.structuredContent["problem"]["code"] == "invalid_request"
+    assert _embedded_json(embedded) == remote.structuredContent
+    assert project_file.read_bytes() == before
+
+
+async def test_image_edit_preview_returns_the_same_quote_without_batches_in_both_hosts(seeded_projects, services):
+    from lib.artifacts.artifact_activation import register_current_artifact_if_provable
+
+    declaration = next(tool for tool in AGENT_TOOLSET if tool.name == "edit_images")
+    seeded_projects.update_project(
+        "demo",
+        lambda p: p.update(
+            {
+                "image_provider_i2i": "gemini-aistudio/gemini-3.1-flash-image",
+                "characters": {"Ana": {"description": "A fictional person", "character_sheet": "characters/ana.png"}},
+            }
+        ),
+    )
+    path = seeded_projects.get_project_path("demo")
+    image = path / "characters/ana.png"
+    image.write_bytes(b"image-fixture")
+    assert register_current_artifact_if_provable(path, ArtifactKey.asset_sheet("character", "Ana"))
+    before = image.read_bytes()
+    arguments = {
+        "resource_type": "character",
+        "edits": [{"id": "Ana", "instruction": "Preserve identity"}],
+        "preview": True,
+    }
+    tasks_before = await services.queue.list_tasks(project_name="demo", task_type="image_edit")
+    embedded = await _call_embedded(declaration, arguments, services)
+    remote = await _call_remote(declaration, {"project": "demo", **arguments}, services)
+    assert embedded.isError is remote.isError is False
+    payload = remote.structuredContent
+    assert payload is not None
+    assert payload["image_edit_quote"]["targets"] == ["Ana"]
+    assert "generation_batch" not in payload
+    assert "batch_id" not in payload
+    assert _embedded_json(embedded) == payload
+    assert (await services.queue.list_tasks(project_name="demo", task_type="image_edit")) == tasks_before
+    assert image.read_bytes() == before
+
+
+async def test_automated_settings_schema_excludes_user_grid_control(seeded_projects, services):
+    from server.routers.projects import UpdateProjectRequest
+
+    embedded = (await _embedded_listing(seeded_projects))["configure_project"]
+    remote = {tool.name: tool for tool in await build_remote_mcp_server(services=services).list_tools()}[
+        "configure_project"
+    ]
+    web_fields = UpdateProjectRequest.model_json_schema()["properties"]
+    for schema in (embedded.inputSchema, _without_project(remote.inputSchema)):
+        assert "grid_storyboard" not in schema["properties"]
+        assert set(schema["properties"]) == set(web_fields) - {"grid_storyboard"}
+        assert schema["additionalProperties"] is False
+
+
 @_SCOPED_DECLARATIONS
 async def test_both_hosts_expose_the_declared_name_schema_and_description(
     declaration: ToolDeclaration[Any, Any], seeded_projects: ProjectManager, services: Services

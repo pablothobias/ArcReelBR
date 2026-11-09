@@ -1,0 +1,64 @@
+# MCP session and shared-adapter review
+
+Read-only source/history review, 2026-11-09. Compared local commits `5e6626de5`, `b88d14cd0`, and `39487c317` with their respective parents. Current source inspected at `1df5ee3b8`. No live application, model calls, paid work or tests were run. Test descriptions below concern inspected test code, not passing results obtained in this review.
+
+## Conclusion
+
+Reusing native services does not establish adapter neutrality. The session bridge mostly delegates lifecycle operations unchanged, but deliberately narrows the REST input contract. Shared workflow tools broaden the embedded Agent's capabilities and carry additional workflow guidance. One concrete policy contradiction is reachable: the new embedded `configure_project` tool can toggle grids despite the native profile's explicit user-only rule. The new speech handler also has presentation-materialization effects before its explicit timing-application branch.
+
+The official public skill supports directly executing native `next_action` through MCP (`skills/video-workflow/SKILL.md:12-18`). This review does not impose `send_agent_message` as the exclusive authorized interface. Product features, including pt-BR and optional speech timing, should not be removed merely because their interfaces are new.
+
+## 1. Confirmed policy contradiction: embedded grid-setting access
+
+Introduced by `b88d14cd0`:
+
+- `ConfigureProjectRequest` inherits the entire Web `UpdateProjectRequest`, with only an extra-field restriction (`server/media_tools/workflow_access.py:34-37`). The inherited schema includes `grid_storyboard` (`server/routers/projects.py:355`).
+- `configure_project` passes that request to the native Settings transaction without caller-specific field restriction (`server/media_tools/workflow_access.py:45-54`). The transaction persists the grid flag for non-ad projects (`server/routers/projects.py:1137-1141`).
+- The declaration is in `AGENT_TOOLSET` and thus available to both remote and embedded hosts (`server/agent_toolset/toolset.py:28-40`; `server/agent_runtime/arcreel_mcp.py:28-35`; `server/remote_mcp.py:68-73`). Generic invocation validates the schema and migration state, then calls the handler; it adds no user-only setting gate (`server/agent_toolset/declaration.py:183-197`). Read-only reviewer restrictions do not restrict the main conversation (`server/agent_runtime/agent_access_policy.py:536-542`).
+- The inherited native profile explicitly says the user toggles `grid_storyboard` and the Agent cannot bypass that through tools (`agent_runtime_profile/CLAUDE.drama.md:100`, also narration). Previously, the Agent's `patch_project` settings allowlist excluded grids (`server/tool_runtime.py:2533-2541`; the exclusion predates `b88d14cd0`).
+
+Classification: confirmed newly reachable behavior and a concrete inconsistency with a documented native restriction. This is not evidence that a live Agent actually toggled grids. Settings validation shared with Web does not preserve the former distinction between Web-user capabilities and embedded-Agent capabilities. Review the intended host/field boundary before any implementation. Preserve the useful Settings API and official external MCP route.
+
+## 2. Session bridge versus native REST/service
+
+| Operation | Comparison and classification |
+| --- | --- |
+| Send/create | Both call `AssistantService.send_or_create`: REST `server/routers/assistant.py:153-169`, MCP `server/session_mcp.py:100-118`. MCP requires nonempty text and a nonempty client key; REST permits empty text, optional keys and image attachments (`server/routers/assistant.py:135-139`). This is a confirmed narrowed interface, not demonstrated lifecycle corruption. Image-only or attachment-bearing messages cannot use this bridge directly. |
+| Locale | REST derives locale from `Accept-Language` (`server/routers/assistant.py:167`; `server/i18n.py:24-37`); MCP accepts an explicit four-value locale defaulting to English (`server/session_mcp.py:105`). Therefore MCP does not inherit the caller's HTTP language automatically. Both pass locale to the same native message path (`server/agent_runtime/service.py:306-317`). Its conversation-language block explicitly preserves creative/project language (`server/agent_runtime/conversation_language.py:8-18`). No pt-BR content regression follows from this distinction. |
+| Retry keys | Mandatory key validation is new in MCP; idempotency itself is inherited from the native service. The bridge does not create another key store or reinterpret accepted versus queued results. `tests/integration/server/test_session_mcp.py:68-84,115-129,154-159` exercises accepted/queued replay and refusal without a key. |
+| Ownership/root | MCP authenticates, resolves project scope, checks service/project root equality, and verifies session ownership (`server/session_mcp.py:84-98`). Native send/queue services also verify ownership (`server/agent_runtime/service.py:294-305,681-690`). Root mismatch is an added adapter refusal. No cross-project bypass was established. |
+| Entries/cursor | Both call `list_session_entries` with the native sequence cursor (`server/routers/assistant.py:326-337`; `server/session_mcp.py:134-147`). MCP adds `next_after_seq=max(previous, returned seqs)` and preserves an empty result's cursor. No separate event filtering or state transition is introduced. |
+| Questions | MCP reads the native pending-question snapshot and invokes the same `answer_user_question` as REST (`server/session_mcp.py:149-165`; `server/routers/assistant.py:484-501`). Both refuse an empty answer mapping. The bridge's sanitized errors lose REST error categorization, not the underlying answer operation. |
+| Queued actions | Added in `b88d14cd0`; MCP maps edit/delete/resend/send_now to the same service methods as REST (`server/session_mcp.py:186-204`; `server/routers/assistant.py:435-479`). Resend carries explicit/default locale; send_now uses the native service's existing behavior. No adapter auto-resend loop was found. |
+| Interruption | MCP invokes the same service interruption as REST (`server/session_mcp.py:167-173`; `server/routers/assistant.py:387-391`). Its warning that interruption does not settle provider jobs is guidance, not added cancellation behavior. |
+
+`5e6626de5` changes the remote server's tool list to append session controls. It does not alter the existing embedded adapter or session service. `server/session_mcp.py:1-5` intentionally keeps session controls external-only, preventing recursive Agent starts through the embedded production toolset.
+
+Coverage limit: the session bridge tests use the real service but replace the SDK process (`tests/integration/server/test_session_mcp.py:22-43`); questions are inserted directly into a pending card (`:87-89`). The source covers reconnect, empty cursor, ownership, interruption, replay and deletion. It does not establish live-model question behavior, locale parity, image-message parity, or all queue-action races. No defect in those untested cases is asserted here.
+
+## 3. Shared tools introduce more than transport adaptation
+
+`b88d14cd0` registers workflow-access tools in both hosts, not only the external interface. `39487c317` similarly adds speech review. Existing remote/embedded encoding and migration invocation machinery is inherited; the new declarations and handler behavior are local additions.
+
+Confirmed differences and effects:
+
+- **Additional upload gates:** MCP requires an existing character for image references (`server/media_tools/workflow_access.py:283-285`; `server/routers/files.py:570-573`). Web calls the extracted helper with the default `require_reference_host=False`; its character-image reference spec has no host bucket (`server/routers/files.py:240-246`), and absent assets are explicitly tolerated for later registration (`:640-655`). The adapter therefore cannot perform every Web reference-upload ordering. This restriction is tested deliberately (`tests/integration/server/test_workflow_access.py:64-78`); it is a confirmed contract difference, not automatically a defect.
+- **Style upload permission gate:** MCP requires `confirm_style_analysis` before invoking the native paid style-analysis path (`server/media_tools/workflow_access.py:268-280`). Web's style upload directly invokes that path. This is new adapter admission, not inherited backend validation. Its purpose is explicit paid-action authorization; do not silently remove it as workflow duplication.
+- **Configuration inspection invokes a process:** `get_effective_configuration` resolves every image/video lane and script provider; when subscription is selected, it invokes official local auth verification with a 15-second bound (`server/media_tools/workflow_access.py:199-231`). It does not submit generation. “Read-only” here does not mean no subprocess activity. Unverified login is returned as data, not a hard production gate in the handler. A mandatory readiness gate arises from instruction prose, not this function.
+- **Tool-description workflow imposition:** removing the added CLAUDE section alone does not remove all local orchestration guidance. `get_project_costs` tells both hosts to use quotes before paid actions (`server/agent_toolset/workflow_access.py:82-86`); `configure_project` says to use it before generation for supplied settings (`:34-39`). The former adds quotation sequencing independently of the otherwise optional accounting API. Keep accurate API descriptions while reviewing imperative workflow guidance separately.
+- **Native field/source behavior:** shared settings/reference handlers label updates `worker`, whereas REST uses `webui` (`server/media_tools/workflow_access.py:49-50,278-296`; `server/routers/projects.py:1073-1076`; `server/routers/files.py:447-469`). That is a deliberate change-source distinction. This review does not establish a broken UI notification or stale-state consequence.
+- **Migration gates:** several new declarations use `BLOCKED`, while configuration inspection and actual usage are exempt (`server/agent_toolset/workflow_access.py:20-103`; `server/agent_toolset/speech_review.py:19-22`). These are actual refusals after failed project migration, implemented by inherited declaration invocation. They do not prove a new universal production state machine.
+
+## 4. Speech review is a new capability with inspection effects
+
+`39487c317` adds an evaluator and measured timing, not merely an adapter around an inherited speech evaluator. Both hosts expose it (`server/agent_toolset/speech_review.py:6-22`). It requires local ASR setup, unit duration at most 120 seconds, speech provenance, exact/confident timing eligibility and current selection for applying timing (`server/media_tools/speech_review.py:40-78`). These are new capability-specific gates, not a pre-existing requirement for ordinary production.
+
+Important side effect: `review_speech` calls `materialize_unit` before testing `apply_timing` and before ASR availability is known (`server/media_tools/speech_review.py:49-67`). Current selections can persist presentation artifacts through `_persist_current` (`server/services/presentation/presentation_read_model.py:329-341`). Therefore `apply_timing=False` means no requested measured-timing application, not a guarantee of zero filesystem writes. This persistence seam predates the speech addition, but the new inspection tool reaches it. No incorrect overwrite was demonstrated.
+
+With eligible explicit application, the handler first saves immutable speech evidence, then rematerializes through the native presentation service (`server/media_tools/speech_review.py:80-95`). The commit also changes subsequent presentation reads to reuse source-bound measurements (`server/services/presentation/presentation_read_model.py:296-320`). This intentionally changes subtitle output beyond the immediate call. Tests demonstrate this with mocked transcription (`tests/integration/server/media_tools/test_speech_review.py:17-57`); they do not establish live ASR accuracy.
+
+The mandatory per-unit ASR step in `agent_runtime_profile/.claude/skills/edit-video/SKILL.md:27` is a separate workflow change. Removing that imposition does not require removing the optional feature, its source-binding safeguards, or its capability-specific admission.
+
+## Review disposition
+
+Confirmed concrete issue: embedded grid-setting reachability contradicts the retained user-only native rule. Confirmed behavioral changes: narrowed session inputs, explicit locale instead of HTTP negotiation, reference-upload ordering restrictions, style-analysis confirmation, new shared capabilities, instruction-level quote sequencing, and lazy presentation persistence during speech inspection. No additional lifecycle defect was established from static inspection. Locale/race/UI-notification regressions remain unproven hypotheses and should not be presented as findings or used to justify speculative cleanup.

@@ -254,7 +254,10 @@ async def edit_images(
         def load_inputs() -> tuple[dict[str, Any] | None, dict[str, Any], Path, int | None, ArtifactCurrencyResolver]:
             script: dict[str, Any] | None = None
             if script_filename is not None:
-                script = services.projects.load_script(scope.project_name, script_filename)
+                reader = (
+                    services.projects.load_script_readonly if request.value.preview else services.projects.load_script
+                )
+                script = reader(scope.project_name, script_filename)
 
             project = services.projects.load_project(scope.project_name)
             project_path = services.projects.get_project_path(scope.project_name)

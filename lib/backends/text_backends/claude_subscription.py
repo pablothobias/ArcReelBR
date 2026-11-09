@@ -25,25 +25,14 @@ from lib.backends.text_backends.base import (
     resolve_schema,
     structured_fallback_reason,
 )
-from lib.config.claude_subscription import CLAUDE_SUBSCRIPTION_MODEL, CLAUDE_SUBSCRIPTION_PROVIDER
+from lib.config.claude_subscription import (
+    CLAUDE_SUBSCRIPTION_MODEL,
+    CLAUDE_SUBSCRIPTION_PROVIDER,
+    enabled_claude_cloud_routes,
+)
+from lib.config.env_keys import CLAUDE_SUBSCRIPTION_API_ENV_KEYS
 from lib.infra.async_thread import run_noninterruptible_sync, run_sync_transaction
 from lib.infra.retry import NonRetryableError
-
-# These variables can select separately billed authentication or alternative endpoints.
-_API_ENVIRONMENT = frozenset(
-    {
-        "ANTHROPIC_API_KEY",
-        "ANTHROPIC_AUTH_TOKEN",
-        "ANTHROPIC_BASE_URL",
-        "CLAUDE_CODE_OAUTH_TOKEN",
-        "CLAUDE_CODE_USE_BEDROCK",
-        "CLAUDE_CODE_USE_VERTEX",
-        "CLAUDE_CODE_USE_FOUNDRY",
-        "ANTHROPIC_CUSTOM_HEADERS",
-        "ANTHROPIC_BEDROCK_BASE_URL",
-        "ANTHROPIC_VERTEX_BASE_URL",
-    }
-)
 
 
 class SubscriptionAuthenticationError(NonRetryableError):
@@ -54,7 +43,7 @@ async def verify_local_subscription(
     cli_path: str, cwd: str, *, process_factory: Callable[..., Any] = asyncio.create_subprocess_exec
 ) -> None:
     """Use official auth status only; never inspect credential files or extract tokens."""
-    if any(os.environ.get(key) for key in _API_ENVIRONMENT):
+    if enabled_claude_cloud_routes(os.environ) or any(os.environ.get(key) for key in CLAUDE_SUBSCRIPTION_API_ENV_KEYS):
         raise SubscriptionAuthenticationError(
             "Subscription text requires a clean local login environment; remove API, bearer-token and cloud-provider overrides."
         )

@@ -1,0 +1,13 @@
+{
+  "mode": "isolated schema/description inspection; no handler invocation",
+  "configure_project_in_shared_toolset": true,
+  "grid_in_embedded_schema": true,
+  "grid_in_remote_schema": true,
+  "grid_true_accepted": true,
+  "fields_set": [
+    "grid_storyboard"
+  ],
+  "image_edit_long_task": true,
+  "remote_description_includes_preview_branch": true,
+  "remote_description_always_says_batch": true
+}

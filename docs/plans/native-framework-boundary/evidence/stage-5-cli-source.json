@@ -1,0 +1,16 @@
+{
+  "sdk_version": "0.2.173",
+  "bundled_cli_sha256": "5eadc0009cdcdbc0d06e58110d7b2baf88ced6088b1c33a60a21217fe410619c",
+  "observed_boolean_helper": "function Ne(e){if(!e)return!1;if(typeof e===\"boolean\")return e;let n=String(e).toLowerCase().trim();return[\"1\",\"true\",\"yes\",\"on\"].includes(n)}",
+  "selectors_observed_in_bundled_code": [
+    "CLAUDE_CODE_USE_ANTHROPIC_AWS",
+    "CLAUDE_CODE_USE_ANTHROPIC_GOOGLE_CLOUD",
+    "CLAUDE_CODE_USE_BEDROCK",
+    "CLAUDE_CODE_USE_FOUNDRY",
+    "CLAUDE_CODE_USE_MANTLE",
+    "CLAUDE_CODE_USE_VERTEX"
+  ],
+  "official_reference": "https://code.claude.com/docs/en/env-vars",
+  "additional_first_party_source": "https://github.com/anthropics/claude-code/blob/main/mods/telemetry/hooks/register.ts",
+  "mode": "Static source inspection only; no CLI/auth execution or credential lookup."
+}

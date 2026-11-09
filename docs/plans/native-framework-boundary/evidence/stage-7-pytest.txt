@@ -1,0 +1,53 @@
+........................................................................ [  5%]
+........................................................................ [ 10%]
+........................................................................ [ 15%]
+........................................................................ [ 20%]
+........................................................................ [ 25%]
+........................................................................ [ 30%]
+........................................................................ [ 35%]
+........................................................................ [ 40%]
+........................................................................ [ 45%]
+........................................................................ [ 50%]
+........................................................................ [ 55%]
+........................................................................ [ 60%]
+........................................................................ [ 65%]
+........................................................................ [ 70%]
+........................................................................ [ 75%]
+........................................................................ [ 80%]
+........................................................................ [ 85%]
+........................................................................ [ 90%]
+........................................................................ [ 95%]
+..................................................................       [100%]
+=============================== warnings summary ===============================
+tests/integration/server/test_session_mcp.py::test_session_bridge_send_retry_reconnect_questions_cursor_and_interrupt
+  /Users/pablo.carminatti.br/.local/share/uv/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/contextlib.py:144: SAWarning: Skipped unsupported reflection of expression-based index idx_tasks_dedupe_active
+    next(self.gen)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 25 durations =============================
+1.90s call     tests/integration/server/services/presentation/test_timeline_final_cut.py::test_burned_and_clean_final_cuts_are_separate_artifacts_and_only_one_shows_subtitles
+1.87s call     tests/integration/server/services/presentation/test_timeline_final_cut.py::test_narrated_final_cut_mixes_each_narration_from_its_carrying_clip_and_cuts_it_at_the_end
+1.74s setup    tests/integration/server/test_session_mcp.py::test_session_bridge_send_retry_reconnect_questions_cursor_and_interrupt
+1.54s call     tests/integration/server/services/presentation/test_timeline_final_cut.py::test_measured_subtitles_render_only_inside_measured_interval
+1.23s call     tests/integration/server/test_remote_mcp.py::test_text_task_is_shared_by_remote_and_embedded_hosts_and_running_member_is_not_cancellable
+0.72s call     tests/integration/server/media_tools/test_speech_review.py::test_inspection_materializes_and_preserves_eligible_timing[True-True]
+0.65s call     tests/integration/server/media_tools/test_speech_review.py::test_inspection_materializes_and_preserves_eligible_timing[False-True]
+0.63s call     tests/integration/server/test_session_mcp.py::test_session_bridge_send_retry_reconnect_questions_cursor_and_interrupt
+0.54s call     tests/integration/server/services/presentation/test_timeline_final_cut.py::test_a_corrupted_narration_snapshot_names_the_unit_and_version
+0.49s call     tests/integration/server/media_tools/test_speech_review.py::test_inspection_materializes_and_preserves_eligible_timing[True-False]
+0.46s call     tests/integration/server/agent_toolset/test_host_consistency.py::test_both_hosts_expose_the_declared_name_schema_and_description[delete_project_file]
+0.43s call     tests/integration/server/media_tools/test_speech_review.py::test_inspection_materializes_and_preserves_eligible_timing[False-False]
+0.41s call     tests/integration/server/agent_toolset/test_host_consistency.py::test_contact_sheets_reach_both_hosts_as_the_same_image_blocks
+0.41s setup    tests/integration/server/agent_toolset/test_host_consistency.py::test_problems_pass_through_both_hosts_unchanged[patch_draft]
+0.40s call     tests/integration/server/agent_toolset/test_host_consistency.py::test_invalid_arguments_are_rejected_as_the_same_invalid_request_by_both_hosts[upload_reference]
+0.37s call     tests/unit/test_public_contract.py::TestAgentInstallationGuideEndpoint::test_legacy_endpoints_are_not_registered
+0.37s call     tests/integration/server/agent_toolset/test_host_consistency.py::test_embedded_content_carries_the_same_json_as_remote_structured_content[cancel_generation_batch]
+0.33s setup    tests/integration/server/agent_toolset/test_host_consistency.py::test_a_blocked_declaration_refuses_a_migration_failed_project_at_both_entries[rename_asset]
+0.31s setup    tests/integration/server/agent_toolset/test_host_consistency.py::test_a_blocked_declaration_refuses_a_migration_failed_project_at_both_entries[confirm_script_review]
+0.27s teardown tests/integration/server/agent_toolset/test_host_consistency.py::test_problems_pass_through_both_hosts_unchanged[open_draft]
+0.27s call     tests/integration/server/agent_toolset/test_host_consistency.py::test_both_hosts_expose_the_declared_name_schema_and_description[patch_episode_script]
+0.27s call     tests/integration/server/test_remote_mcp.py::test_remote_inspect_video_units_returns_contact_sheets_as_image_content
+0.25s setup    tests/integration/server/agent_toolset/test_host_consistency.py::test_remote_project_locating_failures_are_invalid_project[missing-select_provider_library_asset]
+0.24s setup    tests/integration/server/test_remote_mcp.py::test_remote_mcp_draft_errors_name_only_project_relative_paths
+0.24s call     tests/integration/server/agent_toolset/test_host_consistency.py::test_both_hosts_expose_the_declared_name_schema_and_description[restore_revision]
+1434 passed, 1 warning in 68.85s (0:01:08)

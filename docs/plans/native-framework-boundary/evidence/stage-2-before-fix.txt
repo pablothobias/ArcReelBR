@@ -1,0 +1,180 @@
+FFFFFFF                                                                  [100%]
+=================================== FAILURES ===================================
+__ test_automated_settings_reject_grid_without_partial_changes[True-embedded] __
+
+access = (<lib.project.project_manager.ProjectManager object at 0x11d93a300>, <function access.<locals>.call at 0x11d2f39c0>)
+caller_source = 'embedded', grid = True
+
+    @pytest.mark.parametrize("caller_source", ["embedded", "mcp"])
+    @pytest.mark.parametrize("grid", [True, False, None])
+    async def test_automated_settings_reject_grid_without_partial_changes(access, caller_source, grid):
+        pm, call = access
+        pm.update_project("demo", lambda p: p.update({"grid_storyboard": True, "source_language": "pt-BR"}))
+        project_file = pm.get_project_path("demo") / "project.json"
+        before = project_file.read_bytes()
+        result = await call(
+            "configure_project", caller_source=caller_source,
+            grid_storyboard=grid, title="Must not be applied", source_language="en",
+        )
+>       assert result.problem is not None
+E       AssertionError: assert None is not None
+E        +  where None = ToolOutcome(value={'success': True, 'project': {'schema_version': 19, 'title': 'Must not be applied', 'content_mode': ...8:13.297650+00:00'}, 'generation_mode': 'storyboard', 'grid_storyboard': True, 'source_language': 'en'}}, problem=None).problem
+
+tests/integration/server/test_workflow_access.py:70: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-09 14:48:13 [WARNING] server.app: frontend/dist/index.html 不存在，跳过前端页面挂载（API 不受影响）
+------------------------------ Captured log setup ------------------------------
+WARNING  server.app:app.py:1003 frontend/dist/index.html 不存在，跳过前端页面挂载（API 不受影响）
+____ test_automated_settings_reject_grid_without_partial_changes[True-mcp] _____
+
+access = (<lib.project.project_manager.ProjectManager object at 0x11d939730>, <function access.<locals>.call at 0x11cbbc4a0>)
+caller_source = 'mcp', grid = True
+
+    @pytest.mark.parametrize("caller_source", ["embedded", "mcp"])
+    @pytest.mark.parametrize("grid", [True, False, None])
+    async def test_automated_settings_reject_grid_without_partial_changes(access, caller_source, grid):
+        pm, call = access
+        pm.update_project("demo", lambda p: p.update({"grid_storyboard": True, "source_language": "pt-BR"}))
+        project_file = pm.get_project_path("demo") / "project.json"
+        before = project_file.read_bytes()
+        result = await call(
+            "configure_project", caller_source=caller_source,
+            grid_storyboard=grid, title="Must not be applied", source_language="en",
+        )
+>       assert result.problem is not None
+E       AssertionError: assert None is not None
+E        +  where None = ToolOutcome(value={'success': True, 'project': {'schema_version': 19, 'title': 'Must not be applied', 'content_mode': ...8:13.522683+00:00'}, 'generation_mode': 'storyboard', 'grid_storyboard': True, 'source_language': 'en'}}, problem=None).problem
+
+tests/integration/server/test_workflow_access.py:70: AssertionError
+_ test_automated_settings_reject_grid_without_partial_changes[False-embedded] __
+
+access = (<lib.project.project_manager.ProjectManager object at 0x11d900cb0>, <function access.<locals>.call at 0x11cbbd940>)
+caller_source = 'embedded', grid = False
+
+    @pytest.mark.parametrize("caller_source", ["embedded", "mcp"])
+    @pytest.mark.parametrize("grid", [True, False, None])
+    async def test_automated_settings_reject_grid_without_partial_changes(access, caller_source, grid):
+        pm, call = access
+        pm.update_project("demo", lambda p: p.update({"grid_storyboard": True, "source_language": "pt-BR"}))
+        project_file = pm.get_project_path("demo") / "project.json"
+        before = project_file.read_bytes()
+        result = await call(
+            "configure_project", caller_source=caller_source,
+            grid_storyboard=grid, title="Must not be applied", source_language="en",
+        )
+>       assert result.problem is not None
+E       AssertionError: assert None is not None
+E        +  where None = ToolOutcome(value={'success': True, 'project': {'schema_version': 19, 'title': 'Must not be applied', 'content_mode': ...:13.605608+00:00'}, 'generation_mode': 'storyboard', 'grid_storyboard': False, 'source_language': 'en'}}, problem=None).problem
+
+tests/integration/server/test_workflow_access.py:70: AssertionError
+____ test_automated_settings_reject_grid_without_partial_changes[False-mcp] ____
+
+access = (<lib.project.project_manager.ProjectManager object at 0x11d939400>, <function access.<locals>.call at 0x11cbbed40>)
+caller_source = 'mcp', grid = False
+
+    @pytest.mark.parametrize("caller_source", ["embedded", "mcp"])
+    @pytest.mark.parametrize("grid", [True, False, None])
+    async def test_automated_settings_reject_grid_without_partial_changes(access, caller_source, grid):
+        pm, call = access
+        pm.update_project("demo", lambda p: p.update({"grid_storyboard": True, "source_language": "pt-BR"}))
+        project_file = pm.get_project_path("demo") / "project.json"
+        before = project_file.read_bytes()
+        result = await call(
+            "configure_project", caller_source=caller_source,
+            grid_storyboard=grid, title="Must not be applied", source_language="en",
+        )
+>       assert result.problem is not None
+E       AssertionError: assert None is not None
+E        +  where None = ToolOutcome(value={'success': True, 'project': {'schema_version': 19, 'title': 'Must not be applied', 'content_mode': ...:13.686287+00:00'}, 'generation_mode': 'storyboard', 'grid_storyboard': False, 'source_language': 'en'}}, problem=None).problem
+
+tests/integration/server/test_workflow_access.py:70: AssertionError
+__ test_automated_settings_reject_grid_without_partial_changes[None-embedded] __
+
+access = (<lib.project.project_manager.ProjectManager object at 0x11d571c10>, <function access.<locals>.call at 0x11cc04220>)
+caller_source = 'embedded', grid = None
+
+    @pytest.mark.parametrize("caller_source", ["embedded", "mcp"])
+    @pytest.mark.parametrize("grid", [True, False, None])
+    async def test_automated_settings_reject_grid_without_partial_changes(access, caller_source, grid):
+        pm, call = access
+        pm.update_project("demo", lambda p: p.update({"grid_storyboard": True, "source_language": "pt-BR"}))
+        project_file = pm.get_project_path("demo") / "project.json"
+        before = project_file.read_bytes()
+        result = await call(
+            "configure_project", caller_source=caller_source,
+            grid_storyboard=grid, title="Must not be applied", source_language="en",
+        )
+>       assert result.problem is not None
+E       AssertionError: assert None is not None
+E        +  where None = ToolOutcome(value={'success': True, 'project': {'schema_version': 19, 'title': 'Must not be applied', 'content_mode': ...:13.782064+00:00'}, 'generation_mode': 'storyboard', 'grid_storyboard': False, 'source_language': 'en'}}, problem=None).problem
+
+tests/integration/server/test_workflow_access.py:70: AssertionError
+____ test_automated_settings_reject_grid_without_partial_changes[None-mcp] _____
+
+access = (<lib.project.project_manager.ProjectManager object at 0x11cc491c0>, <function access.<locals>.call at 0x11cc05800>)
+caller_source = 'mcp', grid = None
+
+    @pytest.mark.parametrize("caller_source", ["embedded", "mcp"])
+    @pytest.mark.parametrize("grid", [True, False, None])
+    async def test_automated_settings_reject_grid_without_partial_changes(access, caller_source, grid):
+        pm, call = access
+        pm.update_project("demo", lambda p: p.update({"grid_storyboard": True, "source_language": "pt-BR"}))
+        project_file = pm.get_project_path("demo") / "project.json"
+        before = project_file.read_bytes()
+        result = await call(
+            "configure_project", caller_source=caller_source,
+            grid_storyboard=grid, title="Must not be applied", source_language="en",
+        )
+>       assert result.problem is not None
+E       AssertionError: assert None is not None
+E        +  where None = ToolOutcome(value={'success': True, 'project': {'schema_version': 19, 'title': 'Must not be applied', 'content_mode': ...:13.900907+00:00'}, 'generation_mode': 'storyboard', 'grid_storyboard': False, 'source_language': 'en'}}, problem=None).problem
+
+tests/integration/server/test_workflow_access.py:70: AssertionError
+__________ test_automated_settings_schema_excludes_user_grid_control ___________
+
+seeded_projects = <lib.project.project_manager.ProjectManager object at 0x11cc4b200>
+services = Services(projects=<lib.project.project_manager.ProjectManager object at 0x11cc4b200>, workflow_planner=<server.service...sion', bind=<sqlalchemy.ext.asyncio.engine.AsyncEngine object at 0x10a58be10>, autoflush=True, expire_on_commit=False))
+
+    async def test_automated_settings_schema_excludes_user_grid_control(seeded_projects, services):
+        from server.routers.projects import UpdateProjectRequest
+
+        embedded = (await _embedded_listing(seeded_projects))["configure_project"]
+        remote = {tool.name: tool for tool in await build_remote_mcp_server(services=services).list_tools()}["configure_project"]
+        web_fields = UpdateProjectRequest.model_json_schema()["properties"]
+        for schema in (embedded.inputSchema, _without_project(remote.inputSchema)):
+>           assert "grid_storyboard" not in schema["properties"]
+E           AssertionError: assert 'grid_storyboard' not in {'source_language': {'anyOf': [{'enum': ['zh', 'en', 'vi', 'ru', 'pt-BR'], 'type': 'string'}, {'type': 'null'}], 'defa...ype': 'null'}], 'default': None, 'description': 'Output aspect ratio supported by the selected generation route'}, ...}
+
+tests/integration/server/agent_toolset/test_host_consistency.py:341: AssertionError
+=============================== warnings summary ===============================
+tests/integration/server/test_workflow_access.py::test_automated_settings_reject_grid_without_partial_changes[True-embedded]
+  /Users/pablo.carminatti.br/.local/share/uv/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/contextlib.py:144: SAWarning: Skipped unsupported reflection of expression-based index idx_tasks_dedupe_active
+    next(self.gen)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 25 durations =============================
+1.10s setup    tests/integration/server/test_workflow_access.py::test_automated_settings_reject_grid_without_partial_changes[True-embedded]
+0.10s setup    tests/integration/server/test_workflow_access.py::test_automated_settings_reject_grid_without_partial_changes[None-mcp]
+0.08s setup    tests/integration/server/test_workflow_access.py::test_automated_settings_reject_grid_without_partial_changes[None-embedded]
+0.07s setup    tests/integration/server/test_workflow_access.py::test_automated_settings_reject_grid_without_partial_changes[False-mcp]
+0.07s setup    tests/integration/server/test_workflow_access.py::test_automated_settings_reject_grid_without_partial_changes[False-embedded]
+0.07s setup    tests/integration/server/test_workflow_access.py::test_automated_settings_reject_grid_without_partial_changes[True-mcp]
+0.06s call     tests/integration/server/agent_toolset/test_host_consistency.py::test_automated_settings_schema_excludes_user_grid_control
+0.01s call     tests/integration/server/test_workflow_access.py::test_automated_settings_reject_grid_without_partial_changes[None-embedded]
+0.01s call     tests/integration/server/test_workflow_access.py::test_automated_settings_reject_grid_without_partial_changes[None-mcp]
+0.01s call     tests/integration/server/test_workflow_access.py::test_automated_settings_reject_grid_without_partial_changes[True-mcp]
+0.01s call     tests/integration/server/test_workflow_access.py::test_automated_settings_reject_grid_without_partial_changes[True-embedded]
+0.01s setup    tests/integration/server/agent_toolset/test_host_consistency.py::test_automated_settings_schema_excludes_user_grid_control
+0.01s call     tests/integration/server/test_workflow_access.py::test_automated_settings_reject_grid_without_partial_changes[False-embedded]
+0.01s call     tests/integration/server/test_workflow_access.py::test_automated_settings_reject_grid_without_partial_changes[False-mcp]
+
+(7 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/integration/server/test_workflow_access.py::test_automated_settings_reject_grid_without_partial_changes[True-embedded]
+FAILED tests/integration/server/test_workflow_access.py::test_automated_settings_reject_grid_without_partial_changes[True-mcp]
+FAILED tests/integration/server/test_workflow_access.py::test_automated_settings_reject_grid_without_partial_changes[False-embedded]
+FAILED tests/integration/server/test_workflow_access.py::test_automated_settings_reject_grid_without_partial_changes[False-mcp]
+FAILED tests/integration/server/test_workflow_access.py::test_automated_settings_reject_grid_without_partial_changes[None-embedded]
+FAILED tests/integration/server/test_workflow_access.py::test_automated_settings_reject_grid_without_partial_changes[None-mcp]
+FAILED tests/integration/server/agent_toolset/test_host_consistency.py::test_automated_settings_schema_excludes_user_grid_control
+7 failed, 1 warning in 2.13s

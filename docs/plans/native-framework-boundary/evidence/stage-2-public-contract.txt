@@ -1,0 +1,14 @@
+............                                                             [100%]
+=============================== warnings summary ===============================
+tests/unit/test_public_contract.py::TestAgentInstallationGuide::test_covers_installation_and_connection
+  /Users/pablo.carminatti.br/.local/share/uv/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/contextlib.py:144: SAWarning: Skipped unsupported reflection of expression-based index idx_tasks_dedupe_active
+    next(self.gen)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 25 durations =============================
+1.95s setup    tests/unit/test_public_contract.py::TestAgentInstallationGuide::test_covers_installation_and_connection
+0.27s call     tests/unit/test_public_contract.py::TestAgentInstallationGuideEndpoint::test_legacy_endpoints_are_not_registered
+0.01s call     tests/unit/test_public_contract.py::TestAgentInstallationGuideEndpoint::test_returns_text_not_json
+
+(22 durations < 0.005s hidden.  Use -vv to show these durations.)
+12 passed, 1 warning in 2.38s

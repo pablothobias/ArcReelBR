@@ -1,0 +1,5 @@
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! KeyboardInterrupt !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/tests/integration/lib/edit_timeline/test_service_bgm.py:0: KeyboardInterrupt
+(to show a full traceback on KeyboardInterrupt use --full-trace)
+no tests ran in 3.01s

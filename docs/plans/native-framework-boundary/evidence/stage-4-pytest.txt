@@ -1,0 +1,52 @@
+........................................................................ [  5%]
+........................................................................ [ 10%]
+........................................................................ [ 15%]
+........................................................................ [ 21%]
+........................................................................ [ 26%]
+........................................................................ [ 31%]
+........................................................................ [ 36%]
+........................................................................ [ 42%]
+........................................................................ [ 47%]
+........................................................................ [ 52%]
+........................................................................ [ 57%]
+........................................................................ [ 63%]
+........................................................................ [ 68%]
+........................................................................ [ 73%]
+........................................................................ [ 79%]
+........................................................................ [ 84%]
+........................................................................ [ 89%]
+........................................................................ [ 94%]
+.......................................................................  [100%]
+=============================== warnings summary ===============================
+tests/integration/server/test_reference_upload_transaction.py::test_native_deletion_after_mcp_precheck_refuses_without_orphan
+  /Users/pablo.carminatti.br/.local/share/uv/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/contextlib.py:144: SAWarning: Skipped unsupported reflection of expression-based index idx_tasks_dedupe_active
+    next(self.gen)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 25 durations =============================
+5.05s call     tests/integration/lib/project/test_project_manager_concurrent_save.py::TestSaveScriptConcurrency::test_removed_entry_media_cleanup_keeps_script_writers_locked_out
+1.21s call     tests/integration/server/test_remote_mcp.py::test_text_task_is_shared_by_remote_and_embedded_hosts_and_running_member_is_not_cancellable
+1.20s setup    tests/integration/server/test_reference_upload_transaction.py::test_native_deletion_after_mcp_precheck_refuses_without_orphan
+0.84s call     tests/integration/lib/project/test_project_manager_concurrent_save.py::TestSaveScriptConcurrency::test_save_script_atomicity_during_read
+0.52s call     tests/integration/lib/project/test_project_manager_concurrent_save.py::TestSaveScriptConcurrency::test_concurrent_save_script_no_corruption
+0.38s call     tests/integration/server/agent_toolset/test_host_consistency.py::test_contact_sheets_reach_both_hosts_as_the_same_image_blocks
+0.36s call     tests/integration/server/routers/test_files_router.py::TestServeProjectFileThumbnails::test_source_replaced_while_thumbnailing_falls_back_to_the_current_original
+0.33s call     tests/integration/lib/project/test_project_manager.py::TestProjectManager::test_generate_overview_dirty_source_language_falls_back_to_default[dirty_source_language1]
+0.30s setup    tests/integration/server/agent_toolset/test_host_consistency.py::test_unblocked_declarations_reach_the_handler_on_a_migration_failed_project[create_project]
+0.29s call     tests/integration/server/test_remote_mcp.py::test_remote_inspect_video_units_returns_contact_sheets_as_image_content
+0.29s call     tests/integration/server/agent_toolset/test_host_consistency.py::test_both_hosts_expose_the_declared_name_schema_and_description[get_effective_configuration]
+0.29s call     tests/integration/server/test_remote_mcp.py::test_remote_mcp_draft_errors_name_only_project_relative_paths
+0.23s call     tests/integration/server/agent_toolset/test_host_consistency.py::test_both_hosts_expose_the_declared_name_schema_and_description[open_draft]
+0.20s call     tests/integration/server/test_remote_mcp.py::test_remote_api_keys_share_the_persisted_single_operator_owner
+0.19s call     tests/integration/server/agent_toolset/test_host_consistency.py::test_remote_project_locating_failures_are_invalid_project[missing-list_pending_assets]
+0.19s call     tests/integration/lib/project/test_project_manager.py::TestProjectManager::test_generate_overview_dirty_source_language_falls_back_to_default[123]
+0.18s call     tests/integration/server/agent_toolset/test_host_consistency.py::test_both_hosts_expose_the_declared_name_schema_and_description[export_jianying_draft]
+0.18s call     tests/integration/server/routers/test_files_router.py::TestFilesRouter::test_upload_rejects_unsafe_name_for_every_type
+0.17s call     tests/integration/server/test_remote_mcp.py::test_remote_mcp_text_generation_and_script_patch_return_structured_content
+0.17s call     tests/integration/lib/project/test_project_manager.py::TestProjectManager::test_generate_overview_dirty_source_language_falls_back_to_default[dirty_source_language2]
+0.16s call     tests/integration/server/routers/test_files_router.py::TestSourceMultiFormatUpload::test_upload_source_rejects_oversized_upload_by_content_length
+0.16s call     tests/integration/server/routers/test_files_router.py::TestFilesRouter::test_bgm_upload_registers_the_track_and_lists_it_for_playback
+0.15s call     tests/integration/server/routers/test_files_router.py::TestPublicFileRouteServesMediaOnly::test_media_file_is_served_with_nosniff[end_frames/scene_E1S01.png]
+0.15s call     tests/integration/server/test_reference_upload_transaction.py::test_native_deletion_after_mcp_precheck_refuses_without_orphan
+0.15s setup    tests/integration/server/test_workflow_access.py::test_settings_persist_and_invalid_settings_leave_project_unchanged
+1367 passed, 1 warning in 57.35s

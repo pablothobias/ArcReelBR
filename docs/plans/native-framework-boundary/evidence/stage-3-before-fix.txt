@@ -1,0 +1,159 @@
+FFF..F                                                                   [100%]
+=================================== FAILURES ===================================
+________ test_cost_consultation_adopts_legacy_in_memory_without_writes _________
+
+access = (<lib.project.project_manager.ProjectManager object at 0x11fc4a450>, <function access.<locals>.call at 0x11ff41580>)
+
+    async def test_cost_consultation_adopts_legacy_in_memory_without_writes(access):
+        pm, call = access
+        script = _write_legacy_reference_episode(pm)
+        project = pm.get_project_path("demo") / "project.json"
+        before = script.read_bytes(), project.read_bytes()
+        legacy = await call("get_project_costs")
+        assert legacy.problem is None
+>       assert (script.read_bytes(), project.read_bytes()) == before
+E       assert (b'{\n  "epis...water": 1\n}') == (b'{"episode"...water": 1\n}')
+E
+E         At index 0 diff: b'{\n  "episode": 1,\n  "content_mode": "drama",\n  "video_units": [\n    {\n      "unit_id": "E1U01",\n      "text": "Ana diz: \\"Ol\xc3\xa1, Ana!\\"",\n      "duration_seconds": 8,\n      "shots": [\n        {\n          "text": "Ol\xc3\xa1, Ana!"\n        }\n      ]\n    }\n  ]\n}' != b'{"episode": 1, "content_mode": "drama", "video_units": [{"unit_id": "E1U01", "text": "Ana diz: \\"Ol\xc3\xa1, Ana!\\"", "duration_seconds": 8, "duration_override": false, "shots": [{"text": "Ol\xc3\xa1, Ana!", "duration": 8}]}]}'
+E         Use -v to get more diff
+
+tests/integration/server/test_workflow_access.py:244: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-09 14:55:38 [WARNING] server.app: frontend/dist/index.html 不存在，跳过前端页面挂载（API 不受影响）
+------------------------------ Captured log setup ------------------------------
+WARNING  server.app:app.py:1003 frontend/dist/index.html 不存在，跳过前端页面挂载（API 不受影响）
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 14:55:38 [WARNING] lib.script.grid.grid_resolution: 取不到 T2I 图像分辨率档，宫格门控按未配置收紧、计价按保底档: 未找到可用的 image 供应商。请在「全局设置 → 供应商」页面配置至少一个供应商。
+2026-11-09 14:55:38 [INFO] lib.config.resolver: 视频能力解析失败（unknown/unknown），计价 generate_audio 降级到 provider 级规则与请求值：provider not in PROVIDER_REGISTRY: unknown
+2026-11-09 14:55:38 [INFO] lib.config.resolver: 视频能力解析失败（unknown/unknown），计价 generate_audio 降级到 provider 级规则与请求值：provider not in PROVIDER_REGISTRY: unknown
+------------------------------ Captured log call -------------------------------
+WARNING  lib.script.grid.grid_resolution:grid_resolution.py:29 取不到 T2I 图像分辨率档，宫格门控按未配置收紧、计价按保底档: 未找到可用的 image 供应商。请在「全局设置 → 供应商」页面配置至少一个供应商。
+INFO     lib.config.resolver:resolver.py:1096 视频能力解析失败（unknown/unknown），计价 generate_audio 降级到 provider 级规则与请求值：provider not in PROVIDER_REGISTRY: unknown
+INFO     lib.config.resolver:resolver.py:1096 视频能力解析失败（unknown/unknown），计价 generate_audio 降级到 provider 级规则与请求值：provider not in PROVIDER_REGISTRY: unknown
+__________ test_cancelled_cost_reader_cannot_persist_a_late_migration __________
+
+access = (<lib.project.project_manager.ProjectManager object at 0x11faac170>, <function access.<locals>.call at 0x11f067420>)
+file_db_factory = async_sessionmaker(class_='AsyncSession', bind=<sqlalchemy.ext.asyncio.engine.AsyncEngine object at 0x11f3dc7d0>, autoflush=True, expire_on_commit=False)
+
+    async def test_cancelled_cost_reader_cannot_persist_a_late_migration(access, file_db_factory):
+        from lib.project.project_manager import ProjectManager
+        from server.media_tools.workflow_access import get_project_costs
+        from server.tool_runtime import NoArguments, ToolRequest
+
+        pm, _ = access
+        script = _write_legacy_reference_episode(pm)
+        before = script.read_bytes()
+        entered, release, completed = threading.Event(), threading.Event(), threading.Event()
+
+        class PausedProjectManager(ProjectManager):
+            def observe(self, reader, *args):
+                entered.set()
+                assert release.wait(5), "Reader was not released"
+                try:
+                    return reader(*args)
+                finally:
+                    completed.set()
+
+            def load_script(self, *args):
+                return self.observe(super().load_script, *args)
+
+            def load_script_readonly(self, *args):
+                return self.observe(super().load_script_readonly, *args)
+
+        observed = PausedProjectManager(pm.data_root)
+        services = Services(projects=observed, workflow_planner=None, capabilities=ConfigResolver(file_db_factory),
+                            sessions=file_db_factory, queue=GenerationQueue(session_factory=file_db_factory, project_manager=observed))
+        task = asyncio.create_task(get_project_costs(ToolRequest(NoArguments()), ProjectScope("demo", pm.data_root),
+                                                   CallerContext("test", "mcp"), services))
+        try:
+            assert await asyncio.to_thread(entered.wait, 5)
+            task.cancel()
+            with pytest.raises(asyncio.CancelledError):
+                await task
+            release.set()
+            assert await asyncio.to_thread(completed.wait, 5)
+>           assert script.read_bytes() == before
+E           assert b'{\n  "episo...    }\n  ]\n}' == b'{"episode":...tion": 8}]}]}'
+E
+E             At index 1 diff: b'\n' != b'"'
+E             Use -v to get more diff
+
+tests/integration/server/test_workflow_access.py:294: AssertionError
+_ test_storyboard_edit_preview_preserves_legacy_but_real_edit_still_adopts[True] _
+
+access = (<lib.project.project_manager.ProjectManager object at 0x11f170f20>, <function access.<locals>.call at 0x11f050d60>)
+file_db_factory = async_sessionmaker(class_='AsyncSession', bind=<sqlalchemy.ext.asyncio.engine.AsyncEngine object at 0x11f3319d0>, autoflush=True, expire_on_commit=False)
+preview = True
+
+    @pytest.mark.parametrize("preview", [True, False])
+    async def test_storyboard_edit_preview_preserves_legacy_but_real_edit_still_adopts(access, file_db_factory, preview):
+        from server.media_tools.image_edits import EditImagesRequest, edit_images
+        from server.tool_runtime import ToolRequest
+
+        pm, _ = access
+        script = _write_legacy_reference_episode(pm)
+        before = script.read_bytes()
+        queue = GenerationQueue(session_factory=file_db_factory, project_manager=pm)
+        services = Services(projects=pm, workflow_planner=None, capabilities=ConfigResolver(file_db_factory),
+                            sessions=file_db_factory, queue=queue)
+        result = await edit_images(
+            ToolRequest(EditImagesRequest(resource_type="storyboard", script_file="episode_1.json",
+                        edits=[{"id": "E1U01", "instruction": "Preserve Portuguese speech"}], preview=preview)),
+            ProjectScope("demo", pm.data_root), CallerContext("test", "mcp"), services,
+        )
+        assert result.problem is None
+        if preview:
+>           assert script.read_bytes() == before
+E           assert b'{\n  "episo...    }\n  ]\n}' == b'{"episode":...tion": 8}]}]}'
+E
+E             At index 1 diff: b'\n' != b'"'
+E             Use -v to get more diff
+
+tests/integration/server/test_workflow_access.py:318: AssertionError
+____ test_storyboard_quote_refusal_never_adopts_a_legacy_script[storyboard] ____
+
+access = (<lib.project.project_manager.ProjectManager object at 0x11f0e8b30>, <function access.<locals>.call at 0x11f042c00>)
+generation_mode = 'storyboard'
+
+    @pytest.mark.parametrize("generation_mode", ["reference_video", "storyboard"])
+    async def test_storyboard_quote_refusal_never_adopts_a_legacy_script(access, generation_mode):
+        pm, call = access
+        script = _write_legacy_reference_episode(pm, generation_mode=generation_mode)
+        before = script.read_bytes()
+        result = await call("quote_storyboards", episode_id=1)
+        assert result.problem is not None
+        assert result.problem.code == "quote_unavailable"
+>       assert script.read_bytes() == before
+E       assert b'{\n  "episo...    }\n  ]\n}' == b'{"episode":...tion": 8}]}]}'
+E
+E         At index 1 diff: b'\n' != b'"'
+E         Use -v to get more diff
+
+tests/integration/server/test_workflow_access.py:333: AssertionError
+=============================== warnings summary ===============================
+tests/integration/server/test_workflow_access.py::test_cost_consultation_adopts_legacy_in_memory_without_writes
+  /Users/pablo.carminatti.br/.local/share/uv/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/contextlib.py:144: SAWarning: Skipped unsupported reflection of expression-based index idx_tasks_dedupe_active
+    next(self.gen)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 25 durations =============================
+1.33s setup    tests/integration/server/test_workflow_access.py::test_cost_consultation_adopts_legacy_in_memory_without_writes
+0.24s call     tests/integration/server/test_workflow_access.py::test_cost_consultation_adopts_legacy_in_memory_without_writes
+0.11s setup    tests/integration/server/test_workflow_access.py::test_cancelled_cost_reader_cannot_persist_a_late_migration
+0.09s setup    tests/integration/server/test_workflow_access.py::test_storyboard_edit_preview_preserves_legacy_but_real_edit_still_adopts[False]
+0.08s setup    tests/integration/server/test_workflow_access.py::test_storyboard_edit_preview_preserves_legacy_but_real_edit_still_adopts[True]
+0.08s setup    tests/integration/server/test_workflow_access.py::test_storyboard_quote_refusal_never_adopts_a_legacy_script[storyboard]
+0.08s setup    tests/integration/server/test_workflow_access.py::test_storyboard_quote_refusal_never_adopts_a_legacy_script[reference_video]
+0.05s call     tests/integration/server/test_workflow_access.py::test_storyboard_edit_preview_preserves_legacy_but_real_edit_still_adopts[False]
+0.02s call     tests/integration/server/test_workflow_access.py::test_storyboard_edit_preview_preserves_legacy_but_real_edit_still_adopts[True]
+0.02s call     tests/integration/server/test_workflow_access.py::test_cancelled_cost_reader_cannot_persist_a_late_migration
+0.01s call     tests/integration/server/test_workflow_access.py::test_storyboard_quote_refusal_never_adopts_a_legacy_script[storyboard]
+0.01s call     tests/integration/server/test_workflow_access.py::test_storyboard_quote_refusal_never_adopts_a_legacy_script[reference_video]
+
+(6 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/integration/server/test_workflow_access.py::test_cost_consultation_adopts_legacy_in_memory_without_writes
+FAILED tests/integration/server/test_workflow_access.py::test_cancelled_cost_reader_cannot_persist_a_late_migration
+FAILED tests/integration/server/test_workflow_access.py::test_storyboard_edit_preview_preserves_legacy_but_real_edit_still_adopts[True]
+FAILED tests/integration/server/test_workflow_access.py::test_storyboard_quote_refusal_never_adopts_a_legacy_script[storyboard]
+4 failed, 2 passed, 15 deselected, 1 warning in 9.65s

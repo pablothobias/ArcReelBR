@@ -1,0 +1,16 @@
+....                                                                     [100%]
+=============================== warnings summary ===============================
+tests/integration/server/media_tools/test_speech_review.py::test_inspection_materializes_and_preserves_eligible_timing[False-False]
+  /Users/pablo.carminatti.br/.local/share/uv/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/contextlib.py:144: SAWarning: Skipped unsupported reflection of expression-based index idx_tasks_dedupe_active
+    next(self.gen)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 25 durations =============================
+1.30s setup    tests/integration/server/media_tools/test_speech_review.py::test_inspection_materializes_and_preserves_eligible_timing[False-False]
+0.71s call     tests/integration/server/media_tools/test_speech_review.py::test_inspection_materializes_and_preserves_eligible_timing[True-True]
+0.56s call     tests/integration/server/media_tools/test_speech_review.py::test_inspection_materializes_and_preserves_eligible_timing[False-True]
+0.47s call     tests/integration/server/media_tools/test_speech_review.py::test_inspection_materializes_and_preserves_eligible_timing[True-False]
+0.41s call     tests/integration/server/media_tools/test_speech_review.py::test_inspection_materializes_and_preserves_eligible_timing[False-False]
+
+(7 durations < 0.005s hidden.  Use -vv to show these durations.)
+4 passed, 2 deselected, 1 warning in 3.63s

@@ -1,0 +1,50 @@
+........................................................................ [  6%]
+........................................................................ [ 12%]
+........................................................................ [ 18%]
+........................................................................ [ 24%]
+........................................................................ [ 30%]
+........................................................................ [ 36%]
+........................................................................ [ 42%]
+........................................................................ [ 48%]
+........................................................................ [ 55%]
+........................................................................ [ 61%]
+........................................................................ [ 67%]
+........................................................................ [ 73%]
+........................................................................ [ 79%]
+........................................................................ [ 85%]
+........................................................................ [ 91%]
+........................................................................ [ 97%]
+..........................                                               [100%]
+=============================== warnings summary ===============================
+tests/unit/lib/agent/test_profile_manifest.py::test_enumerate_profile_files_includes_top_md_and_claude_tree
+  /Users/pablo.carminatti.br/.local/share/uv/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/contextlib.py:144: SAWarning: Skipped unsupported reflection of expression-based index idx_tasks_dedupe_active
+    next(self.gen)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 25 durations =============================
+1.17s call     tests/integration/server/test_remote_mcp.py::test_text_task_is_shared_by_remote_and_embedded_hosts_and_running_member_is_not_cancellable
+1.10s setup    tests/unit/lib/agent/test_profile_manifest.py::test_enumerate_profile_files_includes_top_md_and_claude_tree
+0.36s call     tests/integration/server/agent_toolset/test_host_consistency.py::test_contact_sheets_reach_both_hosts_as_the_same_image_blocks
+0.24s call     tests/integration/server/test_remote_mcp.py::test_remote_inspect_video_units_returns_contact_sheets_as_image_content
+0.21s setup    tests/integration/server/test_remote_mcp.py::test_remote_mcp_text_generation_and_script_patch_return_structured_content
+0.17s call     tests/integration/server/agent_toolset/test_host_consistency.py::test_both_hosts_expose_the_declared_name_schema_and_description[merge_asset]
+0.16s call     tests/integration/server/agent_toolset/test_host_consistency.py::test_both_hosts_expose_the_declared_name_schema_and_description[list_pending_assets]
+0.15s call     tests/integration/server/media_tools/test_speech_review.py::test_review_applies_timing_and_keeps_evidence_through_native_reader
+0.13s call     tests/integration/server/agent_toolset/test_host_consistency.py::test_remote_project_locating_failures_are_invalid_project[missing-inspect_video_units]
+0.12s call     tests/integration/server/test_remote_mcp.py::test_remote_api_keys_share_the_persisted_single_operator_owner
+0.11s call     tests/integration/server/agent_toolset/test_host_consistency.py::test_embedded_content_carries_the_same_json_as_remote_structured_content[get_effective_configuration]
+0.10s call     tests/integration/server/agent_toolset/test_host_consistency.py::test_patch_episode_script_reports_a_missing_script_as_script_not_found_in_both_hosts
+0.10s call     tests/integration/server/test_remote_mcp.py::test_remote_mcp_text_generation_and_script_patch_return_structured_content
+0.09s setup    tests/integration/server/test_remote_mcp.py::test_remote_batch_submission_reads_migration_verdict_from_fixture_root
+0.09s setup    tests/integration/server/test_remote_mcp.py::test_remote_api_keys_share_the_persisted_single_operator_owner
+0.09s call     tests/integration/server/test_remote_mcp.py::test_remote_mcp_host_initializes_first_request_and_can_restart
+0.09s setup    tests/integration/server/test_remote_mcp.py::test_remote_media_runtime_validates_shared_schema_and_forwards_nested_instruction
+0.08s setup    tests/integration/server/test_remote_mcp.py::test_remote_media_submission_returns_complete_durable_batch_and_dedupes
+0.08s call     tests/integration/server/test_remote_mcp.py::test_remote_mcp_returns_typed_workflow_plan_and_rejects_bad_project
+0.08s call     tests/integration/server/test_remote_mcp.py::test_remote_media_submission_returns_complete_durable_batch_and_dedupes
+0.08s setup    tests/integration/server/test_workflow_access.py::test_effective_configuration_and_unpriced_quote_are_read_only
+0.08s setup    tests/integration/server/test_workflow_access.py::test_reference_rejects_unsafe_or_unconfirmed_input_without_writes[overrides3]
+0.07s call     tests/integration/server/agent_toolset/test_host_consistency.py::test_embedded_content_carries_the_same_json_as_remote_structured_content[upload_source]
+0.07s setup    tests/integration/server/test_workflow_access.py::test_reference_rejects_unsafe_or_unconfirmed_input_without_writes[overrides4]
+0.07s setup    tests/integration/server/test_workflow_access.py::test_settings_persist_and_invalid_settings_leave_project_unchanged
+1178 passed, 1 warning in 29.72s

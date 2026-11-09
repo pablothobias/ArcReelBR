@@ -15,7 +15,7 @@ from lib.db.repositories.usage_repo import UsageRepository
 from lib.i18n import _
 from lib.infra.api_errors import ApiError
 from server.media_tools.assets import GenerateAssetsRequest
-from server.routers.projects import UpdateProjectRequest, update_project_settings
+from server.routers.projects import ProjectSettingsRequest, UpdateProjectRequest, update_project_settings
 from server.services.admission.asset_sheet_batch import AssetSheetScope, load_asset_sheet_batch_plan
 from server.services.admission.cost_estimation import CostEstimationService, estimate_image_batch_cost
 from server.services.admission.storyboard_batch import load_storyboard_image_batch_plan
@@ -31,8 +31,8 @@ from server.tool_runtime import (
 )
 
 
-class ConfigureProjectRequest(UpdateProjectRequest):
-    """Only explicitly supplied fields change; use the same contract as project Settings."""
+class ConfigureProjectRequest(ProjectSettingsRequest):
+    """Automated settings updates exclude user-only controls and reject unknown fields."""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -46,8 +46,10 @@ async def configure_project(
     request: ToolRequest[ConfigureProjectRequest], scope: ProjectScope, caller: CallerContext, services: Services
 ) -> ToolOutcome[dict[str, Any]]:
     try:
+        validated = ConfigureProjectRequest.model_validate(request.value.model_dump(exclude_unset=True))
+        settings = UpdateProjectRequest.model_validate(validated.model_dump(exclude_unset=True))
         value = await update_project_settings(
-            scope.project_name, request.value, _, manager=services.projects, source="worker"
+            scope.project_name, settings, _, manager=services.projects, source="worker"
         )
         return ToolOutcome(value=value)
     except (HTTPException, ApiError, ValueError) as exc:
@@ -101,6 +103,7 @@ async def quote_storyboards(
             project_name=scope.project_name,
             episode_id=request.value.episode_id,
             user_id=caller.user_id,
+            persist_legacy_migrations=False,
         )
         ids = plan.new_task_ids
         quote = await estimate_image_batch_cost(
@@ -131,7 +134,7 @@ async def get_project_costs(
             filename = episode.get("script_file")
             if filename:
                 try:
-                    scripts[filename] = services.projects.load_script(scope.project_name, filename)
+                    scripts[filename] = services.projects.load_script_readonly(scope.project_name, filename)
                 except FileNotFoundError:
                     continue
         return project, scripts, services.projects.get_project_path(scope.project_name)

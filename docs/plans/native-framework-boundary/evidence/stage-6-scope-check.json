@@ -1,0 +1,17 @@
+{
+  "protected_tracked_files_checked": 4711,
+  "protected_changes": [],
+  "stage6_changed_paths": [
+    "server/media_tools/speech_review.py",
+    "server/agent_toolset/speech_review.py",
+    "tests/integration/server/media_tools/test_speech_review.py",
+    "docs/testing/native-speech-review.md",
+    "docs/testing/native-mcp-production.md",
+    "public/agent-installation-guide.md",
+    "agent_runtime_profile/.claude/skills/edit-video/SKILL.md"
+  ],
+  "speech_handler_ast_unchanged": true,
+  "request_schema_semantics_unchanged_except_apply_timing_description": true,
+  "stage7_started": false,
+  "scope": "Contract descriptions, documentation and isolated tests; no materialization/auth/config implementation change."
+}

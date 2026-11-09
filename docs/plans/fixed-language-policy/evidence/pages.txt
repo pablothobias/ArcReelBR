@@ -1,0 +1,263 @@
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies", "pnpm.overrides". See https://pnpm.io/settings for the new home of each setting.
+[WebServer] (node:91344) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:91362) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+[WebServer]   - `__dirname` (vite.config.ts:9:36). Use `import.meta.dirname` instead
+[WebServer] Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+[WebServer] [plugin builtin:vite-reporter]
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] (node:91386) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:91407) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+[WebServer]   - `__dirname` (vite.config.ts:9:36). Use `import.meta.dirname` instead
+[WebServer] Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+Running 11 tests using 2 workers
+
+(node:91471) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:91472) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [1440x900] › e2e/regions/language-policy.spec.ts:10:5 › fresh zh-CN browser › loads English metadata and UI and sends English login requests (628ms)
+  ✓   2 [1440x900] › e2e/regions/language-policy.spec.ts:10:5 › fresh vi-VN browser › loads English metadata and UI and sends English login requests (627ms)
+  ✓   4 [1440x900] › e2e/regions/language-policy.spec.ts:10:5 › fresh pt-BR browser › loads English metadata and UI and sends English login requests (515ms)
+  ✓   3 [1440x900] › e2e/regions/language-policy.spec.ts:10:5 › fresh ru-RU browser › loads English metadata and UI and sends English login requests (518ms)
+  ✓   6 [1440x900] › e2e/regions/language-policy.spec.ts:33:3 › retains saved en-US with normalized document language (581ms)
+  ✘   5 [1440x900] › e2e/regions/language-policy.spec.ts:33:3 › retains saved zh-Hant-TW with normalized document language (5.5s)
+(node:91672) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   7 [1440x900] › e2e/regions/language-policy.spec.ts:33:3 › retains saved vi-VN with normalized document language (5.5s)
+(node:91678) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   8 [1440x900] › e2e/regions/language-policy.spec.ts:33:3 › retains saved ru-RU with normalized document language (5.5s)
+(node:91909) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   9 [1440x900] › e2e/regions/language-policy.spec.ts:42:3 › retains a supported cookie preference after unsupported local storage (5.4s)
+(node:91910) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  10 [1440x900] › e2e/regions/language-policy.spec.ts:42:3 › retains a supported sessionStorage preference after unsupported local storage (5.6s)
+  ✘  11 [1440x900] › e2e/regions/language-policy.spec.ts:54:1 › updates document language and persisted preference after an explicit UI selection (30.2s)
+
+
+  1) [1440x900] › e2e/regions/language-policy.spec.ts:33:3 › retains saved zh-Hant-TW with normalized document language
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('button', { name: '登录', exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('button', { name: '登录', exact: true }) with timeout 5000ms
+      - waiting for getByRole('button', { name: '登录', exact: true })
+
+
+      34 |     await page.addInitScript((value) => localStorage.setItem('i18nextLng', value), saved);
+      35 |     await page.goto('/login');
+    > 36 |     await expect(page.getByRole('button', { name: login, exact: true })).toBeVisible();
+         |                                                                          ^
+      37 |     await expect(page.locator('html')).toHaveAttribute('lang', language);
+      38 |   });
+      39 | }
+        at /Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/frontend/e2e/regions/language-policy.spec.ts:36:74
+
+    Error Context: test-results/regions-language-policy-re-7cfa0-ormalized-document-language-1440x900/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/regions-language-policy-re-7cfa0-ormalized-document-language-1440x900/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/regions-language-policy-re-7cfa0-ormalized-document-language-1440x900/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [1440x900] › e2e/regions/language-policy.spec.ts:33:3 › retains saved vi-VN with normalized document language
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('button', { name: 'Đăng nhập', exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('button', { name: 'Đăng nhập', exact: true }) with timeout 5000ms
+      - waiting for getByRole('button', { name: 'Đăng nhập', exact: true })
+
+
+      34 |     await page.addInitScript((value) => localStorage.setItem('i18nextLng', value), saved);
+      35 |     await page.goto('/login');
+    > 36 |     await expect(page.getByRole('button', { name: login, exact: true })).toBeVisible();
+         |                                                                          ^
+      37 |     await expect(page.locator('html')).toHaveAttribute('lang', language);
+      38 |   });
+      39 | }
+        at /Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/frontend/e2e/regions/language-policy.spec.ts:36:74
+
+    Error Context: test-results/regions-language-policy-re-5519d-ormalized-document-language-1440x900/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/regions-language-policy-re-5519d-ormalized-document-language-1440x900/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/regions-language-policy-re-5519d-ormalized-document-language-1440x900/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [1440x900] › e2e/regions/language-policy.spec.ts:33:3 › retains saved ru-RU with normalized document language
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('button', { name: 'Войти', exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('button', { name: 'Войти', exact: true }) with timeout 5000ms
+      - waiting for getByRole('button', { name: 'Войти', exact: true })
+
+
+      34 |     await page.addInitScript((value) => localStorage.setItem('i18nextLng', value), saved);
+      35 |     await page.goto('/login');
+    > 36 |     await expect(page.getByRole('button', { name: login, exact: true })).toBeVisible();
+         |                                                                          ^
+      37 |     await expect(page.locator('html')).toHaveAttribute('lang', language);
+      38 |   });
+      39 | }
+        at /Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/frontend/e2e/regions/language-policy.spec.ts:36:74
+
+    Error Context: test-results/regions-language-policy-re-91172-ormalized-document-language-1440x900/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/regions-language-policy-re-91172-ormalized-document-language-1440x900/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/regions-language-policy-re-91172-ormalized-document-language-1440x900/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [1440x900] › e2e/regions/language-policy.spec.ts:42:3 › retains a supported cookie preference after unsupported local storage
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('button', { name: 'Войти', exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('button', { name: 'Войти', exact: true }) with timeout 5000ms
+      - waiting for getByRole('button', { name: 'Войти', exact: true })
+
+
+      47 |     }, source);
+      48 |     await page.goto('/login');
+    > 49 |     await expect(page.getByRole('button', { name: 'Войти', exact: true })).toBeVisible();
+         |                                                                            ^
+      50 |     await expect(page.locator('html')).toHaveAttribute('lang', 'ru');
+      51 |   });
+      52 | }
+        at /Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/frontend/e2e/regions/language-policy.spec.ts:49:76
+
+    Error Context: test-results/regions-language-policy-re-7da8e-r-unsupported-local-storage-1440x900/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/regions-language-policy-re-7da8e-r-unsupported-local-storage-1440x900/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/regions-language-policy-re-7da8e-r-unsupported-local-storage-1440x900/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [1440x900] › e2e/regions/language-policy.spec.ts:42:3 › retains a supported sessionStorage preference after unsupported local storage
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('button', { name: 'Войти', exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('button', { name: 'Войти', exact: true }) with timeout 5000ms
+      - waiting for getByRole('button', { name: 'Войти', exact: true })
+
+
+      47 |     }, source);
+      48 |     await page.goto('/login');
+    > 49 |     await expect(page.getByRole('button', { name: 'Login', exact: true })).toBeVisible();
+         |                                                                            ^
+      50 |     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+      51 |   });
+      52 | }
+        at /Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/frontend/e2e/regions/language-policy.spec.ts:49:76
+
+    Error Context: test-results/regions-language-policy-re-9990a-r-unsupported-local-storage-1440x900/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/regions-language-policy-re-9990a-r-unsupported-local-storage-1440x900/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/regions-language-policy-re-9990a-r-unsupported-local-storage-1440x900/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [1440x900] › e2e/regions/language-policy.spec.ts:54:1 › updates document language and persisted preference after an explicit UI selection
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('combobox', { name: 'Interface language', exact: true })
+        - locator resolved to <button disabled type="button" tabindex="-1" role="combobox" data-disabled="" id="base-ui-_r_a_" data-size="default" aria-expanded="false" aria-haspopup="listbox" aria-labelledby="_r_8_" data-slot="select-trigger" class="flex items-center justify-between gap-1.5 rounded-lg border border-input bg-transparent py-2 pr-2 pl-2.5 text-sm whitespace-nowrap transition-colors outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:…>…</button>
+      - attempting click action
+        2 × waiting for element to be visible, enabled and stable
+          - element is not enabled
+        - retrying click action
+        - waiting 20ms
+        2 × waiting for element to be visible, enabled and stable
+          - element is not enabled
+        - retrying click action
+          - waiting 100ms
+        56 × waiting for element to be visible, enabled and stable
+           - element is not enabled
+         - retrying click action
+           - waiting 500ms
+
+
+      56 |   await page.goto('/app/settings?section=general');
+      57 |   const language = page.getByRole('combobox', { name: 'Interface language', exact: true });
+    > 58 |   await expect(language).toBeDisabled();
+         |                  ^
+      59 |   await expect(language).toContainText('English');
+      60 |   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+      61 |   await page.reload();
+        at /Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/frontend/e2e/regions/language-policy.spec.ts:58:18
+
+    Error Context: test-results/regions-language-policy-up-5d655-er-an-explicit-UI-selection-1440x900/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/regions-language-policy-up-5d655-er-an-explicit-UI-selection-1440x900/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/regions-language-policy-up-5d655-er-an-explicit-UI-selection-1440x900/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6 failed
+    [1440x900] › e2e/regions/language-policy.spec.ts:33:3 › retains saved zh-Hant-TW with normalized document language
+    [1440x900] › e2e/regions/language-policy.spec.ts:33:3 › retains saved vi-VN with normalized document language
+    [1440x900] › e2e/regions/language-policy.spec.ts:33:3 › retains saved ru-RU with normalized document language
+    [1440x900] › e2e/regions/language-policy.spec.ts:42:3 › retains a supported cookie preference after unsupported local storage
+    [1440x900] › e2e/regions/language-policy.spec.ts:42:3 › retains a supported sessionStorage preference after unsupported local storage
+    [1440x900] › e2e/regions/language-policy.spec.ts:54:1 › updates document language and persisted preference after an explicit UI selection
+  5 passed (49.5s)

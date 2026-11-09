@@ -1,0 +1,44 @@
+{
+  "allowed_paths": [
+    "server/routers/projects.py",
+    "server/media_tools/workflow_access.py",
+    "server/agent_toolset/remote.py",
+    "server/agent_toolset/workflow_access.py",
+    "tests/integration/server/test_workflow_access.py",
+    "tests/integration/server/agent_toolset/test_host_consistency.py",
+    "tests/integration/server/media_tools/test_image_edits.py",
+    "docs/testing/native-mcp-production.md",
+    "public/agent-installation-guide.md"
+  ],
+  "initial_status": [
+    " D .agents/skills/direct-brazilian-production/SKILL.md",
+    " D .agents/skills/direct-brazilian-production/references/recovery-format.md",
+    " D .agents/skills/direct-brazilian-production/scripts/policy.py",
+    " M agent_runtime_profile/.claude/skills/edit-video/SKILL.md",
+    " M agent_runtime_profile/.claude/skills/generate-assets/SKILL.md",
+    " M agent_runtime_profile/CLAUDE.ad.md",
+    " M agent_runtime_profile/CLAUDE.drama.md",
+    " M agent_runtime_profile/CLAUDE.narration.md",
+    " M server/agent_toolset/workflow_access.py",
+    " D tests/integration/skills/test_direct_brazilian_policy_cli.py",
+    " D tests/unit/skills/test_direct_brazilian_policy.py",
+    "?? docs/audits/",
+    "?? docs/plans/native-framework-boundary/"
+  ],
+  "protected_tracked_files": 4709,
+  "before_hashes": {
+    "server/routers/projects.py": "f485fbbf6e0b6aaaa41d3095e609a46199a006305ab77837f475128d50ab9e12",
+    "server/media_tools/workflow_access.py": "5b9c928351236865e395c1dd980ca85954838479bee35c172ff1fad863e87cad",
+    "server/agent_toolset/remote.py": "0180aac28d1a6219ffade98123e474a3e790bec176d4c665562b07c785aa149f",
+    "server/agent_toolset/workflow_access.py": "370caa5e9444c6137104a2e35f87f4802edc76f56b8c9e28e65193887fe3518c",
+    "tests/integration/server/test_workflow_access.py": "f9a417817119172d97210cb8797113e952c737c919bb3c8934ff33f2cd4f4939",
+    "tests/integration/server/agent_toolset/test_host_consistency.py": "2b1b2ca11a35694334d55413ac82ebc622a8c43c73dd9c3ac6770c0c821cab0e",
+    "tests/integration/server/media_tools/test_image_edits.py": "83abaa14ebf756f0551d6cf4f805581d69da54b77914c792e1736b4416421ee8",
+    "docs/testing/native-mcp-production.md": "77727e818814bc6d3978af191ab5eb836719157c65d2608f4540afa3bf50fb85",
+    "public/agent-installation-guide.md": "bfca833230110dfbc55b615bd3a593f99d31b5527df76c9f686e985fa821fc2e"
+  },
+  "documentation_scope": {
+    "docs/testing/native-mcp-production.md": "Document supported Settings fields, conditional batch polling and official direct/session routes.",
+    "public/agent-installation-guide.md": "Document R07/R09; remove a missed W04 blanket quote instruction without changing installation/connection steps."
+  }
+}

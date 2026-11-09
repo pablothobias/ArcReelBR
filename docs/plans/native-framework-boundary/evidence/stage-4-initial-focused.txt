@@ -1,0 +1,55 @@
+.F.........                                                              [100%]
+=================================== FAILURES ===================================
+__________ test_successful_replacement_keeps_native_metadata_and_ptbr __________
+
+reference_project = <lib.project.project_manager.ProjectManager object at 0x11e804ec0>
+
+    async def test_successful_replacement_keeps_native_metadata_and_ptbr(reference_project):
+        pm = reference_project
+        first = await upload(pm, image_bytes("blue"))
+        assert first.problem is None
+        old_path = first.value["path"]
+        second = await upload(pm, image_bytes("red"))
+        assert second.problem is None
+        assert second.value["path"] == old_path
+        project = pm.load_project("demo")
+        assert project["characters"]["Ana"]["reference_image"] == old_path
+        assert project["source_language"] == "pt-BR"
+>       assert "character_sheet" not in project["characters"]["Ana"]
+E       AssertionError: assert 'character_sheet' not in {'description': 'A fictional person', 'character_sheet': '', 'voice_style': '', 'reference_image': 'characters/refs/Ana.png', ...}
+
+tests/integration/server/test_reference_upload_transaction.py:98: AssertionError
+=============================== warnings summary ===============================
+tests/integration/server/test_reference_upload_transaction.py::test_native_deletion_after_mcp_precheck_refuses_without_orphan
+  /Users/pablo.carminatti.br/.local/share/uv/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/contextlib.py:144: SAWarning: Skipped unsupported reflection of expression-based index idx_tasks_dedupe_active
+    next(self.gen)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 25 durations =============================
+1.25s setup    tests/integration/server/test_reference_upload_transaction.py::test_native_deletion_after_mcp_precheck_refuses_without_orphan
+0.03s call     tests/integration/server/test_reference_upload_transaction.py::test_native_deletion_after_mcp_precheck_refuses_without_orphan
+0.03s call     tests/integration/server/test_reference_upload_transaction.py::test_upload_filesystem_failure_rolls_back_bytes_and_pointer[metadata-True]
+0.03s call     tests/integration/server/test_reference_upload_transaction.py::test_upload_filesystem_failure_rolls_back_bytes_and_pointer[install-True]
+0.03s call     tests/integration/server/test_reference_upload_transaction.py::test_two_same_target_uploads_finish_with_one_coherent_reference
+0.02s call     tests/integration/server/test_reference_upload_transaction.py::test_upload_filesystem_failure_rolls_back_bytes_and_pointer[staging-True]
+0.02s call     tests/integration/server/test_reference_upload_transaction.py::test_upload_filesystem_failure_rolls_back_bytes_and_pointer[staging-False]
+0.02s setup    tests/integration/server/test_reference_upload_transaction.py::test_upload_filesystem_failure_rolls_back_bytes_and_pointer[metadata-False]
+0.02s call     tests/integration/server/test_reference_upload_transaction.py::test_cancelled_upload_waits_for_native_commit
+0.02s call     tests/integration/server/test_reference_upload_transaction.py::test_upload_filesystem_failure_rolls_back_bytes_and_pointer[metadata-False]
+0.02s call     tests/integration/server/test_reference_upload_transaction.py::test_upload_filesystem_failure_rolls_back_bytes_and_pointer[install-False]
+0.01s setup    tests/integration/server/test_reference_upload_transaction.py::test_upload_filesystem_failure_rolls_back_bytes_and_pointer[metadata-True]
+0.01s setup    tests/integration/server/test_reference_upload_transaction.py::test_upload_filesystem_failure_rolls_back_bytes_and_pointer[install-True]
+0.01s setup    tests/integration/server/test_reference_upload_transaction.py::test_upload_filesystem_failure_rolls_back_bytes_and_pointer[staging-True]
+0.01s setup    tests/integration/server/test_reference_upload_transaction.py::test_upload_filesystem_failure_rolls_back_bytes_and_pointer[install-False]
+0.01s setup    tests/integration/server/test_reference_upload_transaction.py::test_upload_filesystem_failure_rolls_back_bytes_and_pointer[staging-False]
+0.01s setup    tests/integration/server/test_reference_upload_transaction.py::test_web_reference_upload_keeps_missing_host_semantics
+0.01s setup    tests/integration/server/test_reference_upload_transaction.py::test_cancelled_upload_waits_for_native_commit
+0.01s setup    tests/integration/server/test_reference_upload_transaction.py::test_two_same_target_uploads_finish_with_one_coherent_reference
+0.01s setup    tests/integration/server/test_reference_upload_transaction.py::test_successful_replacement_keeps_native_metadata_and_ptbr
+0.01s call     tests/integration/server/test_reference_upload_transaction.py::test_successful_replacement_keeps_native_metadata_and_ptbr
+0.01s teardown tests/integration/server/test_reference_upload_transaction.py::test_upload_filesystem_failure_rolls_back_bytes_and_pointer[install-True]
+
+(3 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/integration/server/test_reference_upload_transaction.py::test_successful_replacement_keeps_native_metadata_and_ptbr
+1 failed, 10 passed, 1 warning in 1.84s

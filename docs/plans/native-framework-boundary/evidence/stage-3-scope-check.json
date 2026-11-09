@@ -1,0 +1,17 @@
+{
+  "protected_tracked_files_checked": 4710,
+  "protected_changes": [],
+  "stage3_changed_paths": [
+    "server/media_tools/workflow_access.py",
+    "server/media_tools/image_edits.py",
+    "server/services/admission/storyboard_batch.py",
+    "tests/integration/server/test_workflow_access.py",
+    "tests/integration/server/services/admission/test_storyboard_batch.py",
+    "docs/testing/native-mcp-production.md",
+    "public/agent-installation-guide.md"
+  ],
+  "workflow_members_outside_cost_and_quote_unchanged": true,
+  "stage4_upload_and_stage5_auth_untouched": true,
+  "prior_stages_preserved": true,
+  "live_scope": "No live configuration/authentication, production data, provider or model request."
+}

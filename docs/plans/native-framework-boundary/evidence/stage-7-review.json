@@ -1,0 +1,40 @@
+{
+  "baseline": "1df5ee3b89e865c4193e72d5bbddf64d54b42f0e",
+  "review_mode": "Uncommitted diff plus new test files; independent standards and approved-plan review",
+  "reviewers": "Internal Codex gpt-6.1-sol medium fallback because Claude Code reviewer harness unavailable",
+  "standards": {
+    "initial_actionable_findings": 1,
+    "finding": "R12 typed route-conflict guidance was suppressed by the MCP AgentStartupError sanitizer",
+    "rule": "docs/standards/backend.md: Handle exceptions carrying guidance or identity separately before broad catches",
+    "confirmation": "Six real session MCP cases failed before the correction; generic SDK privacy control passed",
+    "resolution": "Relay only SubscriptionRouteConflictError direct typed cause; leave other startup diagnostics sanitized",
+    "remaining_actionable_findings_after_readonly_recheck": 0
+  },
+  "spec": {
+    "actionable_implementation_findings": 0,
+    "evidence_gap": "Launcher/non-launcher boundary coverage needed explicit identification",
+    "resolution": "Existing native option/SDK merge checks plus a new isolated execution of the actual launcher clean() function; full launcher not run"
+  },
+  "active_instruction_scan": {
+    "surfaces": [
+      ".agents",
+      "agent_runtime_profile",
+      "server",
+      "public",
+      "skills",
+      "docs/testing",
+      "AGENTS.md"
+    ],
+    "matches_for_retired_helper_and_specified_prerequisite_phrases": 0,
+    "limitation": "Repository surfaces only, not installed host skills or existing chat context"
+  },
+  "baseline_test_debt": {
+    "cases": [
+      "test_queued_message_reconnect_failures_explain_the_cause[resend_queued_message-/resend]",
+      "test_queued_message_reconnect_failures_explain_the_cause[send_queued_message_now-/send-now]"
+    ],
+    "cause": "Test compares English Web response against default Chinese make_translator expectation",
+    "baseline_reproduced_at": "Main checkout at same HEAD; test and route sources unchanged there",
+    "resolution": "Recorded, not changed; no runtime-language regression inferred"
+  }
+}

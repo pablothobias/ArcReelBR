@@ -1,0 +1,55 @@
+2026-11-09 14:06:36 [WARNING] server.app: frontend/dist/index.html 不存在，跳过前端页面挂载（API 不受影响）
+2026-11-09 14:06:36 [WARNING] lib.script.grid.grid_resolution: 取不到 T2I 图像分辨率档，宫格门控按未配置收紧、计价按保底档: 未找到可用的 image 供应商。请在「全局设置 → 供应商」页面配置至少一个供应商。
+2026-11-09 14:06:36 [INFO] lib.config.resolver: 视频能力解析失败（unknown/unknown），计价 generate_audio 降级到 provider 级规则与请求值：provider not in PROVIDER_REGISTRY: unknown
+2026-11-09 14:06:36 [INFO] lib.config.resolver: 视频能力解析失败（unknown/unknown），计价 generate_audio 降级到 provider 级规则与请求值：provider not in PROVIDER_REGISTRY: unknown
+R10 cost: {'legacy': True, 'stub_cost_compute': False, 'script_changed': True, 'ptBR_preserved': True}
+.2026-11-09 14:06:36 [WARNING] lib.script.grid.grid_resolution: 取不到 T2I 图像分辨率档，宫格门控按未配置收紧、计价按保底档: 未找到可用的 image 供应商。请在「全局设置 → 供应商」页面配置至少一个供应商。
+2026-11-09 14:06:36 [INFO] lib.config.resolver: 视频能力解析失败（unknown/unknown），计价 generate_audio 降级到 provider 级规则与请求值：provider not in PROVIDER_REGISTRY: unknown
+2026-11-09 14:06:36 [INFO] lib.config.resolver: 视频能力解析失败（unknown/unknown），计价 generate_audio 降级到 provider 级规则与请求值：provider not in PROVIDER_REGISTRY: unknown
+R10 cost: {'legacy': False, 'stub_cost_compute': False, 'script_changed': False, 'ptBR_preserved': True}
+.R10 cost: {'legacy': True, 'stub_cost_compute': True, 'script_changed': True, 'ptBR_preserved': True}
+.R10 cost: {'legacy': False, 'stub_cost_compute': True, 'script_changed': False, 'ptBR_preserved': True}
+.R10 cancellation: {'native_transaction_control': False, 'write_completed_after_caller_cancelled': True}
+.R10 cancellation: {'native_transaction_control': True, 'write_completed_after_caller_cancelled': False}
+.R10 storyboard quote: {'mode': 'reference_video', 'rejected': True, 'script_changed': False}
+.R10 storyboard quote: {'mode': 'storyboard', 'rejected': True, 'script_changed': True}
+.R10 edit preview: {'script_changed': True, 'problem': None}
+.R10 speech: {'ASR_available': False, 'created': ['presentations/episode_1/RTFTMDE.use_tts.json', 'subtitles/episode_1/RTFTMDE.use_tts.json'], 'changed': ['.arcreel_artifacts.json'], 'second_call_content_stable': True, 'measured_timing_applied': False}
+.R10 speech: {'ASR_available': True, 'created': ['presentations/episode_1/RTFTMDE.use_tts.json', 'subtitles/episode_1/RTFTMDE.use_tts.json'], 'changed': ['.arcreel_artifacts.json'], 'second_call_content_stable': True, 'measured_timing_applied': False}
+.R11 upload: {'concurrent_native_deletion': False, 'reported_success': True, 'file_exists': True, 'registered_owner': True}
+.R11 upload: {'concurrent_native_deletion': True, 'reported_success': True, 'file_exists': True, 'registered_owner': False}
+.
+=============================== warnings summary ===============================
+tests/integration/server/test_audit_r10_r11_tmp.py::test_r10_cost_read_persistence[False-True]
+  /Users/pablo.carminatti.br/.local/share/uv/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/contextlib.py:144: SAWarning: Skipped unsupported reflection of expression-based index idx_tasks_dedupe_active
+    next(self.gen)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 25 durations =============================
+1.14s setup    tests/integration/server/test_audit_r10_r11_tmp.py::test_r10_cost_read_persistence[False-True]
+0.20s call     tests/integration/server/test_audit_r10_r11_tmp.py::test_r10_speech_inspection_materializes_before_asr[False]
+0.19s call     tests/integration/server/test_audit_r10_r11_tmp.py::test_r10_speech_inspection_materializes_before_asr[True]
+0.08s call     tests/integration/server/test_audit_r10_r11_tmp.py::test_r10_cost_read_persistence[False-True]
+0.08s setup    tests/integration/server/test_audit_r10_r11_tmp.py::test_r10_cost_read_persistence[False-False]
+0.07s setup    tests/integration/server/test_audit_r10_r11_tmp.py::test_r10_storyboard_quote_route_qualification[storyboard]
+0.07s setup    tests/integration/server/test_audit_r10_r11_tmp.py::test_r10_storyboard_quote_route_qualification[reference_video]
+0.07s setup    tests/integration/server/test_audit_r10_r11_tmp.py::test_r11_upload_with_native_concurrent_deletion[True]
+0.07s setup    tests/integration/server/test_audit_r10_r11_tmp.py::test_r11_upload_with_native_concurrent_deletion[False]
+0.07s setup    tests/integration/server/test_audit_r10_r11_tmp.py::test_r10_cost_read_persistence[True-True]
+0.07s setup    tests/integration/server/test_audit_r10_r11_tmp.py::test_r10_cancelled_cost_reader[True]
+0.06s setup    tests/integration/server/test_audit_r10_r11_tmp.py::test_r10_cost_read_persistence[True-False]
+0.06s setup    tests/integration/server/test_audit_r10_r11_tmp.py::test_r10_storyboard_preview_migrates_before_return
+0.06s setup    tests/integration/server/test_audit_r10_r11_tmp.py::test_r10_cancelled_cost_reader[False]
+0.06s call     tests/integration/server/test_audit_r10_r11_tmp.py::test_r10_cost_read_persistence[False-False]
+0.02s call     tests/integration/server/test_audit_r10_r11_tmp.py::test_r10_storyboard_quote_route_qualification[storyboard]
+0.02s call     tests/integration/server/test_audit_r10_r11_tmp.py::test_r10_storyboard_quote_route_qualification[reference_video]
+0.02s call     tests/integration/server/test_audit_r10_r11_tmp.py::test_r10_cost_read_persistence[True-False]
+0.02s call     tests/integration/server/test_audit_r10_r11_tmp.py::test_r10_cost_read_persistence[True-True]
+0.01s call     tests/integration/server/test_audit_r10_r11_tmp.py::test_r10_storyboard_preview_migrates_before_return
+0.01s call     tests/integration/server/test_audit_r10_r11_tmp.py::test_r10_cancelled_cost_reader[False]
+0.01s call     tests/integration/server/test_audit_r10_r11_tmp.py::test_r10_cancelled_cost_reader[True]
+0.01s call     tests/integration/server/test_audit_r10_r11_tmp.py::test_r11_upload_with_native_concurrent_deletion[False]
+0.01s call     tests/integration/server/test_audit_r10_r11_tmp.py::test_r11_upload_with_native_concurrent_deletion[True]
+
+(1 durations < 0.005s hidden.  Use -vv to show these durations.)
+13 passed, 1 warning in 2.79s

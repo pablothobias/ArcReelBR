@@ -12,11 +12,12 @@ from mcp import ClientSession
 from mcp.client.streamable_http import streamable_http_client
 
 from lib import PROJECT_ROOT
+from lib.config.env_keys import CLAUDE_CLOUD_ROUTE_ENV_KEYS
 from server.agent_runtime.event_log import EventLogService, EventLogStore
 from server.agent_runtime.service import AssistantService
 from server.agent_runtime.session_store import SessionMetaStore
 from server.remote_mcp import ArcApiKeyVerifier, build_remote_mcp_server, mount_remote_mcp
-from tests.fakes import FakeSDKClient, system_frame
+from tests.fakes import FakeSDKClient, bind_session_factory, system_frame
 
 
 @pytest.fixture
@@ -188,3 +189,56 @@ async def test_session_discovery_and_native_queue_withdrawal(session_bridge):
         assert deleted.structuredContent["outcome"] == "withdrawn"
         snapshot = await session.call_tool("get_agent_session", args)
         assert snapshot.structuredContent["queued_messages"] == []
+
+
+@pytest.mark.parametrize("flag", CLAUDE_CLOUD_ROUTE_ENV_KEYS)
+async def test_session_bridge_relays_safe_route_conflict_before_sdk_start(
+    session_bridge, file_db_factory, monkeypatch, flag
+):
+    service, sdk, app, server = session_bridge
+    bind_session_factory(monkeypatch, file_db_factory)
+    for selector in CLAUDE_CLOUD_ROUTE_ENV_KEYS:
+        monkeypatch.delenv(selector, raising=False)
+    monkeypatch.setenv(flag, "true")
+    monkeypatch.setenv("ANTHROPIC_AUTH_TOKEN", "synthetic-secret-not-for-mcp")
+    constructed = []
+
+    def capture_client(options):
+        constructed.append(options)
+        return sdk
+
+    monkeypatch.setattr("server.agent_runtime.session_manager.ClaudeSDKClient", capture_client)
+    async with server.session_manager.run(), connect(app) as session:
+        result = await session.call_tool(
+            "send_agent_message", {"project": "demo", "content": "Inspect only.", "client_key": "route-conflict"}
+        )
+    assert result.isError
+    text = result.content[0].text
+    assert flag in text
+    assert "Use a clean local subscription route" in text
+    assert "did not start inference" in text
+    assert "synthetic-secret-not-for-mcp" not in text
+    assert str(service.pm.data_root) not in text
+    assert constructed == []
+    assert sdk.sent_messages == []
+
+
+async def test_session_bridge_keeps_unclassified_startup_diagnostics_private(session_bridge, monkeypatch):
+    service, _, app, server = session_bridge
+    sdk = FakeSDKClient(connect_error=RuntimeError("private-sdk-detail /private/server synthetic-secret"))
+    monkeypatch.setattr("server.agent_runtime.session_manager.ClaudeSDKClient", lambda options: sdk)
+    try:
+        async with server.session_manager.run(), connect(app) as session:
+            result = await session.call_tool(
+                "send_agent_message", {"project": "demo", "content": "Inspect only.", "client_key": "startup-failure"}
+            )
+        assert result.isError
+        text = result.content[0].text
+        assert "Embedded Agent startup failed" in text
+        assert "private-sdk-detail" not in text
+        assert "/private/server" not in text
+        assert "synthetic-secret" not in text
+        assert str(service.pm.data_root) not in text
+        assert sdk.sent_messages == []
+    finally:
+        sdk.close_stream()

@@ -1,0 +1,78 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_ TestAssistantRoutes.test_queued_message_reconnect_failures_explain_the_cause[resend_queued_message-/resend] _
+
+self = <tests.unit.server.routers.test_assistant_routes.TestAssistantRoutes object at 0x11a1fda90>
+service_method = 'resend_queued_message', path = '/resend'
+
+    @pytest.mark.parametrize(
+        ("service_method", "path"),
+        [("resend_queued_message", "/resend"), ("send_queued_message_now", "/send-now")],
+    )
+    def test_queued_message_reconnect_failures_explain_the_cause(self, service_method: str, path: str):
+        # Resending unsent messages and immediate sends both rebuild session connections.
+        with (
+            patch.object(
+                assistant.assistant_service, service_method, new=AsyncMock(side_effect=SessionCapacityError("full"))
+            ),
+            _build_client() as client,
+        ):
+            response = client.post(f"{PREFIX}/sessions/session-1/queued-messages/m-1{path}")
+        assert response.status_code == 503
+>       assert response.json()["detail"] == make_translator()("session_capacity_exceeded")
+E       AssertionError: assert 'Concurrent s...y again later' == '并发会话数已达上限，请稍后再试'
+E
+E         - 并发会话数已达上限，请稍后再试
+E         + Concurrent session limit reached, please try again later
+
+tests/unit/server/routers/test_assistant_routes.py:175: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 16:02:54 [INFO] httpx2: HTTP Request: POST http://testserver/api/v1/projects/demo/assistant/sessions/session-1/queued-messages/m-1/resend "HTTP/1.1 503 Service Unavailable"
+------------------------------ Captured log call -------------------------------
+INFO     httpx2:_client.py:1084 HTTP Request: POST http://testserver/api/v1/projects/demo/assistant/sessions/session-1/queued-messages/m-1/resend "HTTP/1.1 503 Service Unavailable"
+_ TestAssistantRoutes.test_queued_message_reconnect_failures_explain_the_cause[send_queued_message_now-/send-now] _
+
+self = <tests.unit.server.routers.test_assistant_routes.TestAssistantRoutes object at 0x11a1fdbb0>
+service_method = 'send_queued_message_now', path = '/send-now'
+
+    @pytest.mark.parametrize(
+        ("service_method", "path"),
+        [("resend_queued_message", "/resend"), ("send_queued_message_now", "/send-now")],
+    )
+    def test_queued_message_reconnect_failures_explain_the_cause(self, service_method: str, path: str):
+        # Resending unsent messages and immediate sends both rebuild session connections.
+        with (
+            patch.object(
+                assistant.assistant_service, service_method, new=AsyncMock(side_effect=SessionCapacityError("full"))
+            ),
+            _build_client() as client,
+        ):
+            response = client.post(f"{PREFIX}/sessions/session-1/queued-messages/m-1{path}")
+        assert response.status_code == 503
+>       assert response.json()["detail"] == make_translator()("session_capacity_exceeded")
+E       AssertionError: assert 'Concurrent s...y again later' == '并发会话数已达上限，请稍后再试'
+E
+E         - 并发会话数已达上限，请稍后再试
+E         + Concurrent session limit reached, please try again later
+
+tests/unit/server/routers/test_assistant_routes.py:175: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 16:02:54 [INFO] httpx2: HTTP Request: POST http://testserver/api/v1/projects/demo/assistant/sessions/session-1/queued-messages/m-1/send-now "HTTP/1.1 503 Service Unavailable"
+------------------------------ Captured log call -------------------------------
+INFO     httpx2:_client.py:1084 HTTP Request: POST http://testserver/api/v1/projects/demo/assistant/sessions/session-1/queued-messages/m-1/send-now "HTTP/1.1 503 Service Unavailable"
+=============================== warnings summary ===============================
+tests/unit/server/routers/test_assistant_routes.py::TestAssistantRoutes::test_queued_message_reconnect_failures_explain_the_cause[resend_queued_message-/resend]
+  /Users/pablo.carminatti.br/.local/share/uv/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/contextlib.py:144: SAWarning: Skipped unsupported reflection of expression-based index idx_tasks_dedupe_active
+    next(self.gen)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 25 durations =============================
+1.77s setup    tests/unit/server/routers/test_assistant_routes.py::TestAssistantRoutes::test_queued_message_reconnect_failures_explain_the_cause[resend_queued_message-/resend]
+0.11s call     tests/unit/server/routers/test_assistant_routes.py::TestAssistantRoutes::test_queued_message_reconnect_failures_explain_the_cause[send_queued_message_now-/send-now]
+0.05s call     tests/unit/server/routers/test_assistant_routes.py::TestAssistantRoutes::test_queued_message_reconnect_failures_explain_the_cause[resend_queued_message-/resend]
+
+(3 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/unit/server/routers/test_assistant_routes.py::TestAssistantRoutes::test_queued_message_reconnect_failures_explain_the_cause[resend_queued_message-/resend]
+FAILED tests/unit/server/routers/test_assistant_routes.py::TestAssistantRoutes::test_queued_message_reconnect_failures_explain_the_cause[send_queued_message_now-/send-now]
+2 failed, 22 deselected, 1 warning in 2.20s

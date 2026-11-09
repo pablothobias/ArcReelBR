@@ -1,0 +1,22 @@
+{
+  "protected_tracked_files_checked": 4709,
+  "protected_file_changes": [],
+  "stage2_changed_paths": [
+    "server/routers/projects.py",
+    "server/media_tools/workflow_access.py",
+    "server/agent_toolset/remote.py",
+    "server/agent_toolset/workflow_access.py",
+    "tests/integration/server/test_workflow_access.py",
+    "tests/integration/server/agent_toolset/test_host_consistency.py",
+    "docs/testing/native-mcp-production.md",
+    "public/agent-installation-guide.md"
+  ],
+  "web_settings_field_annotations_and_defaults_unchanged": true,
+  "stage3_readers_untouched": true,
+  "documents_added_to_scope": {
+    "docs/testing/native-mcp-production.md": "Document supported Settings fields, conditional batch polling and official direct/session routes.",
+    "public/agent-installation-guide.md": "Document R07/R09; remove a missed W04 blanket quote instruction without changing installation/connection steps."
+  },
+  "configuration": "No live settings, host connection, authentication, credentials or process changed.",
+  "boundary": "Stage 2 only; prior Stage 1 edits retained."
+}

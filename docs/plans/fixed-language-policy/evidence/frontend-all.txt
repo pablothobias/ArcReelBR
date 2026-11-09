@@ -1,0 +1,92 @@
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies", "pnpm.overrides". See https://pnpm.io/settings for the new home of each setting.
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - `__dirname` (vitest.config.ts:5:36). Use `import.meta.dirname` instead
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - `__dirname` (vitest.config.ts:5:36). Use `import.meta.dirname` instead
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - `__dirname` (vitest.config.ts:5:36). Use `import.meta.dirname` instead
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+ RUN  v4.1.12 /Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/frontend
+
+Not implemented: navigation to another Document
+ ❯ |vm| src/components/pages/settings/endpoints/EndpointsSection.comfyui.test.tsx (17 tests | 2 failed) 52254ms
+       × asks a raw workflow what it produces and re-wraps it under the answer 5543ms
+       × re-imports onto the endpoint the user is looking at, not the one a stale draft came from 5116ms
+ ❯ |vm| src/components/pages/settings/endpoints/EndpointsSection.share.test.tsx (8 tests | 1 failed) 19916ms
+     × shows local diagnostics first and updates the 'declarative' status badge 5426ms
+Not implemented: navigation to another Document
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: HTMLMediaElement's pause() method
+Not implemented: navigation to another Document
+Not implemented: navigation to another Document
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |vm| src/components/pages/settings/endpoints/EndpointsSection.comfyui.test.tsx > EndpointsSection > ComfyUI endpoints > asks a raw workflow what it produces and re-wraps it under the answer
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/components/pages/settings/endpoints/EndpointsSection.comfyui.test.tsx:405:5
+    403|     });
+    404|
+    405|     it("asks a raw workflow what it produces and re-wraps it under the…
+       |     ^
+    406|       const workflow = { "9": { class_type: "SaveImage", inputs: {} } …
+    407|       const validate = vi.spyOn(API, "validateCustomEndpoint").mockRes…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  |vm| src/components/pages/settings/endpoints/EndpointsSection.comfyui.test.tsx > EndpointsSection > ComfyUI endpoints > re-imports onto the endpoint the user is looking at, not the one a stale draft came from
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/components/pages/settings/endpoints/EndpointsSection.comfyui.test.tsx:492:5
+    490|     });
+    491|
+    492|     it("re-imports onto the endpoint the user is looking at, not the o…
+       |     ^
+    493|       // Holding endpoint A's unsaved draft while reimporting on B mus…
+    494|       // workflow onto A, an overwrite nobody requested.
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  |vm| src/components/pages/settings/endpoints/EndpointsSection.share.test.tsx > EndpointsSection · share to official market > shows local diagnostics first and updates the 'declarative' status badge
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/components/pages/settings/endpoints/EndpointsSection.share.test.tsx:57:27
+     55|   });
+     56|
+     57|   it.each([MINE, comfyui])("shows local diagnostics first and updates …
+       |                           ^
+     58|     vi.spyOn(API, "getOfficialService").mockResolvedValue(OFFICIAL_ON);
+     59|     vi.spyOn(API, "listMarketSubmissions").mockResolvedValue({ submiss…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  2 failed | 305 passed (307)
+      Tests  3 failed | 4064 passed (4067)
+   Start at  16:44:01
+   Duration  184.63s (transform 96.73s, setup 192.14s, import 265.16s, tests 1095.15s, environment 50.85s)

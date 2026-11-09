@@ -1,0 +1,12 @@
+diff --git a/.agents/skills/direct-brazilian-production/SKILL.md b/.agents/skills/direct-brazilian-production/SKILL.md
+index 5a55442f9..63ccd099f 100644
+--- a/.agents/skills/direct-brazilian-production/SKILL.md
++++ b/.agents/skills/direct-brazilian-production/SKILL.md
+@@ -1,6 +1,7 @@
+ ---
+ name: direct-brazilian-production
+ description: Direct or resume Brazilian ArcReel production through the existing embedded Agent, checking approved spending, quality attempts and pending jobs before each production action.
++disable-model-invocation: true
+ ---
+ 
+ # Direct Brazilian production

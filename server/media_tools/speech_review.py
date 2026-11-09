@@ -33,7 +33,11 @@ class ReviewSpeechRequest(BaseModel):
         pattern=r"^[a-z]{2,3}$", description="Actual spoken language, e.g. pt; never a transcript prompt"
     )
     apply_timing: StrictBool = Field(
-        default=False, description="Commit eligible measured timing to the current native presentation"
+        default=False,
+        description=(
+            "Commit new eligible measured timing to the current native presentation when true. "
+            "False preserves still-valid measured timing but does not make inspection read-only."
+        ),
     )
 
 

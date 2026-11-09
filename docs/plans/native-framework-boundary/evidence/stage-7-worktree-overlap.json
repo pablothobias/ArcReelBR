@@ -1,0 +1,22 @@
+{
+  "other_worktree": "/Users/pablo.carminatti.br/.codex/worktrees/a6d1/ArcReelBR",
+  "other_head": "1df5ee3b89e865c4193e72d5bbddf64d54b42f0e",
+  "scope": "Read-only tracked source overlap check; no installed skill, saved settings, credentials or configuration imported.",
+  "overlap": {
+    ".agents/skills/direct-brazilian-production/SKILL.md": {
+      "result": "retired here; concurrent disable edit preserved in stage-0 evidence; do not restore package"
+    },
+    "lib/config/env_keys.py": {
+      "three_way_merge_exit": 0,
+      "result": "textually clean, integration not applied or validated"
+    },
+    "lib/config/service.py": {
+      "three_way_merge_exit": 0,
+      "result": "textually clean, integration not applied or validated"
+    },
+    "server/routers/projects.py": {
+      "three_way_merge_exit": 0,
+      "result": "textually clean, integration not applied or validated"
+    }
+  }
+}

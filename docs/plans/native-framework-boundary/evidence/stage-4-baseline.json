@@ -1,0 +1,35 @@
+{
+  "allowed_paths": [
+    "lib/project/project_manager.py",
+    "server/routers/files.py",
+    "tests/integration/server/test_reference_upload_transaction.py",
+    "docs/testing/native-mcp-production.md",
+    "public/agent-installation-guide.md"
+  ],
+  "protected_tracked_files": 4714,
+  "initial_status": [
+    " D .agents/skills/direct-brazilian-production/SKILL.md",
+    " D .agents/skills/direct-brazilian-production/references/recovery-format.md",
+    " D .agents/skills/direct-brazilian-production/scripts/policy.py",
+    " M agent_runtime_profile/.claude/skills/edit-video/SKILL.md",
+    " M agent_runtime_profile/.claude/skills/generate-assets/SKILL.md",
+    " M agent_runtime_profile/CLAUDE.ad.md",
+    " M agent_runtime_profile/CLAUDE.drama.md",
+    " M agent_runtime_profile/CLAUDE.narration.md",
+    " M docs/testing/native-mcp-production.md",
+    " M public/agent-installation-guide.md",
+    " M server/agent_toolset/remote.py",
+    " M server/agent_toolset/workflow_access.py",
+    " M server/media_tools/image_edits.py",
+    " M server/media_tools/workflow_access.py",
+    " M server/routers/projects.py",
+    " M server/services/admission/storyboard_batch.py",
+    " M tests/integration/server/agent_toolset/test_host_consistency.py",
+    " M tests/integration/server/services/admission/test_storyboard_batch.py",
+    " M tests/integration/server/test_workflow_access.py",
+    " D tests/integration/skills/test_direct_brazilian_policy_cli.py",
+    " D tests/unit/skills/test_direct_brazilian_policy.py",
+    "?? docs/audits/",
+    "?? docs/plans/native-framework-boundary/"
+  ]
+}

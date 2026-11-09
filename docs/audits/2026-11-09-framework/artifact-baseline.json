@@ -1,0 +1,382 @@
+{
+  "captured_at": "2026-11-09T09:48:23.807249-03:00",
+  "project": "/Users/pablo.carminatti.br/ArcReelData/projects/br-viral-reuniao-impossivel",
+  "files": {
+    ".artifact_manifest.lock": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    ".last_activity": {
+      "bytes": 32,
+      "sha256": "7efaf87d94b0ead3cdd1768bcdfde786b2e2ade2313d8b344879c710ef021797"
+    },
+    ".arcreel_profile_manifest.json": {
+      "bytes": 4775,
+      "sha256": "b862a9aeb8a9589b4f5ca941f55f1933eb94430bd61e366047a88ca7c8e8c3b0"
+    },
+    "project.json": {
+      "bytes": 5721,
+      "sha256": "1bd0c9491230f44e4a43db63810c24389ed293e32f794ca79d618ffdec29cb4f"
+    },
+    ".profile_sync.lock": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    ".project.json.lock": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    ".arcreel_artifacts.json": {
+      "bytes": 7146,
+      "sha256": "dd3ba8711c2eaa06c8d8ede33698a818e7e893aeb17dd2ef2ec85afbc343980f"
+    },
+    "CLAUDE.md": {
+      "bytes": 23609,
+      "sha256": "38c171d09146e16e6387019023d6384434baeb739b1370ef305a35e28bb3af9a"
+    },
+    "storyboards/scene_E1S05.png": {
+      "bytes": 1191054,
+      "sha256": "fb82a871a716e468dc121dcd37afdfd99be0d4f0ab5612c9d8982a14f80c30b8"
+    },
+    "storyboards/scene_E1S04.png": {
+      "bytes": 1186098,
+      "sha256": "8a02ec9ac6abde61405a4798013ef2a745c5e4d07508d36d042d8a204b21ecce"
+    },
+    "storyboards/scene_E1S01.png": {
+      "bytes": 1212282,
+      "sha256": "bbe250a1620d37a0264fccdc88d32df3b81e615b7d59c65dd6ea01db5d5656e5"
+    },
+    "storyboards/scene_E1S03.png": {
+      "bytes": 1189340,
+      "sha256": "f3807006fa714f73687c310f0cb4593bb21c29b4296eef45866f26598ae14da5"
+    },
+    "storyboards/scene_E1S02.png": {
+      "bytes": 1274791,
+      "sha256": "6f263312f9bf3a942711b049e8ddf465b577d9f0fde55f1a44e5cdf3cd940fc3"
+    },
+    "speech_reviews/7757c3260113e82f35676bd9da6b44b15801ec2d3d50e246ff26457f1a17569c.json": {
+      "bytes": 3728,
+      "sha256": "03892ba16d21cfcd0edd9d678e37227257f6bb9e3fa03af0a8a4fa6f8eb42088"
+    },
+    "source/the-expert-reference.txt": {
+      "bytes": 11492,
+      "sha256": "8e4bc6db570db34f41ba5171281c80c159b24a79b4235b5e614531b9aecd19e8"
+    },
+    "versions/versions.json": {
+      "bytes": 82523,
+      "sha256": "6cd1d015166a77af019fa244122087eaf7275d8c7f57fcc1789919bbc42b7d1d"
+    },
+    ".claude/settings.json": {
+      "bytes": 206,
+      "sha256": "16d05e34a1f809ee0f4d144694b470e6285b055138d417870a440bccb6f41a02"
+    },
+    "edit_timelines/.episode_1.lock": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "videos/scene_E1S05.mp4": {
+      "bytes": 809871,
+      "sha256": "8842d6487f617bc771b7b8c13a8112ef49582d9db6c2caa600a7b72acee73375"
+    },
+    "videos/scene_E1S04.mp4": {
+      "bytes": 601833,
+      "sha256": "38cc948b510f3dd8f795481e2df5534d5ff8d367b9e1af9d4fb4700c837b4d16"
+    },
+    "videos/scene_E1S03.mp4": {
+      "bytes": 1127965,
+      "sha256": "0d43cf403a296f81ecd08caea3ee95cd68aea85996f0eac22caeaf4faf545d68"
+    },
+    "videos/scene_E1S02.mp4": {
+      "bytes": 524785,
+      "sha256": "73ac41b8454ea880b9a7d350ea8278d13b3b137a01e39d3712036b08ddd1cf42"
+    },
+    "videos/scene_E1S01.mp4": {
+      "bytes": 1390972,
+      "sha256": "c0a7bd39404c28146ad2605a96cbda618db96396b33b10e1d997c7a851e60f3c"
+    },
+    ".arcreel/source_encoding_migrated": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "scripts/episode_1.json": {
+      "bytes": 12436,
+      "sha256": "8f738042de1a6ab0fefacb78b376d4b58c848dc3836ce374088993229ab85e39"
+    },
+    "scripts/.episode_1.json.lock": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "characters/J\u00falio.png": {
+      "bytes": 1186213,
+      "sha256": "2e8ed4124336a1b3cbc099de38364dcad955a81610193236288b0de8d0f729ca"
+    },
+    "characters/Marcos.png": {
+      "bytes": 621355,
+      "sha256": "5fae6ecc6b74c0ed7affa3b91ddebd8e7582576f66e831d5c33c9fe68a4a01d2"
+    },
+    "characters/Regina.png": {
+      "bytes": 1206899,
+      "sha256": "6c7e55d4fc6f3a0cff66e7c4f85a66f70c541792daf3ca436f042d9f6d8ced20"
+    },
+    "thumbnails/scene_E1S05.jpg": {
+      "bytes": 85446,
+      "sha256": "f1ef109b6697b4a6e5872debc76fd371dd13ee3a78a01d3b883e554cc8ceb9e1"
+    },
+    "thumbnails/scene_E1S04.jpg": {
+      "bytes": 79351,
+      "sha256": "9c6bed6b6698b930f96ceb53bf7e8ea3c099f31d6c1f10667a872e533d095564"
+    },
+    "thumbnails/scene_E1S01.jpg": {
+      "bytes": 70945,
+      "sha256": "3057be7bc8c87280bf775435dc654033a6c690f368673545557a52db84450284"
+    },
+    "thumbnails/scene_E1S03.jpg": {
+      "bytes": 79854,
+      "sha256": "9263beb4c2a7bf2b4f6999e94fe99d9c21e75253e3845174252a2e7228860fce"
+    },
+    "thumbnails/scene_E1S02.jpg": {
+      "bytes": 105241,
+      "sha256": "bbcc675ea38165bfcf78f735104adf71f372e0105d68078fceb7f02795ca1ed7"
+    },
+    "renders/episode_1/tl-99ec13b6/final_cut.without_narration.burned_subtitles.mp4": {
+      "bytes": 8837561,
+      "sha256": "ba2a5c509bc0f95f432914d2ad23774df9150f216c3ebc2ff4281271b07b5b85"
+    },
+    "renders/episode_1/tl-99ec13b6/final_cut.without_narration.burned_subtitles.render.json": {
+      "bytes": 155,
+      "sha256": "aec82f45169395409785f1c71031ac97359c2b3674a383be2bead70ba47aee4d"
+    },
+    "versions/storyboards/E1S03_v1_20261109T070132.png": {
+      "bytes": 1189340,
+      "sha256": "f3807006fa714f73687c310f0cb4593bb21c29b4296eef45866f26598ae14da5"
+    },
+    "versions/storyboards/E1S04_v1_20261109T070143.png": {
+      "bytes": 1186098,
+      "sha256": "8a02ec9ac6abde61405a4798013ef2a745c5e4d07508d36d042d8a204b21ecce"
+    },
+    "versions/storyboards/E1S01_v2_20261109T070327.png": {
+      "bytes": 1212282,
+      "sha256": "bbe250a1620d37a0264fccdc88d32df3b81e615b7d59c65dd6ea01db5d5656e5"
+    },
+    "versions/storyboards/E1S05_v1_20261109T070120.png": {
+      "bytes": 1238070,
+      "sha256": "15056378d2680ab2f6422e91c6c21ffe5b8170c9c49db8c70c840ccf1c36bcdc"
+    },
+    "versions/storyboards/E1S02_v1_20261109T070110.png": {
+      "bytes": 1274791,
+      "sha256": "6f263312f9bf3a942711b049e8ddf465b577d9f0fde55f1a44e5cdf3cd940fc3"
+    },
+    "versions/storyboards/E1S05_v2_20261109T070317.png": {
+      "bytes": 1191054,
+      "sha256": "fb82a871a716e468dc121dcd37afdfd99be0d4f0ab5612c9d8982a14f80c30b8"
+    },
+    "versions/storyboards/E1S01_v1_20261109T070059.png": {
+      "bytes": 1223002,
+      "sha256": "7dfa810292897078b3343b9afbd279038712758777e69c6580a9a53423668d34"
+    },
+    "versions/videos/E1S05_v1_20261109T070612.mp4": {
+      "bytes": 809871,
+      "sha256": "8842d6487f617bc771b7b8c13a8112ef49582d9db6c2caa600a7b72acee73375"
+    },
+    "versions/videos/E1S03_v1_20261109T070821.mp4": {
+      "bytes": 1127965,
+      "sha256": "0d43cf403a296f81ecd08caea3ee95cd68aea85996f0eac22caeaf4faf545d68"
+    },
+    "versions/videos/E1S01_v1_20261109T070712.mp4": {
+      "bytes": 1815203,
+      "sha256": "3fb2d5b4c153cfd34104bd34d1fd4415fde519d62788b95ad63fdcbb2bfe01a2"
+    },
+    "versions/videos/E1S01_v2_20261109T071352.mp4": {
+      "bytes": 1390972,
+      "sha256": "c0a7bd39404c28146ad2605a96cbda618db96396b33b10e1d997c7a851e60f3c"
+    },
+    "versions/videos/E1S04_v1_20261109T070833.mp4": {
+      "bytes": 601833,
+      "sha256": "38cc948b510f3dd8f795481e2df5534d5ff8d367b9e1af9d4fb4700c837b4d16"
+    },
+    "versions/videos/E1S02_v1_20261109T070524.mp4": {
+      "bytes": 524785,
+      "sha256": "73ac41b8454ea880b9a7d350ea8278d13b3b137a01e39d3712036b08ddd1cf42"
+    },
+    "versions/characters/Marcos_v1_20261109T070003.png": {
+      "bytes": 621355,
+      "sha256": "5fae6ecc6b74c0ed7affa3b91ddebd8e7582576f66e831d5c33c9fe68a4a01d2"
+    },
+    "versions/characters/Regina_v1_20261109T065958.png": {
+      "bytes": 1206899,
+      "sha256": "6c7e55d4fc6f3a0cff66e7c4f85a66f70c541792daf3ca436f042d9f6d8ced20"
+    },
+    "versions/characters/J\u00falio_v1_20261109T070001.png": {
+      "bytes": 1186213,
+      "sha256": "2e8ed4124336a1b3cbc099de38364dcad955a81610193236288b0de8d0f729ca"
+    },
+    ".claude/references/workflow-plan.md": {
+      "bytes": 17615,
+      "sha256": "dafb1857d2b08080913df4269527e02f80ebba0ea640b3d43eefd748a796f813"
+    },
+    ".claude/references/generation-modes.md": {
+      "bytes": 6662,
+      "sha256": "7847087306fa995407826426b7bab7a99a4782a1cb901c980394f2067e51f030"
+    },
+    ".claude/references/generation-results.md": {
+      "bytes": 3997,
+      "sha256": "4329c6d520ebdec435e20b85c916c8bf31e0c75cb08658799bff13f968b7ea09"
+    },
+    ".claude/agents/split-reference-video-units.md": {
+      "bytes": 20276,
+      "sha256": "5cb5fb0d91f4829344d214544bfad2e7607d147231e8509cf2a4fff6051bce42"
+    },
+    ".claude/agents/create-episode-script.md": {
+      "bytes": 4892,
+      "sha256": "ebc656fb501b4fce2d157e40df250e255d64493def03798f3109ff7c6ee4cfa5"
+    },
+    ".claude/agents/generate-assets.md": {
+      "bytes": 2530,
+      "sha256": "9fb4e44b1655a832914bfe368737e91695d7abef342957b4861a45b3cc79bd0f"
+    },
+    ".claude/agents/review-images.md": {
+      "bytes": 4214,
+      "sha256": "47b16a70dbf4a8efcac744dfa445a773484d6983f5dc77754f0483a979e1c1fb"
+    },
+    ".claude/agents/split-narration-segments.md": {
+      "bytes": 16457,
+      "sha256": "212619f098e9bd58773762228d705c7d0dd73b3564c99ae62b52c94d8b1e2d55"
+    },
+    ".claude/agents/review-footage.md": {
+      "bytes": 3983,
+      "sha256": "2abc14652d5295e8ab9f7eeeeddcf325221b32a55672849c25a371335061338b"
+    },
+    ".claude/agents/normalize-drama-script.md": {
+      "bytes": 15703,
+      "sha256": "f88f790af5671e2f07d8231e9630672b97ff72b0b29f214a71a0822bc92fa005"
+    },
+    ".claude/skills/adapt-custom-endpoint/SKILL.md": {
+      "bytes": 3412,
+      "sha256": "c9783b23cd93abb0d60b9be1b908f83101f1dcb33d729b0d6c8f9fa4a4e97c90"
+    },
+    ".claude/skills/generate-narration-audio/SKILL.md": {
+      "bytes": 4046,
+      "sha256": "8f7ec55649c17b2f8c619de62b6a52509638bc8d1f707f109ebcc5505ad02051"
+    },
+    ".claude/skills/generate-script/SKILL.md": {
+      "bytes": 9570,
+      "sha256": "2ceab581ff1a3ebd3918db2d58f6d32d2f4b5aecbed12952cf61c5ee28e764f3"
+    },
+    ".claude/skills/video-workflow/SKILL.md": {
+      "bytes": 10959,
+      "sha256": "a1a24621c0499ea3711d3b887b2a2ec59e66d0459e392608ca9eb1296bb4fb0a"
+    },
+    ".claude/skills/edit-video/SKILL.md": {
+      "bytes": 17504,
+      "sha256": "83b8385bb0b93e47036e253faee4717b5dc4a28f51d73ec008823756ae90c055"
+    },
+    ".claude/skills/generate-video/SKILL.md": {
+      "bytes": 9693,
+      "sha256": "fb7bb530c9380e14566820b5f94e8451bff45d07402683d79d47fb7323a628d5"
+    },
+    ".claude/skills/manage-project/SKILL.md": {
+      "bytes": 11918,
+      "sha256": "ea24d7a24ede3f2ff9212778a3a98768ed08badc687c6026084585c1b5caf23f"
+    },
+    ".claude/skills/generate-assets/SKILL.md": {
+      "bytes": 8168,
+      "sha256": "e88b0b0296b1f13d1db2d18e2f63551c4526e4c046e1233f8628d512416e0734"
+    },
+    ".claude/skills/generate-storyboard/SKILL.md": {
+      "bytes": 8163,
+      "sha256": "782947069429afe25998b0936b2870c4925bb5bd843299219521296268849cac"
+    },
+    ".claude/skills/generate-grid/SKILL.md": {
+      "bytes": 3853,
+      "sha256": "fd2771bfba0c6b59691335cdf7b4db5725b061f26015abcf646762218cca06c5"
+    },
+    ".claude/skills/adapt-custom-endpoint/references/definition-format.md": {
+      "bytes": 4562,
+      "sha256": "2b6cb5082ed51755106559d38d941c600d2efff4342cb0fe7fef36d4354ccc14"
+    },
+    ".claude/skills/adapt-custom-endpoint/scripts/custom_endpoint.py": {
+      "bytes": 9961,
+      "sha256": "695bdaa12dd485def146bf8ff1706c0354307470d5a6728a701fd53a537bc69a"
+    },
+    ".claude/skills/generate-video/references/veo_prompts.md": {
+      "bytes": 4440,
+      "sha256": "11ce575cc95a8286ecc7eea83bbf483547b57e9f0e2cf6eca0fb2b8f445f2082"
+    },
+    "edit_timelines/episode_1/tl-99ec13b6.json": {
+      "bytes": 4499,
+      "sha256": "2bd3e98d210a588d90de6f22a9bd1ce1dc1a805f2f4c59990e35d0000fa6f798"
+    },
+    "presentations/episode_1/RTFTMDM.post_production.json": {
+      "bytes": 2476,
+      "sha256": "be38c96c6e1912091f7a63986ae90cce53521536199bfbee15ebbe20b84f7c03"
+    },
+    "presentations/episode_1/RTFTMDI.post_production.json": {
+      "bytes": 2031,
+      "sha256": "567a999e4af915219703eac103fa911a7ce0430a91ac0b140d75539833fa431b"
+    },
+    "presentations/episode_1/RTFTMDE.post_production.json": {
+      "bytes": 2752,
+      "sha256": "7e59a47d8dad2b6dfb9b36f0982a0a843dba50acbdf58d8f323650ad6a07bd3a"
+    },
+    "presentations/episode_1/RTFTMDQ.post_production.json": {
+      "bytes": 1863,
+      "sha256": "9aeb945c727f67301619d2d4dac3af183e35b69f7dae21b3be0c8a5c2acfd503"
+    },
+    "presentations/episode_1/RTFTMDU.post_production.json": {
+      "bytes": 2609,
+      "sha256": "81de88cc075103c1b17d16501506b8201088ce73933b8ace3f21b42035ccf682"
+    },
+    ".arcreel/memory/viral-reference-the-expert.md": {
+      "bytes": 2645,
+      "sha256": "d93f86987ec3f47bf87d4e5c798cc2f4f4d7f23c7abc62ba140702ab3d28cbd2"
+    },
+    ".arcreel/memory/MEMORY.md": {
+      "bytes": 164,
+      "sha256": "2891299c3d63272f3ff0656846d625ce0efdafbcbbe5839198db02d87340c1ea"
+    },
+    "subtitles/episode_1/RTFTMDM.post_production.json": {
+      "bytes": 958,
+      "sha256": "2486da15502af0a74a7b7047335b8fb2592e9aad4f84e89456e74b3c3576e635"
+    },
+    "subtitles/episode_1/RTFTMDI.post_production.json": {
+      "bytes": 673,
+      "sha256": "07cf402c43c73d2e1d2aa4b762f4feca9e771fbb07461963c68dbe9ff5cac73e"
+    },
+    "subtitles/episode_1/RTFTMDE.post_production.json": {
+      "bytes": 1159,
+      "sha256": "49bfdda85186e6dff170805ce319e11e86adaa4f11f9869fa4d6c12baae6c9d4"
+    },
+    "subtitles/episode_1/RTFTMDQ.post_production.json": {
+      "bytes": 527,
+      "sha256": "c5d079956fda85b6da48ef2fa813676c44fe2d4e8566ff6647f3b3215342f86a"
+    },
+    "subtitles/episode_1/RTFTMDU.post_production.json": {
+      "bytes": 1580,
+      "sha256": "b2dff6e042615cdff367814feffffa43b81cb7c9d01d6dfb71b9880ec16351b8"
+    },
+    ".cache/video_signals/videos/E1S04_v1.json": {
+      "bytes": 172,
+      "sha256": "7e47d9b11f334f5aea0fe5c973bd83dcbba3880d3f9c7cf2d06be12fe343d483"
+    },
+    ".cache/video_signals/videos/E1S01_v2.json": {
+      "bytes": 173,
+      "sha256": "cf8426fa2be01ccaaa6f70619cab2af42af7433dd2481af46399920c4ceede09"
+    },
+    ".cache/video_signals/videos/E1S05_v1.json": {
+      "bytes": 170,
+      "sha256": "82044515d4af48ae7248e25145faf3829aa5937a439cef42eef3962f6b7193f8"
+    },
+    ".cache/video_signals/videos/E1S01_v1.json": {
+      "bytes": 190,
+      "sha256": "97b609b759315271fb1b99e1398c514a3134ebb67a61d7c536d5787262f65c78"
+    },
+    ".cache/video_signals/videos/E1S03_v1.json": {
+      "bytes": 174,
+      "sha256": "85aea4ff2e75491cb8bf943bb9c879aabf25534b26e59cc06adbad2cb7407116"
+    },
+    ".cache/video_signals/videos/E1S02_v1.json": {
+      "bytes": 172,
+      "sha256": "5841379c97bf8a53841cf2c61f05e0d53cc039ba7cc22cff787fd0fa3a51a8b8"
+    }
+  }
+}

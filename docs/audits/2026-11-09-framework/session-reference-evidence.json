@@ -1,0 +1,359 @@
+{
+  "project": "br-viral-reuniao-impossivel",
+  "session": "7409a38e-b7b2-4177-9064-bbaae6585c9a",
+  "captured_at": "2026-11-09T12:51:13.798242+00:00",
+  "source": "versions/versions.json + tasks.execution_checkpoint_json, SQLite mode=ro",
+  "storyboards": [
+    {
+      "unit": "E1S01",
+      "version": 1,
+      "created_at": "2026-11-09T10:00:59Z",
+      "content_digest": "7dfa810292897078b3343b9afbd279038712758777e69c6580a9a53423668d34",
+      "references": [
+        {
+          "kind": "sheet",
+          "logical_identity": {
+            "type": "character"
+          },
+          "role": "asset_sheet",
+          "sha256": "6c7e55d4fc6f3a0cff66e7c4f85a66f70c541792daf3ca436f042d9f6d8ced20"
+        }
+      ]
+    },
+    {
+      "unit": "E1S01",
+      "version": 2,
+      "created_at": "2026-11-09T10:03:27Z",
+      "content_digest": "bbe250a1620d37a0264fccdc88d32df3b81e615b7d59c65dd6ea01db5d5656e5",
+      "references": [
+        {
+          "kind": "current",
+          "logical_identity": {
+            "id": "E1S01",
+            "type": "storyboard"
+          },
+          "role": "edit_source",
+          "sha256": "7dfa810292897078b3343b9afbd279038712758777e69c6580a9a53423668d34"
+        }
+      ]
+    },
+    {
+      "unit": "E1S02",
+      "version": 1,
+      "created_at": "2026-11-09T10:01:10Z",
+      "content_digest": "6f263312f9bf3a942711b049e8ddf465b577d9f0fde55f1a44e5cdf3cd940fc3",
+      "references": [
+        {
+          "kind": "sheet",
+          "logical_identity": {
+            "type": "character"
+          },
+          "role": "asset_sheet",
+          "sha256": "2e8ed4124336a1b3cbc099de38364dcad955a81610193236288b0de8d0f729ca"
+        },
+        {
+          "kind": "sheet",
+          "logical_identity": {
+            "type": "character"
+          },
+          "role": "asset_sheet",
+          "sha256": "5fae6ecc6b74c0ed7affa3b91ddebd8e7582576f66e831d5c33c9fe68a4a01d2"
+        },
+        {
+          "logical_identity": {
+            "id": "E1S01",
+            "type": "storyboard"
+          },
+          "role": "previous_storyboard",
+          "sha256": "7dfa810292897078b3343b9afbd279038712758777e69c6580a9a53423668d34"
+        }
+      ]
+    },
+    {
+      "unit": "E1S05",
+      "version": 1,
+      "created_at": "2026-11-09T10:01:20Z",
+      "content_digest": "15056378d2680ab2f6422e91c6c21ffe5b8170c9c49db8c70c840ccf1c36bcdc",
+      "references": [
+        {
+          "kind": "sheet",
+          "logical_identity": {
+            "type": "character"
+          },
+          "role": "asset_sheet",
+          "sha256": "5fae6ecc6b74c0ed7affa3b91ddebd8e7582576f66e831d5c33c9fe68a4a01d2"
+        },
+        {
+          "kind": "sheet",
+          "logical_identity": {
+            "type": "character"
+          },
+          "role": "asset_sheet",
+          "sha256": "2e8ed4124336a1b3cbc099de38364dcad955a81610193236288b0de8d0f729ca"
+        },
+        {
+          "logical_identity": {
+            "id": "E1S02",
+            "type": "storyboard"
+          },
+          "role": "previous_storyboard",
+          "sha256": "6f263312f9bf3a942711b049e8ddf465b577d9f0fde55f1a44e5cdf3cd940fc3"
+        }
+      ]
+    },
+    {
+      "unit": "E1S05",
+      "version": 2,
+      "created_at": "2026-11-09T10:03:17Z",
+      "content_digest": "fb82a871a716e468dc121dcd37afdfd99be0d4f0ab5612c9d8982a14f80c30b8",
+      "references": [
+        {
+          "kind": "sheet",
+          "logical_identity": {
+            "type": "character"
+          },
+          "role": "asset_sheet",
+          "sha256": "5fae6ecc6b74c0ed7affa3b91ddebd8e7582576f66e831d5c33c9fe68a4a01d2"
+        },
+        {
+          "kind": "sheet",
+          "logical_identity": {
+            "type": "character"
+          },
+          "role": "asset_sheet",
+          "sha256": "2e8ed4124336a1b3cbc099de38364dcad955a81610193236288b0de8d0f729ca"
+        },
+        {
+          "logical_identity": {
+            "id": "E1S02",
+            "type": "storyboard"
+          },
+          "role": "previous_storyboard",
+          "sha256": "6f263312f9bf3a942711b049e8ddf465b577d9f0fde55f1a44e5cdf3cd940fc3"
+        }
+      ]
+    },
+    {
+      "unit": "E1S03",
+      "version": 1,
+      "created_at": "2026-11-09T10:01:32Z",
+      "content_digest": "f3807006fa714f73687c310f0cb4593bb21c29b4296eef45866f26598ae14da5",
+      "references": [
+        {
+          "kind": "sheet",
+          "logical_identity": {
+            "type": "character"
+          },
+          "role": "asset_sheet",
+          "sha256": "2e8ed4124336a1b3cbc099de38364dcad955a81610193236288b0de8d0f729ca"
+        },
+        {
+          "logical_identity": {
+            "id": "E1S05",
+            "type": "storyboard"
+          },
+          "role": "previous_storyboard",
+          "sha256": "15056378d2680ab2f6422e91c6c21ffe5b8170c9c49db8c70c840ccf1c36bcdc"
+        }
+      ]
+    },
+    {
+      "unit": "E1S04",
+      "version": 1,
+      "created_at": "2026-11-09T10:01:43Z",
+      "content_digest": "8a02ec9ac6abde61405a4798013ef2a745c5e4d07508d36d042d8a204b21ecce",
+      "references": [
+        {
+          "kind": "sheet",
+          "logical_identity": {
+            "type": "character"
+          },
+          "role": "asset_sheet",
+          "sha256": "6c7e55d4fc6f3a0cff66e7c4f85a66f70c541792daf3ca436f042d9f6d8ced20"
+        },
+        {
+          "kind": "sheet",
+          "logical_identity": {
+            "type": "character"
+          },
+          "role": "asset_sheet",
+          "sha256": "2e8ed4124336a1b3cbc099de38364dcad955a81610193236288b0de8d0f729ca"
+        },
+        {
+          "kind": "sheet",
+          "logical_identity": {
+            "type": "character"
+          },
+          "role": "asset_sheet",
+          "sha256": "5fae6ecc6b74c0ed7affa3b91ddebd8e7582576f66e831d5c33c9fe68a4a01d2"
+        },
+        {
+          "logical_identity": {
+            "id": "E1S03",
+            "type": "storyboard"
+          },
+          "role": "previous_storyboard",
+          "sha256": "f3807006fa714f73687c310f0cb4593bb21c29b4296eef45866f26598ae14da5"
+        }
+      ]
+    }
+  ],
+  "videos": [
+    {
+      "unit": "E1S02",
+      "version": 1,
+      "created_at": "2026-11-09T10:05:24Z",
+      "task_id": "49a66987028e4510b08d9a038e9e6920",
+      "capability": "i2v",
+      "generate_audio": true,
+      "provider_id": "minimax",
+      "provider_model_id": "MiniMax-H3",
+      "media": [
+        {
+          "index": 0,
+          "kind": "first_frame",
+          "logical_name": "E1S02",
+          "logical_type": "storyboard",
+          "role": "start_image",
+          "sha256": "6f263312f9bf3a942711b049e8ddf465b577d9f0fde55f1a44e5cdf3cd940fc3",
+          "size_bytes": 1274791,
+          "source_locator": "storyboards/scene_E1S02.png",
+          "staged_locator": ".arcreel/tasks/49a66987028e4510b08d9a038e9e6920/provider_media/000-start_image.png",
+          "target_index": null
+        }
+      ],
+      "reference_audio_targets": null,
+      "provider_asset_references": []
+    },
+    {
+      "unit": "E1S05",
+      "version": 1,
+      "created_at": "2026-11-09T10:06:12Z",
+      "task_id": "b598d619919b4bd0a0d6b6a8cb4cfaeb",
+      "capability": "i2v",
+      "generate_audio": true,
+      "provider_id": "minimax",
+      "provider_model_id": "MiniMax-H3",
+      "media": [
+        {
+          "index": 0,
+          "kind": "first_frame",
+          "logical_name": "E1S05",
+          "logical_type": "storyboard",
+          "role": "start_image",
+          "sha256": "fb82a871a716e468dc121dcd37afdfd99be0d4f0ab5612c9d8982a14f80c30b8",
+          "size_bytes": 1191054,
+          "source_locator": "storyboards/scene_E1S05.png",
+          "staged_locator": ".arcreel/tasks/b598d619919b4bd0a0d6b6a8cb4cfaeb/provider_media/000-start_image.png",
+          "target_index": null
+        }
+      ],
+      "reference_audio_targets": null,
+      "provider_asset_references": []
+    },
+    {
+      "unit": "E1S01",
+      "version": 1,
+      "created_at": "2026-11-09T10:07:12Z",
+      "task_id": "f0c5fec41279453cb50f731647f7bf60",
+      "capability": "i2v",
+      "generate_audio": true,
+      "provider_id": "minimax",
+      "provider_model_id": "MiniMax-H3",
+      "media": [
+        {
+          "index": 0,
+          "kind": "first_frame",
+          "logical_name": "E1S01",
+          "logical_type": "storyboard",
+          "role": "start_image",
+          "sha256": "bbe250a1620d37a0264fccdc88d32df3b81e615b7d59c65dd6ea01db5d5656e5",
+          "size_bytes": 1212282,
+          "source_locator": "storyboards/scene_E1S01.png",
+          "staged_locator": ".arcreel/tasks/f0c5fec41279453cb50f731647f7bf60/provider_media/000-start_image.png",
+          "target_index": null
+        }
+      ],
+      "reference_audio_targets": null,
+      "provider_asset_references": []
+    },
+    {
+      "unit": "E1S01",
+      "version": 2,
+      "created_at": "2026-11-09T10:13:52Z",
+      "task_id": "809d2eb4e1c0411bbbe684dda34ddf26",
+      "capability": "i2v",
+      "generate_audio": true,
+      "provider_id": "minimax",
+      "provider_model_id": "MiniMax-H3",
+      "media": [
+        {
+          "index": 0,
+          "kind": "first_frame",
+          "logical_name": "E1S01",
+          "logical_type": "storyboard",
+          "role": "start_image",
+          "sha256": "bbe250a1620d37a0264fccdc88d32df3b81e615b7d59c65dd6ea01db5d5656e5",
+          "size_bytes": 1212282,
+          "source_locator": "storyboards/scene_E1S01.png",
+          "staged_locator": ".arcreel/tasks/809d2eb4e1c0411bbbe684dda34ddf26/provider_media/000-start_image.png",
+          "target_index": null
+        }
+      ],
+      "reference_audio_targets": null,
+      "provider_asset_references": []
+    },
+    {
+      "unit": "E1S03",
+      "version": 1,
+      "created_at": "2026-11-09T10:08:21Z",
+      "task_id": "0cc036e24d8a4973914cf482123ec54f",
+      "capability": "i2v",
+      "generate_audio": true,
+      "provider_id": "minimax",
+      "provider_model_id": "MiniMax-H3",
+      "media": [
+        {
+          "index": 0,
+          "kind": "first_frame",
+          "logical_name": "E1S03",
+          "logical_type": "storyboard",
+          "role": "start_image",
+          "sha256": "f3807006fa714f73687c310f0cb4593bb21c29b4296eef45866f26598ae14da5",
+          "size_bytes": 1189340,
+          "source_locator": "storyboards/scene_E1S03.png",
+          "staged_locator": ".arcreel/tasks/0cc036e24d8a4973914cf482123ec54f/provider_media/000-start_image.png",
+          "target_index": null
+        }
+      ],
+      "reference_audio_targets": null,
+      "provider_asset_references": []
+    },
+    {
+      "unit": "E1S04",
+      "version": 1,
+      "created_at": "2026-11-09T10:08:33Z",
+      "task_id": "ce5e4d35d49c453bbea8b8e38a9303d5",
+      "capability": "i2v",
+      "generate_audio": true,
+      "provider_id": "minimax",
+      "provider_model_id": "MiniMax-H3",
+      "media": [
+        {
+          "index": 0,
+          "kind": "first_frame",
+          "logical_name": "E1S04",
+          "logical_type": "storyboard",
+          "role": "start_image",
+          "sha256": "8a02ec9ac6abde61405a4798013ef2a745c5e4d07508d36d042d8a204b21ecce",
+          "size_bytes": 1186098,
+          "source_locator": "storyboards/scene_E1S04.png",
+          "staged_locator": ".arcreel/tasks/ce5e4d35d49c453bbea8b8e38a9303d5/provider_media/000-start_image.png",
+          "target_index": null
+        }
+      ],
+      "reference_audio_targets": null,
+      "provider_asset_references": []
+    }
+  ]
+}

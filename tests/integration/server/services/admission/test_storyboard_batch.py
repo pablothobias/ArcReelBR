@@ -15,6 +15,7 @@ from lib.generation.batch_admission import BatchAdmissionDecision
 from lib.generation.generation_queue import GenerationQueue
 from lib.generation.video_request_facts import VideoRequestCostFacts
 from lib.project.project_manager import ProjectManager
+from lib.script.script_skeleton import SkeletonRouteMismatchError
 from server.services.admission.cost_estimation import load_video_price_source, quote_video_request_from_price
 from server.services.admission.storyboard_batch import (
     BatchSkip,
@@ -442,3 +443,63 @@ async def test_video_batch_cost_counts_targets_whose_converted_meter_has_no_esti
     assert priced.unpriced_count == 0
     assert priced.total.get("CNY", 0) > 0
     assert (estimated.total, estimated.unpriced_count) == ({}, 2)
+
+
+@pytest.mark.parametrize("persist_legacy_migrations", [True, False])
+async def test_image_planner_quote_can_refuse_legacy_without_persisting(
+    board_projects, board_queue, persist_legacy_migrations
+):
+    path = board_projects.get_project_path(PROJECT) / "scripts/episode_1.json"
+    legacy = {
+        "episode": 1,
+        "content_mode": "narration",
+        "video_units": [
+            {
+                "unit_id": "E1U01",
+                "text": "Olá, Ana!",
+                "duration_seconds": 8,
+                "duration_override": False,
+                "shots": [{"text": "Olá, Ana!", "duration": 8}],
+            }
+        ],
+    }
+    path.write_text(json.dumps(legacy, ensure_ascii=False), encoding="utf-8")
+    board_projects.add_episode(PROJECT, 1, "O café", "scripts/episode_1.json")
+    before = path.read_bytes()
+    options = {} if persist_legacy_migrations else {"persist_legacy_migrations": False}
+    with pytest.raises(SkeletonRouteMismatchError):
+        await load_storyboard_image_batch_plan(
+            board_projects, board_queue, project_name=PROJECT, episode_id=1, user_id=DEFAULT_USER_ID, **options
+        )
+    assert (path.read_bytes() != before) is persist_legacy_migrations
+
+
+async def test_readonly_image_plan_matches_native_targets_skips_and_dependencies(board_projects, board_queue):
+    _write_episode(
+        board_projects,
+        [
+            _segment("E1S01", novel_text="Olá, Ana!"),
+            _segment("E1S02", novel_text="Bom dia!"),
+            _segment("E1S03", image_prompt=None),
+        ],
+    )
+    path = board_projects.get_project_path(PROJECT)
+    before = (path / "scripts/episode_1.json").read_bytes(), (path / "project.json").read_bytes()
+    native_loaded, native_plan = await load_storyboard_image_batch_plan(
+        board_projects, board_queue, project_name=PROJECT, episode_id=1, user_id=DEFAULT_USER_ID
+    )
+    quote_loaded, quote_plan = await load_storyboard_image_batch_plan(
+        board_projects,
+        board_queue,
+        project_name=PROJECT,
+        episode_id=1,
+        user_id=DEFAULT_USER_ID,
+        persist_legacy_migrations=False,
+    )
+    assert quote_loaded == native_loaded
+    assert quote_plan == native_plan
+    assert quote_plan.new_task_ids == ["E1S01", "E1S02"]
+    specs = quote_plan.task_specs(source="mcp")
+    assert [(spec.resource_id, spec.dependency_resource_id) for spec in specs] == [("E1S01", None), ("E1S02", "E1S01")]
+    assert specs == native_plan.task_specs(source="mcp")
+    assert ((path / "scripts/episode_1.json").read_bytes(), (path / "project.json").read_bytes()) == before

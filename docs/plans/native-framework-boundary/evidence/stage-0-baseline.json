@@ -1,0 +1,29 @@
+{
+  "head": "1df5ee3b89e865c4193e72d5bbddf64d54b42f0e",
+  "initial_status": [
+    " M .agents/skills/direct-brazilian-production/SKILL.md",
+    "?? docs/audits/",
+    "?? docs/plans/native-framework-boundary/"
+  ],
+  "authorized_implementation_stages": [
+    0,
+    1
+  ],
+  "allowed_runtime_paths": [
+    ".agents/skills/direct-brazilian-production/SKILL.md",
+    ".agents/skills/direct-brazilian-production/references/recovery-format.md",
+    ".agents/skills/direct-brazilian-production/scripts/policy.py",
+    "tests/unit/skills/test_direct_brazilian_policy.py",
+    "tests/integration/skills/test_direct_brazilian_policy_cli.py",
+    "agent_runtime_profile/CLAUDE.ad.md",
+    "agent_runtime_profile/CLAUDE.drama.md",
+    "agent_runtime_profile/CLAUDE.narration.md",
+    "agent_runtime_profile/.claude/skills/generate-assets/SKILL.md",
+    "agent_runtime_profile/.claude/skills/edit-video/SKILL.md",
+    "server/agent_toolset/workflow_access.py"
+  ],
+  "protected_tracked_files": 4712,
+  "protected_digest": "24eef4ee92db4380f8d11a18029c99f7fb94eb47e089a9473e211368230f2357",
+  "preexisting_skill_edit": "disable-model-invocation: true; preserved as preexisting-skill-disable.patch before authorized package retirement",
+  "configuration_scope": "No host settings, installed skills, credentials, environment, authentication, live processes or stages 2-7 changes."
+}

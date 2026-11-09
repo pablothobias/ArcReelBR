@@ -1,0 +1,36 @@
+........................................................................ [ 34%]
+........................................................................ [ 69%]
+..............................................................           [100%]
+=============================== warnings summary ===============================
+tests/unit/lib/config/test_anthropic_env_dict.py::test_active_credential_returns_full_dict
+  /Users/pablo.carminatti.br/.local/share/uv/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/contextlib.py:144: SAWarning: Skipped unsupported reflection of expression-based index idx_tasks_dedupe_active
+    next(self.gen)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 25 durations =============================
+1.08s setup    tests/unit/lib/config/test_anthropic_env_dict.py::test_active_credential_returns_full_dict
+0.21s call     tests/integration/server/test_session_mcp.py::test_session_bridge_send_retry_reconnect_questions_cursor_and_interrupt
+0.16s call     tests/integration/server/agent_runtime/test_session_manager_usage_billing.py::TestDifferentialBaseline::test_each_turn_bills_its_increment_and_the_first_turn_after_resume_has_no_baseline
+0.15s setup    tests/integration/server/test_session_mcp.py::test_session_bridge_send_retry_reconnect_questions_cursor_and_interrupt
+0.14s setup    tests/unit/lib/backends/test_accounting_characterization.py::TestImageChannel::test_reference_images_absent_from_per_image_price_table_are_not_billed
+0.13s call     tests/integration/server/test_session_mcp.py::test_session_discovery_and_native_queue_withdrawal
+0.12s call     tests/integration/server/agent_runtime/test_session_manager_usage_billing.py::TestSessionCredential::test_turns_are_billed_to_the_credential_injected_when_the_session_connected
+0.11s call     tests/integration/server/agent_runtime/test_session_manager_usage_billing.py::TestUsageRecordsView::test_billed_turns_read_back_as_one_session_with_priced_total_and_unpriced_flag
+0.10s setup    tests/integration/server/agent_runtime/test_session_manager_usage_billing.py::TestDifferentialBaseline::test_a_conversation_reset_starts_the_baseline_from_zero
+0.10s call     tests/integration/server/agent_runtime/test_session_manager_usage_billing.py::TestSessionCredential::test_changing_the_multiplier_mid_session_keeps_the_rate_taken_when_the_session_connected
+0.09s setup    tests/integration/server/test_session_mcp.py::test_session_bridge_rejects_cross_project_ownership[send_agent_message-extra5]
+0.09s setup    tests/integration/server/test_session_mcp.py::test_session_bridge_rejects_cross_project_ownership[answer_agent_question-extra3]
+0.09s setup    tests/integration/server/test_session_mcp.py::test_session_bridge_rejects_cross_project_ownership[list_agent_questions-extra2]
+0.09s setup    tests/integration/server/test_session_mcp.py::test_session_bridge_rejects_cross_project_ownership[list_agent_session_entries-extra1]
+0.09s setup    tests/integration/server/test_session_mcp.py::test_session_discovery_and_native_queue_withdrawal
+0.09s setup    tests/integration/server/test_session_mcp.py::test_session_bridge_rejects_cross_project_ownership[interrupt_agent_session-extra4]
+0.09s setup    tests/integration/server/test_session_mcp.py::test_session_bridge_requires_retry_key_before_submitting
+0.09s setup    tests/integration/server/test_session_mcp.py::test_session_bridge_rejects_cross_project_ownership[get_agent_session-extra0]
+0.07s call     tests/integration/server/agent_runtime/test_session_manager_usage_billing.py::TestDifferentialBaseline::test_an_interrupted_turn_is_cancelled_and_keeps_its_cost
+0.07s call     tests/integration/server/agent_runtime/test_session_manager_usage_billing.py::TestDifferentialBaseline::test_a_conversation_reset_starts_the_baseline_from_zero
+0.06s setup    tests/integration/server/agent_runtime/test_session_manager_usage_billing.py::TestDifferentialBaseline::test_each_turn_bills_its_increment_and_the_first_turn_after_resume_has_no_baseline
+0.06s setup    tests/integration/server/agent_runtime/test_session_manager_usage_billing.py::TestDifferentialBaseline::test_an_interrupted_turn_is_cancelled_and_keeps_its_cost
+0.05s call     tests/integration/server/agent_runtime/test_session_manager_usage_billing.py::TestPricing::test_each_model_gets_one_row_and_frames_of_one_request_count_once
+0.05s setup    tests/integration/server/agent_runtime/test_session_manager_usage_billing.py::TestSessionCredential::test_claude_models_of_the_official_preset_are_priced_from_the_catalog
+0.05s setup    tests/integration/server/agent_runtime/test_session_manager_usage_billing.py::TestPricing::test_each_request_takes_the_price_of_its_own_context_tier
+206 passed, 1 warning in 9.23s

@@ -1,0 +1,15 @@
+{
+  "captured_at": "2026-11-09T10:18:15-03:00",
+  "head": "1df5ee3b89e865c4193e72d5bbddf64d54b42f0e",
+  "status": [
+    "?? docs/audits/"
+  ],
+  "reports": [
+    "codex-responsibility-boundary.md",
+    "native-harness-responsibilities.md"
+  ],
+  "document_check_issues": [],
+  "implementation_tests_run": false,
+  "production_model_calls": 0,
+  "scope": "Static source/history, controller skill configuration entry, prior session evidence, and four materialized profile file comparisons. Only audit documents added."
+}

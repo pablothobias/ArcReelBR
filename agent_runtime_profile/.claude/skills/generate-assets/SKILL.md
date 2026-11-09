@@ -11,8 +11,6 @@ Project settings select the image provider, without locking a specific backend.
 
 > Prompt-writing principles: “Prompt language” in `.claude/references/generation-modes.md`.
 
-Before a paid batch, use `mcp__arcreel__quote_assets` with the same selection. It reads the native batch plan without generating media. Explicit names quote regeneration; omitted names select missing sheets. Preserve unknown prices and `estimate_basis` in the confirmation.
-
 ## Shared conventions
 
 - All asset `description` values use **narrative paragraphs**, not keyword lists.

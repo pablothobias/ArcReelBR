@@ -1,0 +1,24 @@
+{
+  "protected_tracked_files_checked": 4712,
+  "protected_file_changes": [],
+  "unexpected_tracked_changes": [],
+  "actual_tracked_change_paths": [
+    ".agents/skills/direct-brazilian-production/SKILL.md",
+    ".agents/skills/direct-brazilian-production/references/recovery-format.md",
+    ".agents/skills/direct-brazilian-production/scripts/policy.py",
+    "agent_runtime_profile/.claude/skills/edit-video/SKILL.md",
+    "agent_runtime_profile/.claude/skills/generate-assets/SKILL.md",
+    "agent_runtime_profile/CLAUDE.ad.md",
+    "agent_runtime_profile/CLAUDE.drama.md",
+    "agent_runtime_profile/CLAUDE.narration.md",
+    "server/agent_toolset/workflow_access.py",
+    "tests/integration/skills/test_direct_brazilian_policy_cli.py",
+    "tests/unit/skills/test_direct_brazilian_policy.py"
+  ],
+  "three_delegated_sections_identical": true,
+  "removed_profile_clauses_absent": true,
+  "custom_skill_file_absent": true,
+  "obsolete_policy_tests_absent": true,
+  "stage_2_contracts_unchanged": true,
+  "scope": "Stages 0 and 1 only; repository discovery, not installed host copies."
+}

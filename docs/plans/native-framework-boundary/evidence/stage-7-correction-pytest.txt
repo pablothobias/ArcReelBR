@@ -1,0 +1,98 @@
+.....................................................FF...........       [100%]
+=================================== FAILURES ===================================
+_ TestAssistantRoutes.test_queued_message_reconnect_failures_explain_the_cause[resend_queued_message-/resend] _
+
+self = <tests.unit.server.routers.test_assistant_routes.TestAssistantRoutes object at 0x11c751220>
+service_method = 'resend_queued_message', path = '/resend'
+
+    @pytest.mark.parametrize(
+        ("service_method", "path"),
+        [("resend_queued_message", "/resend"), ("send_queued_message_now", "/send-now")],
+    )
+    def test_queued_message_reconnect_failures_explain_the_cause(self, service_method: str, path: str):
+        # Resending unsent messages and immediate sends both rebuild session connections.
+        with (
+            patch.object(
+                assistant.assistant_service, service_method, new=AsyncMock(side_effect=SessionCapacityError("full"))
+            ),
+            _build_client() as client,
+        ):
+            response = client.post(f"{PREFIX}/sessions/session-1/queued-messages/m-1{path}")
+        assert response.status_code == 503
+>       assert response.json()["detail"] == make_translator()("session_capacity_exceeded")
+E       AssertionError: assert 'Concurrent s...y again later' == '并发会话数已达上限，请稍后再试'
+E
+E         - 并发会话数已达上限，请稍后再试
+E         + Concurrent session limit reached, please try again later
+
+tests/unit/server/routers/test_assistant_routes.py:175: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 16:02:23 [INFO] httpx2: HTTP Request: POST http://testserver/api/v1/projects/demo/assistant/sessions/session-1/queued-messages/m-1/resend "HTTP/1.1 503 Service Unavailable"
+------------------------------ Captured log call -------------------------------
+INFO     httpx2:_client.py:1084 HTTP Request: POST http://testserver/api/v1/projects/demo/assistant/sessions/session-1/queued-messages/m-1/resend "HTTP/1.1 503 Service Unavailable"
+_ TestAssistantRoutes.test_queued_message_reconnect_failures_explain_the_cause[send_queued_message_now-/send-now] _
+
+self = <tests.unit.server.routers.test_assistant_routes.TestAssistantRoutes object at 0x11c751370>
+service_method = 'send_queued_message_now', path = '/send-now'
+
+    @pytest.mark.parametrize(
+        ("service_method", "path"),
+        [("resend_queued_message", "/resend"), ("send_queued_message_now", "/send-now")],
+    )
+    def test_queued_message_reconnect_failures_explain_the_cause(self, service_method: str, path: str):
+        # Resending unsent messages and immediate sends both rebuild session connections.
+        with (
+            patch.object(
+                assistant.assistant_service, service_method, new=AsyncMock(side_effect=SessionCapacityError("full"))
+            ),
+            _build_client() as client,
+        ):
+            response = client.post(f"{PREFIX}/sessions/session-1/queued-messages/m-1{path}")
+        assert response.status_code == 503
+>       assert response.json()["detail"] == make_translator()("session_capacity_exceeded")
+E       AssertionError: assert 'Concurrent s...y again later' == '并发会话数已达上限，请稍后再试'
+E
+E         - 并发会话数已达上限，请稍后再试
+E         + Concurrent session limit reached, please try again later
+
+tests/unit/server/routers/test_assistant_routes.py:175: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 16:02:23 [INFO] httpx2: HTTP Request: POST http://testserver/api/v1/projects/demo/assistant/sessions/session-1/queued-messages/m-1/send-now "HTTP/1.1 503 Service Unavailable"
+------------------------------ Captured log call -------------------------------
+INFO     httpx2:_client.py:1084 HTTP Request: POST http://testserver/api/v1/projects/demo/assistant/sessions/session-1/queued-messages/m-1/send-now "HTTP/1.1 503 Service Unavailable"
+=============================== warnings summary ===============================
+tests/integration/server/test_session_mcp.py::test_session_bridge_send_retry_reconnect_questions_cursor_and_interrupt
+  /Users/pablo.carminatti.br/.local/share/uv/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/contextlib.py:144: SAWarning: Skipped unsupported reflection of expression-based index idx_tasks_dedupe_active
+    next(self.gen)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 25 durations =============================
+1.62s setup    tests/integration/server/test_session_mcp.py::test_session_bridge_send_retry_reconnect_questions_cursor_and_interrupt
+0.28s call     tests/integration/server/test_session_mcp.py::test_session_bridge_send_retry_reconnect_questions_cursor_and_interrupt
+0.18s call     tests/unit/server/routers/test_assistant_routes.py::TestAssistantRoutes::test_queued_message_action_errors_are_mapped[error0-404-withdraw_queued_message-delete-]
+0.18s call     tests/integration/server/test_session_mcp.py::test_session_discovery_and_native_queue_withdrawal
+0.12s setup    tests/integration/server/test_session_mcp.py::test_session_bridge_keeps_unclassified_startup_diagnostics_private
+0.12s setup    tests/integration/server/test_session_mcp.py::test_session_bridge_requires_retry_key_before_submitting
+0.11s setup    tests/integration/server/test_session_mcp.py::test_session_bridge_relays_safe_route_conflict_before_sdk_start[CLAUDE_CODE_USE_FOUNDRY]
+0.11s setup    tests/integration/server/test_session_mcp.py::test_session_bridge_rejects_cross_project_ownership[interrupt_agent_session-extra4]
+0.11s setup    tests/integration/server/test_session_mcp.py::test_session_bridge_relays_safe_route_conflict_before_sdk_start[CLAUDE_CODE_USE_VERTEX]
+0.11s setup    tests/integration/server/test_session_mcp.py::test_session_bridge_rejects_cross_project_ownership[get_agent_session-extra0]
+0.11s setup    tests/integration/server/test_session_mcp.py::test_session_discovery_and_native_queue_withdrawal
+0.11s setup    tests/integration/server/test_session_mcp.py::test_session_bridge_relays_safe_route_conflict_before_sdk_start[CLAUDE_CODE_USE_BEDROCK]
+0.11s setup    tests/integration/server/test_session_mcp.py::test_session_bridge_rejects_cross_project_ownership[list_agent_questions-extra2]
+0.11s setup    tests/integration/server/test_session_mcp.py::test_session_bridge_relays_safe_route_conflict_before_sdk_start[CLAUDE_CODE_USE_MANTLE]
+0.11s setup    tests/integration/server/test_session_mcp.py::test_session_bridge_rejects_cross_project_ownership[send_agent_message-extra5]
+0.11s setup    tests/integration/server/test_session_mcp.py::test_session_bridge_rejects_cross_project_ownership[answer_agent_question-extra3]
+0.10s setup    tests/integration/server/test_session_mcp.py::test_session_bridge_rejects_cross_project_ownership[list_agent_session_entries-extra1]
+0.10s setup    tests/integration/server/test_session_mcp.py::test_session_bridge_relays_safe_route_conflict_before_sdk_start[CLAUDE_CODE_USE_ANTHROPIC_AWS]
+0.10s setup    tests/integration/server/test_session_mcp.py::test_session_bridge_relays_safe_route_conflict_before_sdk_start[CLAUDE_CODE_USE_ANTHROPIC_GOOGLE_CLOUD]
+0.08s call     tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_local_launcher_clean_boundary_excludes_inherited_cloud_selectors
+0.07s setup    tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_cloud_route_cannot_reach_zero_price_sdk_spawn[CLAUDE_CODE_USE_ANTHROPIC_GOOGLE_CLOUD]
+0.07s setup    tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_disabled_cloud_flag_keeps_zero_price_and_reaches_only_intercepted_spawn[CLAUDE_CODE_USE_FOUNDRY]
+0.07s setup    tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_cloud_route_cannot_reach_zero_price_sdk_spawn[CLAUDE_CODE_USE_BEDROCK]
+0.06s setup    tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_cloud_route_cannot_reach_zero_price_sdk_spawn[CLAUDE_CODE_USE_ANTHROPIC_AWS]
+0.06s setup    tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_configured_api_pricing_and_environment_are_retained[False-False]
+=========================== short test summary info ============================
+FAILED tests/unit/server/routers/test_assistant_routes.py::TestAssistantRoutes::test_queued_message_reconnect_failures_explain_the_cause[resend_queued_message-/resend]
+FAILED tests/unit/server/routers/test_assistant_routes.py::TestAssistantRoutes::test_queued_message_reconnect_failures_explain_the_cause[send_queued_message_now-/send-now]
+2 failed, 64 passed, 1 warning in 11.62s

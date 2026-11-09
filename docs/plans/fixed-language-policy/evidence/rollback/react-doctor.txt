@@ -1,0 +1,3 @@
+Scanning changes: (detached HEAD) → HEAD
+
+No changed source files in /Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/frontend, skipping.

@@ -1,0 +1,105 @@
+........................................................................ [ 10%]
+........................................................................ [ 21%]
+.................................................................F...... [ 31%]
+F...........F........................................................... [ 42%]
+........................................................................ [ 52%]
+........................................................................ [ 63%]
+........................................................................ [ 74%]
+........................................................................ [ 84%]
+........................................................................ [ 95%]
+.................................                                        [100%]
+=================================== FAILURES ===================================
+__ TestScreenplaySourceKind.test_normalize_screenplay_flips_to_extract_first ___
+
+self = <tests.unit.lib.prompts.test_prompt_builders_script.TestScreenplaySourceKind object at 0x11ec25f10>
+
+    def test_normalize_screenplay_flips_to_extract_first(self):
+        prompt = self._normalize_prompt("screenplay")
+        # Extraction/verbatim semantics exist: screenplay source feeds utterances/source_text, without adaptation.
+        assert "extract" in prompt
+        assert "verbatim" in prompt
+        assert "off-screen speech" in prompt
+        assert "<screenplay>\n【第1集】角色甲：「你好」\n</screenplay>" in prompt
+        assert "utterances" in prompt
+        assert "source_text" in prompt
+>       assert "adapt" not in prompt
+E       AssertionError: assert 'adapt' not in 'Your task i... and `skip`.'
+E
+E         'adapt' is contained here:
+E         ?           ^^^^
+E           rtuguese adaptation before generation when the original is in another language; do not silently rewrite existing approved scripts, history or submitted requests; keep JSON keys / enum values in English. Exceptions (preserve the source verbatim, without translation or rewriting): asset-reference fields (`characters_in_scene[]` / `scenes[]` / `props[]`, which must exactly match names registered in project.json or names in `new_assets`) and verbatim fields (`utterances[].text` / `utterances[].speaker` / `source_text`); speaker retains the original ch...
+E
+E         ...Full output truncated (80 lines hidden), use '-vv' to show
+
+tests/unit/lib/prompts/test_prompt_builders_script.py:285: AssertionError
+_ TestScreenplaySourceKind.test_normalize_output_language_keeps_main_clause_for_both_source_kinds _
+
+self = <tests.unit.lib.prompts.test_prompt_builders_script.TestScreenplaySourceKind object at 0x11ec667b0>
+
+    def test_normalize_output_language_keeps_main_clause_for_both_source_kinds(self):
+        for source_kind in ("novel", "screenplay"):
+            prompt = self._normalize_prompt(source_kind, target_language="English")
+>           assert (
+                "**Output language**: natural-language string values must use English; keep JSON keys / enum values in English. Exceptions (preserve"
+                in prompt
+            )
+E           AssertionError: assert '**Output language**: natural-language string values must use English; keep JSON keys / enum values in English. Exceptions (preserve' in 'Your task is to **adapt** the original novel into structured shot content (including visual adaptation descriptions, ...tive relationship. Keep descriptions of registered assets unchanged; leave `description` empty for `merge` and `skip`.'
+
+tests/unit/lib/prompts/test_prompt_builders_script.py:360: AssertionError
+_____ TestOverviewPrompt.test_prompt_has_task_language_and_source_in_order _____
+
+self = <tests.unit.lib.prompts.test_prompt_builders_script.TestOverviewPrompt object at 0x11eb55880>
+
+    def test_prompt_has_task_language_and_source_in_order(self):
+        prompt = build_overview_prompt("正文内容", source_kind="novel", target_language="English")
+>       assert prompt == (
+            "Analyze the following novel content and extract key information:\n\n"
+            "**Output language**: all string values must use English; keep JSON keys / enum values in English.\n\n"
+            "正文内容"
+        )
+E       AssertionError: assert 'Analyze the ...lish.\n\n正文内容' == 'Analyze the ...lish.\n\n正文内容'
+E
+E         Skipping 111 identical leading characters in diff, use -v to show
+E         - se English; keep JSON keys / enum values in English.
+E         + se English for technical directions (camera, staging, lighting, visual descriptions, image/video prompts and voice-performance instructions), and Brazilian Portuguese (pt-BR) for creative story content, dialogue, narration, subtitles and visible story text. Copy approved Brazilian Portuguese speech and subtitle text verbatim, including accents, punctuation and speaker attribution; never translate spoken quotations into English. Preserve source anchors...
+E
+E         ...Full output truncated (3 lines hidden), use '-vv' to show
+
+tests/unit/lib/prompts/test_prompt_builders_script.py:481: AssertionError
+=============================== warnings summary ===============================
+tests/unit/lib/prompts/prompt_rules/test_asset_appearance.py::test_character_names_list_each_form_after_its_ontology
+  /Users/pablo.carminatti.br/.local/share/uv/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/contextlib.py:144: SAWarning: Skipped unsupported reflection of expression-based index idx_tasks_dedupe_active
+    next(self.gen)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 25 durations =============================
+12.26s call     tests/integration/server/agent_runtime/test_event_log_session_flow.py::TestQueuedMessages::test_queued_idempotency_and_replays_survive_many_later_sends
+1.27s setup    tests/unit/lib/prompts/prompt_rules/test_asset_appearance.py::test_character_names_list_each_form_after_its_ontology
+0.35s call     tests/unit/lib/prompts/prompt_templates/test_builtin.py::test_builtin_shared_partials_are_not_referenced_by_a_single_partial
+0.32s setup    tests/integration/server/agent_runtime/test_event_log_session_flow.py::TestNewSessionEventLogFlow::test_sdk_error_becomes_one_turn_failure_event_with_raw_assistant_and_result
+0.30s call     tests/unit/lib/prompts/prompt_templates/test_builtin.py::test_builtin_applies_to_values_are_real_project_values
+0.29s call     tests/unit/lib/prompts/prompt_templates/test_builtin.py::test_builtin_templates_declare_stage_and_trigger_and_lock_structural_partials
+0.28s call     tests/unit/lib/prompts/prompt_templates/test_builtin.py::test_builtin_directory_has_valid_slots_variants_and_template_syntax
+0.25s call     tests/integration/server/agent_runtime/test_event_log_session_flow.py::TestNewSessionEventLogFlow::test_task_notification_flow_produces_typed_entries
+0.24s call     tests/integration/server/agent_runtime/test_event_log_session_flow.py::TestQueuedMessages::test_retry_of_an_accepted_message_whose_entry_failed_to_record_is_refused_not_resent
+0.24s setup    tests/integration/server/agent_runtime/test_event_log_session_flow.py::TestSendQueuedMessageNow::test_a_withdrawn_message_is_sent_again_with_now_priority
+0.22s call     tests/integration/server/agent_runtime/test_event_log_session_flow.py::TestNewSessionEventLogFlow::test_replayed_echo_persists_user_message_identity_mapping
+0.22s call     tests/integration/server/agent_runtime/test_event_log_session_flow.py::TestNewSessionEventLogFlow::test_full_round_produces_typed_monotonic_entries
+0.20s call     tests/integration/server/agent_runtime/test_event_log_session_flow.py::TestQueuedMessages::test_a_failed_send_during_a_turn_leaves_the_turn_running_and_settled_by_the_cli
+0.19s setup    tests/integration/server/agent_runtime/test_event_log_session_flow.py::TestNewSessionEventLogFlow::test_replayed_echo_persists_user_message_identity_mapping
+0.19s setup    tests/integration/server/agent_runtime/test_event_log_session_flow.py::TestNewSessionEventLogFlow::test_interrupt_flow_produces_single_typed_entry
+0.19s call     tests/integration/server/agent_runtime/test_event_log_session_flow.py::TestSendQueuedMessageNow::test_the_turn_it_preempts_is_interrupted_and_a_dropped_message_runs_after_it
+0.18s call     tests/unit/lib/agent/test_profile_translation_lifecycle.py::test_translation_roundtrip_preserves_user_state[False-drama]
+0.18s call     tests/unit/lib/agent/test_profile_translation_lifecycle.py::test_translation_roundtrip_preserves_user_state[False-narration]
+0.17s call     tests/integration/server/agent_runtime/test_event_log_session_flow.py::TestQueuedMessages::test_a_send_that_resumes_after_a_graceful_eviction_keeps_the_eviction_status
+0.17s call     tests/integration/server/agent_runtime/test_event_log_session_flow.py::TestNewSessionEventLogFlow::test_interrupt_flow_produces_single_typed_entry
+0.15s call     tests/integration/server/agent_runtime/test_event_log_session_flow.py::TestQueuedMessageWithdrawal::test_editing_a_queued_message_the_cli_cancels_returns_its_content
+0.15s call     tests/integration/server/agent_runtime/test_event_log_session_flow.py::TestQueuedMessages::test_messages_merged_into_the_running_turn_share_its_usage_prompt
+0.15s setup    tests/integration/server/agent_runtime/test_event_log_session_flow.py::TestNewSessionEventLogFlow::test_inbox_processor_failure_before_init_is_cleaned_up_and_reported
+0.15s call     tests/integration/server/agent_runtime/test_event_log_session_flow.py::TestQueuedMessages::test_usage_of_each_turn_is_recorded_against_the_prompt_it_handled
+0.14s call     tests/integration/server/agent_runtime/test_event_log_session_flow.py::TestSendQueuedMessageNow::test_a_withdrawn_message_is_sent_again_with_now_priority
+=========================== short test summary info ============================
+FAILED tests/unit/lib/prompts/test_prompt_builders_script.py::TestScreenplaySourceKind::test_normalize_screenplay_flips_to_extract_first
+FAILED tests/unit/lib/prompts/test_prompt_builders_script.py::TestScreenplaySourceKind::test_normalize_output_language_keeps_main_clause_for_both_source_kinds
+FAILED tests/unit/lib/prompts/test_prompt_builders_script.py::TestOverviewPrompt::test_prompt_has_task_language_and_source_in_order
+3 failed, 678 passed, 1 warning in 37.49s

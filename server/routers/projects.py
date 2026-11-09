@@ -329,7 +329,9 @@ class EpisodePatch(BaseModel):
     script_file: str | None = None
 
 
-class UpdateProjectRequest(BaseModel):
+class ProjectSettingsRequest(BaseModel):
+    """Settings shared by user and automated updates; user-only controls live on the Web request."""
+
     source_language: ContentLanguage | None = Field(
         default=None, description="Content language used for project speech and language defaults"
     )
@@ -351,8 +353,6 @@ class UpdateProjectRequest(BaseModel):
     )
     # Ad-only brief; explicit null clears to empty string.
     brief: str | None = Field(default=None, description="Ad creative brief; null clears it")
-    # Generation mode is creation-fixed, structurally absent from PATCH; grid toggles remain mutable.
-    grid_storyboard: bool | None = Field(default=None, description="Enable or disable grid storyboard generation")
     video_backend: str | None = Field(
         default=None, description="Default video provider/model; empty clears the project override"
     )
@@ -397,6 +397,11 @@ class UpdateProjectRequest(BaseModel):
     model_settings: dict[str, dict[str, str | None]] | None = Field(
         default=None, description="Per-model settings keyed by provider/model, including resolution"
     )
+
+
+class UpdateProjectRequest(ProjectSettingsRequest):
+    # Generation mode is creation-fixed; only user Settings updates may toggle grids.
+    grid_storyboard: bool | None = Field(default=None, description="Enable or disable grid storyboard generation")
 
 
 def _apply_narration_patch(project: dict, req: UpdateProjectRequest) -> None:

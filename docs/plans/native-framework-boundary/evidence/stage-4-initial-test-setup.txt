@@ -1,0 +1,62 @@
+E                                                                        [100%]
+==================================== ERRORS ====================================
+_ ERROR at setup of test_native_deletion_after_mcp_precheck_refuses_without_orphan _
+
+isolated_data_root = None
+
+    @pytest.fixture
+    def reference_project(isolated_data_root):
+>       pm = ProjectManager(isolated_data_root)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/server/test_reference_upload_transaction.py:26:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+lib/project/project_manager.py:417: in __init__
+    self.layout = DataRootLayout(Path(data_root))
+                                 ^^^^^^^^^^^^^^^
+../../../../.local/share/uv/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/pathlib.py:1162: in __init__
+    super().__init__(*args)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <[AttributeError("'PosixPath' object has no attribute '_raw_paths'") raised in repr()] PosixPath object at 0x12078c7b0>
+args = (None,)
+
+    def __init__(self, *args):
+        paths = []
+        for arg in args:
+            if isinstance(arg, PurePath):
+                if arg._flavour is not self._flavour:
+                    # GH-103631: Convert separators for backwards compatibility.
+                    paths.append(arg.as_posix())
+                else:
+                    paths.extend(arg._raw_paths)
+            else:
+                try:
+                    path = os.fspath(arg)
+                except TypeError:
+                    path = arg
+                if not isinstance(path, str):
+>                   raise TypeError(
+                        "argument should be a str or an os.PathLike "
+                        "object where __fspath__ returns a str, "
+                        f"not {type(path).__name__!r}")
+E                   TypeError: argument should be a str or an os.PathLike object where __fspath__ returns a str, not 'NoneType'
+
+../../../../.local/share/uv/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/pathlib.py:373: TypeError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-09 15:01:16 [WARNING] server.app: frontend/dist/index.html 不存在，跳过前端页面挂载（API 不受影响）
+------------------------------ Captured log setup ------------------------------
+WARNING  server.app:app.py:1003 frontend/dist/index.html 不存在，跳过前端页面挂载（API 不受影响）
+=============================== warnings summary ===============================
+tests/integration/server/test_reference_upload_transaction.py::test_native_deletion_after_mcp_precheck_refuses_without_orphan
+  /Users/pablo.carminatti.br/.local/share/uv/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/contextlib.py:144: SAWarning: Skipped unsupported reflection of expression-based index idx_tasks_dedupe_active
+    next(self.gen)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 25 durations =============================
+1.66s setup    tests/integration/server/test_reference_upload_transaction.py::test_native_deletion_after_mcp_precheck_refuses_without_orphan
+
+(1 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+ERROR tests/integration/server/test_reference_upload_transaction.py::test_native_deletion_after_mcp_precheck_refuses_without_orphan
+1 warning, 1 error in 2.31s

@@ -1,0 +1,28 @@
+{
+  "head": "1df5ee3b89e865c4193e72d5bbddf64d54b42f0e",
+  "restored_paths": [
+    "AGENTS.md",
+    "agent_runtime_profile/.claude/references/generation-modes.md",
+    "agent_runtime_profile/.claude/skills/manage-project/SKILL.md",
+    "agent_runtime_profile/.claude/skills/video-workflow/SKILL.drama.md",
+    "agent_runtime_profile/.claude/skills/video-workflow/SKILL.narration.md",
+    "docs/adr/0122-english-product-defaults-preserve-project-language.md",
+    "frontend/e2e/regions/language-policy.spec.ts",
+    "frontend/src/components/pages/settings/GeneralSection.test.tsx",
+    "frontend/src/components/pages/settings/GeneralSection.tsx",
+    "frontend/src/i18n/index.ts",
+    "frontend/src/i18n/initialization.test.ts",
+    "frontend/src/test/setup.ts",
+    "lib/prompts/prompt_rules/content_language.py",
+    "lib/prompts/prompt_templates/templates/text/agent_language_rule.md",
+    "lib/prompts/prompt_templates/templates/text/source_overview.md",
+    "server/agent_runtime/options_assembler.py",
+    "server/agent_runtime/session_manager.py",
+    "tests/unit/lib/prompts/test_brazilian_content.py",
+    "tests/unit/lib/prompts/test_prompt_builders_script.py",
+    "tests/unit/server/agent_runtime/test_options_assembler.py",
+    "tests/unit/server/agent_runtime/test_session_manager_user_input.py",
+    "public/agent-installation-guide.md"
+  ],
+  "retained_test_assertion": "tests/unit/server/routers/test_assistant_routes.py"
+}

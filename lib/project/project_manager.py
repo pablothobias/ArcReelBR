@@ -3815,12 +3815,30 @@ class ProjectManager:
             Updated project data."""
 
         def _mutate(project: dict) -> None:
-            key = resolve_asset_key(project.get("characters"), char_name)
-            if key is None:
-                raise KeyError(f"角色 '{char_name}' 不存在")
-            project["characters"][key]["reference_image"] = ref_path
+            self._set_character_reference_image(project, char_name, ref_path)
 
         return self.update_project(project_name, _mutate)
+
+    @staticmethod
+    def _set_character_reference_image(project: dict, char_name: str, ref_path: str) -> None:
+        key = resolve_asset_key(project.get("characters"), char_name)
+        if key is None:
+            raise KeyError(f"角色 '{char_name}' 不存在")
+        project["characters"][key]["reference_image"] = ref_path
+
+    def install_character_reference_image(
+        self, project_name: str, char_name: str, ref_path: str, content: bytes
+    ) -> dict:
+        """Install image bytes and their existing character pointer in one rollback-capable project transaction."""
+        project_dir = self.get_project_path(project_name)
+        target = Path(self._safe_subpath(project_dir, ref_path))
+        if os.path.realpath(target.parent) != os.path.realpath(project_dir / "characters" / "refs"):
+            raise ValueError("reference image target must be inside characters/refs")
+
+        def _mutate(project: dict) -> None:
+            self._set_character_reference_image(project, char_name, ref_path)
+
+        return self._update_project_with_files(project_name, _mutate, writes=[(content, target)])
 
     def update_character_reference_audio(self, project_name: str, char_name: str, ref_path: str) -> dict:
         r"""Update a character's reference-audio path (empty string clears it).

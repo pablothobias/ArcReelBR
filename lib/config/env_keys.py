@@ -16,6 +16,26 @@ ANTHROPIC_ENV_KEYS: tuple[str, ...] = (
     "CLAUDE_CODE_SUBAGENT_MODEL",
 )
 
+# Claude CLI cloud selectors are checked, not silently cleared, when local subscription pricing is selected.
+CLAUDE_CLOUD_ROUTE_ENV_KEYS: tuple[str, ...] = (
+    "CLAUDE_CODE_USE_BEDROCK",
+    "CLAUDE_CODE_USE_VERTEX",
+    "CLAUDE_CODE_USE_FOUNDRY",
+    "CLAUDE_CODE_USE_ANTHROPIC_AWS",
+    "CLAUDE_CODE_USE_ANTHROPIC_GOOGLE_CLOUD",
+    "CLAUDE_CODE_USE_MANTLE",
+)
+
+CLAUDE_SUBSCRIPTION_API_ENV_KEYS: tuple[str, ...] = (
+    "ANTHROPIC_API_KEY",
+    "ANTHROPIC_AUTH_TOKEN",
+    "ANTHROPIC_BASE_URL",
+    "CLAUDE_CODE_OAUTH_TOKEN",
+    "ANTHROPIC_CUSTOM_HEADERS",
+    "ANTHROPIC_BEDROCK_BASE_URL",
+    "ANTHROPIC_VERTEX_BASE_URL",
+)
+
 # Other provider environment keys, overridden empty in options.env.
 OTHER_PROVIDER_ENV_KEYS: tuple[str, ...] = (
     # Claude CLI/SDK prioritize these bypass authentication variables. Outside ArcReel provider

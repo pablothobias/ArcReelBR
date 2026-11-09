@@ -1,0 +1,102 @@
+[
+  {
+    "unit": "E1S01",
+    "duration": 12.25,
+    "streams": [
+      {
+        "codec_type": "video",
+        "codec_name": "h264",
+        "width": 768,
+        "height": 1344,
+        "r_frame_rate": "24/1"
+      },
+      {
+        "codec_type": "audio",
+        "codec_name": "aac",
+        "width": null,
+        "height": null,
+        "r_frame_rate": "0/0"
+      }
+    ]
+  },
+  {
+    "unit": "E1S02",
+    "duration": 4.458333,
+    "streams": [
+      {
+        "codec_type": "video",
+        "codec_name": "h264",
+        "width": 768,
+        "height": 1344,
+        "r_frame_rate": "24/1"
+      },
+      {
+        "codec_type": "audio",
+        "codec_name": "aac",
+        "width": null,
+        "height": null,
+        "r_frame_rate": "0/0"
+      }
+    ]
+  },
+  {
+    "unit": "E1S05",
+    "duration": 8.0,
+    "streams": [
+      {
+        "codec_type": "video",
+        "codec_name": "h264",
+        "width": 768,
+        "height": 1344,
+        "r_frame_rate": "24/1"
+      },
+      {
+        "codec_type": "audio",
+        "codec_name": "aac",
+        "width": null,
+        "height": null,
+        "r_frame_rate": "0/0"
+      }
+    ]
+  },
+  {
+    "unit": "E1S03",
+    "duration": 10.125,
+    "streams": [
+      {
+        "codec_type": "video",
+        "codec_name": "h264",
+        "width": 768,
+        "height": 1344,
+        "r_frame_rate": "24/1"
+      },
+      {
+        "codec_type": "audio",
+        "codec_name": "aac",
+        "width": null,
+        "height": null,
+        "r_frame_rate": "0/0"
+      }
+    ]
+  },
+  {
+    "unit": "E1S04",
+    "duration": 6.583333,
+    "streams": [
+      {
+        "codec_type": "video",
+        "codec_name": "h264",
+        "width": 768,
+        "height": 1344,
+        "r_frame_rate": "24/1"
+      },
+      {
+        "codec_type": "audio",
+        "codec_name": "aac",
+        "width": null,
+        "height": null,
+        "r_frame_rate": "0/0"
+      }
+    ]
+  }
+]

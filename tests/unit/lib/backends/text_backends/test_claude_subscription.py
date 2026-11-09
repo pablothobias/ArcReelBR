@@ -21,6 +21,7 @@ from lib.backends.text_backends.claude_subscription import (
     verify_local_subscription,
 )
 from lib.config.claude_subscription import CLAUDE_SUBSCRIPTION_MODEL, CLAUDE_SUBSCRIPTION_PAIR
+from lib.config.env_keys import CLAUDE_CLOUD_ROUTE_ENV_KEYS
 from lib.infra.api_errors import BadRequestError
 from server.routers._validators import validate_backend_value
 
@@ -331,3 +332,31 @@ async def test_concurrent_generations_use_distinct_sessions_and_isolation_direct
     assert len(set(directories)) == 2
     assert runtime.auth_calls == 2
     assert not any(await asyncio.gather(*(asyncio.to_thread(Path(directory).exists) for directory in directories)))
+
+
+@pytest.mark.parametrize("flag", CLAUDE_CLOUD_ROUTE_ENV_KEYS)
+@pytest.mark.parametrize("enabled", [True, False])
+async def test_subscription_auth_uses_shared_cloud_route_semantics(monkeypatch, tmp_path, flag, enabled):
+    from lib.config.env_keys import CLAUDE_CLOUD_ROUTE_ENV_KEYS, CLAUDE_SUBSCRIPTION_API_ENV_KEYS
+
+    for key in (*CLAUDE_CLOUD_ROUTE_ENV_KEYS, *CLAUDE_SUBSCRIPTION_API_ENV_KEYS):
+        monkeypatch.delenv(key, raising=False)
+    monkeypatch.setenv(flag, " YES " if enabled else "false")
+
+    class Process:
+        returncode = 0
+
+        async def communicate(self):
+            return json.dumps(
+                {"loggedIn": True, "authMethod": "claude.ai", "apiProvider": "firstParty", "subscriptionType": "max"}
+            ).encode(), None
+
+    async def process_factory(*args, **kwargs):
+        assert not enabled, "An enabled cloud route must be refused before authentication"
+        return Process()
+
+    if enabled:
+        with pytest.raises(SubscriptionAuthenticationError, match="clean local login"):
+            await verify_local_subscription("unused-cli", str(tmp_path), process_factory=process_factory)
+    else:
+        assert await verify_local_subscription("unused-cli", str(tmp_path), process_factory=process_factory) is None

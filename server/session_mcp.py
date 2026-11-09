@@ -14,6 +14,7 @@ from mcp.server.fastmcp.exceptions import ToolError
 from mcp.server.fastmcp.tools import Tool
 from pydantic import Field
 
+from lib.config.claude_subscription import SubscriptionRouteConflictError
 from lib.project.project_manager import ProjectManager
 from server.agent_runtime.models import SessionMeta
 from server.agent_runtime.service import AssistantService, SessionSupersededError
@@ -48,7 +49,9 @@ class _SessionTool(Tool):
             return self.fn_metadata.convert_result(result) if convert_result else result
         except ToolError:
             raise
-        except AgentStartupError:
+        except AgentStartupError as exc:
+            if isinstance(exc.__cause__, SubscriptionRouteConflictError):
+                raise ToolError(str(exc.__cause__)) from None
             raise ToolError(
                 "Embedded Agent startup failed; inspect local diagnostics and authentication before retrying"
             ) from None

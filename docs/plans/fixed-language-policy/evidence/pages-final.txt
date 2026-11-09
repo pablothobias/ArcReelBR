@@ -1,0 +1,40 @@
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies", "pnpm.overrides". See https://pnpm.io/settings for the new home of each setting.
+[WebServer] (node:93826) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:93843) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+[WebServer]   - `__dirname` (vite.config.ts:9:36). Use `import.meta.dirname` instead
+[WebServer] Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+[WebServer] [plugin builtin:vite-reporter]
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[WebServer] (node:93952) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:93964) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+[WebServer]   - `__dirname` (vite.config.ts:9:36). Use `import.meta.dirname` instead
+[WebServer] Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+Running 11 tests using 2 workers
+
+(node:93998) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:93999) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [1440x900] › e2e/regions/language-policy.spec.ts:10:5 › fresh zh-CN browser › loads English metadata and UI and sends English login requests (994ms)
+  ✓   2 [1440x900] › e2e/regions/language-policy.spec.ts:10:5 › fresh vi-VN browser › loads English metadata and UI and sends English login requests (1.0s)
+  ✓   3 [1440x900] › e2e/regions/language-policy.spec.ts:10:5 › fresh ru-RU browser › loads English metadata and UI and sends English login requests (686ms)
+  ✓   4 [1440x900] › e2e/regions/language-policy.spec.ts:10:5 › fresh pt-BR browser › loads English metadata and UI and sends English login requests (854ms)
+  ✓   5 [1440x900] › e2e/regions/language-policy.spec.ts:33:3 › uses English with saved zh-Hant-TW (759ms)
+  ✓   6 [1440x900] › e2e/regions/language-policy.spec.ts:33:3 › uses English with saved en-US (767ms)
+  ✓   7 [1440x900] › e2e/regions/language-policy.spec.ts:33:3 › uses English with saved vi-VN (507ms)
+  ✓   8 [1440x900] › e2e/regions/language-policy.spec.ts:33:3 › uses English with saved ru-RU (627ms)
+  ✓   9 [1440x900] › e2e/regions/language-policy.spec.ts:42:3 › ignores legacy cookie presentation preference (495ms)
+  ✓  10 [1440x900] › e2e/regions/language-policy.spec.ts:42:3 › ignores legacy sessionStorage presentation preference (539ms)
+  ✓  11 [1440x900] › e2e/regions/language-policy.spec.ts:54:1 › keeps English fixed in Settings across reloads (1.5s)
+
+  11 passed (12.2s)

@@ -615,7 +615,13 @@ async def upload_project_file(
             target_path = target_dir / filename
             relative_path = "/".join((*spec.subdir, filename))
 
-            if spec.tracks_stale_audio and name:
+            if require_reference_host and upload_type == "character_ref" and name:
+                try:
+                    with project_change_source(change_source):
+                        manager.install_character_reference_image(project_name, name, relative_path, content)
+                except KeyError as exc:
+                    raise HTTPException(status_code=404, detail=_t("character_not_found", name=name)) from exc
+            elif spec.tracks_stale_audio and name:
                 try:
                     with project_change_source(change_source):
                         manager.install_character_reference_audio(project_name, name, relative_path, content)

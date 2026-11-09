@@ -1,0 +1,20 @@
+{
+  "ended_at": "2026-11-09T09:56:26-03:00",
+  "worktree_head": "1df5ee3b89e865c4193e72d5bbddf64d54b42f0e",
+  "worktree_status": [
+    "?? docs/audits/"
+  ],
+  "application_checkout_head": "1df5ee3b89e865c4193e72d5bbddf64d54b42f0e",
+  "application_checkout_status": [],
+  "health_status": "ok",
+  "health_commit": null,
+  "frontend_http_status": 200,
+  "baseline_at": "2026-11-09T09:48:23.807249-03:00",
+  "project_files_checked": 94,
+  "project_files_changed_or_removed": [],
+  "project_files_added": [],
+  "missing_report_links": [],
+  "new_model_or_generation_calls": 0,
+  "implementation_tests_run": false,
+  "verification": "Artifact content hashes and local report links; no application or configuration mutation requested."
+}

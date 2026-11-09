@@ -1,0 +1,34 @@
+................................................................         [100%]
+=============================== warnings summary ===============================
+tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_cloud_route_cannot_reach_zero_price_sdk_spawn[CLAUDE_CODE_USE_BEDROCK]
+  /Users/pablo.carminatti.br/.local/share/uv/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/contextlib.py:144: SAWarning: Skipped unsupported reflection of expression-based index idx_tasks_dedupe_active
+    next(self.gen)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 25 durations =============================
+1.07s setup    tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_cloud_route_cannot_reach_zero_price_sdk_spawn[CLAUDE_CODE_USE_BEDROCK]
+0.11s call     tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_cloud_route_cannot_reach_zero_price_sdk_spawn[CLAUDE_CODE_USE_BEDROCK]
+0.05s setup    tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_disabled_cloud_flag_keeps_zero_price_and_reaches_only_intercepted_spawn[CLAUDE_CODE_USE_FOUNDRY]
+0.05s setup    tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_configured_api_pricing_and_environment_are_retained[True]
+0.05s setup    tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_disabled_cloud_flag_keeps_zero_price_and_reaches_only_intercepted_spawn[CLAUDE_CODE_USE_MANTLE]
+0.05s setup    tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_configured_api_pricing_and_environment_are_retained[False]
+0.04s setup    tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_disabled_cloud_flag_keeps_zero_price_and_reaches_only_intercepted_spawn[CLAUDE_CODE_USE_ANTHROPIC_GOOGLE_CLOUD]
+0.04s setup    tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_disabled_cloud_flag_keeps_zero_price_and_reaches_only_intercepted_spawn[CLAUDE_CODE_USE_VERTEX]
+0.04s setup    tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_disabled_cloud_flag_keeps_zero_price_and_reaches_only_intercepted_spawn[CLAUDE_CODE_USE_ANTHROPIC_AWS]
+0.04s setup    tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_clean_subscription_keeps_zero_price_without_claiming_login
+0.04s setup    tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_disabled_cloud_flag_keeps_zero_price_and_reaches_only_intercepted_spawn[CLAUDE_CODE_USE_BEDROCK]
+0.04s setup    tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_cloud_route_cannot_reach_zero_price_sdk_spawn[CLAUDE_CODE_USE_FOUNDRY]
+0.04s setup    tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_cloud_route_cannot_reach_zero_price_sdk_spawn[CLAUDE_CODE_USE_ANTHROPIC_GOOGLE_CLOUD]
+0.04s setup    tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_cloud_route_cannot_reach_zero_price_sdk_spawn[CLAUDE_CODE_USE_ANTHROPIC_AWS]
+0.04s setup    tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_cloud_route_cannot_reach_zero_price_sdk_spawn[CLAUDE_CODE_USE_MANTLE]
+0.04s setup    tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_cloud_route_cannot_reach_zero_price_sdk_spawn[CLAUDE_CODE_USE_VERTEX]
+0.02s call     tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_configured_api_pricing_and_environment_are_retained[False]
+0.01s call     tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_configured_api_pricing_and_environment_are_retained[True]
+0.01s call     tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_cloud_route_cannot_reach_zero_price_sdk_spawn[CLAUDE_CODE_USE_FOUNDRY]
+0.01s call     tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_disabled_cloud_flag_keeps_zero_price_and_reaches_only_intercepted_spawn[CLAUDE_CODE_USE_ANTHROPIC_AWS]
+0.01s call     tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_clean_subscription_keeps_zero_price_without_claiming_login
+0.01s call     tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_cloud_route_cannot_reach_zero_price_sdk_spawn[CLAUDE_CODE_USE_ANTHROPIC_GOOGLE_CLOUD]
+0.01s call     tests/integration/server/agent_runtime/test_subscription_route_pricing.py::test_disabled_cloud_flag_keeps_zero_price_and_reaches_only_intercepted_spawn[CLAUDE_CODE_USE_BEDROCK]
+
+(2 durations < 0.005s hidden.  Use -vv to show these durations.)
+64 passed, 1 warning in 8.54s

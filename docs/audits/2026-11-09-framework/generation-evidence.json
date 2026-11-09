@@ -1,0 +1,417 @@
+[
+  {
+    "unit": "E1S01",
+    "version": 1,
+    "kind": "storyboard",
+    "file": "versions/storyboards/E1S01_v1_20261109T070059.png",
+    "reference_basis": [
+      {
+        "kind": "sheet",
+        "logical_identity": {
+          "type": "character"
+        },
+        "role": "asset_sheet",
+        "sha256": "6c7e55d4fc6f3a0cff66e7c4f85a66f70c541792daf3ca436f042d9f6d8ced20"
+      }
+    ]
+  },
+  {
+    "unit": "E1S01",
+    "version": 2,
+    "kind": "storyboard",
+    "file": "versions/storyboards/E1S01_v2_20261109T070327.png",
+    "reference_basis": [
+      {
+        "kind": "current",
+        "logical_identity": {
+          "id": "E1S01",
+          "type": "storyboard"
+        },
+        "role": "edit_source",
+        "sha256": "7dfa810292897078b3343b9afbd279038712758777e69c6580a9a53423668d34"
+      }
+    ]
+  },
+  {
+    "unit": "E1S02",
+    "version": 1,
+    "kind": "storyboard",
+    "file": "versions/storyboards/E1S02_v1_20261109T070110.png",
+    "reference_basis": [
+      {
+        "kind": "sheet",
+        "logical_identity": {
+          "type": "character"
+        },
+        "role": "asset_sheet",
+        "sha256": "2e8ed4124336a1b3cbc099de38364dcad955a81610193236288b0de8d0f729ca"
+      },
+      {
+        "kind": "sheet",
+        "logical_identity": {
+          "type": "character"
+        },
+        "role": "asset_sheet",
+        "sha256": "5fae6ecc6b74c0ed7affa3b91ddebd8e7582576f66e831d5c33c9fe68a4a01d2"
+      },
+      {
+        "logical_identity": {
+          "id": "E1S01",
+          "type": "storyboard"
+        },
+        "role": "previous_storyboard",
+        "sha256": "7dfa810292897078b3343b9afbd279038712758777e69c6580a9a53423668d34"
+      }
+    ]
+  },
+  {
+    "unit": "E1S05",
+    "version": 1,
+    "kind": "storyboard",
+    "file": "versions/storyboards/E1S05_v1_20261109T070120.png",
+    "reference_basis": [
+      {
+        "kind": "sheet",
+        "logical_identity": {
+          "type": "character"
+        },
+        "role": "asset_sheet",
+        "sha256": "5fae6ecc6b74c0ed7affa3b91ddebd8e7582576f66e831d5c33c9fe68a4a01d2"
+      },
+      {
+        "kind": "sheet",
+        "logical_identity": {
+          "type": "character"
+        },
+        "role": "asset_sheet",
+        "sha256": "2e8ed4124336a1b3cbc099de38364dcad955a81610193236288b0de8d0f729ca"
+      },
+      {
+        "logical_identity": {
+          "id": "E1S02",
+          "type": "storyboard"
+        },
+        "role": "previous_storyboard",
+        "sha256": "6f263312f9bf3a942711b049e8ddf465b577d9f0fde55f1a44e5cdf3cd940fc3"
+      }
+    ]
+  },
+  {
+    "unit": "E1S05",
+    "version": 2,
+    "kind": "storyboard",
+    "file": "versions/storyboards/E1S05_v2_20261109T070317.png",
+    "reference_basis": [
+      {
+        "kind": "sheet",
+        "logical_identity": {
+          "type": "character"
+        },
+        "role": "asset_sheet",
+        "sha256": "5fae6ecc6b74c0ed7affa3b91ddebd8e7582576f66e831d5c33c9fe68a4a01d2"
+      },
+      {
+        "kind": "sheet",
+        "logical_identity": {
+          "type": "character"
+        },
+        "role": "asset_sheet",
+        "sha256": "2e8ed4124336a1b3cbc099de38364dcad955a81610193236288b0de8d0f729ca"
+      },
+      {
+        "logical_identity": {
+          "id": "E1S02",
+          "type": "storyboard"
+        },
+        "role": "previous_storyboard",
+        "sha256": "6f263312f9bf3a942711b049e8ddf465b577d9f0fde55f1a44e5cdf3cd940fc3"
+      }
+    ]
+  },
+  {
+    "unit": "E1S03",
+    "version": 1,
+    "kind": "storyboard",
+    "file": "versions/storyboards/E1S03_v1_20261109T070132.png",
+    "reference_basis": [
+      {
+        "kind": "sheet",
+        "logical_identity": {
+          "type": "character"
+        },
+        "role": "asset_sheet",
+        "sha256": "2e8ed4124336a1b3cbc099de38364dcad955a81610193236288b0de8d0f729ca"
+      },
+      {
+        "logical_identity": {
+          "id": "E1S05",
+          "type": "storyboard"
+        },
+        "role": "previous_storyboard",
+        "sha256": "15056378d2680ab2f6422e91c6c21ffe5b8170c9c49db8c70c840ccf1c36bcdc"
+      }
+    ]
+  },
+  {
+    "unit": "E1S04",
+    "version": 1,
+    "kind": "storyboard",
+    "file": "versions/storyboards/E1S04_v1_20261109T070143.png",
+    "reference_basis": [
+      {
+        "kind": "sheet",
+        "logical_identity": {
+          "type": "character"
+        },
+        "role": "asset_sheet",
+        "sha256": "6c7e55d4fc6f3a0cff66e7c4f85a66f70c541792daf3ca436f042d9f6d8ced20"
+      },
+      {
+        "kind": "sheet",
+        "logical_identity": {
+          "type": "character"
+        },
+        "role": "asset_sheet",
+        "sha256": "2e8ed4124336a1b3cbc099de38364dcad955a81610193236288b0de8d0f729ca"
+      },
+      {
+        "kind": "sheet",
+        "logical_identity": {
+          "type": "character"
+        },
+        "role": "asset_sheet",
+        "sha256": "5fae6ecc6b74c0ed7affa3b91ddebd8e7582576f66e831d5c33c9fe68a4a01d2"
+      },
+      {
+        "logical_identity": {
+          "id": "E1S03",
+          "type": "storyboard"
+        },
+        "role": "previous_storyboard",
+        "sha256": "f3807006fa714f73687c310f0cb4593bb21c29b4296eef45866f26598ae14da5"
+      }
+    ]
+  },
+  {
+    "execution_checkpoint_schema_version": 5,
+    "execution_task_id": "49a66987028e4510b08d9a038e9e6920",
+    "execution_script_file": "episode_1.json",
+    "execution_request_digest": "57880adc1a45c5dd4faba0f6c818f8056301522c36daa0b814baebf735ce19dd",
+    "execution_capability": "i2v",
+    "execution_provider_id": "minimax",
+    "execution_provider_model_id": "MiniMax-H3",
+    "execution_backend_model_id": "MiniMax-H3",
+    "execution_endpoint_guard": "builtin:minimax-h3",
+    "execution_prompt_sha256": "b179c43c32017ec4314d8f2c31a501d10ca989fdc51a9d3283c5410bfd31a2eb",
+    "execution_duration_seconds": 4,
+    "execution_aspect_ratio": "9:16",
+    "execution_resolution": null,
+    "execution_generate_audio": true,
+    "execution_service_tier": "default",
+    "execution_seed": null,
+    "execution_visual_basis_digest": "sha256-v1:457560fa4bdf40c28d90c88a3e64940f2ac161619df3c4f71d07516cca15e915",
+    "execution_reference_audio_targets": null,
+    "unit": "E1S02",
+    "version": 1,
+    "file": "versions/videos/E1S02_v1_20261109T070524.mp4",
+    "provider_media": [
+      {
+        "index": 0,
+        "role": "start_image",
+        "logical_type": "storyboard",
+        "logical_name": "E1S02",
+        "kind": "first_frame",
+        "source_locator": "storyboards/scene_E1S02.png",
+        "staged_locator": ".arcreel/tasks/49a66987028e4510b08d9a038e9e6920/provider_media/000-start_image.png",
+        "sha256": "6f263312f9bf3a942711b049e8ddf465b577d9f0fde55f1a44e5cdf3cd940fc3",
+        "size_bytes": 1274791,
+        "target_index": null
+      }
+    ]
+  },
+  {
+    "execution_checkpoint_schema_version": 5,
+    "execution_task_id": "b598d619919b4bd0a0d6b6a8cb4cfaeb",
+    "execution_script_file": "episode_1.json",
+    "execution_request_digest": "2584cdcb760de4e2910828fa314050e32d6024c976d4e48655bc8dea01f823ee",
+    "execution_capability": "i2v",
+    "execution_provider_id": "minimax",
+    "execution_provider_model_id": "MiniMax-H3",
+    "execution_backend_model_id": "MiniMax-H3",
+    "execution_endpoint_guard": "builtin:minimax-h3",
+    "execution_prompt_sha256": "38d9625fea1485cd09945a639ac2b1f69f47f3f188a631f63b7faff5a44c04d4",
+    "execution_duration_seconds": 8,
+    "execution_aspect_ratio": "9:16",
+    "execution_resolution": null,
+    "execution_generate_audio": true,
+    "execution_service_tier": "default",
+    "execution_seed": null,
+    "execution_visual_basis_digest": "sha256-v1:0e05abc828f738800deb17c0cf2e7f152f90ef698eeeaed73348b892ad9da162",
+    "execution_reference_audio_targets": null,
+    "unit": "E1S05",
+    "version": 1,
+    "file": "versions/videos/E1S05_v1_20261109T070612.mp4",
+    "provider_media": [
+      {
+        "index": 0,
+        "role": "start_image",
+        "logical_type": "storyboard",
+        "logical_name": "E1S05",
+        "kind": "first_frame",
+        "source_locator": "storyboards/scene_E1S05.png",
+        "staged_locator": ".arcreel/tasks/b598d619919b4bd0a0d6b6a8cb4cfaeb/provider_media/000-start_image.png",
+        "sha256": "fb82a871a716e468dc121dcd37afdfd99be0d4f0ab5612c9d8982a14f80c30b8",
+        "size_bytes": 1191054,
+        "target_index": null
+      }
+    ]
+  },
+  {
+    "execution_checkpoint_schema_version": 5,
+    "execution_task_id": "f0c5fec41279453cb50f731647f7bf60",
+    "execution_script_file": "episode_1.json",
+    "execution_request_digest": "4c69f7e513d72eb9fd27e3e2a6ad539c4266a6b71f86451dcb5f98f48b082e7f",
+    "execution_capability": "i2v",
+    "execution_provider_id": "minimax",
+    "execution_provider_model_id": "MiniMax-H3",
+    "execution_backend_model_id": "MiniMax-H3",
+    "execution_endpoint_guard": "builtin:minimax-h3",
+    "execution_prompt_sha256": "ef3ded632b4714bd1bf0bda3816e0fbd48571e9bf89cd74f60a2d4abdc14c1dc",
+    "execution_duration_seconds": 12,
+    "execution_aspect_ratio": "9:16",
+    "execution_resolution": null,
+    "execution_generate_audio": true,
+    "execution_service_tier": "default",
+    "execution_seed": null,
+    "execution_visual_basis_digest": "sha256-v1:f8f5bc09f07f4fd41c33465729e8ce7fe899ec2d5a38790b371338828aed7df0",
+    "execution_reference_audio_targets": null,
+    "unit": "E1S01",
+    "version": 1,
+    "file": "versions/videos/E1S01_v1_20261109T070712.mp4",
+    "provider_media": [
+      {
+        "index": 0,
+        "role": "start_image",
+        "logical_type": "storyboard",
+        "logical_name": "E1S01",
+        "kind": "first_frame",
+        "source_locator": "storyboards/scene_E1S01.png",
+        "staged_locator": ".arcreel/tasks/f0c5fec41279453cb50f731647f7bf60/provider_media/000-start_image.png",
+        "sha256": "bbe250a1620d37a0264fccdc88d32df3b81e615b7d59c65dd6ea01db5d5656e5",
+        "size_bytes": 1212282,
+        "target_index": null
+      }
+    ]
+  },
+  {
+    "execution_checkpoint_schema_version": 5,
+    "execution_task_id": "809d2eb4e1c0411bbbe684dda34ddf26",
+    "execution_script_file": "episode_1.json",
+    "execution_request_digest": "f2a2d0ebab4cc167679e4165a54223218c14d5ea5d37d9dd8dec3b8324babfef",
+    "execution_capability": "i2v",
+    "execution_provider_id": "minimax",
+    "execution_provider_model_id": "MiniMax-H3",
+    "execution_backend_model_id": "MiniMax-H3",
+    "execution_endpoint_guard": "builtin:minimax-h3",
+    "execution_prompt_sha256": "9cda9b0c0f666ba758566bf130eb35077ec188a9ffe49d7a640e4fcf109aa97b",
+    "execution_duration_seconds": 12,
+    "execution_aspect_ratio": "9:16",
+    "execution_resolution": null,
+    "execution_generate_audio": true,
+    "execution_service_tier": "default",
+    "execution_seed": null,
+    "execution_visual_basis_digest": "sha256-v1:afc9608794233ba126e641ae1dea2bede014515bef1b14967331dce65a58cb67",
+    "execution_reference_audio_targets": null,
+    "unit": "E1S01",
+    "version": 2,
+    "file": "versions/videos/E1S01_v2_20261109T071352.mp4",
+    "provider_media": [
+      {
+        "index": 0,
+        "role": "start_image",
+        "logical_type": "storyboard",
+        "logical_name": "E1S01",
+        "kind": "first_frame",
+        "source_locator": "storyboards/scene_E1S01.png",
+        "staged_locator": ".arcreel/tasks/809d2eb4e1c0411bbbe684dda34ddf26/provider_media/000-start_image.png",
+        "sha256": "bbe250a1620d37a0264fccdc88d32df3b81e615b7d59c65dd6ea01db5d5656e5",
+        "size_bytes": 1212282,
+        "target_index": null
+      }
+    ]
+  },
+  {
+    "execution_checkpoint_schema_version": 5,
+    "execution_task_id": "0cc036e24d8a4973914cf482123ec54f",
+    "execution_script_file": "episode_1.json",
+    "execution_request_digest": "cecb48a12348facbcaf7af72c4559f874c57a34088ac3c98a5ba4b706dbf77e2",
+    "execution_capability": "i2v",
+    "execution_provider_id": "minimax",
+    "execution_provider_model_id": "MiniMax-H3",
+    "execution_backend_model_id": "MiniMax-H3",
+    "execution_endpoint_guard": "builtin:minimax-h3",
+    "execution_prompt_sha256": "7b23b3afae279d8e2e216be6b917b6c0239f9e5de7bf91c8681aa5c5dc3c5e37",
+    "execution_duration_seconds": 10,
+    "execution_aspect_ratio": "9:16",
+    "execution_resolution": null,
+    "execution_generate_audio": true,
+    "execution_service_tier": "default",
+    "execution_seed": null,
+    "execution_visual_basis_digest": "sha256-v1:93af027a6e7eb391e59f95b9c56da140166ff0984ecebafd005a38bfbfe4af2e",
+    "execution_reference_audio_targets": null,
+    "unit": "E1S03",
+    "version": 1,
+    "file": "versions/videos/E1S03_v1_20261109T070821.mp4",
+    "provider_media": [
+      {
+        "index": 0,
+        "role": "start_image",
+        "logical_type": "storyboard",
+        "logical_name": "E1S03",
+        "kind": "first_frame",
+        "source_locator": "storyboards/scene_E1S03.png",
+        "staged_locator": ".arcreel/tasks/0cc036e24d8a4973914cf482123ec54f/provider_media/000-start_image.png",
+        "sha256": "f3807006fa714f73687c310f0cb4593bb21c29b4296eef45866f26598ae14da5",
+        "size_bytes": 1189340,
+        "target_index": null
+      }
+    ]
+  },
+  {
+    "execution_checkpoint_schema_version": 5,
+    "execution_task_id": "ce5e4d35d49c453bbea8b8e38a9303d5",
+    "execution_script_file": "episode_1.json",
+    "execution_request_digest": "adf3e5f60cfc8f954548e54b86d15824bf1c566c4a18808ab708b001bb4f8838",
+    "execution_capability": "i2v",
+    "execution_provider_id": "minimax",
+    "execution_provider_model_id": "MiniMax-H3",
+    "execution_backend_model_id": "MiniMax-H3",
+    "execution_endpoint_guard": "builtin:minimax-h3",
+    "execution_prompt_sha256": "1ecae7c0b19bcce2a6457b4ab882fd2c76ef83966c000a1a77cd85a4f02292a7",
+    "execution_duration_seconds": 6,
+    "execution_aspect_ratio": "9:16",
+    "execution_resolution": null,
+    "execution_generate_audio": true,
+    "execution_service_tier": "default",
+    "execution_seed": null,
+    "execution_visual_basis_digest": "sha256-v1:8b9fb3f491d1460dceb23fcaa4aab4d1aca7bc8f2ba4bf7d1c7a2e7cf42cdfab",
+    "execution_reference_audio_targets": null,
+    "unit": "E1S04",
+    "version": 1,
+    "file": "versions/videos/E1S04_v1_20261109T070833.mp4",
+    "provider_media": [
+      {
+        "index": 0,
+        "role": "start_image",
+        "logical_type": "storyboard",
+        "logical_name": "E1S04",
+        "kind": "first_frame",
+        "source_locator": "storyboards/scene_E1S04.png",
+        "staged_locator": ".arcreel/tasks/ce5e4d35d49c453bbea8b8e38a9303d5/provider_media/000-start_image.png",
+        "sha256": "8a02ec9ac6abde61405a4798013ef2a745c5e4d07508d36d042d8a204b21ecce",
+        "size_bytes": 1186098,
+        "target_index": null
+      }
+    ]
+  }
+]

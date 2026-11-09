@@ -1,0 +1,398 @@
+FFFFFF.                                                                  [100%]
+=================================== FAILURES ===================================
+_ test_session_bridge_relays_safe_route_conflict_before_sdk_start[CLAUDE_CODE_USE_BEDROCK] _
+
+session_bridge = (<server.agent_runtime.service.AssistantService object at 0x11b8d3350>, <tests.fakes.FakeSDKClient object at 0x11b6ce510>, <fastapi.applications.FastAPI object at 0x11b9cb020>, <mcp.server.fastmcp.server.FastMCP object at 0x11b9c8230>)
+file_db_factory = async_sessionmaker(class_='AsyncSession', bind=<sqlalchemy.ext.asyncio.engine.AsyncEngine object at 0x11b0e45d0>, autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x11ae5fbc0>
+flag = 'CLAUDE_CODE_USE_BEDROCK'
+
+    @pytest.mark.parametrize("flag", CLAUDE_CLOUD_ROUTE_ENV_KEYS)
+    async def test_session_bridge_relays_safe_route_conflict_before_sdk_start(
+        session_bridge, file_db_factory, monkeypatch, flag
+    ):
+        service, sdk, app, server = session_bridge
+        bind_session_factory(monkeypatch, file_db_factory)
+        for selector in CLAUDE_CLOUD_ROUTE_ENV_KEYS:
+            monkeypatch.delenv(selector, raising=False)
+        monkeypatch.setenv(flag, "true")
+        monkeypatch.setenv("ANTHROPIC_AUTH_TOKEN", "synthetic-secret-not-for-mcp")
+        constructed = []
+
+        def capture_client(options):
+            constructed.append(options)
+            return sdk
+
+        monkeypatch.setattr("server.agent_runtime.session_manager.ClaudeSDKClient", capture_client)
+        async with server.session_manager.run(), connect(app) as session:
+            result = await session.call_tool(
+                "send_agent_message", {"project": "demo", "content": "Inspect only.", "client_key": "route-conflict"}
+            )
+        assert result.isError
+        text = result.content[0].text
+>       assert flag in text
+E       AssertionError: assert 'CLAUDE_CODE_USE_BEDROCK' in 'Embedded Agent startup failed; inspect local diagnostics and authentication before retrying'
+
+tests/integration/server/test_session_mcp.py:217: AssertionError
+---------------------------- Captured stderr setup -----------------------------
+2026-11-09 16:01:49 [WARNING] server.app: frontend/dist/index.html 不存在，跳过前端页面挂载（API 不受影响）
+------------------------------ Captured log setup ------------------------------
+WARNING  server.app:app.py:1003 frontend/dist/index.html 不存在，跳过前端页面挂载（API 不受影响）
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 16:01:49 [INFO] mcp.server.streamable_http_manager: StreamableHTTP session manager started
+2026-11-09 16:01:49 [INFO] mcp.server.streamable_http: Terminating session: None
+2026-11-09 16:01:49 [INFO] httpx: HTTP Request: POST http://localhost/mcp "HTTP/1.1 200 OK"
+2026-11-09 16:01:49 [INFO] mcp.client.streamable_http: Negotiated protocol version: 2025-11-25
+2026-11-09 16:01:49 [INFO] mcp.server.streamable_http: Terminating session: None
+2026-11-09 16:01:49 [INFO] httpx: HTTP Request: POST http://localhost/mcp "HTTP/1.1 202 Accepted"
+2026-11-09 16:01:49 [INFO] mcp.server.lowlevel.server: Processing request of type CallToolRequest
+2026-11-09 16:01:49 [ERROR] server.agent_runtime.session_manager: Agent 启动失败 project_name=demo session_id=None failure_observation={"phase": "startup", "project_name": "demo", "raw": {"exception": {"message": "Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_BEDROCK. Use a clean local subscription route; this request did not start inference.", "module": "lib.config.claude_subscription", "traceback": "Traceback (most recent call last):\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/session_manager.py\", line 878, in send_new_session\n    options = await self._build_options(\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/session_manager.py\", line 720, in _build_options\n    return await self._options_assembler.build(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 345, in build\n    provider_env = await self.build_provider_env_overrides()\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 148, in build_provider_env_overrides\n    return await loader()\n           ^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 87, in load_provider_env_overrides\n    anthropic = await build_anthropic_env(session)\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/lib/config/service.py\", line 117, in build_anthropic_env\n    raise SubscriptionRouteConflictError(routes)\nlib.config.claude_subscription.SubscriptionRouteConflictError: Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_BEDROCK. Use a clean local subscription route; this request did not start inference.\n", "type": "SubscriptionRouteConflictError"}, "sdk_stderr": ""}, "session_id": null, "summary": {"key": "startup_failed", "message": "Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_BEDROCK. Use a clean local subscription route; this request did not start inference.", "source": "local_exception", "type": "SubscriptionRouteConflictError"}, "timestamp": "2026-11-09T19:01:49.906166Z", "version": 1}
+2026-11-09 16:01:49 [INFO] mcp.server.streamable_http: Terminating session: None
+2026-11-09 16:01:49 [INFO] httpx: HTTP Request: POST http://localhost/mcp "HTTP/1.1 200 OK"
+2026-11-09 16:01:49 [INFO] mcp.server.streamable_http_manager: StreamableHTTP session manager shutting down
+------------------------------ Captured log call -------------------------------
+INFO     mcp.server.streamable_http_manager:streamable_http_manager.py:164 StreamableHTTP session manager started
+INFO     mcp.server.streamable_http:streamable_http.py:831 Terminating session: None
+INFO     httpx:_client.py:1740 HTTP Request: POST http://localhost/mcp "HTTP/1.1 200 OK"
+INFO     mcp.client.streamable_http:streamable_http.py:219 Negotiated protocol version: 2025-11-25
+INFO     mcp.server.streamable_http:streamable_http.py:831 Terminating session: None
+INFO     httpx:_client.py:1740 HTTP Request: POST http://localhost/mcp "HTTP/1.1 202 Accepted"
+INFO     mcp.server.lowlevel.server:server.py:733 Processing request of type CallToolRequest
+ERROR    server.agent_runtime.session_manager:session_manager.py:173 Agent 启动失败 project_name=demo session_id=None failure_observation={"phase": "startup", "project_name": "demo", "raw": {"exception": {"message": "Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_BEDROCK. Use a clean local subscription route; this request did not start inference.", "module": "lib.config.claude_subscription", "traceback": "Traceback (most recent call last):\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/session_manager.py\", line 878, in send_new_session\n    options = await self._build_options(\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/session_manager.py\", line 720, in _build_options\n    return await self._options_assembler.build(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 345, in build\n    provider_env = await self.build_provider_env_overrides()\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 148, in build_provider_env_overrides\n    return await loader()\n           ^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 87, in load_provider_env_overrides\n    anthropic = await build_anthropic_env(session)\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/lib/config/service.py\", line 117, in build_anthropic_env\n    raise SubscriptionRouteConflictError(routes)\nlib.config.claude_subscription.SubscriptionRouteConflictError: Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_BEDROCK. Use a clean local subscription route; this request did not start inference.\n", "type": "SubscriptionRouteConflictError"}, "sdk_stderr": ""}, "session_id": null, "summary": {"key": "startup_failed", "message": "Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_BEDROCK. Use a clean local subscription route; this request did not start inference.", "source": "local_exception", "type": "SubscriptionRouteConflictError"}, "timestamp": "2026-11-09T19:01:49.906166Z", "version": 1}
+INFO     mcp.server.streamable_http:streamable_http.py:831 Terminating session: None
+INFO     httpx:_client.py:1740 HTTP Request: POST http://localhost/mcp "HTTP/1.1 200 OK"
+INFO     mcp.server.streamable_http_manager:streamable_http_manager.py:168 StreamableHTTP session manager shutting down
+_ test_session_bridge_relays_safe_route_conflict_before_sdk_start[CLAUDE_CODE_USE_VERTEX] _
+
+session_bridge = (<server.agent_runtime.service.AssistantService object at 0x11ba4bd70>, <tests.fakes.FakeSDKClient object at 0x11ba4bb90>, <fastapi.applications.FastAPI object at 0x11b960ce0>, <mcp.server.fastmcp.server.FastMCP object at 0x11aca1040>)
+file_db_factory = async_sessionmaker(class_='AsyncSession', bind=<sqlalchemy.ext.asyncio.engine.AsyncEngine object at 0x11b3bc890>, autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x11b8d2240>
+flag = 'CLAUDE_CODE_USE_VERTEX'
+
+    @pytest.mark.parametrize("flag", CLAUDE_CLOUD_ROUTE_ENV_KEYS)
+    async def test_session_bridge_relays_safe_route_conflict_before_sdk_start(
+        session_bridge, file_db_factory, monkeypatch, flag
+    ):
+        service, sdk, app, server = session_bridge
+        bind_session_factory(monkeypatch, file_db_factory)
+        for selector in CLAUDE_CLOUD_ROUTE_ENV_KEYS:
+            monkeypatch.delenv(selector, raising=False)
+        monkeypatch.setenv(flag, "true")
+        monkeypatch.setenv("ANTHROPIC_AUTH_TOKEN", "synthetic-secret-not-for-mcp")
+        constructed = []
+
+        def capture_client(options):
+            constructed.append(options)
+            return sdk
+
+        monkeypatch.setattr("server.agent_runtime.session_manager.ClaudeSDKClient", capture_client)
+        async with server.session_manager.run(), connect(app) as session:
+            result = await session.call_tool(
+                "send_agent_message", {"project": "demo", "content": "Inspect only.", "client_key": "route-conflict"}
+            )
+        assert result.isError
+        text = result.content[0].text
+>       assert flag in text
+E       AssertionError: assert 'CLAUDE_CODE_USE_VERTEX' in 'Embedded Agent startup failed; inspect local diagnostics and authentication before retrying'
+
+tests/integration/server/test_session_mcp.py:217: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 16:01:50 [INFO] mcp.server.streamable_http_manager: StreamableHTTP session manager started
+2026-11-09 16:01:50 [INFO] mcp.server.streamable_http: Terminating session: None
+2026-11-09 16:01:50 [INFO] httpx: HTTP Request: POST http://localhost/mcp "HTTP/1.1 200 OK"
+2026-11-09 16:01:50 [INFO] mcp.client.streamable_http: Negotiated protocol version: 2025-11-25
+2026-11-09 16:01:50 [INFO] mcp.server.streamable_http: Terminating session: None
+2026-11-09 16:01:50 [INFO] httpx: HTTP Request: POST http://localhost/mcp "HTTP/1.1 202 Accepted"
+2026-11-09 16:01:50 [INFO] mcp.server.lowlevel.server: Processing request of type CallToolRequest
+2026-11-09 16:01:50 [ERROR] server.agent_runtime.session_manager: Agent 启动失败 project_name=demo session_id=None failure_observation={"phase": "startup", "project_name": "demo", "raw": {"exception": {"message": "Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_VERTEX. Use a clean local subscription route; this request did not start inference.", "module": "lib.config.claude_subscription", "traceback": "Traceback (most recent call last):\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/session_manager.py\", line 878, in send_new_session\n    options = await self._build_options(\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/session_manager.py\", line 720, in _build_options\n    return await self._options_assembler.build(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 345, in build\n    provider_env = await self.build_provider_env_overrides()\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 148, in build_provider_env_overrides\n    return await loader()\n           ^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 87, in load_provider_env_overrides\n    anthropic = await build_anthropic_env(session)\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/lib/config/service.py\", line 117, in build_anthropic_env\n    raise SubscriptionRouteConflictError(routes)\nlib.config.claude_subscription.SubscriptionRouteConflictError: Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_VERTEX. Use a clean local subscription route; this request did not start inference.\n", "type": "SubscriptionRouteConflictError"}, "sdk_stderr": ""}, "session_id": null, "summary": {"key": "startup_failed", "message": "Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_VERTEX. Use a clean local subscription route; this request did not start inference.", "source": "local_exception", "type": "SubscriptionRouteConflictError"}, "timestamp": "2026-11-09T19:01:50.230892Z", "version": 1}
+2026-11-09 16:01:50 [INFO] mcp.server.streamable_http: Terminating session: None
+2026-11-09 16:01:50 [INFO] httpx: HTTP Request: POST http://localhost/mcp "HTTP/1.1 200 OK"
+2026-11-09 16:01:50 [INFO] mcp.server.streamable_http_manager: StreamableHTTP session manager shutting down
+------------------------------ Captured log call -------------------------------
+INFO     mcp.server.streamable_http_manager:streamable_http_manager.py:164 StreamableHTTP session manager started
+INFO     mcp.server.streamable_http:streamable_http.py:831 Terminating session: None
+INFO     httpx:_client.py:1740 HTTP Request: POST http://localhost/mcp "HTTP/1.1 200 OK"
+INFO     mcp.client.streamable_http:streamable_http.py:219 Negotiated protocol version: 2025-11-25
+INFO     mcp.server.streamable_http:streamable_http.py:831 Terminating session: None
+INFO     httpx:_client.py:1740 HTTP Request: POST http://localhost/mcp "HTTP/1.1 202 Accepted"
+INFO     mcp.server.lowlevel.server:server.py:733 Processing request of type CallToolRequest
+ERROR    server.agent_runtime.session_manager:session_manager.py:173 Agent 启动失败 project_name=demo session_id=None failure_observation={"phase": "startup", "project_name": "demo", "raw": {"exception": {"message": "Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_VERTEX. Use a clean local subscription route; this request did not start inference.", "module": "lib.config.claude_subscription", "traceback": "Traceback (most recent call last):\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/session_manager.py\", line 878, in send_new_session\n    options = await self._build_options(\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/session_manager.py\", line 720, in _build_options\n    return await self._options_assembler.build(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 345, in build\n    provider_env = await self.build_provider_env_overrides()\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 148, in build_provider_env_overrides\n    return await loader()\n           ^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 87, in load_provider_env_overrides\n    anthropic = await build_anthropic_env(session)\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/lib/config/service.py\", line 117, in build_anthropic_env\n    raise SubscriptionRouteConflictError(routes)\nlib.config.claude_subscription.SubscriptionRouteConflictError: Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_VERTEX. Use a clean local subscription route; this request did not start inference.\n", "type": "SubscriptionRouteConflictError"}, "sdk_stderr": ""}, "session_id": null, "summary": {"key": "startup_failed", "message": "Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_VERTEX. Use a clean local subscription route; this request did not start inference.", "source": "local_exception", "type": "SubscriptionRouteConflictError"}, "timestamp": "2026-11-09T19:01:50.230892Z", "version": 1}
+INFO     mcp.server.streamable_http:streamable_http.py:831 Terminating session: None
+INFO     httpx:_client.py:1740 HTTP Request: POST http://localhost/mcp "HTTP/1.1 200 OK"
+INFO     mcp.server.streamable_http_manager:streamable_http_manager.py:168 StreamableHTTP session manager shutting down
+_ test_session_bridge_relays_safe_route_conflict_before_sdk_start[CLAUDE_CODE_USE_FOUNDRY] _
+
+session_bridge = (<server.agent_runtime.service.AssistantService object at 0x11ac18680>, <tests.fakes.FakeSDKClient object at 0x11abac4a0>, <fastapi.applications.FastAPI object at 0x11ae5e5a0>, <mcp.server.fastmcp.server.FastMCP object at 0x11abacb30>)
+file_db_factory = async_sessionmaker(class_='AsyncSession', bind=<sqlalchemy.ext.asyncio.engine.AsyncEngine object at 0x11ad2b250>, autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x11ba494f0>
+flag = 'CLAUDE_CODE_USE_FOUNDRY'
+
+    @pytest.mark.parametrize("flag", CLAUDE_CLOUD_ROUTE_ENV_KEYS)
+    async def test_session_bridge_relays_safe_route_conflict_before_sdk_start(
+        session_bridge, file_db_factory, monkeypatch, flag
+    ):
+        service, sdk, app, server = session_bridge
+        bind_session_factory(monkeypatch, file_db_factory)
+        for selector in CLAUDE_CLOUD_ROUTE_ENV_KEYS:
+            monkeypatch.delenv(selector, raising=False)
+        monkeypatch.setenv(flag, "true")
+        monkeypatch.setenv("ANTHROPIC_AUTH_TOKEN", "synthetic-secret-not-for-mcp")
+        constructed = []
+
+        def capture_client(options):
+            constructed.append(options)
+            return sdk
+
+        monkeypatch.setattr("server.agent_runtime.session_manager.ClaudeSDKClient", capture_client)
+        async with server.session_manager.run(), connect(app) as session:
+            result = await session.call_tool(
+                "send_agent_message", {"project": "demo", "content": "Inspect only.", "client_key": "route-conflict"}
+            )
+        assert result.isError
+        text = result.content[0].text
+>       assert flag in text
+E       AssertionError: assert 'CLAUDE_CODE_USE_FOUNDRY' in 'Embedded Agent startup failed; inspect local diagnostics and authentication before retrying'
+
+tests/integration/server/test_session_mcp.py:217: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 16:01:50 [INFO] mcp.server.streamable_http_manager: StreamableHTTP session manager started
+2026-11-09 16:01:50 [INFO] mcp.server.streamable_http: Terminating session: None
+2026-11-09 16:01:50 [INFO] httpx: HTTP Request: POST http://localhost/mcp "HTTP/1.1 200 OK"
+2026-11-09 16:01:50 [INFO] mcp.client.streamable_http: Negotiated protocol version: 2025-11-25
+2026-11-09 16:01:50 [INFO] mcp.server.streamable_http: Terminating session: None
+2026-11-09 16:01:50 [INFO] httpx: HTTP Request: POST http://localhost/mcp "HTTP/1.1 202 Accepted"
+2026-11-09 16:01:50 [INFO] mcp.server.lowlevel.server: Processing request of type CallToolRequest
+2026-11-09 16:01:50 [ERROR] server.agent_runtime.session_manager: Agent 启动失败 project_name=demo session_id=None failure_observation={"phase": "startup", "project_name": "demo", "raw": {"exception": {"message": "Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_FOUNDRY. Use a clean local subscription route; this request did not start inference.", "module": "lib.config.claude_subscription", "traceback": "Traceback (most recent call last):\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/session_manager.py\", line 878, in send_new_session\n    options = await self._build_options(\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/session_manager.py\", line 720, in _build_options\n    return await self._options_assembler.build(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 345, in build\n    provider_env = await self.build_provider_env_overrides()\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 148, in build_provider_env_overrides\n    return await loader()\n           ^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 87, in load_provider_env_overrides\n    anthropic = await build_anthropic_env(session)\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/lib/config/service.py\", line 117, in build_anthropic_env\n    raise SubscriptionRouteConflictError(routes)\nlib.config.claude_subscription.SubscriptionRouteConflictError: Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_FOUNDRY. Use a clean local subscription route; this request did not start inference.\n", "type": "SubscriptionRouteConflictError"}, "sdk_stderr": ""}, "session_id": null, "summary": {"key": "startup_failed", "message": "Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_FOUNDRY. Use a clean local subscription route; this request did not start inference.", "source": "local_exception", "type": "SubscriptionRouteConflictError"}, "timestamp": "2026-11-09T19:01:50.393477Z", "version": 1}
+2026-11-09 16:01:50 [INFO] mcp.server.streamable_http: Terminating session: None
+2026-11-09 16:01:50 [INFO] httpx: HTTP Request: POST http://localhost/mcp "HTTP/1.1 200 OK"
+2026-11-09 16:01:50 [INFO] mcp.server.streamable_http_manager: StreamableHTTP session manager shutting down
+------------------------------ Captured log call -------------------------------
+INFO     mcp.server.streamable_http_manager:streamable_http_manager.py:164 StreamableHTTP session manager started
+INFO     mcp.server.streamable_http:streamable_http.py:831 Terminating session: None
+INFO     httpx:_client.py:1740 HTTP Request: POST http://localhost/mcp "HTTP/1.1 200 OK"
+INFO     mcp.client.streamable_http:streamable_http.py:219 Negotiated protocol version: 2025-11-25
+INFO     mcp.server.streamable_http:streamable_http.py:831 Terminating session: None
+INFO     httpx:_client.py:1740 HTTP Request: POST http://localhost/mcp "HTTP/1.1 202 Accepted"
+INFO     mcp.server.lowlevel.server:server.py:733 Processing request of type CallToolRequest
+ERROR    server.agent_runtime.session_manager:session_manager.py:173 Agent 启动失败 project_name=demo session_id=None failure_observation={"phase": "startup", "project_name": "demo", "raw": {"exception": {"message": "Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_FOUNDRY. Use a clean local subscription route; this request did not start inference.", "module": "lib.config.claude_subscription", "traceback": "Traceback (most recent call last):\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/session_manager.py\", line 878, in send_new_session\n    options = await self._build_options(\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/session_manager.py\", line 720, in _build_options\n    return await self._options_assembler.build(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 345, in build\n    provider_env = await self.build_provider_env_overrides()\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 148, in build_provider_env_overrides\n    return await loader()\n           ^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 87, in load_provider_env_overrides\n    anthropic = await build_anthropic_env(session)\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/lib/config/service.py\", line 117, in build_anthropic_env\n    raise SubscriptionRouteConflictError(routes)\nlib.config.claude_subscription.SubscriptionRouteConflictError: Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_FOUNDRY. Use a clean local subscription route; this request did not start inference.\n", "type": "SubscriptionRouteConflictError"}, "sdk_stderr": ""}, "session_id": null, "summary": {"key": "startup_failed", "message": "Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_FOUNDRY. Use a clean local subscription route; this request did not start inference.", "source": "local_exception", "type": "SubscriptionRouteConflictError"}, "timestamp": "2026-11-09T19:01:50.393477Z", "version": 1}
+INFO     mcp.server.streamable_http:streamable_http.py:831 Terminating session: None
+INFO     httpx:_client.py:1740 HTTP Request: POST http://localhost/mcp "HTTP/1.1 200 OK"
+INFO     mcp.server.streamable_http_manager:streamable_http_manager.py:168 StreamableHTTP session manager shutting down
+_ test_session_bridge_relays_safe_route_conflict_before_sdk_start[CLAUDE_CODE_USE_ANTHROPIC_AWS] _
+
+session_bridge = (<server.agent_runtime.service.AssistantService object at 0x11ae5c7d0>, <tests.fakes.FakeSDKClient object at 0x11ae5e030>, <fastapi.applications.FastAPI object at 0x11adbe7b0>, <mcp.server.fastmcp.server.FastMCP object at 0x11ae13020>)
+file_db_factory = async_sessionmaker(class_='AsyncSession', bind=<sqlalchemy.ext.asyncio.engine.AsyncEngine object at 0x11aa40550>, autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x11ac19310>
+flag = 'CLAUDE_CODE_USE_ANTHROPIC_AWS'
+
+    @pytest.mark.parametrize("flag", CLAUDE_CLOUD_ROUTE_ENV_KEYS)
+    async def test_session_bridge_relays_safe_route_conflict_before_sdk_start(
+        session_bridge, file_db_factory, monkeypatch, flag
+    ):
+        service, sdk, app, server = session_bridge
+        bind_session_factory(monkeypatch, file_db_factory)
+        for selector in CLAUDE_CLOUD_ROUTE_ENV_KEYS:
+            monkeypatch.delenv(selector, raising=False)
+        monkeypatch.setenv(flag, "true")
+        monkeypatch.setenv("ANTHROPIC_AUTH_TOKEN", "synthetic-secret-not-for-mcp")
+        constructed = []
+
+        def capture_client(options):
+            constructed.append(options)
+            return sdk
+
+        monkeypatch.setattr("server.agent_runtime.session_manager.ClaudeSDKClient", capture_client)
+        async with server.session_manager.run(), connect(app) as session:
+            result = await session.call_tool(
+                "send_agent_message", {"project": "demo", "content": "Inspect only.", "client_key": "route-conflict"}
+            )
+        assert result.isError
+        text = result.content[0].text
+>       assert flag in text
+E       AssertionError: assert 'CLAUDE_CODE_USE_ANTHROPIC_AWS' in 'Embedded Agent startup failed; inspect local diagnostics and authentication before retrying'
+
+tests/integration/server/test_session_mcp.py:217: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 16:01:50 [INFO] mcp.server.streamable_http_manager: StreamableHTTP session manager started
+2026-11-09 16:01:50 [INFO] mcp.server.streamable_http: Terminating session: None
+2026-11-09 16:01:50 [INFO] httpx: HTTP Request: POST http://localhost/mcp "HTTP/1.1 200 OK"
+2026-11-09 16:01:50 [INFO] mcp.client.streamable_http: Negotiated protocol version: 2025-11-25
+2026-11-09 16:01:50 [INFO] mcp.server.streamable_http: Terminating session: None
+2026-11-09 16:01:50 [INFO] httpx: HTTP Request: POST http://localhost/mcp "HTTP/1.1 202 Accepted"
+2026-11-09 16:01:50 [INFO] mcp.server.lowlevel.server: Processing request of type CallToolRequest
+2026-11-09 16:01:50 [ERROR] server.agent_runtime.session_manager: Agent 启动失败 project_name=demo session_id=None failure_observation={"phase": "startup", "project_name": "demo", "raw": {"exception": {"message": "Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_ANTHROPIC_AWS. Use a clean local subscription route; this request did not start inference.", "module": "lib.config.claude_subscription", "traceback": "Traceback (most recent call last):\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/session_manager.py\", line 878, in send_new_session\n    options = await self._build_options(\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/session_manager.py\", line 720, in _build_options\n    return await self._options_assembler.build(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 345, in build\n    provider_env = await self.build_provider_env_overrides()\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 148, in build_provider_env_overrides\n    return await loader()\n           ^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 87, in load_provider_env_overrides\n    anthropic = await build_anthropic_env(session)\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/lib/config/service.py\", line 117, in build_anthropic_env\n    raise SubscriptionRouteConflictError(routes)\nlib.config.claude_subscription.SubscriptionRouteConflictError: Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_ANTHROPIC_AWS. Use a clean local subscription route; this request did not start inference.\n", "type": "SubscriptionRouteConflictError"}, "sdk_stderr": ""}, "session_id": null, "summary": {"key": "startup_failed", "message": "Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_ANTHROPIC_AWS. Use a clean local subscription route; this request did not start inference.", "source": "local_exception", "type": "SubscriptionRouteConflictError"}, "timestamp": "2026-11-09T19:01:50.577209Z", "version": 1}
+2026-11-09 16:01:50 [INFO] mcp.server.streamable_http: Terminating session: None
+2026-11-09 16:01:50 [INFO] httpx: HTTP Request: POST http://localhost/mcp "HTTP/1.1 200 OK"
+2026-11-09 16:01:50 [INFO] mcp.server.streamable_http_manager: StreamableHTTP session manager shutting down
+------------------------------ Captured log call -------------------------------
+INFO     mcp.server.streamable_http_manager:streamable_http_manager.py:164 StreamableHTTP session manager started
+INFO     mcp.server.streamable_http:streamable_http.py:831 Terminating session: None
+INFO     httpx:_client.py:1740 HTTP Request: POST http://localhost/mcp "HTTP/1.1 200 OK"
+INFO     mcp.client.streamable_http:streamable_http.py:219 Negotiated protocol version: 2025-11-25
+INFO     mcp.server.streamable_http:streamable_http.py:831 Terminating session: None
+INFO     httpx:_client.py:1740 HTTP Request: POST http://localhost/mcp "HTTP/1.1 202 Accepted"
+INFO     mcp.server.lowlevel.server:server.py:733 Processing request of type CallToolRequest
+ERROR    server.agent_runtime.session_manager:session_manager.py:173 Agent 启动失败 project_name=demo session_id=None failure_observation={"phase": "startup", "project_name": "demo", "raw": {"exception": {"message": "Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_ANTHROPIC_AWS. Use a clean local subscription route; this request did not start inference.", "module": "lib.config.claude_subscription", "traceback": "Traceback (most recent call last):\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/session_manager.py\", line 878, in send_new_session\n    options = await self._build_options(\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/session_manager.py\", line 720, in _build_options\n    return await self._options_assembler.build(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 345, in build\n    provider_env = await self.build_provider_env_overrides()\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 148, in build_provider_env_overrides\n    return await loader()\n           ^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 87, in load_provider_env_overrides\n    anthropic = await build_anthropic_env(session)\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/lib/config/service.py\", line 117, in build_anthropic_env\n    raise SubscriptionRouteConflictError(routes)\nlib.config.claude_subscription.SubscriptionRouteConflictError: Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_ANTHROPIC_AWS. Use a clean local subscription route; this request did not start inference.\n", "type": "SubscriptionRouteConflictError"}, "sdk_stderr": ""}, "session_id": null, "summary": {"key": "startup_failed", "message": "Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_ANTHROPIC_AWS. Use a clean local subscription route; this request did not start inference.", "source": "local_exception", "type": "SubscriptionRouteConflictError"}, "timestamp": "2026-11-09T19:01:50.577209Z", "version": 1}
+INFO     mcp.server.streamable_http:streamable_http.py:831 Terminating session: None
+INFO     httpx:_client.py:1740 HTTP Request: POST http://localhost/mcp "HTTP/1.1 200 OK"
+INFO     mcp.server.streamable_http_manager:streamable_http_manager.py:168 StreamableHTTP session manager shutting down
+_ test_session_bridge_relays_safe_route_conflict_before_sdk_start[CLAUDE_CODE_USE_ANTHROPIC_GOOGLE_CLOUD] _
+
+session_bridge = (<server.agent_runtime.service.AssistantService object at 0x11adbf170>, <tests.fakes.FakeSDKClient object at 0x11ad8f5c0>, <fastapi.applications.FastAPI object at 0x11ad359a0>, <mcp.server.fastmcp.server.FastMCP object at 0x11adbd940>)
+file_db_factory = async_sessionmaker(class_='AsyncSession', bind=<sqlalchemy.ext.asyncio.engine.AsyncEngine object at 0x11abe0790>, autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x11ae5c110>
+flag = 'CLAUDE_CODE_USE_ANTHROPIC_GOOGLE_CLOUD'
+
+    @pytest.mark.parametrize("flag", CLAUDE_CLOUD_ROUTE_ENV_KEYS)
+    async def test_session_bridge_relays_safe_route_conflict_before_sdk_start(
+        session_bridge, file_db_factory, monkeypatch, flag
+    ):
+        service, sdk, app, server = session_bridge
+        bind_session_factory(monkeypatch, file_db_factory)
+        for selector in CLAUDE_CLOUD_ROUTE_ENV_KEYS:
+            monkeypatch.delenv(selector, raising=False)
+        monkeypatch.setenv(flag, "true")
+        monkeypatch.setenv("ANTHROPIC_AUTH_TOKEN", "synthetic-secret-not-for-mcp")
+        constructed = []
+
+        def capture_client(options):
+            constructed.append(options)
+            return sdk
+
+        monkeypatch.setattr("server.agent_runtime.session_manager.ClaudeSDKClient", capture_client)
+        async with server.session_manager.run(), connect(app) as session:
+            result = await session.call_tool(
+                "send_agent_message", {"project": "demo", "content": "Inspect only.", "client_key": "route-conflict"}
+            )
+        assert result.isError
+        text = result.content[0].text
+>       assert flag in text
+E       AssertionError: assert 'CLAUDE_CODE_USE_ANTHROPIC_GOOGLE_CLOUD' in 'Embedded Agent startup failed; inspect local diagnostics and authentication before retrying'
+
+tests/integration/server/test_session_mcp.py:217: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 16:01:50 [INFO] mcp.server.streamable_http_manager: StreamableHTTP session manager started
+2026-11-09 16:01:50 [INFO] mcp.server.streamable_http: Terminating session: None
+2026-11-09 16:01:50 [INFO] httpx: HTTP Request: POST http://localhost/mcp "HTTP/1.1 200 OK"
+2026-11-09 16:01:50 [INFO] mcp.client.streamable_http: Negotiated protocol version: 2025-11-25
+2026-11-09 16:01:50 [INFO] mcp.server.streamable_http: Terminating session: None
+2026-11-09 16:01:50 [INFO] httpx: HTTP Request: POST http://localhost/mcp "HTTP/1.1 202 Accepted"
+2026-11-09 16:01:50 [INFO] mcp.server.lowlevel.server: Processing request of type CallToolRequest
+2026-11-09 16:01:50 [ERROR] server.agent_runtime.session_manager: Agent 启动失败 project_name=demo session_id=None failure_observation={"phase": "startup", "project_name": "demo", "raw": {"exception": {"message": "Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_ANTHROPIC_GOOGLE_CLOUD. Use a clean local subscription route; this request did not start inference.", "module": "lib.config.claude_subscription", "traceback": "Traceback (most recent call last):\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/session_manager.py\", line 878, in send_new_session\n    options = await self._build_options(\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/session_manager.py\", line 720, in _build_options\n    return await self._options_assembler.build(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 345, in build\n    provider_env = await self.build_provider_env_overrides()\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 148, in build_provider_env_overrides\n    return await loader()\n           ^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 87, in load_provider_env_overrides\n    anthropic = await build_anthropic_env(session)\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/lib/config/service.py\", line 117, in build_anthropic_env\n    raise SubscriptionRouteConflictError(routes)\nlib.config.claude_subscription.SubscriptionRouteConflictError: Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_ANTHROPIC_GOOGLE_CLOUD. Use a clean local subscription route; this request did not start inference.\n", "type": "SubscriptionRouteConflictError"}, "sdk_stderr": ""}, "session_id": null, "summary": {"key": "startup_failed", "message": "Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_ANTHROPIC_GOOGLE_CLOUD. Use a clean local subscription route; this request did not start inference.", "source": "local_exception", "type": "SubscriptionRouteConflictError"}, "timestamp": "2026-11-09T19:01:50.739104Z", "version": 1}
+2026-11-09 16:01:50 [INFO] mcp.server.streamable_http: Terminating session: None
+2026-11-09 16:01:50 [INFO] httpx: HTTP Request: POST http://localhost/mcp "HTTP/1.1 200 OK"
+2026-11-09 16:01:50 [INFO] mcp.server.streamable_http_manager: StreamableHTTP session manager shutting down
+------------------------------ Captured log call -------------------------------
+INFO     mcp.server.streamable_http_manager:streamable_http_manager.py:164 StreamableHTTP session manager started
+INFO     mcp.server.streamable_http:streamable_http.py:831 Terminating session: None
+INFO     httpx:_client.py:1740 HTTP Request: POST http://localhost/mcp "HTTP/1.1 200 OK"
+INFO     mcp.client.streamable_http:streamable_http.py:219 Negotiated protocol version: 2025-11-25
+INFO     mcp.server.streamable_http:streamable_http.py:831 Terminating session: None
+INFO     httpx:_client.py:1740 HTTP Request: POST http://localhost/mcp "HTTP/1.1 202 Accepted"
+INFO     mcp.server.lowlevel.server:server.py:733 Processing request of type CallToolRequest
+ERROR    server.agent_runtime.session_manager:session_manager.py:173 Agent 启动失败 project_name=demo session_id=None failure_observation={"phase": "startup", "project_name": "demo", "raw": {"exception": {"message": "Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_ANTHROPIC_GOOGLE_CLOUD. Use a clean local subscription route; this request did not start inference.", "module": "lib.config.claude_subscription", "traceback": "Traceback (most recent call last):\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/session_manager.py\", line 878, in send_new_session\n    options = await self._build_options(\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/session_manager.py\", line 720, in _build_options\n    return await self._options_assembler.build(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 345, in build\n    provider_env = await self.build_provider_env_overrides()\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 148, in build_provider_env_overrides\n    return await loader()\n           ^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 87, in load_provider_env_overrides\n    anthropic = await build_anthropic_env(session)\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/lib/config/service.py\", line 117, in build_anthropic_env\n    raise SubscriptionRouteConflictError(routes)\nlib.config.claude_subscription.SubscriptionRouteConflictError: Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_ANTHROPIC_GOOGLE_CLOUD. Use a clean local subscription route; this request did not start inference.\n", "type": "SubscriptionRouteConflictError"}, "sdk_stderr": ""}, "session_id": null, "summary": {"key": "startup_failed", "message": "Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_ANTHROPIC_GOOGLE_CLOUD. Use a clean local subscription route; this request did not start inference.", "source": "local_exception", "type": "SubscriptionRouteConflictError"}, "timestamp": "2026-11-09T19:01:50.739104Z", "version": 1}
+INFO     mcp.server.streamable_http:streamable_http.py:831 Terminating session: None
+INFO     httpx:_client.py:1740 HTTP Request: POST http://localhost/mcp "HTTP/1.1 200 OK"
+INFO     mcp.server.streamable_http_manager:streamable_http_manager.py:168 StreamableHTTP session manager shutting down
+_ test_session_bridge_relays_safe_route_conflict_before_sdk_start[CLAUDE_CODE_USE_MANTLE] _
+
+session_bridge = (<server.agent_runtime.service.AssistantService object at 0x11ad13980>, <tests.fakes.FakeSDKClient object at 0x11ad10980>, <fastapi.applications.FastAPI object at 0x11acc3f50>, <mcp.server.fastmcp.server.FastMCP object at 0x11acc2ea0>)
+file_db_factory = async_sessionmaker(class_='AsyncSession', bind=<sqlalchemy.ext.asyncio.engine.AsyncEngine object at 0x11ad15950>, autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x11ae38920>
+flag = 'CLAUDE_CODE_USE_MANTLE'
+
+    @pytest.mark.parametrize("flag", CLAUDE_CLOUD_ROUTE_ENV_KEYS)
+    async def test_session_bridge_relays_safe_route_conflict_before_sdk_start(
+        session_bridge, file_db_factory, monkeypatch, flag
+    ):
+        service, sdk, app, server = session_bridge
+        bind_session_factory(monkeypatch, file_db_factory)
+        for selector in CLAUDE_CLOUD_ROUTE_ENV_KEYS:
+            monkeypatch.delenv(selector, raising=False)
+        monkeypatch.setenv(flag, "true")
+        monkeypatch.setenv("ANTHROPIC_AUTH_TOKEN", "synthetic-secret-not-for-mcp")
+        constructed = []
+
+        def capture_client(options):
+            constructed.append(options)
+            return sdk
+
+        monkeypatch.setattr("server.agent_runtime.session_manager.ClaudeSDKClient", capture_client)
+        async with server.session_manager.run(), connect(app) as session:
+            result = await session.call_tool(
+                "send_agent_message", {"project": "demo", "content": "Inspect only.", "client_key": "route-conflict"}
+            )
+        assert result.isError
+        text = result.content[0].text
+>       assert flag in text
+E       AssertionError: assert 'CLAUDE_CODE_USE_MANTLE' in 'Embedded Agent startup failed; inspect local diagnostics and authentication before retrying'
+
+tests/integration/server/test_session_mcp.py:217: AssertionError
+----------------------------- Captured stderr call -----------------------------
+2026-11-09 16:01:50 [INFO] mcp.server.streamable_http_manager: StreamableHTTP session manager started
+2026-11-09 16:01:50 [INFO] mcp.server.streamable_http: Terminating session: None
+2026-11-09 16:01:50 [INFO] httpx: HTTP Request: POST http://localhost/mcp "HTTP/1.1 200 OK"
+2026-11-09 16:01:50 [INFO] mcp.client.streamable_http: Negotiated protocol version: 2025-11-25
+2026-11-09 16:01:50 [INFO] mcp.server.streamable_http: Terminating session: None
+2026-11-09 16:01:50 [INFO] httpx: HTTP Request: POST http://localhost/mcp "HTTP/1.1 202 Accepted"
+2026-11-09 16:01:50 [INFO] mcp.server.lowlevel.server: Processing request of type CallToolRequest
+2026-11-09 16:01:50 [ERROR] server.agent_runtime.session_manager: Agent 启动失败 project_name=demo session_id=None failure_observation={"phase": "startup", "project_name": "demo", "raw": {"exception": {"message": "Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_MANTLE. Use a clean local subscription route; this request did not start inference.", "module": "lib.config.claude_subscription", "traceback": "Traceback (most recent call last):\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/session_manager.py\", line 878, in send_new_session\n    options = await self._build_options(\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/session_manager.py\", line 720, in _build_options\n    return await self._options_assembler.build(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 345, in build\n    provider_env = await self.build_provider_env_overrides()\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 148, in build_provider_env_overrides\n    return await loader()\n           ^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 87, in load_provider_env_overrides\n    anthropic = await build_anthropic_env(session)\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/lib/config/service.py\", line 117, in build_anthropic_env\n    raise SubscriptionRouteConflictError(routes)\nlib.config.claude_subscription.SubscriptionRouteConflictError: Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_MANTLE. Use a clean local subscription route; this request did not start inference.\n", "type": "SubscriptionRouteConflictError"}, "sdk_stderr": ""}, "session_id": null, "summary": {"key": "startup_failed", "message": "Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_MANTLE. Use a clean local subscription route; this request did not start inference.", "source": "local_exception", "type": "SubscriptionRouteConflictError"}, "timestamp": "2026-11-09T19:01:50.894306Z", "version": 1}
+2026-11-09 16:01:50 [INFO] mcp.server.streamable_http: Terminating session: None
+2026-11-09 16:01:50 [INFO] httpx: HTTP Request: POST http://localhost/mcp "HTTP/1.1 200 OK"
+2026-11-09 16:01:50 [INFO] mcp.server.streamable_http_manager: StreamableHTTP session manager shutting down
+------------------------------ Captured log call -------------------------------
+INFO     mcp.server.streamable_http_manager:streamable_http_manager.py:164 StreamableHTTP session manager started
+INFO     mcp.server.streamable_http:streamable_http.py:831 Terminating session: None
+INFO     httpx:_client.py:1740 HTTP Request: POST http://localhost/mcp "HTTP/1.1 200 OK"
+INFO     mcp.client.streamable_http:streamable_http.py:219 Negotiated protocol version: 2025-11-25
+INFO     mcp.server.streamable_http:streamable_http.py:831 Terminating session: None
+INFO     httpx:_client.py:1740 HTTP Request: POST http://localhost/mcp "HTTP/1.1 202 Accepted"
+INFO     mcp.server.lowlevel.server:server.py:733 Processing request of type CallToolRequest
+ERROR    server.agent_runtime.session_manager:session_manager.py:173 Agent 启动失败 project_name=demo session_id=None failure_observation={"phase": "startup", "project_name": "demo", "raw": {"exception": {"message": "Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_MANTLE. Use a clean local subscription route; this request did not start inference.", "module": "lib.config.claude_subscription", "traceback": "Traceback (most recent call last):\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/session_manager.py\", line 878, in send_new_session\n    options = await self._build_options(\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/session_manager.py\", line 720, in _build_options\n    return await self._options_assembler.build(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 345, in build\n    provider_env = await self.build_provider_env_overrides()\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 148, in build_provider_env_overrides\n    return await loader()\n           ^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/options_assembler.py\", line 87, in load_provider_env_overrides\n    anthropic = await build_anthropic_env(session)\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/lib/config/service.py\", line 117, in build_anthropic_env\n    raise SubscriptionRouteConflictError(routes)\nlib.config.claude_subscription.SubscriptionRouteConflictError: Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_MANTLE. Use a clean local subscription route; this request did not start inference.\n", "type": "SubscriptionRouteConflictError"}, "sdk_stderr": ""}, "session_id": null, "summary": {"key": "startup_failed", "message": "Local subscription Agent pricing conflicts with enabled cloud route flags: CLAUDE_CODE_USE_MANTLE. Use a clean local subscription route; this request did not start inference.", "source": "local_exception", "type": "SubscriptionRouteConflictError"}, "timestamp": "2026-11-09T19:01:50.894306Z", "version": 1}
+INFO     mcp.server.streamable_http:streamable_http.py:831 Terminating session: None
+INFO     httpx:_client.py:1740 HTTP Request: POST http://localhost/mcp "HTTP/1.1 200 OK"
+INFO     mcp.server.streamable_http_manager:streamable_http_manager.py:168 StreamableHTTP session manager shutting down2026-11-09 16:01:51 [ERROR] asyncio: Task exception was never retrieved
+future: <Task finished name='session-actor' coro=<SessionActor._run() done, defined at /Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/session_actor.py:144> exception=RuntimeError('private-sdk-detail /private/server synthetic-secret')>
+Traceback (most recent call last):
+  File "/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/session_manager.py", line 915, in send_new_session
+    await actor.start()
+  File "/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/session_actor.py", line 142, in start
+    raise fatal
+  File "/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/server/agent_runtime/session_actor.py", line 146, in _run
+    async with self._client_factory() as client:
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pablo.carminatti.br/.codex/worktrees/0372/ArcReelBR/tests/fakes.py", line 446, in __aenter__
+    raise self._connect_error
+RuntimeError: private-sdk-detail /private/server synthetic-secret
+
+=============================== warnings summary ===============================
+tests/integration/server/test_session_mcp.py::test_session_bridge_relays_safe_route_conflict_before_sdk_start[CLAUDE_CODE_USE_BEDROCK]
+  /Users/pablo.carminatti.br/.local/share/uv/python/cpython-3.12.16-macos-aarch64-none/lib/python3.12/contextlib.py:144: SAWarning: Skipped unsupported reflection of expression-based index idx_tasks_dedupe_active
+    next(self.gen)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 25 durations =============================
+1.99s setup    tests/integration/server/test_session_mcp.py::test_session_bridge_relays_safe_route_conflict_before_sdk_start[CLAUDE_CODE_USE_BEDROCK]
+0.18s call     tests/integration/server/test_session_mcp.py::test_session_bridge_relays_safe_route_conflict_before_sdk_start[CLAUDE_CODE_USE_BEDROCK]
+0.14s setup    tests/integration/server/test_session_mcp.py::test_session_bridge_relays_safe_route_conflict_before_sdk_start[CLAUDE_CODE_USE_ANTHROPIC_AWS]
+0.13s setup    tests/integration/server/test_session_mcp.py::test_session_bridge_keeps_unclassified_startup_diagnostics_private
+0.12s setup    tests/integration/server/test_session_mcp.py::test_session_bridge_relays_safe_route_conflict_before_sdk_start[CLAUDE_CODE_USE_FOUNDRY]
+0.12s setup    tests/integration/server/test_session_mcp.py::test_session_bridge_relays_safe_route_conflict_before_sdk_start[CLAUDE_CODE_USE_VERTEX]
+0.12s setup    tests/integration/server/test_session_mcp.py::test_session_bridge_relays_safe_route_conflict_before_sdk_start[CLAUDE_CODE_USE_MANTLE]
+0.11s setup    tests/integration/server/test_session_mcp.py::test_session_bridge_relays_safe_route_conflict_before_sdk_start[CLAUDE_CODE_USE_ANTHROPIC_GOOGLE_CLOUD]
+0.06s call     tests/integration/server/test_session_mcp.py::test_session_bridge_keeps_unclassified_startup_diagnostics_private
+0.04s call     tests/integration/server/test_session_mcp.py::test_session_bridge_relays_safe_route_conflict_before_sdk_start[CLAUDE_CODE_USE_ANTHROPIC_GOOGLE_CLOUD]
+0.04s call     tests/integration/server/test_session_mcp.py::test_session_bridge_relays_safe_route_conflict_before_sdk_start[CLAUDE_CODE_USE_ANTHROPIC_AWS]
+0.03s call     tests/integration/server/test_session_mcp.py::test_session_bridge_relays_safe_route_conflict_before_sdk_start[CLAUDE_CODE_USE_VERTEX]
+0.03s call     tests/integration/server/test_session_mcp.py::test_session_bridge_relays_safe_route_conflict_before_sdk_start[CLAUDE_CODE_USE_FOUNDRY]
+0.03s call     tests/integration/server/test_session_mcp.py::test_session_bridge_relays_safe_route_conflict_before_sdk_start[CLAUDE_CODE_USE_MANTLE]
+
+(7 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/integration/server/test_session_mcp.py::test_session_bridge_relays_safe_route_conflict_before_sdk_start[CLAUDE_CODE_USE_BEDROCK]
+FAILED tests/integration/server/test_session_mcp.py::test_session_bridge_relays_safe_route_conflict_before_sdk_start[CLAUDE_CODE_USE_VERTEX]
+FAILED tests/integration/server/test_session_mcp.py::test_session_bridge_relays_safe_route_conflict_before_sdk_start[CLAUDE_CODE_USE_FOUNDRY]
+FAILED tests/integration/server/test_session_mcp.py::test_session_bridge_relays_safe_route_conflict_before_sdk_start[CLAUDE_CODE_USE_ANTHROPIC_AWS]
+FAILED tests/integration/server/test_session_mcp.py::test_session_bridge_relays_safe_route_conflict_before_sdk_start[CLAUDE_CODE_USE_ANTHROPIC_GOOGLE_CLOUD]
+FAILED tests/integration/server/test_session_mcp.py::test_session_bridge_relays_safe_route_conflict_before_sdk_start[CLAUDE_CODE_USE_MANTLE]
+6 failed, 1 passed, 9 deselected, 1 warning in 3.67s
