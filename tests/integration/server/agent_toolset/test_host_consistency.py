@@ -28,7 +28,7 @@ from lib.config.resolver import ConfigResolver
 from lib.db import async_session_factory
 from lib.generation.generation_queue import GenerationQueue
 from lib.generation.generation_result import GenerationBatchResult
-from lib.project.project_manager import ProjectManager
+from lib.project.project_manager import ProjectManager, get_project_manager
 from lib.project.project_migration_failure import (
     MIGRATION_FAILURE_CODE,
     RETRY_MIGRATION_ACTION,
@@ -105,6 +105,18 @@ SAMPLE_ARGUMENTS: dict[str, dict[str, Any]] = {
     "upload_source": {"filename": "novel.txt", "content": "第一章\n你好", "on_conflict": "replace"},
     "edit_source_text": {"filename": "novel.txt", "text": "第一章\n改写"},
     "get_workflow_plan": {"episode_id": 1},
+    "configure_project": {"title": "Updated title"},
+    "get_effective_configuration": {},
+    "quote_assets": {"type": "character", "names": ["张三"]},
+    "quote_storyboards": {"episode_id": 1},
+    "get_project_costs": {},
+    "get_project_usage": {"limit": 10},
+    "upload_reference": {
+        "kind": "character_image",
+        "name": "张三",
+        "filename": "reference.png",
+        "content_base64": "aW1hZ2U=",
+    },
     "get_video_capabilities": {},
     "get_prompt_preview": {"script": "episode_1.json", "item_id": "E1S01"},
     "get_generation_batch": {"batch_id": "batch-absent"},
@@ -196,8 +208,8 @@ _SCOPED_DECLARATIONS = pytest.mark.parametrize(
 
 
 @pytest.fixture
-def seeded_projects(tmp_path: Path) -> ProjectManager:
-    manager = ProjectManager(tmp_path / "data")
+def seeded_projects(tmp_path: Path, isolated_data_root: Path) -> ProjectManager:
+    manager = get_project_manager()
     root = manager.projects_dir
     manager.create_project("demo", content_mode="drama")
     manager.create_project_metadata("demo", "Demo", "", "drama")
@@ -562,6 +574,8 @@ _TIME_DEPENDENT_RESULTS = frozenset({CREATE_PROJECT.name, CREATE_TIMELINE.name})
 # Declarations legitimately returning problems under sample arguments lack required objects/configuration; all others must succeed.
 _PROBLEM_ON_SAMPLE = frozenset(
     {
+        "upload_reference",  # The sample character is absent.
+        "quote_storyboards",  # The sample episode has no bound formal script.
         GET_VIDEO_CAPABILITIES.name,
         GET_PROMPT_PREVIEW.name,
         GET_GENERATION_BATCH.name,
@@ -617,8 +631,22 @@ async def test_embedded_content_carries_the_same_json_as_remote_structured_conte
     assert embedded.isError is remote.isError is (declaration.name in _PROBLEM_ON_SAMPLE)
     assert remote.structuredContent is not None
     assert set(remote.structuredContent) == {"problem" if remote.isError else declaration.domain_key}
-    assert _embedded_json(embedded) == remote.structuredContent
-    assert _texts(embedded) == _texts(remote)
+    embedded_json = _embedded_json(embedded)
+    remote_json = remote.structuredContent
+    if declaration.name == "configure_project":
+        # Settings writes stamp updated_at separately for each host invocation.
+        embedded_time = embedded_json["project"]["project"]["metadata"].pop("updated_at")
+        remote_time = remote_json["project"]["project"]["metadata"].pop("updated_at")
+        assert isinstance(embedded_time, str)
+        assert embedded_time
+        assert isinstance(remote_time, str)
+        assert remote_time
+        assert [text.replace(embedded_time, "<updated_at>") for text in _texts(embedded)] == [
+            text.replace(remote_time, "<updated_at>") for text in _texts(remote)
+        ]
+    else:
+        assert _texts(embedded) == _texts(remote)
+    assert embedded_json == remote_json
 
 
 async def test_contact_sheets_reach_both_hosts_as_the_same_image_blocks(

@@ -24,7 +24,7 @@ You (the main Agent) are the orchestration hub. You **do not directly** process 
 
 ### New projects
 
-1. Ask the user to create a project in Web first, **specifying content_mode (narration / drama) and generation_mode (storyboard / reference_video) at creation**; both are immutable afterward, and the Agent cannot write them. Session cwd is bound to the corresponding root at startup
+1. The user or external MCP client creates the project through Web or `create_project` before the session, **specifying content_mode (narration / drama) and generation_mode (storyboard / reference_video) at creation**; both are immutable afterward, and the Agent cannot write them. Session cwd is bound to the corresponding root at startup
 2. Read `project.json` with Read to confirm `title`, `content_mode`, and `generation_mode` (this session's content_mode is `drama`, immutable after creation)
 3. Ask the user to upload the novel text (whole-book source) in Web, or write through `mcp__arcreel__upload_source`; files placed in `source/` without registration are not source text. For a completed screenplay, register through the tool with `source_kind=screenplay`; the default is novel
 4. **Automatically generate the project overview after upload** (synopsis, genre, theme, world_setting)

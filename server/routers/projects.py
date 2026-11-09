@@ -72,7 +72,7 @@ from lib.project import deleted_projects
 from lib.project.asset_fingerprints import compute_asset_fingerprints
 from lib.project.asset_types import asset_name_comparison_key
 from lib.project.project_change_hints import project_change_source
-from lib.project.project_manager import EmptySourceError, EpisodeScriptReboundError, get_project_manager
+from lib.project.project_manager import EmptySourceError, EpisodeScriptReboundError, ProjectManager, get_project_manager
 from lib.prompts.style_templates import is_known_template, resolve_template_prompt
 from lib.script.blank_script import BlankScriptError, start_blank_script
 from lib.script.script_batch_edit import ScriptBatchEditCommand, ScriptBatchEditor, blank_item_after, script_revision
@@ -330,45 +330,73 @@ class EpisodePatch(BaseModel):
 
 
 class UpdateProjectRequest(BaseModel):
-    source_language: ContentLanguage | None = None
-    title: str | None = None
-    style: str | None = None
-    aspect_ratio: str | None = None
-    default_duration: int | None = None
+    source_language: ContentLanguage | None = Field(
+        default=None, description="Content language used for project speech and language defaults"
+    )
+    title: str | None = Field(default=None, description="Project display title")
+    style: str | None = Field(
+        default=None, description="Visual style instructions; an empty value clears the custom style"
+    )
+    aspect_ratio: str | None = Field(
+        default=None, description="Output aspect ratio supported by the selected generation route"
+    )
+    default_duration: int | None = Field(default=None, description="Default duration in seconds for generated units")
     # Episode target seconds: explicit null clears; ad rejects field presence itself.
-    episode_target_duration: int | None = None
+    episode_target_duration: int | None = Field(
+        default=None, description="Episode target duration in seconds; null clears it; unavailable in ad mode"
+    )
     # Ad-only total target seconds: any positive integer, never clearable.
-    target_duration: int | None = Field(default=None, gt=0)
+    target_duration: int | None = Field(
+        default=None, gt=0, description="Positive total target duration in seconds for ad mode"
+    )
     # Ad-only brief; explicit null clears to empty string.
-    brief: str | None = None
+    brief: str | None = Field(default=None, description="Ad creative brief; null clears it")
     # Generation mode is creation-fixed, structurally absent from PATCH; grid toggles remain mutable.
-    grid_storyboard: bool | None = None
-    video_backend: str | None = None
-    video_provider_i2v: str | None = None
-    video_provider_r2v: str | None = None
-    image_provider_t2i: str | None = None
-    image_provider_i2i: str | None = None
-    default_image_backend: str | None = None
-    video_generate_audio: bool | None = None
+    grid_storyboard: bool | None = Field(default=None, description="Enable or disable grid storyboard generation")
+    video_backend: str | None = Field(
+        default=None, description="Default video provider/model; empty clears the project override"
+    )
+    video_provider_i2v: str | None = Field(default=None, description="Image-to-video provider/model override")
+    video_provider_r2v: str | None = Field(default=None, description="Reference-to-video provider/model override")
+    image_provider_t2i: str | None = Field(default=None, description="Text-to-image provider/model override")
+    image_provider_i2i: str | None = Field(default=None, description="Image-to-image provider/model override")
+    default_image_backend: str | None = Field(default=None, description="Default image provider/model override")
+    video_generate_audio: bool | None = Field(
+        default=None, description="Request native video audio when supported by the selected model"
+    )
     # Character voice binding: prompt (default, soft voice_style constraints) / reference_audio (character audio).
-    character_voice_binding: str | None = None
+    character_voice_binding: str | None = Field(
+        default=None, description="Character voice binding: prompt or reference_audio"
+    )
     # Narration delivery (docs/adr/0089): mutable without staling existing artifacts; not clearable.
-    narration_delivery: NarrationDelivery | None = None
+    narration_delivery: NarrationDelivery | None = Field(
+        default=None, description="Narration delivery mode; cannot be cleared"
+    )
     # TTS snapshot: provider/model, voice, speech rate, without global inheritance.
     # TTS model/voice cannot clear; null rate means omit provider rate.
-    audio_backend: str | None = None
-    narration_voice: str | None = None
-    narration_speed: float | None = None
+    audio_backend: str | None = Field(default=None, description="Narration TTS provider/model snapshot")
+    narration_voice: str | None = Field(default=None, description="Narration voice ID for the selected TTS model")
+    narration_speed: float | None = Field(default=None, description="Narration speed; null omits the provider rate")
     # Estimated speech rate (reading units/second) override; null clears to language defaults.
-    speech_rate_units_per_second: SpeechRateOverride = None
+    speech_rate_units_per_second: SpeechRateOverride = Field(
+        default=None, description="Estimated reading units per second; null restores project-language defaults"
+    )
     # Project text tiers/default (docs/adr/0051); empty clears to global inheritance.
-    text_backend_simple: str | None = None
-    text_backend_complex: str | None = None
-    default_text_backend: str | None = None
-    style_template_id: str | None = None
-    clear_style_image: bool | None = None
-    episodes: list[EpisodePatch] | None = None
-    model_settings: dict[str, dict[str, str | None]] | None = None
+    text_backend_simple: str | None = Field(
+        default=None, description="Simple text task provider/model; empty restores global inheritance"
+    )
+    text_backend_complex: str | None = Field(
+        default=None, description="Complex text task provider/model; empty restores global inheritance"
+    )
+    default_text_backend: str | None = Field(
+        default=None, description="Default text provider/model; empty restores global inheritance"
+    )
+    style_template_id: str | None = Field(default=None, description="Built-in visual style template ID")
+    clear_style_image: bool | None = Field(default=None, description="Clear the project style reference image")
+    episodes: list[EpisodePatch] | None = Field(default=None, description="Episode metadata updates")
+    model_settings: dict[str, dict[str, str | None]] | None = Field(
+        default=None, description="Per-model settings keyed by provider/model, including resolution"
+    )
 
 
 def _apply_narration_patch(project: dict, req: UpdateProjectRequest) -> None:
@@ -1045,10 +1073,22 @@ async def reset_agent_profile(name: str, _t: Translator):
 @router.patch("/projects/{name}")
 async def update_project(name: str, req: UpdateProjectRequest, _t: Translator):
     """Update project metadata."""
+    return await update_project_settings(name, req, _t, manager=None, source="webui")
+
+
+async def update_project_settings(
+    name: str,
+    req: UpdateProjectRequest,
+    _t: Translator,
+    *,
+    manager: ProjectManager | None,
+    source: Literal["webui", "worker"],
+):
+    """Apply the same validated project settings transaction for Web and MCP callers."""
     try:
 
         def _sync():
-            manager = get_project_manager()
+            project_manager = manager or get_project_manager()
 
             def _mutate(project: dict) -> None:
                 # Entire RMW uses one _project_lock, preserving concurrent PATCH/task-writeback updates.
@@ -1190,10 +1230,10 @@ async def update_project(name: str, req: UpdateProjectRequest, _t: Translator):
 
                     project["episodes"] = new_episodes
 
-            with project_change_source("webui"):
+            with project_change_source(source):
                 # Update fields and clear episode-binding-affected Manifest claims inside one project lock;
                 # return upgraded fields without reloading project.
-                project = manager.update_project_reconciling_episode_bindings(name, _mutate)
+                project = project_manager.update_project_reconciling_episode_bindings(name, _mutate)
                 return {"success": True, "project": project}
 
         return await run_sync_transaction(_sync)

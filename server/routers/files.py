@@ -448,6 +448,38 @@ async def upload_file(
     source_kind: SourceKind | None = None,
     revision: str | None = None,
 ):
+    return await upload_project_file(
+        project_name=project_name,
+        upload_type=upload_type,
+        _t=_t,
+        file=file,
+        name=name,
+        on_conflict=on_conflict,
+        role=role,
+        insert_at=insert_at,
+        source_kind=source_kind,
+        revision=revision,
+        manager=None,
+        change_source="webui",
+    )
+
+
+async def upload_project_file(
+    *,
+    project_name: str,
+    upload_type: str,
+    _t: Translator,
+    file: UploadFile = File(...),
+    name: str | None = None,
+    on_conflict: OnConflict = "fail",
+    role: SourceUploadRole = "whole_source",
+    insert_at: Annotated[int | None, Query(ge=0)] = None,
+    source_kind: SourceKind | None = None,
+    revision: str | None = None,
+    manager: ProjectManager | None,
+    require_reference_host: bool = False,
+    change_source: Literal["webui", "worker"],
+):
     """Upload a file.
 
     Args:
@@ -505,6 +537,7 @@ async def upload_file(
         )
 
     try:
+        manager = manager or get_project_manager()
         content = await file.read()
 
         if spec.max_bytes is not None and len(content) > spec.max_bytes:
@@ -532,8 +565,12 @@ async def upload_file(
                 )
 
         def _sync():
-            manager = get_project_manager()
             project_dir = manager.get_project_path(project_name)
+
+            if require_reference_host and upload_type == "character_ref":
+                hosts = manager.load_project(project_name).get("characters") or {}
+                if not name or resolve_asset_key(hosts, name) is None:
+                    raise HTTPException(status_code=404, detail=_t("character_not_found", name=name or ""))
 
             if spec.host_bucket is not None:
                 hosts = manager.load_project(project_name).get(spec.host_bucket) or {}
@@ -580,13 +617,13 @@ async def upload_file(
 
             if spec.tracks_stale_audio and name:
                 try:
-                    with project_change_source("webui"):
+                    with project_change_source(change_source):
                         manager.install_character_reference_audio(project_name, name, relative_path, content)
                 except KeyError as exc:
                     raise HTTPException(status_code=404, detail=_t(spec.host_not_found_key, name=name)) from exc
             else:
                 if upload_type in _FORMAL_SHEET_UPLOAD_TYPES and name:
-                    with project_change_source("webui"):
+                    with project_change_source(change_source):
                         install_manual_asset_sheet_upload(
                             project_manager=manager,
                             project_name=project_name,
@@ -603,7 +640,7 @@ async def upload_file(
                     # Update metadata.
                     if spec.metadata_setter is not None and name:
                         try:
-                            with project_change_source("webui"):
+                            with project_change_source(change_source):
                                 spec.metadata_setter(manager, project_name, name, relative_path)
                         except KeyError as exc:
                             if spec.host_bucket is not None:
@@ -1410,6 +1447,17 @@ async def delete_draft(project_name: str, episode: int, stage: str, _t: Translat
 
 @router.post("/projects/{project_name}/style-image")
 async def upload_style_image(project_name: str, _t: Translator, file: UploadFile = File(...)):
+    return await upload_project_style_image(project_name, _t, file, manager=None, change_source="webui")
+
+
+async def upload_project_style_image(
+    project_name: str,
+    _t: Translator,
+    file: UploadFile,
+    *,
+    manager: ProjectManager | None,
+    change_source: Literal["webui", "worker"],
+):
     """Upload a style reference and analyze style.
 
     1. Save to projects/{project_name}/style_reference.png.
@@ -1426,10 +1474,11 @@ async def upload_style_image(project_name: str, _t: Translator, file: UploadFile
         )
 
     try:
+        manager = manager or get_project_manager()
         content = await file.read()
 
         def _sync_prepare():
-            project_dir = get_project_manager().get_project_path(project_name)
+            project_dir = manager.get_project_path(project_name)
             try:
                 content_norm, new_ext = normalize_uploaded_image(content, Path(original_filename).suffix.lower())
             except ValueError as exc:
@@ -1469,8 +1518,8 @@ async def upload_style_image(project_name: str, _t: Translator, file: UploadFile
                 project_data.pop("style_template_id", None)
                 project_data["style"] = ""
 
-            with project_change_source("webui"):
-                get_project_manager().update_project(project_name, _mutate)
+            with project_change_source(change_source):
+                manager.update_project(project_name, _mutate)
 
         await run_sync_transaction(_sync_save)
 

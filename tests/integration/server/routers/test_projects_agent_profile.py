@@ -26,6 +26,7 @@ class TestProjectsRouter:
 
     def test_agent_profile_endpoints_reject_invalid_project_name(self, tmp_path, monkeypatch):
         client = build_projects_client(monkeypatch, _FakePM(tmp_path))
+        client.headers["Accept-Language"] = "zh"
         with client:
             status = client.get("/api/v1/projects/illegal-name/agent-profile")
             reset = client.post("/api/v1/projects/illegal-name/agent-profile/reset")

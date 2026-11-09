@@ -409,3 +409,27 @@ async def test_i2i_unavailable_problem_model_not_in_catalog_guides_reselect() ->
     assert problem.code == "model_not_in_provider_catalog"
     assert problem.action == "configure_provider"
     assert problem.params == {"provider": "ark", "model": "old-img"}
+
+
+async def test_edit_preview_quotes_without_replacing_source_or_submitting(fake_ctx: ToolHarness):
+    from lib.config.resolver import ConfigResolver
+    from lib.db import async_session_factory
+
+    _give_zhangsan_a_sheet(fake_ctx)
+    fake_ctx.pm.project_payload["image_provider_i2i"] = "gemini-aistudio/gemini-3.1-flash-image"
+    fake_ctx.pm.mirror_to_disk()
+    fake_ctx.config_resolver = ConfigResolver(async_session_factory)
+    before = (fake_ctx.project_path / "characters/zhangsan.png").read_bytes()
+
+    async def no_submission(**_kwargs):
+        raise AssertionError("Preview must not submit paid edits")
+
+    out = await run_declared_tool(
+        "edit_images", fake_ctx, {**_EDIT_ZHANGSAN, "preview": True}, batch_waiter=no_submission
+    )
+    assert out.problem is None, out
+    assert out.value["image_edit_quote"]["targets"] == ["张三"]
+    assert out.value["image_edit_quote"]["unpriced_count"] == 1
+    assert out.value["image_edit_quote"]["estimated_cost"] is None
+    assert read_generation_result(out).succeeded == []
+    assert (fake_ctx.project_path / "characters/zhangsan.png").read_bytes() == before

@@ -42,3 +42,11 @@ The authenticated connection also exposes external-only session controls. They u
 A result entry marks a turn ending. It does not prove session or production completion. Continue inspecting actual status, unresolved questions, queued work and project artifacts. An idle session may run again. Unsent queued messages require explicit recovery rather than automatic resubmission.
 
 Production tools, confirmation parameters and media-batch polling keep their existing contracts. Reuse `get_generation_batch` at its suggested polling interval; an elapsed wait does not authorize another generation. A successful MCP connection establishes connectivity only. Verify actual no-media delegation, questions, reconnect and idempotent retry before claiming that embedded production works.
+
+## Native configuration and references
+
+Use `get_effective_configuration` to inspect resolved project models and `get_video_capabilities` for route-specific reference/audio support. `configure_project` applies explicitly supplied fields through the same validated Settings transaction as the application; changing settings does not regenerate existing media.
+
+`upload_reference` accepts supplied base64 bytes with a filename and reference kind, not server-local paths. Character references require an existing character. Style-reference uploads invoke the configured text model and require explicit `confirm_style_analysis`; they are not read-only inspection.
+
+Read `quote_assets`, `quote_storyboards`, or `generate_videos(preview=true)` before authorized generation. `edit_images(preview=true)` quotes an edit without submitting it. Keep unknown prices distinct from zero and conservative upper bounds distinct from expected spend. `get_project_costs` provides estimates and recorded costs; paginate `get_project_usage` until `next_cursor` is null for ledger reconciliation. Neither remaining budget nor a quote grants permission beyond the user's scope.

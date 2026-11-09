@@ -13,7 +13,7 @@ import asyncio
 from pathlib import Path
 from typing import Any, Literal, Self, get_args
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, model_validator
 from pydantic.json_schema import SkipJsonSchema
 
 from lib.artifacts.artifact_activation import (
@@ -44,7 +44,13 @@ from server.media_tools.context import (
     tool_error,
     tool_problem,
 )
-from server.services.tasks.image_edit_tasks import EDITABLE_RESOURCE_TYPES, resolve_usable_image_edit_source
+from server.services.admission.cost_estimation import ImageLane, estimate_image_batch_cost
+from server.services.tasks.formal_image_commit import get_aspect_ratio
+from server.services.tasks.image_edit_tasks import (
+    EDITABLE_RESOURCE_TYPES,
+    edit_version_resource_type,
+    resolve_usable_image_edit_source,
+)
 from server.tool_runtime import CallerContext, ProjectScope, Services, ToolOutcome, ToolRequest, submit_media_generation
 
 # Editing is always explicit selection: every edit carries an instruction, with no Manifest-derived
@@ -211,6 +217,11 @@ class ImageEdit(BaseModel):
 class EditImagesRequest(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
+    preview: StrictBool = Field(
+        default=False,
+        description="Read-only target validation and i2i cost estimate. No tasks, provider calls or image writes.",
+    )
+
     resource_type: EditableResourceType = Field(description="Edit target type; edit only one type per call")
     edits: list[ImageEdit] = Field(
         min_length=1,
@@ -295,6 +306,21 @@ async def edit_images(
             )
         if not specs and not builder.recorded_ids:
             return tool_problem("\n".join([*warnings, "没有可执行的编辑任务"]))
+
+        if request.value.preview:
+            lanes: list[ImageLane] = ["i2i"] * len(specs)
+            quote = await estimate_image_batch_cost(
+                project,
+                lanes,
+                aspect_ratio=get_aspect_ratio(project, edit_version_resource_type(resource_type)),
+                resolver=services.capabilities,
+                session_factory=services.sessions,
+            )
+            return generation_result_outcome(
+                builder.build(),
+                warnings,
+                image_edit_quote={"targets": list(states), **quote.to_payload()},
+            )
 
         submitted = await submit_media_generation(
             scope=scope,

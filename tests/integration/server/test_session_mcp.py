@@ -157,3 +157,34 @@ async def test_session_bridge_requires_retry_key_before_submitting(session_bridg
         result = await session.call_tool("send_agent_message", {"project": "demo", "content": "Inspect only."})
     assert result.isError
     assert sdk.sent_messages == []
+
+
+async def test_session_discovery_and_native_queue_withdrawal(session_bridge):
+    _service, sdk, app, server = session_bridge
+    async with server.session_manager.run(), connect(app) as session:
+        accepted = await session.call_tool(
+            "send_agent_message", {"project": "demo", "content": "Inspect only.", "client_key": "discover"}
+        )
+        sid = accepted.structuredContent["session_id"]
+        listed = await session.call_tool("list_agent_sessions", {"project": "demo"})
+        assert not listed.isError, listed
+        assert [row["id"] for row in listed.structuredContent["sessions"]] == [sid]
+        other = await session.call_tool("list_agent_sessions", {"project": "other"})
+        assert other.structuredContent["sessions"] == []
+        args = {"project": "demo", "session_id": sid}
+        queued = await session.call_tool(
+            "send_agent_message", {**args, "content": "Queued request", "client_key": "queued"}
+        )
+        message_id = queued.structuredContent["queued_message"]["id"]
+        denied = await session.call_tool(
+            "act_on_agent_queued_message", {**args, "project": "other", "message_id": message_id, "action": "delete"}
+        )
+        assert denied.isError
+        sdk.respond_control("cancel_async_message", {"cancelled": True})
+        deleted = await session.call_tool(
+            "act_on_agent_queued_message", {**args, "message_id": message_id, "action": "delete"}
+        )
+        assert not deleted.isError, deleted
+        assert deleted.structuredContent["outcome"] == "withdrawn"
+        snapshot = await session.call_tool("get_agent_session", args)
+        assert snapshot.structuredContent["queued_messages"] == []

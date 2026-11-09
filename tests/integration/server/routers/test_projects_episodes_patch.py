@@ -237,6 +237,7 @@ class TestProjectsRouter:
         also pass ApiError, avoiding internal_server_error fallback.
         """
         client = build_projects_client(monkeypatch, _FakePM(tmp_path))
+        client.headers["Accept-Language"] = "zh"
         with client:
             resp = client.patch("/api/v1/projects/nope/episodes/1", json={"title": "x"})
             assert resp.status_code == 404

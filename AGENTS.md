@@ -2,6 +2,12 @@
 
 An AI video creation platform that turns novels, screenplays, or creative ideas into short videos. Three layers: `frontend/` (React SPA) → `server/` (FastAPI, with `agent_runtime/` wrapping the Claude Agent SDK) → `lib/` (core library). The embedded creation Agent's configuration source is `agent_runtime_profile/`, separate from the development `.claude/` directory. uv workspace subpackages live under `lib/` and do not depend on the main repository: market-source tools and the endpoint-definition validator are in `packages/arcreel-market-core/` (`arcreel_market_core`); model-catalog data formats and validators are in `packages/arcreel-catalog-core/` (`arcreel_catalog_core`).
 
+## Production through MCP
+
+Codex automates the existing ArcReel Agent through MCP: submit original requirements and supplied inputs, track the native session, answer authorized questions, and reconcile costs and delivery. The embedded Agent and its native skills own creative planning, references, prompts, generation, review, version selection, and editing. Extend missing MCP access through existing services; keep production decisions in the framework. Do not build an external production harness or repair production through direct database/file writes. The disabled direct-production skill is not production authority.
+
+Keep the user's spending authorization and round scope in the Codex context. Remaining budget does not authorize excluded regenerations. Session completion, task success, and a successful render are separate from editorial acceptance. Record any intervention outside MCP when assessing autonomy.
+
 ## Toolchain and validation
 
 The backend uses `uv`; the frontend and documentation site use `pnpm`. This personal repository uses a lightweight local workflow: choose checks proportional to the actual changes according to `docs/agents/testing.md`, and reuse passing results while the checked files remain unchanged. A commit or push request does not require complete gates or additional diagnostic scans. Run complete gates when explicitly requested or in CI; the commands remain available for manual use:

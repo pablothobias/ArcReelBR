@@ -175,6 +175,7 @@ class TestUnexpectedErrorsDoNotLeak:
         # Overview generation is optional after upload: failure retains 200, downgrading into overview_error.
         # Low-level errors can contain absolute server paths; never forward raw str(e).
         client = build_projects_client(monkeypatch, _FakePM(tmp_path))
+        client.headers["Accept-Language"] = "zh"
         with client:
             resp = client.post(
                 "/api/v1/projects/leaky/source",
@@ -194,6 +195,7 @@ class TestUnexpectedErrorsDoNotLeak:
 
     def test_set_project_source_overview_model_not_in_catalog_guides_reselect(self, tmp_path, monkeypatch):
         client = build_projects_client(monkeypatch, _FakePM(tmp_path))
+        client.headers["Accept-Language"] = "zh"
         with client:
             resp = client.post(
                 "/api/v1/projects/retired-upload/source",
@@ -237,6 +239,7 @@ class TestUnexpectedErrorsDoNotLeak:
         # Pydantic ValidationError also subclasses ValueError; schema-invalid model output must reach
         # dedicated invalid-AI-response handling, never unconfigured-provider branches.
         client = build_projects_client(monkeypatch, _FakePM(tmp_path))
+        client.headers["Accept-Language"] = "zh"
         with client:
             resp = client.post("/api/v1/projects/bad-schema/generate-overview")
             assert resp.status_code == 400
@@ -267,6 +270,7 @@ class TestUnexpectedErrorsDoNotLeak:
             await session.commit()
         set_error_handler_sessions(db_factory)
         client = build_projects_client(monkeypatch, _FakePM(tmp_path))
+        client.headers["Accept-Language"] = "zh"
         with client:
             resp = client.post("/api/v1/projects/truncated/generate-overview")
             assert resp.status_code == 422

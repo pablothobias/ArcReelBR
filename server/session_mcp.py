@@ -28,6 +28,8 @@ SESSION_MCP_TOOL_IDS = frozenset(
         "list_agent_questions",
         "answer_agent_question",
         "interrupt_agent_session",
+        "list_agent_sessions",
+        "act_on_agent_queued_message",
     }
 )
 
@@ -170,6 +172,37 @@ def session_tools(
         service, _, meta = await locate(project, session_id)
         return await service.interrupt_session(session_id, meta=meta)
 
+    async def list_agent_sessions(
+        project: str,
+        status: Literal["idle", "running", "completed", "error", "interrupted", "closed"] | None = None,
+        limit: Annotated[int, Field(ge=1, le=200)] = 50,
+        offset: Annotated[int, Field(ge=0)] = 0,
+    ) -> dict[str, Any]:
+        """Rediscover existing project sessions before starting or resending work. Read-only."""
+        service, project_name, _ = await locate(project)
+        sessions = await service.list_sessions(project_name=project_name, status=status, limit=limit, offset=offset)
+        return {"sessions": [session.model_dump(mode="json") for session in sessions]}
+
+    async def act_on_agent_queued_message(
+        project: str,
+        session_id: str,
+        message_id: str,
+        action: Literal["edit", "delete", "resend", "send_now"],
+        locale: Literal["en", "zh", "vi", "ru"] = "en",
+    ) -> dict[str, Any]:
+        """Recover an existing queued message through the native session actor.
+
+        edit withdraws it and returns its text; delete withdraws and discards it.
+        resend retries an unsent message; send_now interrupts the active turn to prioritize it.
+        Re-read the queue after uncertain results; accepted messages must not be submitted again.
+        """
+        service, project_name, _ = await locate(project, session_id)
+        if action == "edit" or action == "delete":
+            return await service.withdraw_queued_message(project_name, session_id, message_id, intent=action)
+        if action == "resend":
+            return await service.resend_queued_message(project_name, session_id, message_id, locale=locale)
+        return await service.send_queued_message_now(project_name, session_id, message_id)
+
     return [
         _SessionTool.from_function(function)
         for function in (
@@ -179,5 +212,7 @@ def session_tools(
             list_agent_questions,
             answer_agent_question,
             interrupt_agent_session,
+            list_agent_sessions,
+            act_on_agent_queued_message,
         )
     ]

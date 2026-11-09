@@ -14,6 +14,13 @@ import type { SummaryFormat, ToolInput } from "./work-label";
 type Summarize = (input: ToolInput, f: SummaryFormat) => string;
 
 export const ARCREEL_TOOL_SUMMARIES: Record<string, Summarize> = {
+  configure_project: () => "",
+  get_effective_configuration: () => "",
+  quote_assets: () => "",
+  quote_storyboards: () => "",
+  get_project_costs: () => "",
+  get_project_usage: () => "",
+  upload_reference: () => "",
   list_projects: () => "",
   create_project: (i, f) => f.text(i.title) || f.text(i.name),
   upload_source: (i, f) => f.text(i.filename),

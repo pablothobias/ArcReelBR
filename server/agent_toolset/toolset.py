@@ -21,10 +21,12 @@ from server.agent_toolset.script_authoring import SCRIPT_AUTHORING_TOOLS
 from server.agent_toolset.script_editing import SCRIPT_EDITING_TOOLS
 from server.agent_toolset.video_review import VIDEO_REVIEW_TOOLS
 from server.agent_toolset.video_versions import VIDEO_VERSION_TOOLS
+from server.agent_toolset.workflow_access import WORKFLOW_ACCESS_TOOLS
 from server.agent_toolset.workflow_completion import WORKFLOW_COMPLETION_TOOLS
 
 AGENT_TOOLSET: tuple[AgentToolDeclaration, ...] = (
     *PROJECT_ENTRY_TOOLS,
+    *WORKFLOW_ACCESS_TOOLS,
     *ORIENTATION_TOOLS,
     *GENERATION_BATCH_TOOLS,
     *CONTENT_READ_TOOLS,
