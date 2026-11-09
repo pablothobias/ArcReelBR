@@ -1266,3 +1266,13 @@ _Avoid_: Bare draft (reserved for invalid/editable drafts), local draft.
 **wide window (宽窗口)**:
 Layout issues caused by a wide CSS viewport, such as logical widths 1920 or 2560, unrelated to pixel density.
 _Avoid_: Big screen, high-resolution screen, high DPI.
+
+### Reference-led Brazilian production
+
+**production reference**:
+An external work selected as the comparison source for a production's creative intent and adaptation. Every production in the Brazilian workflow has a production reference.
+_Avoid_: Confusing it with a character reference image or the reference-to-video generation route.
+
+**Brazilian adaptation**:
+An original story developed from a production reference's narrative mechanisms for a Brazilian audience, with Brazilian Portuguese creative content.
+_Avoid_: Treating adaptation as literal translation or automatic duplication of the source work.

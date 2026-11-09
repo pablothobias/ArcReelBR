@@ -1,0 +1,92 @@
+{
+  "spec": 2,
+  "spec_verified": true,
+  "native_subissues_verified": true,
+  "tickets": [
+    {
+      "number": 3,
+      "title_verified": true,
+      "body_verified": true,
+      "label_verified": true,
+      "blocked_by": []
+    },
+    {
+      "number": 4,
+      "title_verified": true,
+      "body_verified": true,
+      "label_verified": true,
+      "blocked_by": []
+    },
+    {
+      "number": 5,
+      "title_verified": true,
+      "body_verified": true,
+      "label_verified": true,
+      "blocked_by": []
+    },
+    {
+      "number": 6,
+      "title_verified": true,
+      "body_verified": true,
+      "label_verified": true,
+      "blocked_by": []
+    },
+    {
+      "number": 7,
+      "title_verified": true,
+      "body_verified": true,
+      "label_verified": true,
+      "blocked_by": [
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "number": 8,
+      "title_verified": true,
+      "body_verified": true,
+      "label_verified": true,
+      "blocked_by": [
+        3
+      ]
+    },
+    {
+      "number": 9,
+      "title_verified": true,
+      "body_verified": true,
+      "label_verified": true,
+      "blocked_by": [
+        8
+      ]
+    },
+    {
+      "number": 10,
+      "title_verified": true,
+      "body_verified": true,
+      "label_verified": true,
+      "blocked_by": []
+    },
+    {
+      "number": 11,
+      "title_verified": true,
+      "body_verified": true,
+      "label_verified": true,
+      "blocked_by": [
+        6,
+        7,
+        9,
+        10
+      ]
+    },
+    {
+      "number": 12,
+      "title_verified": true,
+      "body_verified": true,
+      "label_verified": true,
+      "blocked_by": [
+        11
+      ]
+    }
+  ]
+}

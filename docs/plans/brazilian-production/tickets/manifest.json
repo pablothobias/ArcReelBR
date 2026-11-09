@@ -1,0 +1,77 @@
+[
+  {
+    "number": 1,
+    "title": "Control an embedded Agent session from Codex through MCP",
+    "blocked_by": [],
+    "body_file": "01-control-an-embedded-agent-session-from-codex-through-mcp.md"
+  },
+  {
+    "number": 2,
+    "title": "Run internal text generation with Opus 5.5 through the subscription",
+    "blocked_by": [],
+    "body_file": "02-run-internal-text-generation-with-opus-5.5-through-the-subscription.md"
+  },
+  {
+    "number": 3,
+    "title": "Produce Portuguese content with English technical prompts",
+    "blocked_by": [],
+    "body_file": "03-produce-portuguese-content-with-english-technical-prompts.md"
+  },
+  {
+    "number": 4,
+    "title": "Register a Codex-generated image as a reusable project asset",
+    "blocked_by": [],
+    "body_file": "04-register-a-codex-generated-image-as-a-reusable-project-asset.md"
+  },
+  {
+    "number": 5,
+    "title": "Turn one verified reference and Markdown request into a production-ready episode",
+    "blocked_by": [
+      1,
+      2,
+      3
+    ],
+    "body_file": "05-turn-one-verified-reference-and-markdown-request-into-a-production-ready-episode.md"
+  },
+  {
+    "number": 6,
+    "title": "Apply spending and retry limits in the Codex directing workflow",
+    "blocked_by": [
+      1
+    ],
+    "body_file": "06-apply-spending-and-retry-limits-in-the-codex-directing-workflow.md"
+  },
+  {
+    "number": 7,
+    "title": "Configure selected media providers and verify a 1080p delivery path",
+    "blocked_by": [
+      6
+    ],
+    "body_file": "07-configure-selected-media-providers-and-verify-a-1080p-delivery-path.md"
+  },
+  {
+    "number": 8,
+    "title": "Let Codex inspect and judge actual video, speech and subtitle timing",
+    "blocked_by": [],
+    "body_file": "08-let-codex-inspect-and-judge-actual-video,-speech-and-subtitle-timing.md"
+  },
+  {
+    "number": 9,
+    "title": "Deliver one reviewed reference-led Brazilian pilot end to end",
+    "blocked_by": [
+      4,
+      5,
+      7,
+      8
+    ],
+    "body_file": "09-deliver-one-reviewed-reference-led-brazilian-pilot-end-to-end.md"
+  },
+  {
+    "number": 10,
+    "title": "Validate existing series continuity and release bounded batch production",
+    "blocked_by": [
+      9
+    ],
+    "body_file": "10-validate-existing-series-continuity-and-release-bounded-batch-production.md"
+  }
+]

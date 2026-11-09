@@ -1,0 +1,115 @@
+{
+  "repository": "pablothobias/ArcReelBR",
+  "spec": {
+    "number": 2,
+    "url": "https://github.com/pablothobias/ArcReelBR/issues/2",
+    "title": "Spec: Reference-led Brazilian video production with Codex and ArcReel"
+  },
+  "tickets": [
+    {
+      "draft_number": 1,
+      "number": 3,
+      "url": "https://github.com/pablothobias/ArcReelBR/issues/3",
+      "title": "Control an embedded Agent session from Codex through MCP [Spec #2]",
+      "body_file": "published-body-01.md",
+      "blockers": [],
+      "database_id": 6272378801
+    },
+    {
+      "draft_number": 2,
+      "number": 4,
+      "url": "https://github.com/pablothobias/ArcReelBR/issues/4",
+      "title": "Run internal text generation with Opus 5.5 through the subscription [Spec #2]",
+      "body_file": "published-body-02.md",
+      "blockers": [],
+      "database_id": 6272379321
+    },
+    {
+      "draft_number": 3,
+      "number": 5,
+      "url": "https://github.com/pablothobias/ArcReelBR/issues/5",
+      "title": "Produce Portuguese content with English technical prompts [Spec #2]",
+      "body_file": "published-body-03.md",
+      "blockers": [],
+      "database_id": 6272379859
+    },
+    {
+      "draft_number": 4,
+      "number": 6,
+      "url": "https://github.com/pablothobias/ArcReelBR/issues/6",
+      "title": "Register a Codex-generated image as a reusable project asset [Spec #2]",
+      "body_file": "published-body-04.md",
+      "blockers": [],
+      "database_id": 6272380349
+    },
+    {
+      "draft_number": 5,
+      "number": 7,
+      "url": "https://github.com/pablothobias/ArcReelBR/issues/7",
+      "title": "Turn one verified reference and Markdown request into a production-ready episode [Spec #2]",
+      "body_file": "published-body-05.md",
+      "blockers": [
+        3,
+        4,
+        5
+      ],
+      "database_id": 6272380940
+    },
+    {
+      "draft_number": 6,
+      "number": 8,
+      "url": "https://github.com/pablothobias/ArcReelBR/issues/8",
+      "title": "Apply spending and retry limits in the Codex directing workflow [Spec #2]",
+      "body_file": "published-body-06.md",
+      "blockers": [
+        3
+      ],
+      "database_id": 6272381818
+    },
+    {
+      "draft_number": 7,
+      "number": 9,
+      "url": "https://github.com/pablothobias/ArcReelBR/issues/9",
+      "title": "Configure selected media providers and verify a 1080p delivery path [Spec #2]",
+      "body_file": "published-body-07.md",
+      "blockers": [
+        8
+      ],
+      "database_id": 6272382424
+    },
+    {
+      "draft_number": 8,
+      "number": 10,
+      "url": "https://github.com/pablothobias/ArcReelBR/issues/10",
+      "title": "Let Codex inspect and judge actual video, speech and subtitle timing [Spec #2]",
+      "body_file": "published-body-08.md",
+      "blockers": [],
+      "database_id": 6272383090
+    },
+    {
+      "draft_number": 9,
+      "number": 11,
+      "url": "https://github.com/pablothobias/ArcReelBR/issues/11",
+      "title": "Deliver one reviewed reference-led Brazilian pilot end to end [Spec #2]",
+      "body_file": "published-body-09.md",
+      "blockers": [
+        6,
+        7,
+        9,
+        10
+      ],
+      "database_id": 6272383653
+    },
+    {
+      "draft_number": 10,
+      "number": 12,
+      "url": "https://github.com/pablothobias/ArcReelBR/issues/12",
+      "title": "Validate existing series continuity and release bounded batch production [Spec #2]",
+      "body_file": "published-body-10.md",
+      "blockers": [
+        11
+      ],
+      "database_id": 6272384664
+    }
+  ]
+}
