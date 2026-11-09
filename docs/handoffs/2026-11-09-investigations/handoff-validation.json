@@ -12,13 +12,13 @@
   "files": [
     {
       "path": "README.md",
-      "bytes": 11532,
-      "sha256": "8f996b4450ef33fd703c07c41a001b62ac0ff8a5192f9915eb753bf5771c03c7"
+      "bytes": 11635,
+      "sha256": "451bfcd95f644d1afcbc3678a36b4a692169a7ef75dbc92f957d3799c36ec79c"
     },
     {
       "path": "commit-closeout.md",
-      "bytes": 4542,
-      "sha256": "fadb686491a05f8ba4a956c67ad8571eb315889932b11d6a4538e6bca678c29e"
+      "bytes": 4610,
+      "sha256": "a187cd7606fd3103ea9fe37b3aadba6d9841c8f4f92076ede42f534ad9bfee2b"
     },
     {
       "path": "git-diff-stat-before.txt",
@@ -46,6 +46,11 @@
       "sha256": "0b66a9a493c419f43d1ee27b3ea911b559a5e363ef7b2f24c5e72f0fe8a20e7f"
     },
     {
+      "path": "restart-verification.md",
+      "bytes": 4069,
+      "sha256": "e4b4e16ecbc98d12d47108b63f4d20ecdd3328a567c3c7e88c1ee955d82bba52"
+    },
+    {
       "path": "runtime-snapshot.json",
       "bytes": 8024,
       "sha256": "2f5dd5e2bab81301a0b6d8c72d30ff12c3af30f94a20238dd3ab48788639bf64"
@@ -57,5 +62,8 @@
   "git_commit_or_push": false,
   "closeout_validated_at": "2026-11-09T09:05:55.381108-03:00",
   "baseline_comparison_is_historical": true,
-  "closeout_broken_relative_links": []
+  "closeout_broken_relative_links": [],
+  "restart_documentation_updated_at": "2026-11-09T09:25:07.913753-03:00",
+  "restart_verification_record": "restart-verification.md",
+  "restart_documentation_broken_relative_links": []
 }

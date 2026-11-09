@@ -36,7 +36,7 @@ The original host-consistency failures are resolved; they are no longer a curren
 
 ## Starting the investigations
 
-Use the current committed checkout and existing data root. The running application was deliberately not restarted; it may retain pre-closeout modules/schema descriptions until restarted separately. Distinguish loaded runtime behavior from the committed source during inspection rather than silently restarting it.
+Use the current checkout and existing data root. No restart occurred during the commit closeout itself. The user subsequently authorized a restart, completed on 9 November 2026; [restart-verification.md](restart-verification.md) records the successful startup and read-only checks. That later verification supersedes the earlier warning about pre-closeout modules remaining loaded.
 
 The earlier observation that `frontend/vite.config.ts` changed during handoff preparation remains historical. It was not included in these commits because it no longer differed from HEAD at closeout. No author or cause is inferred.
 

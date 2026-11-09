@@ -1,6 +1,6 @@
 # Investigation handoff: 9 November 2026
 
-**Later closeout:** the uncommitted baseline below is preserved as historical evidence. The authorized test/schema corrections and missing public documentation were subsequently completed and committed by scope. Read [commit-closeout.md](commit-closeout.md) before starting: it records validation results and supersedes the outstanding test-failure/uncommitted-work status below. The application was not restarted to load these source changes.
+**Later closeout:** the uncommitted baseline below is preserved as historical evidence. The authorized test/schema corrections and missing public documentation were subsequently completed and committed by scope. Read [commit-closeout.md](commit-closeout.md) before starting: it records validation results and supersedes the outstanding test-failure/uncommitted-work status below. The application was subsequently restarted with user authorization; see [restart verification](restart-verification.md) for the loaded-schema checks and their limits.
 
 ## Start here
 
@@ -89,8 +89,6 @@ Existing implementation evidence: [native-mcp-production.md](../../testing/nativ
 - [handoff-validation.json](handoff-validation.json): final comparison of baseline hashes, file/link checks and handoff inventory.
 
 The manifest records file identities, not authorship. It includes work from different origins and must not be interpreted as changes all made by this session. The tracked changes touch native Agent instructions, MCP/tool exposure, speech/presentation, image edits, routes, local launcher/dependencies, UI summaries/localization and tests, alongside other existing changes. Untracked files include implementation, tests, research, plans and user material.
-
-**Concurrent-change observation:** final validation detected a different hash for `frontend/vite.config.ts` than at the initial capture. This handoff did not edit that file. Attribution and the effect on the running frontend were not established. `handoff-validation.json` retains both hashes and the validation timestamp; do not describe this checkout as an immutable snapshot. Investigators must re-read that file and verify the currently running configuration. Other inventoried baseline file hashes matched at validation.
 
 No raw patch, database copy, `.env`, access key or media archive is included. Ignored files and files outside the checkout are not comprehensively inventoried. Final videos have separate hashes in the runtime snapshot. This package is not a backup and does not reproduce the complete environment in a fresh clone. Use the existing checkout/data root for the audits; preserve them until conclusions are recorded.
 
