@@ -53,6 +53,9 @@ async def verify_local_subscription(
         "status",
         "--json",
         cwd=cwd,
+        # Never inherit the server's terminal: when the server runs as a background job, a child that
+        # touches the tty stops the whole process group (SIGTTIN/SIGTTOU) and the backend freezes.
+        stdin=asyncio.subprocess.DEVNULL,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.DEVNULL,
     )

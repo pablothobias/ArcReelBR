@@ -255,6 +255,28 @@ async def test_official_auth_status_requires_local_first_party_subscription(stat
             await verify_local_subscription("official-cli", str(tmp_path), process_factory=process_factory)
 
 
+async def test_auth_status_never_inherits_the_server_terminal(monkeypatch, tmp_path):
+    # A child that inherits a background job's tty stdin gets SIGTTIN/SIGTTOU, which stops the whole
+    # server process group (uv, uvicorn and the child), so the backend stops accepting connections.
+    for key in ("ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN", "ANTHROPIC_BASE_URL", "CLAUDE_CODE_OAUTH_TOKEN"):
+        monkeypatch.delenv(key, raising=False)
+    status = {"loggedIn": True, "authMethod": "claude.ai", "apiProvider": "firstParty", "subscriptionType": "max"}
+    seen: dict = {}
+
+    class Process:
+        returncode = 0
+
+        async def communicate(self):
+            return json.dumps(status).encode(), None
+
+    async def process_factory(*args, **kwargs):
+        seen.update(kwargs)
+        return Process()
+
+    await verify_local_subscription("official-cli", str(tmp_path), process_factory=process_factory)
+    assert seen.get("stdin") == asyncio.subprocess.DEVNULL
+
+
 async def test_rejected_quota_event_closes_stream_before_overage_or_another_submission():
     from claude_agent_sdk import RateLimitEvent, RateLimitInfo
 

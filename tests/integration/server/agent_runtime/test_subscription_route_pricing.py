@@ -112,9 +112,12 @@ async def test_clean_subscription_keeps_zero_price_without_claiming_login(monkey
 
 def test_local_launcher_clean_boundary_excludes_inherited_cloud_selectors(tmp_path):
     launcher = Path("scripts/run_local.sh").read_text(encoding="utf-8")
-    clean_function = launcher.split("clean() {", 1)[1].split("\n}", 1)[0]
+    # The clean boundary is the CLEAN_ENV array plus the one-line clean() function that applies it; the
+    # servers start through the same array.
+    start = launcher.index("CLEAN_ENV=(")
+    end = launcher.index("\n", launcher.index("clean() {"))
     probe = "import json,os; print(json.dumps({key: os.environ.get(key) for key in " + repr(CLOUD_FLAGS) + "}))"
-    command = "clean() {" + clean_function + '\n}\nclean "$@"'
+    command = launcher[start:end] + '\nclean "$@"'
     result = subprocess.run(
         ["/bin/bash", "-c", command, "launcher-clean-test", sys.executable, "-c", probe],
         env={

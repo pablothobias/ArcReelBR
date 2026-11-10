@@ -109,7 +109,8 @@ scripts/run_local.sh
 - Por padrão o backend roda sem auto-reload (uso normal e futuro autopilot): editar código, `git pull` ou trocar de branch não reinicia o backend no meio de um turno do Agent ou de uma geração. Depois de `git pull`, pare e suba de novo com `--setup`.
 - `--reload`: reinicia o backend quando um `.py` em `server/` ou `lib/` muda (para editar código). As conexões SSE abertas são derrubadas após 3 s (`--timeout-graceful-shutdown 3`, também usado no `Ctrl+C`) e o frontend reconecta sozinho, sem erro na tela. Um turno do Agent em andamento é perdido (a sessão volta como interrompida; reenvie a mensagem). Se houver geração de imagem/vídeo em andamento, a API fica parada até ela terminar. O log mostra `ERROR: Cancel N running task(s)...` a cada reload com aba aberta: é esperado.
 - `--no-reload`: o padrão, explícito.
-- Recusa iniciar se as portas 1241/5173 estiverem ocupadas, e mostra os PIDs. As migrações rodam sozinhas no startup do backend (`lib/db/__init__.py:64`).
+- Recusa iniciar se as portas 1241/5173 estiverem ocupadas, e mostra os PIDs. Se o processo na porta estiver congelado (parado, estado `T` no `ps`), um `kill` comum não o para: o script avisa e mostra o comando que funciona (`kill -KILL <pid>`, ou `kill -KILL -<grupo>` para um servidor iniciado por ele). As migrações rodam sozinhas no startup do backend (`lib/db/__init__.py:64`).
+- Cada servidor roda em sua própria sessão, sem terminal e com a entrada em `/dev/null`. Antes (até 2026-11-10), eles compartilhavam a sessão do terminal: quando o backend iniciava um processo que lia ou configurava o terminal (o `claude auth status` chamado por uma ferramenta MCP), o sistema congelava o backend inteiro (SIGTTIN/SIGTTOU) e a interface ficava carregando para sempre. Se mesmo assim um servidor ficar parado, o script avisa ("a server is frozen") e o `Ctrl+C` o encerra normalmente. Fechar a janela do terminal também para os dois servidores.
 - Encontra o Node >= 24.12 sozinho (o do `PATH` ou o mais novo do nvm).
 - Testado: subida, `/health`, proxy `/api` do Vite, turno do Agent pela assinatura com custo 0, `Ctrl+C` real no terminal liberando as portas sem processos órfãos. Com o timeout de 3 s: no modo padrão, tocar `lib/__init__.py` não reinicia o backend (stream SSE continua aberto); com `--reload` e stream SSE aberto, o `/health` volta em ~5-8 s (também durante um turno do Agent, que fica como interrompido, sem processo `claude` sobrando); parar via `SIGTERM` leva ~4 s com stream aberto, portas livres e nenhum processo nos grupos da API/web.
 
@@ -129,7 +130,7 @@ Frontend (terminal 2, em `frontend/`; `--host 127.0.0.1` porque `vite.config` us
 env -i HOME="$HOME" USER="$USER" LANG=en_US.UTF-8 TERM=xterm-256color PATH="$HOME/.nvm/versions/node/v24.22.2/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin" pnpm dev --host 127.0.0.1
 ```
 
-Abrir `http://127.0.0.1:5173`. Parar: `Ctrl+C` em cada terminal (ou `lsof -ti :1241 -ti :5173 | xargs kill`).
+Abrir `http://127.0.0.1:5173`. Parar: `Ctrl+C` em cada terminal (ou `lsof -ti :1241 -ti :5173 | xargs kill`). Um processo congelado (estado `T` no `ps`) ignora esse `kill` até ser retomado: use `kill -KILL <pid>`.
 
 Após `git pull`: `uv sync`, `pnpm install` em `frontend/`, e as migrações:
 
