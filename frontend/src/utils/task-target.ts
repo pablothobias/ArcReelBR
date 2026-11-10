@@ -156,16 +156,41 @@ export function buildTaskFailureTarget(
 const PROVIDER_REASON_MAX_LENGTH = 120;
 
 /**
- * Upstream rejection summaries: raw upstream text separately returned in `provider_rejected` error_params,
+ * Upstream rejection summaries: raw upstream text separately returned in `provider_rejected` / `provider_job_rejected` error_params,
  * never translated. Strip entry episode prefixes for display, separately from i18n-template error_message. Other failure codes lack
  * this field; return null.
  */
 export function providerReasonOf(task: TaskItem): string | null {
-  if (task.error_code !== "provider_rejected") return null;
-  const reason = task.error_params?.provider_reason;
-  if (typeof reason !== "string") return null;
+  const reason = rawProviderReason(task);
+  if (reason === null) return null;
   const trimmed = itemIdsInEpisodeText(reason.trim());
   return trimmed || null;
+}
+
+/**
+ * `provider_rejected` carries `provider_reason`; provider-coded job failures (declarative `error_code` extraction) carry
+ * the provider's own code plus a redacted, bounded message, shown as "code: message".
+ */
+const PROVIDER_CODED_FAILURES: ReadonlySet<string> = new Set([
+  "provider_job_rejected",
+  "provider_job_configuration_rejected",
+  "provider_job_failed_coded",
+]);
+
+function rawProviderReason(task: TaskItem): string | null {
+  const params = task.error_params;
+  if (task.error_code === "provider_rejected") {
+    return typeof params?.provider_reason === "string" ? params.provider_reason : null;
+  }
+  if (task.error_code !== undefined && PROVIDER_CODED_FAILURES.has(task.error_code)) {
+    const code = params?.provider_error_code;
+    const message = params?.provider_error_message;
+    const codeText = typeof code === "string" || typeof code === "number" ? String(code) : "";
+    const messageText = typeof message === "string" ? message : "";
+    if (!codeText && !messageText) return null;
+    return codeText && messageText ? `${codeText}: ${messageText}` : codeText || messageText;
+  }
+  return null;
 }
 
 function truncateProviderReason(reason: string): string {

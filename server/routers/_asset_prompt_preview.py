@@ -11,11 +11,10 @@ from pydantic import BaseModel
 from lib.i18n import render_generation_input_error, render_message
 from lib.i18n.display_names import DisplayNames
 from lib.infra.api_errors import NotFoundError
-from lib.project.asset_derivatives import resolve_derivative_target
-from lib.project.asset_types import AssetSpec, resolve_asset_key
+from lib.project.asset_types import AssetSpec
 from lib.project.project_manager import ProjectManager
 from server.i18n import DisplayNamesCatalog, Translator
-from server.services.admission.asset_prompt_preview import render_asset_prompt
+from server.services.admission.asset_prompt_preview import render_asset_prompt, resolve_asset_preview_target
 from server.services.admission.prompt_preview import UNAVAILABLE_MISSING, RenderedPrompt
 
 
@@ -40,16 +39,10 @@ def register_asset_prompt_preview_routes(
         def load() -> tuple[dict[str, Any], Path, str, str | None] | None:
             pm = pm_getter()
             project = pm.load_project(project_name)
-            asset_key = resolve_asset_key(project.get(spec.bucket_key), entry_name)
-            if asset_key is None:
+            target = resolve_asset_preview_target(project, spec, entry_name, derivative_name)
+            if target is None:
                 return None
-            if derivative_name is None:
-                return project, pm.get_project_path(project_name), asset_key, None
-            try:
-                target = resolve_derivative_target(project, entry_name, derivative_name)
-            except (KeyError, NotFoundError):
-                return None
-            return project, pm.get_project_path(project_name), target.owner_key, target.derivative_key
+            return project, pm.get_project_path(project_name), *target
 
         try:
             loaded = await asyncio.to_thread(load)

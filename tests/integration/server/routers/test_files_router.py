@@ -34,6 +34,7 @@ from lib.workflow.workflow_state import WorkflowStateService
 from server.auth import CurrentUserInfo, get_current_user
 from server.error_handlers import register_error_handlers
 from server.routers import files
+from server.services.project import asset_uploads
 from tests.factories import wav_bytes
 from tests.fakes import (
     fail_project_json_write,
@@ -783,7 +784,7 @@ class TestFilesRouter:
         async def _fake_duration(content, suffix):
             return 3.0
 
-        monkeypatch.setattr(files, "probe_audio_duration_seconds", _fake_duration)
+        monkeypatch.setattr(asset_uploads, "probe_audio_duration_seconds", _fake_duration)
 
         with client:
             first = client.post(
@@ -812,7 +813,7 @@ class TestFilesRouter:
         async def _fake_duration(content, suffix):
             return 3.0
 
-        monkeypatch.setattr(files, "probe_audio_duration_seconds", _fake_duration)
+        monkeypatch.setattr(asset_uploads, "probe_audio_duration_seconds", _fake_duration)
 
         with client:
             for name in ("v1.wav", "v2.mp3"):
@@ -908,7 +909,7 @@ class TestFilesRouter:
         async def _fake_duration(content, suffix):
             return 3.0
 
-        monkeypatch.setattr(files, "probe_audio_duration_seconds", _fake_duration)
+        monkeypatch.setattr(asset_uploads, "probe_audio_duration_seconds", _fake_duration)
 
         with client:
             resp = client.post(
@@ -944,7 +945,7 @@ class TestFilesRouter:
         async def _fake_duration(content, suffix):
             return 3.0
 
-        monkeypatch.setattr(files, "probe_audio_duration_seconds", _fake_duration)
+        monkeypatch.setattr(asset_uploads, "probe_audio_duration_seconds", _fake_duration)
 
         with client:
             resp = client.post(

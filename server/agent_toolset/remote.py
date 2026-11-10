@@ -2,7 +2,7 @@
 
 Adds required ``project`` at the schema root to explicitly locate the project on each call; all location failures return ``invalid_project``. Unscoped declarations (list/create projects) add no ``project`` and perform no project lookup.
 
-Long-task declarations append shared batch-handle and polling instructions. Results go to ``structuredContent``; content (text and image blocks) matches the embedded host."""
+Long-task declarations append shared batch-handle and polling instructions. Results go to ``structuredContent``; content (text, image and embedded-resource blocks) matches the embedded host."""
 
 from __future__ import annotations
 
@@ -13,9 +13,11 @@ from dataclasses import replace
 from typing import Any
 
 from mcp.server.auth.middleware.auth_context import get_access_token
+from mcp.server.fastmcp.exceptions import ToolError
 from mcp.server.fastmcp.tools import Tool as FastMCPTool
-from mcp.types import CallToolResult, ImageContent, TextContent
-from pydantic import Field
+from mcp.types import BlobResourceContents, CallToolResult, EmbeddedResource, ImageContent, TextContent
+from pydantic import AnyUrl, Field
+from sqlalchemy.exc import SQLAlchemyError
 
 from lib.db.base import DEFAULT_USER_ID
 from lib.project.project_manager import ProjectManager
@@ -112,6 +114,15 @@ def remote_result(declaration: AgentToolDeclaration, outcome: ToolOutcome[Any]) 
                 ImageContent(type="image", data=image.base64_data, mimeType=image.mime_type)
                 for image in envelope.images
             ),
+            *(
+                EmbeddedResource(
+                    type="resource",
+                    resource=BlobResourceContents(
+                        uri=AnyUrl(resource.uri), mimeType=resource.mime_type, blob=resource.base64_data
+                    ),
+                )
+                for resource in envelope.resources
+            ),
         ],
         structuredContent=envelope.structured,
         isError=envelope.is_error,
@@ -125,7 +136,11 @@ class _DeclaredRemoteTool(FastMCPTool):
 
     async def run(self, arguments: dict[str, Any], context: Any = None, convert_result: bool = False) -> Any:
         del context, convert_result
-        return await self.invoke(arguments)
+        try:
+            return await self.invoke(arguments)
+        except SQLAlchemyError:
+            # Database exception text can embed bound parameters (credential columns among them); never forward it.
+            raise ToolError("Database operation failed; inspect server diagnostics before retrying") from None
 
 
 def _locate_project(project: object, projects: ProjectManager) -> tuple[ProjectScope, tuple[str, ...]]:

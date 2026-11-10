@@ -50,6 +50,7 @@ def _make_assembler(
     max_turns: int | None = None,
     provider_env_loader=None,
     user_id: str = DEFAULT_USER_ID,
+    artifact_download_worker_provider=None,
 ) -> OptionsAssembler:
     projects_root = (tmp_path / "projects").resolve()
     projects_root.mkdir(parents=True, exist_ok=True)
@@ -64,6 +65,7 @@ def _make_assembler(
         resolve_project_cwd=lambda name: projects_root / name,
         provider_env_loader=provider_env_loader,
         user_id_provider=lambda: user_id,
+        artifact_download_worker_provider=artifact_download_worker_provider,
     )
 
 
@@ -105,6 +107,31 @@ async def test_build_provider_env_overrides_uses_injected_loader(tmp_path: Path)
 
     assembler = _make_assembler(tmp_path, provider_env_loader=fake_loader)
     assert await assembler.build_provider_env_overrides() == sentinel
+
+
+@pytest.mark.asyncio
+async def test_build_hands_the_registered_worker_to_the_session_mcp_server(tmp_path: Path) -> None:
+    """The session's ArcReel tools receive the worker registered at build time for retrieval resume."""
+    import server.agent_runtime.options_assembler as assembler_module
+
+    async def fake_loader():
+        return {}
+
+    worker = object()
+    captured: dict = {}
+    real_build = assembler_module.build_arcreel_mcp_server
+
+    def capture(**kwargs):
+        captured.update(kwargs)
+        return real_build(**kwargs)
+
+    assembler = _make_assembler(
+        tmp_path, provider_env_loader=fake_loader, artifact_download_worker_provider=lambda: worker
+    )
+    with patch.object(assembler_module, "build_arcreel_mcp_server", side_effect=capture):
+        await assembler.build("demo")
+
+    assert captured["artifact_download_worker"] is worker
 
 
 @pytest.mark.asyncio

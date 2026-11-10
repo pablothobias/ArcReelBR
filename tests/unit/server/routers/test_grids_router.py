@@ -22,6 +22,7 @@ from server.auth import CurrentUserInfo, get_current_user
 from server.error_handlers import register_error_handlers
 from server.routers import grids
 from server.routers import versions as versions_router
+from server.services.grid import grid_composite
 from tests.auth_deps import AUTH_DEPENDENCIES
 from tests.fakes import use_project_manager
 
@@ -1346,7 +1347,7 @@ def test_upload_grid_image_marks_stage_and_emit_as_webui(monkeypatch, tmp_path):
     """Upload persistence and success events must both run in webui contexts, preventing false filesystem-change classification."""
     grid = _make_completed_grid(tmp_path)
     sources: list[tuple[str, str]] = []
-    original_stage = grids.stage_uploaded_bytes
+    original_stage = grid_composite.stage_uploaded_bytes
 
     def _stage(*args, **kwargs):
         sources.append(("stage", get_project_change_source()))
@@ -1356,7 +1357,7 @@ def test_upload_grid_image_marks_stage_and_emit_as_webui(monkeypatch, tmp_path):
         sources.append(("emit", get_project_change_source()))
         return {}
 
-    monkeypatch.setattr(grids, "stage_uploaded_bytes", _stage)
+    monkeypatch.setattr(grid_composite, "stage_uploaded_bytes", _stage)
     monkeypatch.setattr("server.services.tasks.generation_tasks.emit_generation_success_batch", _emit)
     client = _client(monkeypatch, get_project_manager=lambda: _FakePMRegenerate(tmp_path))
 
@@ -1489,7 +1490,7 @@ def test_upload_grid_image_registration_failure_restores_file_version_and_record
     record_bytes = record.read_bytes()
 
     monkeypatch.setattr(
-        grids,
+        grid_composite,
         "register_current_resource_artifact",
         lambda *_a, **_kw: (_ for _ in ()).throw(RuntimeError("manifest commit failed")),
     )
@@ -1608,7 +1609,7 @@ async def test_upload_grid_image_cancelled_while_staging_leaves_no_staged_file(m
     started = threading.Event()
     release = threading.Event()
     staged = threading.Event()
-    original_stage = grids.stage_uploaded_bytes
+    original_stage = grid_composite.stage_uploaded_bytes
 
     def _stage(*args, **kwargs):
         started.set()
@@ -1618,7 +1619,7 @@ async def test_upload_grid_image_cancelled_while_staging_leaves_no_staged_file(m
         finally:
             staged.set()
 
-    monkeypatch.setattr(grids, "stage_uploaded_bytes", _stage)
+    monkeypatch.setattr(grid_composite, "stage_uploaded_bytes", _stage)
     use_project_manager(monkeypatch, _FakePMRegenerate(tmp_path))
     content = _png_bytes()
     task = asyncio.create_task(

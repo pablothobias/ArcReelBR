@@ -277,6 +277,10 @@ class TestPreviewMatchesClampedExecution:
             {"key": "ref_too_many_images", "params": {"count": 8, "model": "gpt-image-2", "max_count": 7}},
         )
         assert preview.video.warnings == ()
+        # Sent references follow 图N numbering and match what execution attached.
+        assert [reference["index"] for reference in preview.storyboard_image.references] == list(range(1, 8))
+        assert preview.preview_basis == "current_configuration"
+        assert preview.generation_mode == "storyboard"
 
     async def test_preview_within_the_limit_carries_no_warning(self, tmp_path, monkeypatch):
         project_path = prepare_files(tmp_path)

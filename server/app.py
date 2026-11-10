@@ -522,6 +522,8 @@ async def lifespan(app: FastAPI):
     logger.info("启动 GenerationWorker...")
     worker = create_generation_worker()
     app.state.generation_worker = worker
+    # Embedded Agent sessions resume artifact retrieval through this worker (retry_artifact_download).
+    assistant.assistant_service.session_manager.set_artifact_download_worker(worker)
     await worker.start()
     logger.info("GenerationWorker 已启动")
 
@@ -549,7 +551,9 @@ async def lifespan(app: FastAPI):
         async_session_factory, layout.projects_dir, layout.deleted_projects_dir, data_root=layout.root
     )
     try:
-        async with remote_mcp_host.run():
+        # Provider configuration writes through MCP refresh this worker's limits, like the Web provider routes.
+        # Retrieval resume (retry_artifact_download) dispatches to this same worker, like the Web retry-download route.
+        async with remote_mcp_host.run(reload_limits=worker.reload_limits, artifact_download_worker=worker):
             yield
     finally:
         await material_maintenance.stop()

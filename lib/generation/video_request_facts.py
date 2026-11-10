@@ -355,6 +355,27 @@ async def evaluate_video_request_facts(
         except (ValueError, SQLAlchemyError):
             return VideoRequestFactsFailure(codes["unavailable"], (("capability", generation_type), *identity_params))
 
+    # The resolution must be one the executing endpoint renders: a declarative ``enum_maps.resolution`` miss would
+    # otherwise surface only after a task exists (``declarative_template_render_failed``). Same check for quotes,
+    # preflight and execution, with the valid values listed and no alias applied.
+    if resolution is not None:
+        try:
+            resolution_options = await resolver.video_resolution_options(
+                provider_id, model_id, builtin_endpoint=builtin_endpoint
+            )
+        except SQLAlchemyError:
+            return VideoRequestFactsFailure(codes["unavailable"], (("capability", generation_type), *identity_params))
+        if resolution_options is not None and resolution not in resolution_options:
+            return VideoRequestFactsFailure(
+                "video_resolution_not_supported",
+                (
+                    *identity_params,
+                    ("resolution", resolution),
+                    ("supported", ", ".join(resolution_options)),
+                    ("allowed_values", list(resolution_options)),
+                ),
+            )
+
     # Reference-image constraints follow buckets: available references determine unit buckets; r2v carries references, i2v does not.
     uses_reference_images = generation_type == "r2v"
     try:

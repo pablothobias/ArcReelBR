@@ -62,6 +62,7 @@ async def restore_typed_media_resource(
     resource_type: str,
     resource_id: str,
     version: int,
+    expected_current_version: int | None = None,
 ) -> dict[str, Any]:
     """Switch a typed media resource (audio / videos / reference_videos) back to a specified historical version.
 
@@ -96,6 +97,7 @@ async def restore_typed_media_resource(
                 version=version,
                 current_file=current_file,
                 artifact_path=file_path,
+                expected_current_version=expected_current_version,
             )
 
             # Compute the restored file fingerprint; fingerprint=0 invalidates the file in the frontend (the poster disappears until regenerated).

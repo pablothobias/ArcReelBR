@@ -1063,7 +1063,7 @@ async def test_split_grids_splits_each_ready_grid_and_explains_the_rest(
     broken = _saved_grid(fake_ctx, scene_ids[8:], status="completed")
     await _queue_grid_task(fake_ctx, in_flight)
 
-    async def fake_split(project_name: str, grid: Any) -> GridSplitResult:
+    async def fake_split(project_name: str, grid: Any, *, expected_composite_sha256: str | None) -> GridSplitResult:
         if grid.id == broken.id:
             raise RuntimeError("disk full")
         return GridSplitResult(updated_scene_ids=list(grid.scene_ids), missing_scene_ids=[], asset_fingerprints={})
@@ -1091,7 +1091,7 @@ async def test_split_grids_allows_a_record_left_generating_without_an_active_tas
     scene_ids = _enable_grid(fake_ctx, groups=1)
     orphan = _saved_grid(fake_ctx, scene_ids[:4], status="generating")
 
-    async def fake_split(project_name: str, grid: Any) -> GridSplitResult:
+    async def fake_split(project_name: str, grid: Any, *, expected_composite_sha256: str | None) -> GridSplitResult:
         return GridSplitResult(updated_scene_ids=list(grid.scene_ids), missing_scene_ids=[], asset_fingerprints={})
 
     monkeypatch.setattr("server.media_tools.grid.apply_grid_split", fake_split)
@@ -1115,7 +1115,7 @@ async def test_split_grids_reports_an_unreadable_record_without_abandoning_the_r
     )
     ready = _saved_grid(fake_ctx, scene_ids[4:], status="completed")
 
-    async def fake_split(project_name: str, grid: Any) -> GridSplitResult:
+    async def fake_split(project_name: str, grid: Any, *, expected_composite_sha256: str | None) -> GridSplitResult:
         return GridSplitResult(updated_scene_ids=list(grid.scene_ids), missing_scene_ids=[], asset_fingerprints={})
 
     monkeypatch.setattr("server.media_tools.grid.apply_grid_split", fake_split)

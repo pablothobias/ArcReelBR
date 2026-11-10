@@ -19,6 +19,8 @@ from lib.infra.api_errors import BadRequestError, ConflictError, NotFoundError
 from lib.project.project_manager import get_project_manager
 from server.i18n import DisplayNamesCatalog, Translator
 from server.services.project.episode_item_refs import with_episode_item_refs
+from server.services.tasks.artifact_download_retry import ArtifactDownloadRetryUnavailable
+from server.services.tasks.artifact_download_retry import retry_artifact_download as retry_artifact_download_service
 
 router = APIRouter()
 
@@ -224,17 +226,11 @@ async def cancel_task(task_id: str, _t: Translator, names: DisplayNamesCatalog):
 
 @router.post("/tasks/{task_id}/retry-download")
 async def retry_artifact_download(task_id: str, request: Request, _t: Translator, names: DisplayNamesCatalog):
-    queue = get_task_queue()
-    worker = getattr(request.app.state, "generation_worker", None)
-    if worker is None:
-        raise BadRequestError("task_retry_download_unavailable", id=task_id)
     try:
-        # Read the polling timeout before changing state: configuration reads can fail, with no rollback point after commit,
-        # leaving the task permanently running, unclaimed by the queue and ineligible for retry-download.
-        poll_timeout_seconds = await worker.read_video_poll_timeout_seconds()
-        task = await queue.retry_artifact_download(task_id)
-        await worker.retry_artifact_download(task, poll_timeout_seconds=poll_timeout_seconds)
-    except ValueError as exc:
+        task = await retry_artifact_download_service(
+            task_id, queue=get_task_queue(), worker=getattr(request.app.state, "generation_worker", None)
+        )
+    except ArtifactDownloadRetryUnavailable as exc:
         raise BadRequestError("task_retry_download_unavailable", id=task_id) from exc
     [task] = await _with_resource_refs([_localize_task(task, _t, names)], _t)
     return {"task": task}

@@ -75,6 +75,15 @@ def _render_request_facts(task_type: str, payload: dict[str, Any] | None) -> dic
     return dict(payload or {}) if is_render_task_type(task_type) else None
 
 
+def _voice_sample_request_facts(task_type: str, payload: dict[str, Any] | None) -> tuple[Any, Any] | None:
+    """A character voice sample is defined by its exact text and voice; another active sample for the same character
+    with different facts must not silently attach to it (the caller would audition and pay for a different request)."""
+    if task_type != "voice_sample":
+        return None
+    payload = payload or {}
+    return payload.get("prompt"), payload.get("voice")
+
+
 class ActiveTaskRequestConflict(RuntimeError):
     """An active video task owns the resource with different request facts."""
 
@@ -449,6 +458,7 @@ class GenerationQueue:
         requested_facts = _reference_request_facts(task_type, payload)
         text_request_facts = _text_request_facts(task_type, payload)
         render_request_facts = _render_request_facts(task_type, payload)
+        voice_sample_facts = _voice_sample_request_facts(task_type, payload)
 
         def _guard_deduped(existing_payload: dict[str, Any], existing_task_id: str) -> None:
             if requested_facts is not None and _reference_request_facts(task_type, existing_payload) != requested_facts:
@@ -461,6 +471,11 @@ class GenerationQueue:
             if (
                 render_request_facts is not None
                 and _render_request_facts(task_type, existing_payload) != render_request_facts
+            ):
+                raise ActiveTaskRequestConflict(resource_id=resource_id, existing_task_id=existing_task_id)
+            if (
+                voice_sample_facts is not None
+                and _voice_sample_request_facts(task_type, existing_payload) != voice_sample_facts
             ):
                 raise ActiveTaskRequestConflict(resource_id=resource_id, existing_task_id=existing_task_id)
 

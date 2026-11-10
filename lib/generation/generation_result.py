@@ -170,11 +170,20 @@ _TASK_FAILURE_ACTIONS: dict[str, GenerationAction] = {
     "model_discontinued": GenerationAction.CONFIGURE_PROVIDER,
     # Deterministic upstream 4xx reject requests; unchanged retries repeat rejection/payment.
     "provider_rejected": GenerationAction.FIX_INPUT,
+    # Coded provider verdicts, classified by the definition's declared error_code sets. An input/content code
+    # (e.g. MiniMax 2013 invalid audio format) is deterministic for the same request.
+    "provider_job_rejected": GenerationAction.FIX_INPUT,
+    # Credentials, balance or endpoint configuration must change before resubmitting.
+    "provider_job_configuration_rejected": GenerationAction.CONFIGURE_PROVIDER,
+    # An undeclared code has no known repair: resubmitting is a paid retry that needs the user's authorization.
+    "provider_job_failed_coded": GenerationAction.RETRY,
     # Usually moderation filters: change prompts/references then regenerate.
     "image_output_missing": GenerationAction.FIX_INPUT,
     # Vector-only/nonraster outputs: switch models.
     "image_output_format_unsupported": GenerationAction.CONFIGURE_PROVIDER,
     "declarative_template_render_failed": GenerationAction.CONFIGURE_PROVIDER,
+    # A URL template let a rendered value change the credentialed host: fix the endpoint definition.
+    "credential_host_mismatch": GenerationAction.CONFIGURE_PROVIDER,
     "declarative_response_extract_failed": GenerationAction.CONFIGURE_PROVIDER,
     # Images generated but unfetched cannot resume; retry-download cannot reconnect, so regenerate only.
     "declarative_image_save_failed": GenerationAction.RETRY,

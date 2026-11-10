@@ -36,6 +36,7 @@ from lib.prompts.prompt_templates.builtin import builtin_templates
 from server.agent_runtime.agent_access_policy import AgentAccessPolicy
 from server.agent_runtime.arcreel_mcp import build_arcreel_mcp_server
 from server.auth import EMBEDDED_AGENT_SUB, create_token, is_auth_enabled
+from server.services.tasks.artifact_download_retry import ArtifactDownloadWorker
 
 logger = logging.getLogger(__name__)
 
@@ -126,6 +127,7 @@ class OptionsAssembler:
         provider_env_loader: Callable[[], Awaitable[dict[str, str]]] | None = None,
         session_factory_provider: Callable[[], Any] | None = None,
         user_id_provider: Callable[[], str] | None = None,
+        artifact_download_worker_provider: Callable[[], ArtifactDownloadWorker | None] | None = None,
     ) -> None:
         self.data_root = Path(data_root)
         self.layout = DataRootLayout(self.data_root)
@@ -137,6 +139,7 @@ class OptionsAssembler:
         self._provider_env_loader = provider_env_loader
         self._session_factory_provider = session_factory_provider or (lambda: None)
         self._user_id_provider = user_id_provider or (lambda: DEFAULT_USER_ID)
+        self._artifact_download_worker_provider = artifact_download_worker_provider or (lambda: None)
         # Session-store singleton cache: one per assembler, avoiding a new store on every build.
         self._cached_session_store: DbSessionStore | None = None
         self._session_store_resolved = False
@@ -358,12 +361,18 @@ class OptionsAssembler:
             }
         )
         user_id = self._user_id_provider()
+        artifact_download_worker = self._artifact_download_worker_provider()
 
         def _build_sandbox_and_mcp_server() -> tuple[dict[str, Any], McpSdkServerConfig]:
             # Both scan disk/create directories (sandbox sensitive-path resolution and MCP ProjectManager); combine and offload to a thread.
             sandbox = policy.build_sandbox_settings(project_cwd)
             # Built-in ArcReel in-process MCP server: handlers run in the main process, bypassing sandboxing.
-            server = build_arcreel_mcp_server(project_name=project_name, data_root=self.data_root, user_id=user_id)
+            server = build_arcreel_mcp_server(
+                project_name=project_name,
+                data_root=self.data_root,
+                user_id=user_id,
+                artifact_download_worker=artifact_download_worker,
+            )
             return sandbox, server
 
         sandbox_typed, arcreel_server = await asyncio.to_thread(_build_sandbox_and_mcp_server)

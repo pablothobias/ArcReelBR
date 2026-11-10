@@ -43,6 +43,7 @@ async def test_lifespan_invokes_session_store_migration(tmp_path, monkeypatch):
             {
                 "start": AsyncMock(),
                 "stop": AsyncMock(),
+                "reload_limits": AsyncMock(),
             },
         )()
         # assistant_service.startup is awaited
@@ -54,6 +55,7 @@ async def test_lifespan_invokes_session_store_migration(tmp_path, monkeypatch):
                 "start_patrol": lambda self: None,
                 "stop_patrol": lambda self: None,
                 "set_autonomous_turn_listener": lambda self, listener: None,
+                "set_artifact_download_worker": lambda self, worker: None,
             },
         )()
         # project_event_service.start() / shutdown()

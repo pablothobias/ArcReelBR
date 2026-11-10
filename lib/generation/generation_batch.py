@@ -10,6 +10,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from lib.artifacts.artifact_activation import ArtifactCurrencyResolver
 from lib.artifacts.artifact_manifest import ArtifactKey, ArtifactStatus
+from lib.generation.generation_diagnostics import task_checkpoint_summary
 from lib.generation.generation_result import (
     GenerationAction,
     GenerationBatchResult,
@@ -89,6 +90,24 @@ class GenerationBatchRequestSnapshot(BaseModel):
         return self
 
 
+class GenerationBatchMemberCheckpoint(BaseModel):
+    """Provider submission facts the worker persisted on the task row, readable before the batch is terminal.
+
+    ``submitted`` means a provider job id exists; ``checkpoint_state`` is the video resume classification
+    (``None`` for non-video tasks). Timestamps are task-row times, not provider observation times: the last provider
+    response and its stage are read through the diagnostics reader, and nothing here polls the provider.
+    """
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    submitted: bool
+    provider_id: str | None = None
+    provider_job_id: str | None = None
+    checkpoint_state: str | None = None
+    started_at: str | None = None
+    updated_at: str | None = None
+
+
 class GenerationBatchMember(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
@@ -99,6 +118,7 @@ class GenerationBatchMember(BaseModel):
     deduped: bool = False
     problem: GenerationProblem | None = None
     admission: dict[str, Any] = Field(default_factory=dict)
+    provider_checkpoint: GenerationBatchMemberCheckpoint | None = None
 
 
 class GenerationBatchCounts(BaseModel):
@@ -414,6 +434,7 @@ def build_generation_batch_read_model(
                 status=task["status"],
                 deduped=bool(task["deduped"]),
                 admission=requested.admission,
+                provider_checkpoint=GenerationBatchMemberCheckpoint.model_validate(task_checkpoint_summary(task)),
             )
         )
 
@@ -441,6 +462,7 @@ def build_generation_batch_read_model(
 __all__ = [
     "GenerationBatchBlockedItem",
     "GenerationBatchCancelResult",
+    "GenerationBatchMemberCheckpoint",
     "GenerationBatchReadModel",
     "GenerationBatchRequestSnapshot",
     "GenerationBatchRequestedItem",

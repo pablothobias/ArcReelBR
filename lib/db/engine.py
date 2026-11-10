@@ -100,6 +100,8 @@ def _create_engine():
     engine = create_async_engine(
         url,
         echo=False,
+        # Bound parameters (credential columns among them) must not appear in exception text or logs.
+        hide_parameters=True,
         pool_pre_ping=True,
         connect_args=connect_args,
         **kwargs,

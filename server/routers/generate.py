@@ -23,15 +23,13 @@ from lib.artifacts.artifact_activation import (
 from lib.artifacts.artifact_manifest import ArtifactKey
 from lib.catalog.errors import ModelNotInCatalogError
 from lib.config.resolver import ConfigResolver, video_bucket_for_generation_mode
-from lib.generation.generation_queue import get_generation_queue
+from lib.generation.generation_queue import ActiveTaskRequestConflict, get_generation_queue
 from lib.generation.generation_queue_client import TaskSpec
 from lib.infra.api_errors import BadRequestError, ConflictError, NotFoundError
 from lib.infra.async_thread import run_sync_transaction
 from lib.infra.json_io import domain_error_on_value_error
-from lib.infra.path_safety import safe_exists, safe_join
 from lib.project.asset_derivatives import DERIVATIVE_TASK_TYPE, DerivativeSheetSource, resolve_derivative_sheet_source
-from lib.project.asset_types import ASSET_SPECS, resolve_asset_key, validate_asset_name
-from lib.project.project_change_hints import build_change_label, emit_project_change_batch, project_change_source
+from lib.project.asset_types import ASSET_SPECS, resolve_asset_key
 from lib.project.project_manager import get_project_manager, is_reference_video_project
 from lib.script.script_editor import resolve_items
 from lib.script.script_models import get_generated_assets
@@ -48,9 +46,9 @@ from lib.speech.speech_composition import SpeechMode, admit_script_unit
 from server.auth import CurrentUser
 from server.i18n import Translator
 from server.routers._validators import require_audio_switch_supported, require_video_bucket_capability
+from server.services import voice_references
 from server.services.admission.reference_admission import require_admitted_storyboard_references
 from server.services.tasks.derivative_sheet_tasks import build_derivative_sheet_instruction
-from server.services.tasks.generation_context import AudioLaneRequest, resolve_generation_context
 from server.services.tasks.image_edit_tasks import (
     EDITABLE_RESOURCE_TYPES,
     resolve_usable_image_edit_source,
@@ -290,25 +288,6 @@ async def generate_video(
 # ==================== Narration audio (TTS) generation ====================
 
 
-async def _require_audio_provider_configured(project: dict) -> str:
-    """Return 400 immediately without a configured audio provider, giving clear guidance at generation entry.
-
-    Resolution failure (no global default and auto-resolution finds no ready audio provider) means
-    unconfigured. Successful resolution followed by invalid credentials or other runtime errors belongs
-    to workers/task panels, as with images/videos. Return resolved provider_id for enqueue reuse,
-    avoiding repeated resolution per segment."""
-    from lib.db import async_session_factory
-
-    try:
-        resolved = await ConfigResolver(async_session_factory).resolve_audio_backend(project, None)
-    except ModelNotInCatalogError:
-        # Model absent from provider lists: app-level handlers return model-reselection 400 (ValueError subclass, caught before ValueError).
-        raise
-    except ValueError as exc:
-        raise BadRequestError("audio_provider_not_configured") from exc
-    return resolved.provider_id
-
-
 def _require_project_tts(project: dict) -> str:
     """Generate narration only for TTS-selected projects with complete snapshots; return snapshot provider_id for enqueue reuse."""
 
@@ -471,10 +450,14 @@ async def generate_tts_batch(
 
 # ==================== Character reference audio: TTS preview samples ====================
 
-# Coarse preview-text length guard (same as frontend VOICE_SAMPLE_TEXT_MAX_LENGTH). Reference audio must be 2-10 seconds,
-# but text-length-to-duration varies by language/voice and cannot be predicted precisely before submission. Block only pasted paragraphs
-# certain to fail and waste billing; actual duration validation remains post-persistence in execution.
-VOICE_SAMPLE_TEXT_MAX_LENGTH = 200
+# Re-exported for callers and tests; the domain rules live in server/services/voice_references.py.
+VOICE_SAMPLE_TEXT_MAX_LENGTH = voice_references.VOICE_SAMPLE_TEXT_MAX_LENGTH
+
+
+def _audio_resolver() -> ConfigResolver:
+    from lib.db import async_session_factory
+
+    return ConfigResolver(async_session_factory)
 
 
 @router.get("/projects/{project_name}/audio-backend/voices")
@@ -484,26 +467,17 @@ async def get_audio_backend_voices(project_name: str, _t: Translator):
     Without an audio provider, return configured=false + empty list, not 400: frontend disables generation
     rather than reporting an error, matching character-card behavior when audio_backend is unconfigured."""
     project = await asyncio.to_thread(get_project_manager().load_project, project_name)
-    try:
-        await _require_audio_provider_configured(project)
-    except BadRequestError:
+    catalog = await voice_references.resolve_voice_catalog(project_name, project, resolver=_audio_resolver())
+    if not catalog.configured:
         return {"configured": False, "provider_id": None, "model": None, "voices": []}
-
-    ctx = await resolve_generation_context(
-        project_name,
-        None,
-        project=project,
-        audio=AudioLaneRequest(),
-    )
-    audio = ctx.audio
     # Backend VoiceOption.label for providers with descriptive wording (e.g. DashScope) stores lib/i18n
     # translation keys, not direct wording. Render by request locale; providers lacking descriptions whose labels equal IDs
     # (e.g. OpenAI) fall back to original strings when _t() finds no key, without side effects.
     return {
         "configured": True,
-        "provider_id": audio.provider_model.provider_id,
-        "model": audio.backend_model,
-        "voices": [{"id": v.id, "label": _t(v.label)} for v in audio.voices],
+        "provider_id": catalog.provider_id,
+        "model": catalog.model,
+        "voices": [{"id": v.id, "label": _t(v.label)} for v in catalog.voices],
     }
 
 
@@ -519,54 +493,35 @@ async def generate_character_voice_sample(
 
     Artifacts are previews, promoted to character reference_audio only explicitly through confirm. This
     endpoint only enqueues, using the existing audio lane with identical concurrency/rate/accounting to narration."""
-    text = req.text.strip()
-    voice = req.voice.strip()
-    if not text:
-        raise BadRequestError("prompt_text_empty")
-    if len(text) > VOICE_SAMPLE_TEXT_MAX_LENGTH:
-        raise BadRequestError("voice_sample_text_too_long", max_length=VOICE_SAMPLE_TEXT_MAX_LENGTH)
-    if not voice:
-        raise BadRequestError("voice_sample_voice_required")
-
-    def _sync() -> tuple[dict, str]:
-        pm_local = get_project_manager()
-        project = pm_local.load_project(project_name)
-        try:
-            char_name = validate_asset_name(name)
-        except ValueError as exc:
-            raise BadRequestError("asset_invalid_name", name=name) from exc
-        # Existing character keys may use NFD; resolve existence in the coordinate system.
-        if resolve_asset_key(project.get("characters"), char_name) is None:
-            raise NotFoundError("character_not_found", name=char_name)
-        return project, char_name
-
-    project, char_name = await asyncio.to_thread(_sync)
-    provider_id = await _require_audio_provider_configured(project)
-
-    spec = TaskSpec.from_request(
-        task_type="voice_sample",
-        media_type="audio",
-        resource_id=char_name,
-        prompt=text,
-        extra_payload={"voice": voice},
-        source="webui",
+    sample = await voice_references.prepare_voice_sample(
+        project_name,
+        name,
+        text=req.text,
+        voice=req.voice,
+        projects=get_project_manager(),
+        resolver=_audio_resolver(),
     )
+    spec = voice_references.voice_sample_task_spec(sample, source="webui")
     queue = get_generation_queue()
-    result = await queue.enqueue_task(
-        project_name=project_name,
-        task_type=spec.task_type,
-        media_type=spec.media_type,
-        resource_id=spec.resource_id,
-        payload=spec.payload,
-        source="webui",
-        user_id=user.id,
-        provider_id=provider_id,
-    )
+    try:
+        result = await queue.enqueue_task(
+            project_name=project_name,
+            task_type=spec.task_type,
+            media_type=spec.media_type,
+            resource_id=spec.resource_id,
+            payload=spec.payload,
+            source="webui",
+            user_id=user.id,
+            provider_id=sample.provider_id,
+        )
+    except ActiveTaskRequestConflict as exc:
+        # A different sample for this character is still active: name the voice-sample cause, not the video one.
+        raise ConflictError("voice_sample_in_progress", name=sample.character, id=exc.existing_task_id) from exc
     return {
         "success": True,
         "task_id": result["task_id"],
         "deduped": result.get("deduped", False),
-        "message": _t("voice_sample_task_submitted", name=char_name),
+        "message": _t("voice_sample_task_submitted", name=sample.character),
     }
 
 
@@ -579,82 +534,20 @@ async def confirm_character_voice_sample(
 ):
     """Promote a generated, auditioned TTS sample to character reference_audio; without confirmation, do not persist it to assets.
 
-    Trust only voice_sample results identified by task_id, never client-supplied paths. Execution already
-    validated format/duration/size under upload rules (see ``execute_character_voice_sample_task``).
-    Check only successful-task ownership by this character, then persist unchanged without repeating validation."""
-    try:
-        char_name = validate_asset_name(name)
-    except ValueError as exc:
-        raise BadRequestError("asset_invalid_name", name=name) from exc
-    queue = get_generation_queue()
-    task = await queue.get_task(req.task_id)
-    if (
-        task is None
-        or task.get("project_name") != project_name
-        or task.get("task_type") != "voice_sample"
-        or task.get("resource_id") != char_name
-    ):
-        raise NotFoundError("task_not_found", id=req.task_id)
-    if task.get("status") != "succeeded":
-        raise BadRequestError("voice_sample_not_ready")
-
-    result = task.get("result") or {}
-    sample_rel = result.get("file_path")
-    if not isinstance(sample_rel, str) or not sample_rel:
-        raise BadRequestError("voice_sample_not_ready")
-
-    def _sync() -> dict:
-        pm_local = get_project_manager()
-        project_dir = pm_local.get_project_path(project_name)
-        if not safe_exists(project_dir, sample_rel):
-            raise NotFoundError("voice_sample_file_missing")
-        sample_abs = safe_join(project_dir, sample_rel)
-        content = sample_abs.read_bytes()
-
-        filename = f"{char_name}.wav"
-        ref_audio_rel = f"characters/refs_audio/{filename}"
-        target_path = project_dir / ref_audio_rel
-        try:
-            with project_change_source("webui"):
-                pm_local.install_character_reference_audio(project_name, char_name, ref_audio_rel, content)
-        except KeyError as exc:
-            raise NotFoundError("character_not_found", name=char_name) from exc
-
-        # Fixed target name {char_name}.wav means reference_audio stays unchanged after regeneration/reconfirmation
-        # (same path string). project.json field diffs cannot detect changes or automatically broadcast refreshes,
-        # although persisted bytes changed. Emit character:updated explicitly with new mtime fingerprints
-        # so other open clients cache-bust the audio without waiting for an unrelated
-        # project refresh to synchronize by chance.
-        try:
-            emit_project_change_batch(
-                project_name,
-                [
-                    {
-                        "entity_type": "character",
-                        "action": "updated",
-                        "entity_id": char_name,
-                        **build_change_label("character_reference_audio", id=char_name),
-                        "focus": None,
-                        "important": False,
-                        "asset_fingerprints": {ref_audio_rel: target_path.stat().st_mtime_ns},
-                    }
-                ],
-                source="webui",
-            )
-        except Exception:
-            logger.exception(
-                "发送试听样本确认项目事件失败 project=%s character=%s",
-                project_name,
-                char_name,
-            )
-
-        return {"path": ref_audio_rel}
-
-    saved = await run_sync_transaction(_sync)
+    Trust only voice_sample results identified by task_id, never client-supplied paths; see
+    ``server.services.voice_references.confirm_voice_sample``."""
+    saved = await voice_references.confirm_voice_sample(
+        project_name,
+        name,
+        req.task_id,
+        projects=get_project_manager(),
+        queue=get_generation_queue(),
+        source="webui",
+    )
     return {
         "success": True,
-        "path": saved["path"],
-        "url": f"/api/v1/files/{project_name}/{saved['path']}",
+        "path": saved.path,
+        "url": f"/api/v1/files/{project_name}/{saved.path}",
     }
 
 

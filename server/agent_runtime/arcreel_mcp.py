@@ -16,6 +16,7 @@ from lib.generation.generation_queue_client import batch_enqueue_and_wait
 from lib.project.project_manager import ProjectManager
 from server.agent_toolset.embedded import embedded_server
 from server.agent_toolset.toolset import AGENT_TOOLSET
+from server.services.tasks.artifact_download_retry import ArtifactDownloadWorker
 from server.tool_runtime import CallerContext, ProjectScope, Services
 
 
@@ -24,6 +25,7 @@ def build_arcreel_mcp_server(
     project_name: str,
     data_root: Path,
     user_id: str = DEFAULT_USER_ID,
+    artifact_download_worker: ArtifactDownloadWorker | None = None,
 ) -> McpSdkServerConfig:
     """Build an in-process MCP server exposing all ArcReel tools for the session project; generation tools wait for terminal batch state before returning."""
     return embedded_server(
@@ -32,7 +34,7 @@ def build_arcreel_mcp_server(
         version="1.0.0",
         scope=ProjectScope(project_name=project_name, data_root=data_root),
         caller=CallerContext(user_id=user_id, source="embedded", batch_waiter=batch_enqueue_and_wait),
-        services=Services.defaults(ProjectManager(data_root)),
+        services=Services.defaults(ProjectManager(data_root), artifact_download_worker=artifact_download_worker),
     )
 
 

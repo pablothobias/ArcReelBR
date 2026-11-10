@@ -1,6 +1,6 @@
 {
   "kind": "declarative",
-  "schema_version": "1.2.0",
+  "schema_version": "1.3.0",
   "media_type": "image",
   "meta": {
     "name": "Generic Image Submit + Poll",

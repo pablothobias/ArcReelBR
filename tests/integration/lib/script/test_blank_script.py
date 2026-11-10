@@ -10,7 +10,12 @@ from lib.infra.json_io import atomic_write_json
 from lib.project import project_trash
 from lib.project.project_manager import ProjectManager
 from lib.script import script_review
-from lib.script.blank_script import BlankScriptError, start_blank_script
+from lib.script.blank_script import (
+    BlankScriptError,
+    BlankScriptResult,
+    start_blank_script,
+    start_blank_script_detailed,
+)
 from lib.script.draft_quarantine import (
     FORMAL_EDIT_META_KEY,
     QUARANTINE_KIND_DRAMA_SCRIPT_PLAN,
@@ -254,3 +259,41 @@ def test_an_old_confirmation_does_not_confirm_a_plan_made_after_the_blank_start(
 
     project = pm.load_project("demo")
     assert script_review.review_status(project_path, project, 1) == "pending_review"
+
+
+def test_detailed_blank_start_reports_the_discarded_planning(tmp_path: Path) -> None:
+    pm, project_path = _project(tmp_path, "drama")
+    fingerprint = script_review.content_fingerprint_of_data(_drama_plan())
+    pm.update_project("demo", lambda project: script_review.apply_confirmation(project, 1, fingerprint, "2026-01-01"))
+    _write_plan(project_path)
+    write_quarantine(project_path, 1, QUARANTINE_KIND_DRAMA_SCRIPT_PLAN, content=_drama_plan(), violations=[])
+
+    result = start_blank_script_detailed(pm, "demo", 1)
+
+    assert result == BlankScriptResult(
+        episode=1,
+        script_file="episode_1.json",
+        discarded_script_plan=True,
+        discarded_drafts=(QUARANTINE_KIND_DRAMA_SCRIPT_PLAN,),
+        cleared_review=True,
+    )
+
+
+def test_detailed_blank_start_without_planning_discards_nothing(tmp_path: Path) -> None:
+    pm, _project_path = _project(tmp_path, "narration")
+
+    result = start_blank_script_detailed(pm, "demo", 1)
+
+    assert (result.discarded_script_plan, result.discarded_drafts, result.cleared_review) == (False, (), False)
+
+
+def test_a_repeated_blank_start_refuses_and_keeps_the_first_script(tmp_path: Path) -> None:
+    pm, project_path = _project(tmp_path, "drama")
+    start_blank_script(pm, "demo", 1)
+    first = (project_path / "scripts" / "episode_1.json").read_bytes()
+
+    with pytest.raises(BlankScriptError) as excinfo:
+        start_blank_script(pm, "demo", 1)
+
+    assert excinfo.value.code == "formal_script_exists"
+    assert (project_path / "scripts" / "episode_1.json").read_bytes() == first

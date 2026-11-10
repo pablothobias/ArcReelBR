@@ -67,6 +67,31 @@ from server.services.presentation.timeline_units import TimelineUnitMaterials, l
 
 _WINDOWS_UNSAFE_NAME_CHARACTERS = str.maketrans(dict.fromkeys('<>:"/\\|?*', "_"))
 
+#: Longest accepted local Jianying draft directory.
+DRAFT_ROOT_MAX_LENGTH = 1024
+
+
+class JianyingDraftRootError(ValueError):
+    """The user-supplied local Jianying draft directory is unusable; ``key`` is the stable i18n key / problem code."""
+
+    def __init__(self, key: str) -> None:
+        super().__init__(key)
+        self.key = key
+
+
+def validate_draft_root(value: str) -> str:
+    """Validate the user's local Jianying draft directory (it is only substituted into draft JSON, never touched on disk).
+
+    Raises :class:`JianyingDraftRootError` with ``jianying_path_invalid`` (empty), ``jianying_path_too_long`` or
+    ``jianying_path_illegal`` (control characters); returns the stripped value. Shared by the Web download and MCP packaging."""
+    if not value or not value.strip():
+        raise JianyingDraftRootError("jianying_path_invalid")
+    if len(value) > DRAFT_ROOT_MAX_LENGTH:
+        raise JianyingDraftRootError("jianying_path_too_long")
+    if any(ord(character) < 32 for character in value):
+        raise JianyingDraftRootError("jianying_path_illegal")
+    return value.strip()
+
 
 def _applicable_issues(issues: tuple[TimelineIssue, ...], narration: DraftNarration) -> tuple[TimelineIssue, ...]:
     """Issues applicable to the selected narration variant; narrated-only issues do not count for nonnarrated output."""
@@ -406,7 +431,10 @@ class TimelineJianyingDraftService:
 
 
 __all__ = [
+    "DRAFT_ROOT_MAX_LENGTH",
     "JianyingDraftJob",
+    "JianyingDraftRootError",
     "TimelineJianyingDraftService",
     "draft_folder_name",
+    "validate_draft_root",
 ]

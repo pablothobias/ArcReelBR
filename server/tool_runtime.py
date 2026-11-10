@@ -190,7 +190,7 @@ from lib.speech.narration_config import (
     validate_project_narration_config,
 )
 from lib.speech.speech_composition import SpeechProblemCode
-from lib.workflow.operation_admission import admit_plan_episodes, whole_source_present
+from lib.workflow.operation_admission import AdmissionReason, admit_plan_episodes, whole_source_present
 from lib.workflow.workflow_plan import (
     EPISODE_PLANNING_NEXT_SLOT,
     EPISODE_PLANNING_SLOT,
@@ -214,11 +214,13 @@ from server.draft_workflow import (
     PositiveEpisode,
     PromoteDraftRequest,
 )
-from server.services.admission.prompt_preview import ItemPromptPreview, ScriptItemNotFound, preview_item_prompts
+from server.services.admission.captured_submission import CapturedSubmissionError, captured_video_submission
+from server.services.admission.prompt_preview import ItemPromptPreview, ScriptItemNotFound, preview_entry_prompts
 from server.services.admission.video_batch_admission import generation_action_for
 from server.services.project.episode_id_records import recorded_episode_ids_on
 from server.services.project.narration_settings import NarrationSettingsInput, new_project_narration_fields
 from server.services.project.workflow_planner import WorkflowPlanner
+from server.services.tasks.artifact_download_retry import ArtifactDownloadWorker
 from server.services.tasks.episode_activity import episode_has_active_tasks
 from server.services.tasks.video_caps import (
     annotate_reference_unit_tiers,
@@ -292,14 +294,20 @@ class Services:
     queue: GenerationQueue = field(default_factory=get_generation_queue)
     #: Session factory for database records such as provider-material associations.
     sessions: async_sessionmaker[AsyncSession] = field(default_factory=lambda: async_session_factory)
+    #: The running generation worker's retrieval-resume surface, injected at app assembly; None when this process runs
+    #: no worker (tools that need it then refuse with a stable problem).
+    artifact_download_worker: ArtifactDownloadWorker | None = None
 
     @classmethod
-    def defaults(cls, projects: ProjectManager) -> Services:
+    def defaults(
+        cls, projects: ProjectManager, *, artifact_download_worker: ArtifactDownloadWorker | None = None
+    ) -> Services:
         """Production default collaborators: this project manager's workflow planner, database-reading config resolver, global generation queue and session factory."""
         return cls(
             projects=projects,
             workflow_planner=WorkflowPlanner(projects),
             capabilities=ConfigResolver(async_session_factory),
+            artifact_download_worker=artifact_download_worker,
         )
 
 
@@ -845,6 +853,9 @@ async def _submit_text_task(
             return ToolOutcome(problem=ToolProblem(**problem.model_dump(mode="json")))
         result = task.get("result") or {}
         if task_type == _TEXT_EPISODE_PLAN:
+            # Replan windows share the episode-plan task type but return their own window result.
+            if isinstance(payload.get("replan"), str):
+                return ToolOutcome(value=ReplanWindowResult.model_validate(result))
             return ToolOutcome(value=PlanEpisodesResult.model_validate(result))
         if task_type == TEXT_DRAFT_REPAIR_TASK_TYPE:
             return ToolOutcome(value=DraftRepairResult.model_validate(result))
@@ -1372,28 +1383,57 @@ class PromptPreviewRequest(BaseModel):
     item_id: str = Field(
         min_length=1, description="Storyboard entry ID (segment_id / scene_id / shot_id / unit_id), such as E1S01"
     )
+    task_id: str | SkipJsonSchema[None] = Field(
+        default=None,
+        min_length=1,
+        description=(
+            "Optional submitted video task ID for this entry: also return captured_submission, the inputs that task's "
+            "execution checkpoint froze at provider submission (distinct from the current-configuration preview)"
+        ),
+    )
 
 
 async def get_prompt_preview(
     request: ToolRequest[PromptPreviewRequest],
     scope: ProjectScope,
-    _caller: CallerContext,
+    caller: CallerContext,
     services: Services,
 ) -> ToolOutcome[ItemPromptPreview]:
     """Render the final prompt text currently sent to the image / video model for one entry.
 
-    Share execution's rendering outlet so the result is verbatim the prompt actually sent for this generation. Read only: no provider requests, costs or manifest writes. ``unavailable`` is a stable machine-readable reason code forwarded unchanged by both hosts; the REST route renders finished UI wording in the request language."""
-    filename = request.value.script
+    Route by the entry's generation route: storyboard entries share the storyboard execution renderer; reference-video
+    units share the reference request projector and unit renderer used by the Web unit preview and execution. Read only:
+    no provider requests, costs, task submissions or manifest writes. ``unavailable`` is a stable machine-readable reason
+    code forwarded unchanged by both hosts. ``preview_basis`` is always ``current_configuration``; ``captured_submission``
+    is filled only for an explicit ``task_id`` from that task's native execution checkpoint."""
+    value = request.value
+    filename = value.script
     if "/" in filename or "\\" in filename or filename in {".", ".."}:
         return ToolOutcome(problem=ToolProblem("invalid_request", "script 必须是纯文件名"))
     try:
         if problem := await migration_gate(scope, services):
             return ToolOutcome(problem=problem)
-        preview = await preview_item_prompts(
-            scope.project_name, filename, request.value.item_id, projects=services.projects
+        preview = await preview_entry_prompts(
+            scope.project_name,
+            filename,
+            value.item_id,
+            projects=services.projects,
+            resolver=services.capabilities,
         )
+        if value.task_id is not None:
+            task = await services.queue.get_task(value.task_id)
+            captured = captured_video_submission(
+                task,
+                project_name=scope.project_name,
+                user_id=caller.user_id,
+                script_file=filename,
+                item_id=value.item_id,
+            )
+            preview = replace(preview, captured_submission=captured)
     except ScriptItemNotFound:
-        return ToolOutcome(problem=ToolProblem("item_not_found", f"剧本中不存在分镜 {request.value.item_id}"))
+        return ToolOutcome(problem=ToolProblem("item_not_found", f"剧本中不存在分镜 {value.item_id}"))
+    except CapturedSubmissionError as exc:
+        return ToolOutcome(problem=ToolProblem(exc.code, str(exc), params={"task_id": value.task_id}))
     except FileNotFoundError as exc:
         return ToolOutcome(problem=ToolProblem("file_not_found", str(exc)))
     except (TypeError, ValueError) as exc:
@@ -2991,7 +3031,22 @@ async def _plan_episodes_gate(scope: ProjectScope, services: Services) -> ToolPr
     try:
         await asyncio.to_thread(_plan_episodes_preflight, services.projects, scope.project_name)
     except OperationNotAdmittedError as exc:
-        return _not_admitted_problem(exc)
+        problem = _not_admitted_problem(exc)
+        if exc.reason is AdmissionReason.REPLAN_CANDIDATE_PENDING:
+            # Point a reconnecting client at the candidate it must resolve before planning again.
+            problem = replace(
+                problem,
+                params={
+                    **(problem.params or {}),
+                    "next_tools": [
+                        "get_episode_replan",
+                        "adopt_episode_replan",
+                        "discard_episode_replan",
+                        "continue_episode_replan",
+                    ],
+                },
+            )
+        return problem
     return None
 
 

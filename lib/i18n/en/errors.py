@@ -78,6 +78,10 @@ MESSAGES = {
     # Task failure reasons (GenerationWorker stores a code + params; tasks API renders per locale on read)
     "task_fail_provider_unsupported_media": "Provider {provider_id} does not support {media_type} generation",
     "subscription_quota_paused": "Claude subscription quota is exhausted. Preserve production state and resume explicitly after quota resets. No paid API fallback was attempted.",
+    "task_fail_provider_job_rejected": "The provider rejected this generation job at the {stage} stage and reported its own error code (shown with this failure); fix the request inputs or content before resubmitting",
+    "model_setting_value_unsupported": "{model} ({provider}) does not accept resolution {value}; choose one of: {allowed_values}",
+    "task_fail_provider_job_configuration_rejected": "The provider rejected this generation job at the {stage} stage because of credentials, balance or endpoint configuration (its own error code is shown with this failure); fix the provider configuration before resubmitting",
+    "task_fail_provider_job_failed_coded": "The provider failed this generation job at the {stage} stage with its own error code (shown with this failure), which the endpoint does not classify; resubmitting is a new paid attempt, so check the code before retrying",
     "task_fail_provider_rejected": "The provider rejected this generation request (HTTP {status})",
     "task_fail_dispatch_provider_requeue_failed": "The task provider changed from {claimed_provider_id} to {actual_provider_id}, but the task could not be requeued for a new slot; please retry",
     "task_fail_project_deleted_during_task": "The project was deleted while the task was running; the generated result was not saved",
@@ -97,6 +101,7 @@ MESSAGES = {
         "This model's endpoint has changed, so the generation started earlier cannot be resumed: {detail}"
     ),
     "task_fail_declarative_template_render_failed": "Endpoint request rendering failed: {detail}",
+    "task_fail_credential_host_mismatch": "The endpoint's {section} request was stopped before sending because its URL would reach a different host than the endpoint template fixes; fix the endpoint URL template so values cannot change its host",
     "task_fail_declarative_response_extract_failed": "Endpoint response extraction failed: {detail}",
     "task_fail_declarative_image_save_failed": "The provider generated the image, but it couldn't be saved locally; regenerating will be billed again: {detail}",
     "task_fail_comfyui_image_drop_unsupported": "This workflow's output depends on the image read by node {node}, so it cannot be rewired for fewer images; supply the missing images or use another workflow",
@@ -194,6 +199,10 @@ MESSAGES = {
     "voice_sample_task_submitted": "Voice sample generation task for character '{name}' submitted",
     "voice_sample_not_ready": "The voice sample has not finished generating successfully; cannot confirm yet",
     "voice_sample_file_missing": "The voice sample file no longer exists; please regenerate it",
+    "voice_sample_content_changed": "The voice sample file changed after generation; it is no longer the recorded sample (task {id})",
+    "voice_sample_in_progress": "Character '{name}' already has a voice sample task in progress with different text or voice (task {id}); wait for it to finish before retrying (a task that is still queued can be cancelled first)",
+    "voice_reference_revision_conflict": "The reference audio of character {name} changed since it was inspected; inspect it again before confirming",
+    "voice_reference_path_invalid": "The reference audio of character {name} points outside characters/refs_audio and is not usable",
     "scene_task_submitted": "Scene asset sheet generation task for '{name}' submitted",
     "prop_task_submitted": "Prop asset sheet generation task for '{name}' submitted",
     "product_task_submitted": "Merchandise asset sheet generation task for '{name}' submitted",
@@ -512,6 +521,7 @@ MESSAGES = {
     "end_frame_source_not_found": "End frame source image not found: {path}",
     "end_frame_source_too_large": "End frame image exceeds the size limit ({max_mb} MB): {path}",
     "end_frame_reference_video_unsupported": "Reference video mode has no start/end frame concept; setting an end frame is not supported",
+    "end_frame_unsupported_by_video_model": "The current video model ({provider}/{model}) does not support last frames, so an end frame would not be sent; change the video model in project settings first",
     # Reference Video
     "ref_missing_asset": "Reference to {type} '{name}' is not in the project asset library, please generate it first",
     "ref_duration_exceeded": "The script runs {total}s, beyond {model}'s longest duration option; generated at {duration}s, so the clip is shorter than the script",

@@ -142,6 +142,11 @@ FAILURE_CODE_KEYS: dict[str, str] = {
     # Deterministic upstream 4xx rejection. provider_reason in params is redacted, truncated upstream text, intentionally excluded from
     # translation templates: never translate it; readers display it unchanged in a separate field.
     "provider_rejected": "task_fail_provider_rejected",
+    # Provider-reported job failure with the provider's own error code (declarative ``error_code`` extraction). The
+    # redacted provider message stays a raw param displayed unchanged, never inserted into translated copy.
+    "provider_job_rejected": "task_fail_provider_job_rejected",
+    "provider_job_configuration_rejected": "task_fail_provider_job_configuration_rejected",
+    "provider_job_failed_coded": "task_fail_provider_job_failed_coded",
     "subscription_quota_paused": "subscription_quota_paused",
     "dispatch_provider_requeue_failed": "task_fail_dispatch_provider_requeue_failed",
     # Projects deleted during execution: tasks abandon disk writes; see lib.project.task_project_claim.
@@ -158,6 +163,7 @@ FAILURE_CODE_KEYS: dict[str, str] = {
     "resume_expired_detail": "task_fail_resume_expired_detail",
     "resume_endpoint_changed_detail": "task_fail_resume_endpoint_changed_detail",
     "declarative_template_render_failed": "task_fail_declarative_template_render_failed",
+    "credential_host_mismatch": "task_fail_credential_host_mismatch",
     "declarative_response_extract_failed": "task_fail_declarative_response_extract_failed",
     "declarative_image_save_failed": "task_fail_declarative_image_save_failed",
     # Image-edit failure from insufficient references or first/last frames: cascades reach artifact nodes because this workflow's output depends on that image.

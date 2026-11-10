@@ -55,6 +55,7 @@ import logging
 import threading
 from collections.abc import Callable
 from pathlib import Path
+from typing import Any, Literal
 
 from lib.infra.async_thread import run_sync_transaction
 from lib.infra.image_utils import normalize_storyboard_upload
@@ -377,3 +378,104 @@ async def clear_end_frame(*, project_name: str, script_file: str, shot_id: str) 
     project_path = await run_sync_transaction(_locate_shot, project_name, script_file, shot_id)
     target, _ = _snapshot_target(project_path, shot_id)
     await run_sync_transaction(_clear_snapshot_and_field, project_name, script_file, shot_id, target)
+
+
+async def require_last_frame_capability(project: dict, capabilities: Any) -> dict:
+    """Refuse an end frame the project's current video model would not send.
+
+    Agent (MCP) path only, deliberately stricter than the Web routes: the storyboard worker silently drops an
+    end frame when the model lacks last-frame support, so an Agent must not be told an end frame was set when
+    it will never reach the request. The storyboard route always uses the i2v bucket.
+
+    Reads the effective ``last_frame`` capability through the same resolver used by execution
+    (``video_capabilities_for_project``). Only an explicit ``True`` admits; ``False``/missing is an
+    incompatibility, and an unresolvable model is reported rather than treated as support. Returns the
+    capability payload so callers can show provider/model.
+
+    Raises:
+        EndFrameError: ``end_frame_unsupported_by_video_model`` / ``video_capability_unavailable`` (409).
+    """
+    if is_reference_video_project(project):
+        raise EndFrameError("end_frame_reference_video_unsupported")
+    try:
+        caps = await capabilities.video_capabilities_for_project(project)
+    except Exception as exc:
+        raise EndFrameError("video_capability_unavailable", status_code=409, capability="i2v") from exc
+    if caps.get("last_frame") is not True:
+        raise EndFrameError(
+            "end_frame_unsupported_by_video_model",
+            status_code=409,
+            provider=caps.get("provider_id"),
+            model=caps.get("model"),
+        )
+    return caps
+
+
+EndFrameSourceKind = Literal["storyboard_image", "asset_sheet", "character_derivative", "product_reference_image"]
+
+
+def resolve_end_frame_source_identity(
+    manager: ProjectManager,
+    project_name: str,
+    *,
+    kind: EndFrameSourceKind,
+    script_file: str | None = None,
+    item_id: str | None = None,
+    asset_type: str | None = None,
+    name: str | None = None,
+    derivative: str | None = None,
+    index: int | None = None,
+) -> str:
+    """Resolve a typed project-image identity to the current project-relative path it designates.
+
+    The returned path is then read by :func:`set_end_frame_from_project_image`, which copies a snapshot,
+    so later regeneration/rollback of the source never changes the chosen end frame.
+
+    Raises:
+        EndFrameError: Unknown identity (404) or identity without a current image (404).
+    """
+    from lib.project.asset_derivatives import resolve_derivative_target
+    from lib.project.asset_types import ASSET_SPECS, resolve_asset_key
+
+    def _missing() -> EndFrameError:
+        return EndFrameError("end_frame_source_not_found", status_code=404, path=kind)
+
+    if kind == "storyboard_image":
+        if not script_file or not item_id:
+            raise EndFrameError("invalid_end_frame_source", path=kind)
+        script = manager.load_script(project_name, script_file)
+        items, id_field, _, _, _ = get_storyboard_items(script)
+        found = find_storyboard_item(items, id_field, item_id)
+        if found is None:
+            raise EndFrameError("segment_not_found", status_code=404, id=item_id)
+        path = (found[0].get("generated_assets") or {}).get("storyboard_image")
+    else:
+        project = manager.load_project(project_name)
+        if kind == "asset_sheet":
+            if asset_type not in ASSET_SPECS or not name:
+                raise EndFrameError("invalid_end_frame_source", path=kind)
+            spec = ASSET_SPECS[asset_type]
+            bucket = project.get(spec.bucket_key) or {}
+            key = resolve_asset_key(bucket, name)
+            if key is None:
+                raise _missing()
+            path = bucket[key].get(spec.sheet_field)
+        elif kind == "character_derivative":
+            if not name or not derivative:
+                raise EndFrameError("invalid_end_frame_source", path=kind)
+            try:
+                path = resolve_derivative_target(project, name, derivative).sheet_path
+            except KeyError as exc:
+                raise _missing() from exc
+        else:
+            if not name or index is None:
+                raise EndFrameError("invalid_end_frame_source", path=kind)
+            bucket = project.get("products") or {}
+            key = resolve_asset_key(bucket, name)
+            refs = bucket[key].get("reference_images") if key is not None else None
+            if not isinstance(refs, list) or not 0 <= index < len(refs):
+                raise _missing()
+            path = refs[index]
+    if not isinstance(path, str) or not path:
+        raise _missing()
+    return path

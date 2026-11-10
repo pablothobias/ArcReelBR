@@ -13,23 +13,16 @@ from fastapi import APIRouter, File, HTTPException, Request, UploadFile
 from pydantic import BaseModel
 
 from lib.artifacts.artifact_activation import (
-    register_current_resource_artifact,
     resolve_artifact_episode,
-    resolve_current_resource_artifact_basis,
 )
-from lib.artifacts.artifact_version_provenance import IMAGE_ARTIFACT_BASIS_FIELD
-from lib.artifacts.version_manager import VersionManager
 from lib.generation.generation_queue import get_generation_queue
 from lib.generation.generation_result import GenerationProblemCode
 from lib.infra.api_errors import BadRequestError, ConflictError, NotFoundError
-from lib.infra.async_thread import run_noninterruptible_sync, run_sync_transaction
-from lib.infra.image_utils import MAX_UPLOAD_PIXELS, ImagePixelLimitError, normalize_storyboard_upload
+from lib.infra.async_thread import run_sync_transaction
 from lib.infra.json_io import domain_error_on_value_error
-from lib.material.formal_objects import formal_commit
 from lib.material.work_files import material_file_present
 from lib.project.project_change_hints import project_change_source
 from lib.project.project_manager import get_project_manager
-from lib.script.grid.grid_access import ensure_grid_writable
 from lib.script.grid.grid_manager import GridManager
 from lib.script.grid.grid_resolution import resolve_large_grid_allowed
 from lib.script.grid.layout import grid_aspect_ratio_for, max_cell_count, video_aspect_ratio_of
@@ -40,11 +33,16 @@ from server.auth import CurrentUser
 from server.i18n import Translator
 from server.services.admission.reference_admission import require_admitted_storyboard_references
 from server.services.currency.upload_finalize import (
-    UPLOAD_VERSION_SOURCE,
     UploadTooLargeError,
     UploadValidationError,
-    stage_uploaded_bytes,
     validate_upload,
+)
+from server.services.grid.grid_composite import (
+    ensure_grid_idle,
+    grid_project_path,
+    grid_write_target,
+    install_grid_composite,
+    load_project_for_grid_write,
 )
 from server.services.grid.grid_split import GridImageNotReadyError, apply_grid_split
 from server.services.grid.grid_submission import (
@@ -52,7 +50,6 @@ from server.services.grid.grid_submission import (
     GridSubmissionPlan,
     commit_grid_submission,
     ensure_grid_submittable,
-    grid_is_in_flight,
     grid_submission_section,
     plan_grid_submission,
     queue_active_grid_tasks,
@@ -260,14 +257,14 @@ async def list_grids(project_name: str, request: Request, _t: Translator):
 
 
 def _grid_project_path(project_name: str) -> Path:
-    try:
-        return get_project_manager().get_project_path(project_name)
-    except ValueError as exc:
-        raise BadRequestError("invalid_project_name", name=project_name) from exc
+    return grid_project_path(get_project_manager(), project_name)
 
 
 def _load_grid_or_404(project_path: Path, grid_id: str) -> GridGeneration:
-    """Read a grid record by ID; invalid ID formats and missing records both return 404 without format details."""
+    """Read a grid record by ID; invalid ID formats and missing records both return 404 without format details.
+
+    Resolves ``GridManager`` through this module so route tests can substitute it; same rule as
+    :func:`server.services.grid.grid_composite.load_grid_or_404`."""
     try:
         grid = GridManager(project_path).get(grid_id)
     except ValueError as exc:
@@ -296,30 +293,17 @@ def _require_grid_prompts_written(items: list[dict], id_field: str) -> None:
 
 def _load_project_for_grid_write(project_name: str) -> dict:
     """Load the project and enforce grid-write gates, sharing ``ensure_grid_writable`` with version restoration."""
-    # Corrupt project.json (JSONDecodeError) is not an invalid project name; let app catch-all return generic 500.
-    with domain_error_on_value_error(lambda _exc: BadRequestError("invalid_project_name", name=project_name)):
-        project = get_project_manager().load_project(project_name)
-    ensure_grid_writable(project)
-    return project
+    return load_project_for_grid_write(get_project_manager(), project_name)
 
 
 def _grid_write_target(project_name: str) -> tuple[dict, Path]:
     """Project and directory for grid writes."""
-    project = _load_project_for_grid_write(project_name)
-    return project, get_project_manager().get_project_path(project_name)
+    return grid_write_target(get_project_manager(), project_name)
 
 
 async def _ensure_grid_idle(project_name: str, grid: GridGeneration, user_id: str) -> None:
-    """Reject splitting/uploads for in-flight pending/generating grids: worker completion overwrites composites and
-    would race uploads or splits of old content. Only active queued tasks establish in-flight state. User actions
-    may take over orphan intermediate records after cancellation, restart loss or enqueue failure."""
-    if await grid_is_in_flight(
-        grid,
-        queue=get_generation_queue(),
-        project_name=project_name,
-        user_id=user_id,
-    ):
-        raise ConflictError("grid_generation_in_progress", grid_id=grid.id)
+    """Reject splitting/uploads for in-flight grids (see :func:`ensure_grid_idle`)."""
+    await ensure_grid_idle(get_generation_queue(), project_name, grid, user_id)
 
 
 @router.post("/grids/{grid_id}/regenerate")
@@ -442,7 +426,6 @@ async def upload_grid_image(
 
     project, project_path, grid = await asyncio.to_thread(_prepare)
     await _ensure_grid_idle(project_name, grid, user.id)
-    aspect_ratio = video_aspect_ratio_of(project)
 
     try:
         max_bytes = validate_upload(file.filename, file.size, kind="image")
@@ -452,106 +435,15 @@ async def upload_grid_image(
             raise UploadTooLargeError(max_bytes)
     except UploadValidationError as e:
         raise HTTPException(status_code=e.status_code, detail=_t(e.key, **e.params)) from e
-    try:
-        png_bytes = await asyncio.to_thread(normalize_storyboard_upload, content, max_long_edge=None)
-    except ImagePixelLimitError as exc:
-        raise BadRequestError("image_pixels_too_large", max_megapixels=MAX_UPLOAD_PIXELS // 1_000_000) from exc
-    except ValueError as exc:
-        raise BadRequestError("invalid_image_file") from exc
 
-    # Register staging immediately; cancellation loses staging returns, so finally cleans via registration.
-    staged_files: list[Path] = []
-
-    def _stage() -> Path:
-        target = GridManager(project_path).image_path(grid_id)
-        staged_files.append(stage_uploaded_bytes(png_bytes, target))
-        return target
-
-    try:
-        with project_change_source("webui"):
-            target = await run_sync_transaction(_stage)
-        staged_file = staged_files[0]
-        async with grid_submission_section(project_name):
-            # Enqueueing/record writes share one critical section; reread and probe again after acquiring it
-            # to prevent regeneration between an earlier orphan decision and submission.
-            current_grid = await asyncio.to_thread(_load_grid_or_404, project_path, grid_id)
-            await _ensure_grid_idle(project_name, current_grid, user.id)
-
-            def _commit() -> int:
-                grid_manager = GridManager(project_path)
-                versions = VersionManager(project_path)
-                version_box: list[int] = []
-
-                def _replace_record(current_grid: GridGeneration) -> None:
-                    # Manual replacement equals successful composite output, returning failed records to ready;
-                    # changed content clears split_at, marking it awaiting explicit splitting.
-                    current_grid.status = "completed"
-                    current_grid.error_message = None
-                    current_grid.mark_composite_replaced()
-                    # Upload layout uses the current project ratio and updates frozen values; retaining old values after
-                    # a ratio change would center-crop new images with the old ratio.
-                    current_grid.video_aspect_ratio = aspect_ratio
-
-                def _activate() -> None:
-                    basis = resolve_current_resource_artifact_basis(
-                        project_path,
-                        resource_type="grids",
-                        resource_id=grid_id,
-                    )
-                    metadata: dict[str, object] = {"source": UPLOAD_VERSION_SOURCE}
-                    if file.filename:
-                        metadata["original_filename"] = file.filename
-                    if basis is not None:
-                        metadata[IMAGE_ARTIFACT_BASIS_FIELD] = basis.to_evidence_dict()
-
-                    def _register() -> None:
-                        register_current_resource_artifact(
-                            project_path,
-                            resource_type="grids",
-                            resource_id=grid_id,
-                            basis=basis,
-                        )
-
-                    version_box.append(
-                        versions.commit_staged_version(
-                            resource_type="grids",
-                            resource_id=grid_id,
-                            prompt="",
-                            staged_file=staged_file,
-                            current_file=target,
-                            on_commit=_register,
-                            **metadata,
-                        )
-                    )
-
-                with project_change_source("webui"):
-                    committed = grid_manager.update_formal(grid_id, _replace_record, on_commit=_activate)
-                    if committed is None or len(version_box) != 1:
-                        raise RuntimeError("grid upload metadata commit skipped staged activation")
-                    return version_box[0]
-
-            # Save new versions according to global storage; unconfirmed remote persistence publishes nothing, preserving records/selection.
-            async with formal_commit(project_name):
-                version = await run_noninterruptible_sync(_commit)
-
-        with project_change_source("webui"):
-            from server.services.tasks.generation_tasks import emit_generation_success_batch
-
-            # Reading scripts may persist migrations.
-            fingerprints = await run_sync_transaction(
-                emit_generation_success_batch,
-                task_type="grid",
-                project_name=project_name,
-                resource_id=grid_id,
-                payload={"script_file": grid.script_file},
-            )
-    finally:
-        for path in staged_files:
-            await asyncio.to_thread(path.unlink, missing_ok=True)  # hard-delete: temp -- staged upload file
-
-    return {
-        "success": True,
-        "path": f"grids/{grid_id}.png",
-        "version": version,
-        "asset_fingerprints": fingerprints,
-    }
+    return await install_grid_composite(
+        queue=get_generation_queue(),
+        project_name=project_name,
+        project=project,
+        project_path=project_path,
+        grid=grid,
+        content=content,
+        filename=file.filename,
+        user_id=user.id,
+        change_source="webui",
+    )

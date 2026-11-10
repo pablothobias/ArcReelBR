@@ -17,7 +17,7 @@ from lib.i18n import _ as translate_message
 from lib.project.asset_derivatives import derivative_artifact_key, derivative_sheet_relative_path
 from lib.project.asset_types import DERIVATIVES_FIELD
 from lib.project.project_change_hints import register_project_change_listener
-from server.routers import assets
+from server.services.asset_library import global_library
 from tests.fakes import fail_project_json_write
 
 
@@ -383,14 +383,14 @@ class TestFromProject:
 
         pm.update_project("demo", _set_fields)
 
-        real_copyfile = assets.shutil.copyfile
+        real_copyfile = global_library.shutil.copyfile
 
         def flaky_copyfile(src, dst, **kwargs):
             if str(src).endswith(".wav"):
                 raise OSError("disk full")
             return real_copyfile(src, dst, **kwargs)
 
-        monkeypatch.setattr(assets.shutil, "copyfile", flaky_copyfile)
+        monkeypatch.setattr(global_library.shutil, "copyfile", flaky_copyfile)
 
         with pytest.raises(OSError, match=r"disk full"):
             client.post(
@@ -736,7 +736,7 @@ class TestApplyToProject:
         def _fail_claim_commit(*_args, **_kwargs):
             raise RuntimeError("injected claim failure")
 
-        monkeypatch.setattr(assets, "register_artifact_entries_atomically", _fail_claim_commit)
+        monkeypatch.setattr(global_library, "register_artifact_entries_atomically", _fail_claim_commit)
         with pytest.raises(RuntimeError, match="injected claim failure"):
             client.post(
                 "/api/v1/assets/apply-to-project",
@@ -1493,7 +1493,7 @@ class TestDerivativesThroughTheLibrary:
             assert all(entry is not None for entry in entries.values())
             raise RuntimeError("injected claim failure")
 
-        monkeypatch.setattr(assets, "register_artifact_entries_atomically", _fail_claim_commit)
+        monkeypatch.setattr(global_library, "register_artifact_entries_atomically", _fail_claim_commit)
         with pytest.raises(RuntimeError, match="injected claim failure"):
             client.post(
                 "/api/v1/assets/apply-to-project",

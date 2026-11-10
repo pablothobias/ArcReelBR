@@ -9,22 +9,17 @@ and persist with fixed ``.png`` extensions. Submission uses the formal activatio
 
 from __future__ import annotations
 
-import asyncio
 import logging
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
 
 from lib.infra.api_errors import ApiError
-from lib.infra.async_thread import run_sync_transaction
-from lib.infra.image_utils import normalize_storyboard_upload
-from lib.project.project_change_hints import project_change_source
 from lib.project.project_manager import get_project_manager
 from server.i18n import Translator
+from server.services.currency.manual_media_install import install_derivative_sheet
 from server.services.currency.upload_finalize import (
     UploadTooLargeError,
     UploadValidationError,
-    install_manual_derivative_upload,
-    resolve_derivative_upload_target,
     validate_upload,
 )
 
@@ -46,31 +41,23 @@ async def upload_derivative_sheet(
     No base asset image is required: the upload is a finished image, not generated from the base image."""
     try:
         max_bytes = validate_upload(file.filename, file.size, kind="image")
-        upload = await run_sync_transaction(
-            resolve_derivative_upload_target, get_project_manager(), project_name, char_name, derivative_name
-        )
-
         # Bound bytes read into memory to prevent OOM when Content-Length is absent or bypassed.
         content = await file.read(max_bytes + 1)
         if len(content) > max_bytes:
             raise UploadTooLargeError(max_bytes)
-        try:
-            # Canonical paths use .png; normalize all input formats to PNG.
-            png_bytes = await asyncio.to_thread(normalize_storyboard_upload, content)
-        except ValueError as exc:
-            raise HTTPException(status_code=400, detail=_t("invalid_image_file")) from exc
-
-        with project_change_source("webui"):
-            installed = await install_manual_derivative_upload(
-                project_name=project_name,
-                upload=upload,
-                png_bytes=png_bytes,
-                original_filename=file.filename,
-            )
+        installed = await install_derivative_sheet(
+            manager=get_project_manager(),
+            project_name=project_name,
+            owner_name=char_name,
+            derivative_name=derivative_name,
+            filename=file.filename,
+            content=content,
+            change_source="webui",
+        )
 
         return {
             "success": True,
-            "path": upload.target.sheet_path,
+            "path": installed.path,
             "version": installed.version,
             "asset_fingerprints": installed.asset_fingerprints,
         }

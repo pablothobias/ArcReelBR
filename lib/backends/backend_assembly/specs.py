@@ -1008,6 +1008,20 @@ def _builtin_video_spec(provider_id: str, model_id: str, endpoint: str | None) -
     return builtin_model_spec(provider_id, "video", model_id)
 
 
+def builtin_video_definition(
+    provider_id: str, model_id: str, *, endpoint: str | None = None
+) -> Mapping[str, Any] | None:
+    """Bundled declarative definition executing this built-in video model, or ``None`` for Python/unresolved channels.
+
+    Configuration and preflight read the same definition the backend renders, e.g. its ``enum_maps.resolution``.
+    """
+    try:
+        spec = _builtin_video_spec(provider_id, model_id, endpoint)
+    except ValueError:
+        return None
+    return _declarative_definition(spec)
+
+
 def declared_builtin_video_capabilities(
     provider_id: str, model_id: str, *, endpoint: str | None = None
 ) -> VideoCapabilities:

@@ -14,7 +14,7 @@ import mimetypes
 import re
 from collections.abc import Awaitable, Callable, Collection, Generator, Mapping
 from contextlib import contextmanager
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any, Protocol
@@ -25,10 +25,13 @@ import httpx
 from arcreel_catalog_core import CatalogEntry
 from arcreel_market_core.endpoint_definition import (
     AssetData,
+    DefinitionErrorCode,
     JsonPathEvaluationError,
+    ProviderErrorClass,
     RenderedRequest,
     TemplateRenderError,
     build_context,
+    classify_provider_error_code,
     definition_media_type,
     encode_inputs,
     extract_value,
@@ -43,6 +46,7 @@ from arcreel_market_core.video_backend_contract import (
     ResumeExpiredError,
     VideoAudioMode,
     VideoCapabilities,
+    VideoCapabilityError,
     VideoGenerationRequest,
     VideoGenerationResult,
 )
@@ -52,6 +56,7 @@ from lib.backends.backend_runtime import (
     faststart_video_artifact,
     notify_provider_response_to,
     poll_with_retry,
+    redact_provider_text,
     request_with_scoped_credentials,
     should_retry_poll,
     should_retry_submit,
@@ -65,6 +70,7 @@ from lib.backends.http_status_errors import redacted_status_error
 from lib.backends.video_backends.metering import video_usage
 from lib.billing.metering import Usage
 from lib.config.url_utils import strip_base_url_version
+from lib.custom_provider.credential_origin import CREDENTIAL_HOST_MISMATCH, credential_origin_matches, strict_origin
 from lib.custom_provider.path_overrides import NO_PATH_OVERRIDES, PathOverrides, raw_base_url
 from lib.db.repositories.usage_repo import MAX_BILLED_DURATION_SECONDS
 from lib.infra.logging_utils import format_kwargs_for_log
@@ -142,6 +148,15 @@ def _headers_with_auth_masked(headers: Mapping[str, str], auth: Mapping[str, Any
     return {name: "***" if name.lower() in auth_names else value for name, value in headers.items()}
 
 
+#: Render failures caused by the asset file itself (``inputs.*.container_mime``), not by the definition.
+_ASSET_CONTAINER_CODES = frozenset(
+    {
+        DefinitionErrorCode.ASSET_CONTAINER_UNRECOGNIZED,
+        DefinitionErrorCode.ASSET_CONTAINER_UNSUPPORTED,
+        DefinitionErrorCode.ASSET_CONTAINER_EXTENSION_MISMATCH,
+    }
+)
+
 #: Three URL-rendering sections.
 REQUEST_SECTIONS = ("submit", "poll", "result")
 #: URL templates directly beginning base_url + explicit versions.
@@ -211,6 +226,82 @@ class DeclarativeRuntimeError(RuntimeError):
         super().__init__(detail.render(default_translate) if isinstance(detail, ValidationMessage) else detail)
 
 
+class CredentialHostMismatchError(DeclarativeRuntimeError):
+    """A rendered request URL left the origin its template fixes; nothing was sent.
+
+    Params carry only the section (``submit`` / ``poll`` / ``result`` / ``download``), never the URL: every locale
+    renders the refusal from that one machine value. ``str(exc)`` is the English log line.
+    """
+
+    def __init__(self, section: str) -> None:
+        super().__init__(
+            CREDENTIAL_HOST_MISMATCH,
+            detail=f"{section} URL does not resolve to the origin its template fixes; credentials were not sent",
+        )
+        self.params = {"section": section}
+
+
+#: Upper bound for provider error text carried in structured failure params (characters, after redaction).
+PROVIDER_ERROR_MESSAGE_MAX_CHARS = 1000
+_TRUNCATION_MARKER = "…[truncated]"
+
+
+def bounded_provider_text(value: str | None) -> str | None:
+    """Redact credentials/signed-URL queries from provider text, then cap its length with an explicit marker."""
+    if value is None:
+        return None
+    redacted = redact_provider_text(value)
+    if len(redacted) <= PROVIDER_ERROR_MESSAGE_MAX_CHARS:
+        return redacted
+    return redacted[: PROVIDER_ERROR_MESSAGE_MAX_CHARS - len(_TRUNCATION_MARKER)] + _TRUNCATION_MARKER
+
+
+#: Stable failure code per declared classification of the provider's own error code.
+PROVIDER_ERROR_CLASS_CODES: dict[ProviderErrorClass, str] = {
+    "fix_input": "provider_job_rejected",
+    "configure": "provider_job_configuration_rejected",
+    "unclassified": "provider_job_failed_coded",
+}
+
+
+class ProviderJobRejectedError(DeclarativeRuntimeError):
+    """The provider reported a failed job (or refused submission) with its own error code.
+
+    The definition's ``error_code`` extraction proves a provider verdict, e.g. MiniMax ``2013`` invalid parameters.
+    The stable code follows the definition's declared code sets (:func:`classify_provider_error_code`):
+    ``fix_input_codes`` → ``provider_job_rejected`` (fix_input), ``configure_codes`` →
+    ``provider_job_configuration_rejected`` (configure_provider), any other code → ``provider_job_failed_coded``
+    (retry, only on the user's authorization). None of them is retried automatically. Params keep the provider code
+    and redacted, bounded message as data, separate from the localized wording.
+    """
+
+    def __init__(
+        self,
+        *,
+        provider_error_code: str,
+        provider_error_message: str | None,
+        stage: str,
+        classification: ProviderErrorClass = "unclassified",
+        provider_status: str | None = None,
+    ) -> None:
+        message = bounded_provider_text(provider_error_message)
+        super().__init__(
+            PROVIDER_ERROR_CLASS_CODES[classification],
+            detail=f"provider rejected the job at {stage} (code {provider_error_code})"
+            + (f": {message}" if message else ""),
+        )
+        self.classification = classification
+        self.provider_error_code = provider_error_code
+        self.provider_error_message = message
+        self.stage = stage
+        self.params = {
+            "provider_error_code": provider_error_code,
+            "provider_error_message": message,
+            "stage": stage,
+            **({"provider_status": provider_status} if provider_status else {}),
+        }
+
+
 @dataclass(frozen=True)
 class JobState:
     """Media-independent response interpretation: status/errors/secondary-retrieval ids."""
@@ -221,6 +312,8 @@ class JobState:
     provider_status: str | None
     error: str | None
     result_id: str | None
+    #: Provider error code from the definition's optional ``error_code`` extraction; ``None`` when undeclared/absent.
+    provider_error_code: str | None = field(default=None, kw_only=True)
 
 
 def _failure_reason(state: JobState) -> str:
@@ -298,6 +391,7 @@ def extract_provider_state(
             provider_status=provider_status,
             video_url=extract_text(extract.get("video_url"), body),
             error=extract_text(extract.get("error"), body),
+            provider_error_code=extract_text(extract.get("error_code"), body),
             result_id=extract_text(extract.get("result_id"), body),
             duration_seconds=extract_duration((extract.get("usage") or {}).get("duration_seconds"), body),
         )
@@ -462,12 +556,24 @@ class DeclarativeJobEngine[StateT: JobState]:
                 media_type=definition_media_type(self._definition),
             )
         except TemplateRenderError as exc:
+            if exc.code in _ASSET_CONTAINER_CODES:
+                # The file, not the configuration, is wrong: report the input repair (FIX_INPUT) before any request.
+                params = exc.message.params
+                raise VideoCapabilityError(
+                    "video_reference_audio_format_unsupported",
+                    model=self._model,
+                    name=str(params.get("asset") or params.get("input") or ""),
+                    supported=str(params.get("supported") or ""),
+                    detected=params.get("detected"),
+                ) from exc
             raise DeclarativeRuntimeError("declarative_template_render_failed", detail=exc.message) from exc
         except OSError as exc:
             raise DeclarativeRuntimeError("declarative_template_render_failed", detail=str(exc)) from exc
 
     @staticmethod
     def _asset(path: Path | None) -> AssetData | None:
+        """Read one asset with its host-guessed MIME; inputs declaring ``container_mime`` replace it from the bytes
+        during encoding (:func:`arcreel_market_core.endpoint_definition.encode_inputs`)."""
         if path is None:
             return None
         mime = (
@@ -478,7 +584,7 @@ class DeclarativeJobEngine[StateT: JobState]:
         content = path.read_bytes()
         if mime.startswith("image/"):
             mime = image_mime_from_bytes(content) or mime
-        return AssetData(mime, content)
+        return AssetData(mime, content, path.name)
 
     @classmethod
     def _assets(cls, paths: list[Path] | None) -> list[AssetData] | None:
@@ -496,6 +602,22 @@ class DeclarativeJobEngine[StateT: JobState]:
             raise DeclarativeRuntimeError("declarative_template_render_failed", detail=exc.message) from exc
         except (KeyError, TypeError, ValueError) as exc:
             raise DeclarativeRuntimeError("declarative_template_render_failed", detail=str(exc)) from exc
+
+    def _require_template_origin(
+        self, section: Mapping[str, Any], rendered_url: str, context: Mapping[str, object]
+    ) -> None:
+        """Refuse a credentialed request whose rendered origin is not the one its URL template fixes.
+
+        Runs before anything is sent: a free-text value (prompt, provider-returned ``task_id``) rendered into the
+        authority would otherwise carry the auth headers/query to another host. The detail names only the section.
+        """
+        if credential_origin_matches(str(section.get("url") or ""), rendered_url, context):
+            return
+        name = next(
+            (key for key in ("submit", "poll", "result") if self._definition.get(key) is section),
+            "request",
+        )
+        raise CredentialHostMismatchError(name)
 
     def _endpoint_origin(self, section: Mapping[str, Any], context: Mapping[str, object]) -> Origin:
         """Origins of rendered request addresses, actual credential destinations.
@@ -539,6 +661,7 @@ class DeclarativeJobEngine[StateT: JobState]:
         try:
             job_id = extract_value(section["extract"]["task_id"], body)
             error = extract_text(section["extract"].get("error"), body)
+            error_code = extract_text(section["extract"].get("error_code"), body)
         except JsonPathEvaluationError as exc:
             raise DeclarativeRuntimeError("declarative_response_extract_failed", detail=exc.message) from exc
         except (TypeError, ValueError) as exc:
@@ -546,6 +669,13 @@ class DeclarativeJobEngine[StateT: JobState]:
         # accept="scalar" can match numbers/bools, contractually stringified downstream;
         # str conversion matches artifact URLs/result_id semantics.
         task_id = str(job_id).strip() if job_id is not None and not isinstance(job_id, (list, dict)) else ""
+        if not task_id and error_code:
+            raise ProviderJobRejectedError(
+                provider_error_code=error_code,
+                provider_error_message=error,
+                stage="submit",
+                classification=classify_provider_error_code(section["extract"].get("error_code"), error_code),
+            )
         if not task_id:
             raise DeclarativeRuntimeError(
                 "declarative_response_extract_failed",
@@ -560,6 +690,7 @@ class DeclarativeJobEngine[StateT: JobState]:
         context: Mapping[str, object],
     ) -> httpx.Response:
         rendered = self._render(section, context)
+        self._require_template_origin(section, rendered.url, context)
         logger.info(
             "%s: %s",
             self._log_label,
@@ -630,7 +761,7 @@ class DeclarativeJobEngine[StateT: JobState]:
             return await self._response_body(response, call, stage)
 
         async def poll_once() -> StateT:
-            return self._extract_state(
+            state = self._extract_state(
                 # Default true: resume 404 immediately means absent tasks; definitions with transient 404 on active jobs
                 # use false, retrying to budget exhaustion.
                 await fetch(
@@ -641,6 +772,19 @@ class DeclarativeJobEngine[StateT: JobState]:
                 ),
                 self._definition["poll"]["extract"],
             )
+            # A failed job carrying a provider error code is a terminal verdict: raise the structured error (not
+            # retried by should_retry_poll) instead of the generic text failure, keeping code and message apart.
+            if state.status is ProviderJobStatus.FAILED and state.provider_error_code:
+                raise ProviderJobRejectedError(
+                    provider_error_code=state.provider_error_code,
+                    provider_error_message=state.error,
+                    stage="poll",
+                    classification=classify_provider_error_code(
+                        self._definition["poll"]["extract"].get("error_code"), state.provider_error_code
+                    ),
+                    provider_status=state.provider_status,
+                )
+            return state
 
         final = await poll_with_retry(
             poll_fn=poll_once,
@@ -732,6 +876,9 @@ class DeclarativeJobEngine[StateT: JobState]:
         rendered = (
             self._render({"method": "GET", "url": url}, context) if credential_origin in trusted_origins else None
         )
+        if rendered is not None and ((checked := strict_origin(url)) is None or strict_origin(rendered.url) != checked):
+            # The artifact URL is rendered for auth only; it must still address the trusted origin it was checked for.
+            raise CredentialHostMismatchError("download")
 
         async def download_once() -> None:
             await stream_to_file(

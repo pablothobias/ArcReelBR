@@ -679,6 +679,7 @@ class FakeConfigResolver:
         image_backend_error: BaseException | None = None,
         reference_payload_limits: tuple[int, int] | None = None,
         image_resolution: str = "1080p",
+        resolution_options: tuple[str, ...] | None = None,
         **extra: Any,
     ) -> None:
         self._base: dict[str, Any] = {
@@ -704,6 +705,7 @@ class FakeConfigResolver:
         self._image_backend_error = image_backend_error
         self._reference_payload_limits = reference_payload_limits
         self._image_resolution = image_resolution
+        self._resolution_options = resolution_options
         self.generation_type_calls: list[str | None] = []
         self.project_payloads: list[dict[str, Any]] = []
         self.image_generation_type_calls: list[str | None] = []
@@ -731,6 +733,13 @@ class FakeConfigResolver:
     async def resolve_resolution(self, project: dict[str, Any], provider_id: str, model_id: str) -> str:
         del project, provider_id, model_id
         return self._image_resolution
+
+    async def video_resolution_options(
+        self, provider_id: str, model_id: str, *, builtin_endpoint: str | None = None
+    ) -> tuple[str, ...] | None:
+        """Renderable resolutions; default ``None`` leaves resolution unconstrained like Python endpoints."""
+        del provider_id, model_id, builtin_endpoint
+        return self._resolution_options
 
     async def resolve_image_backend(
         self,

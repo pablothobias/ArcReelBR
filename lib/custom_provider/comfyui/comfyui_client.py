@@ -32,6 +32,7 @@ from lib.backends.backend_runtime import (
 )
 from lib.backends.http_status_errors import redacted_status_error
 from lib.custom_provider.comfyui.failures import NODE_ERRORS, UPLOAD_FAILED, ComfyuiError
+from lib.custom_provider.credential_origin import CREDENTIAL_HOST_MISMATCH, strict_origin
 from lib.infra.logging_utils import format_kwargs_for_log
 from lib.infra.retry import retry_async
 
@@ -111,7 +112,11 @@ class ComfyuiClient:
         redirects; never pass ``params``, which would replace composed queries. ``/view`` with its own
         parameters instead passes credentials/parameters together to first-hop ``stream_to_file`` ``params``.
         """
-        url = httpx.URL(self._url(path))
+        address = self._url(path)
+        if (expected := strict_origin(self._base_url)) is None or strict_origin(address) != expected:
+            # Credentials go only to this ComfyUI's own origin, whatever a provider-returned id appended.
+            raise ComfyuiError(CREDENTIAL_HOST_MISMATCH, section="request")
+        url = httpx.URL(address)
         return str(url.copy_merge_params(self._query) if self._query else url)
 
     @property

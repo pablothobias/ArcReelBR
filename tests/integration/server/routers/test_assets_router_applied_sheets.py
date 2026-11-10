@@ -21,7 +21,8 @@ from lib.project.asset_types import DERIVATIVES_FIELD
 from lib.project.project_manager import ProjectManager
 from lib.project.resource_paths import CHARACTER_DERIVATIVE_RESOURCE_TYPE
 from lib.workflow.workflow_state import WorkflowStateService
-from server.routers import assets, versions
+from server.routers import versions
+from server.services.asset_library import global_library
 from server.services.currency.upload_finalize import (
     commit_manual_derivative_upload,
     install_manual_asset_sheet_upload,
@@ -216,7 +217,7 @@ def test_a_failed_apply_rolls_back_files_metadata_versions_and_claims(library, m
     def _fail_claim_commit(*_args, **_kwargs):
         raise RuntimeError("injected claim failure")
 
-    monkeypatch.setattr(assets, "register_artifact_entries_atomically", _fail_claim_commit)
+    monkeypatch.setattr(global_library, "register_artifact_entries_atomically", _fail_claim_commit)
     with pytest.raises(RuntimeError, match="injected claim failure"):
         _apply(client, asset_id, policy="overwrite")
 

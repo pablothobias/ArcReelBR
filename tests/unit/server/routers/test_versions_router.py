@@ -31,7 +31,7 @@ from lib.speech.speech_artifact_provenance import build_video_duration_basis
 from server.auth import CurrentUserInfo, get_current_user
 from server.error_handlers import register_error_handlers
 from server.routers import versions
-from server.services.currency import typed_media_restore
+from server.services.currency import media_version_selection, typed_media_restore
 from server.services.currency.artifact_version_restore import TypedMediaRestoreTarget
 from tests.auth_deps import AUTH_DEPENDENCIES
 from tests.factories import add_typed_video_version
@@ -172,7 +172,7 @@ def test_non_typed_storyboard_restore_enters_version_commit_from_metadata_transa
 
     pm = _OrderedPM(tmp_path)
     use_project_manager(monkeypatch, pm)
-    monkeypatch.setattr(versions, "register_current_resource_artifact", lambda *_args, **_kwargs: False)
+    monkeypatch.setattr(media_version_selection, "register_current_resource_artifact", lambda *_args, **_kwargs: False)
     project_path = pm.get_project_path("demo")
     current_file = project_path / "storyboards" / "scene_E1S01.png"
 
@@ -490,7 +490,7 @@ class TestVersionsRouter:
         pm = ProjectManager(tmp_path)
         use_project_manager(monkeypatch, pm)
         monkeypatch.setattr(
-            versions,
+            media_version_selection,
             "forget_current_resource_artifact",
             lambda *_args, **_kwargs: (_ for _ in ()).throw(RuntimeError("manifest commit failed")),
         )
@@ -626,7 +626,7 @@ class TestVersionsRouter:
             raise RuntimeError("manifest commit failed")
 
         use_project_manager(monkeypatch, pm)
-        monkeypatch.setattr(versions, "forget_current_resource_artifact", _fail_registration)
+        monkeypatch.setattr(media_version_selection, "forget_current_resource_artifact", _fail_registration)
 
         def _restore() -> None:
             versions._restore_non_typed_version(

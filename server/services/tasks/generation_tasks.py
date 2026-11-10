@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import asyncio
 import copy
+import hashlib
 import logging
 import math
 from collections.abc import Awaitable, Callable, Mapping, Sequence
@@ -912,6 +913,10 @@ def _truncate_name_bytes(name: str, max_bytes: int) -> str:
     return encoded[:max_bytes].decode("utf-8", errors="ignore")
 
 
+def _sha256_hex(content: bytes) -> str:
+    return hashlib.sha256(content).hexdigest()
+
+
 def voice_sample_resource_id(character_name: str, task_id: str) -> str:
     """Resource ID for a character TTS preview sample in ``audio/`` (separate from narration segment-ID namespace).
 
@@ -983,7 +988,8 @@ async def execute_character_voice_sample_task(
     )
 
     audio_rel = resource_relative_path("audio", sample_id)
-    audio_abs = get_project_manager().get_project_path(project_name) / audio_rel
+    # get_project_path stats the project directory: resolve it off the event loop together with the read.
+    audio_abs = await asyncio.to_thread(lambda: get_project_manager().get_project_path(project_name) / audio_rel)
 
     def _read_bytes() -> bytes:
         return audio_abs.read_bytes()
@@ -1007,6 +1013,11 @@ async def execute_character_voice_sample_task(
         "character_name": character_name,
         "voice": voice.strip(),
         "duration_seconds": duration,
+        # Provenance for sample listing/confirmation: the effective audio backend and the bytes' digest. A later digest
+        # mismatch means the file is no longer this paid sample, so confirmation refuses it.
+        "provider_id": ctx.audio.provider_model.provider_id,
+        "model": ctx.audio.backend_model,
+        "sha256": await run_noninterruptible_sync(_sha256_hex, content),
     }
 
 

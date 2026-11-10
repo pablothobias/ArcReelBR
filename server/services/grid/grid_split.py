@@ -6,6 +6,7 @@ Composite changes refresh only composites; assigning cells requires explicit ser
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import logging
 import os
 import tempfile
@@ -57,6 +58,16 @@ def _register_split_entries_atomically(
     register_artifact_entries_atomically(project_path, entries, expected_entries=expected_entries)
 
 
+class GridCompositeChangedError(Exception):
+    """The composite on disk is not the one the caller reviewed (its sha256 differs); nothing was split."""
+
+    def __init__(self, grid_id: str, *, expected_sha256: str, actual_sha256: str) -> None:
+        super().__init__(f"grid {grid_id} composite changed since it was reviewed")
+        self.grid_id = grid_id
+        self.expected_sha256 = expected_sha256
+        self.actual_sha256 = actual_sha256
+
+
 class GridImageNotReadyError(Exception):
     """The grid has no composite yet, neither completed generation nor upload, and cannot be split."""
 
@@ -73,6 +84,7 @@ async def apply_grid_split(
     grid: GridGeneration,
     *,
     register_entries: Callable[..., None] | None = None,
+    expected_composite_sha256: str | None = None,
 ) -> GridSplitResult:
     """Split the current ``grid`` composite and overwrite storyboard cells.
 
@@ -87,7 +99,13 @@ async def apply_grid_split(
     project_path = await asyncio.to_thread(get_project_manager().get_project_path, project_name)
     reads = [grid_image_path, *(ref.path for ref in grid.reference_images or [])]
     async with local_work_files(project_path, reads), formal_commit(project_name):
-        return await _apply_grid_split(project_name, grid, grid_image_path, register_entries=register_entries)
+        return await _apply_grid_split(
+            project_name,
+            grid,
+            grid_image_path,
+            register_entries=register_entries,
+            expected_composite_sha256=expected_composite_sha256,
+        )
 
 
 async def _apply_grid_split(
@@ -96,6 +114,7 @@ async def _apply_grid_split(
     grid_image_path: str,
     *,
     register_entries: Callable[..., None] | None,
+    expected_composite_sha256: str | None = None,
 ) -> GridSplitResult:
     from PIL import Image
 
@@ -145,6 +164,15 @@ async def _apply_grid_split(
         video_aspect_ratio = grid.video_aspect_ratio or get_aspect_ratio(project_snapshot, "videos")
 
         def _snapshot_and_split() -> tuple[Path, list[Any]]:
+            composite_bytes = grid_image_file.read_bytes()
+            if expected_composite_sha256 is not None:
+                # Bind the split to the composite the user reviewed: these bytes become the split snapshot,
+                # and the commit re-verifies that the canonical file still matches the snapshot.
+                actual = hashlib.sha256(composite_bytes).hexdigest()
+                if actual != expected_composite_sha256.lower():
+                    raise GridCompositeChangedError(
+                        grid.id, expected_sha256=expected_composite_sha256, actual_sha256=actual
+                    )
             fd, snapshot_name = tempfile.mkstemp(
                 prefix=f".{grid.id}.",
                 suffix=".split-source.png",
@@ -153,7 +181,7 @@ async def _apply_grid_split(
             snapshot = Path(snapshot_name)
             try:
                 with os.fdopen(fd, "wb") as handle:
-                    handle.write(grid_image_file.read_bytes())
+                    handle.write(composite_bytes)
                 # Image.open reads lazily and retains handles. Copy complete composite bytes first, then split and build basis from
                 # that snapshot; later upload/restoration may replace canonical PNG without mixing old/new evidence.
                 with Image.open(snapshot) as src:

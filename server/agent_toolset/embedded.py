@@ -1,6 +1,6 @@
 """ArcReel Agent adapter for the embedded Claude Agent SDK.
 
-The session determines the project, so schema has no ``project``; unscoped declarations do not receive a session project. Structured results are JSON text blocks in content after the summary, independent of whether ``structuredContent`` reaches the model; image blocks, if any, come last.
+The session determines the project, so schema has no ``project``; unscoped declarations do not receive a session project. Structured results are JSON text blocks in content after the summary, independent of whether ``structuredContent`` reaches the model; image blocks, then embedded blob resources, if any, come last.
 
 The embedded server disables MCP inputSchema prevalidation: request models validate all declared-tool arguments, so invalid arguments receive ``invalid_request`` problems just like the remote host, instead of MCP plain-text validation errors."""
 
@@ -12,6 +12,7 @@ from typing import Any
 from claude_agent_sdk import McpSdkServerConfig
 from mcp import types
 from mcp.server import Server
+from pydantic import AnyUrl
 
 from server.agent_toolset.declaration import (
     AgentToolDeclaration,
@@ -32,6 +33,15 @@ def embedded_result(declaration: AgentToolDeclaration, outcome: ToolOutcome[Any]
             *(
                 types.ImageContent(type="image", data=image.base64_data, mimeType=image.mime_type)
                 for image in envelope.images
+            ),
+            *(
+                types.EmbeddedResource(
+                    type="resource",
+                    resource=types.BlobResourceContents(
+                        uri=AnyUrl(resource.uri), mimeType=resource.mime_type, blob=resource.base64_data
+                    ),
+                )
+                for resource in envelope.resources
             ),
         ],
         isError=envelope.is_error,

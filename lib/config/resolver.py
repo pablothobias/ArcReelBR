@@ -871,6 +871,46 @@ class ConfigResolver:
         async with self._open_session() as (session, _svc):
             return await self._resolve_custom_resolution_default(session, provider_id, model_id)
 
+    async def video_resolution_options(
+        self, provider_id: str, model_id: str, *, builtin_endpoint: str | None = None
+    ) -> tuple[str, ...] | None:
+        """Resolution values the executing declarative endpoint renders for this model; ``None`` when unconstrained.
+
+        Shared by configuration writes and video request facts so a value accepted in settings or quoted in a preview
+        is exactly one the endpoint renderer accepts (see
+        :mod:`arcreel_market_core.endpoint_definition.resolution_options`). Unresolved models/endpoints return
+        ``None``: capability resolution reports those, never this check.
+        """
+        from arcreel_market_core.endpoint_definition import declarative_resolution_options
+
+        if not provider_id or not model_id:
+            return None
+        if not is_custom_provider(provider_id):
+            from lib.backends.backend_assembly.specs import builtin_video_definition
+
+            definition = builtin_video_definition(provider_id, model_id, endpoint=builtin_endpoint)
+            model = catalog.get_model(provider_id, model_id, media_type="video")
+            facts = list(model.resolutions) if model is not None and model.resolutions else None
+            return declarative_resolution_options(definition, facts)
+        from lib.custom_provider.endpoint_resolution import resolve_endpoint_spec
+        from lib.custom_provider.model_facts import video_model_facts
+        from lib.db.repositories.custom_endpoint_repo import CustomEndpointRepository
+
+        async with self._open_session() as (session, _svc):
+            try:
+                model_row = await CustomProviderRepository(session).get_model_by_ids(
+                    parse_provider_id(provider_id), model_id
+                )
+                if model_row is None:
+                    return None
+                endpoint_spec = await resolve_endpoint_spec(model_row.endpoint, CustomEndpointRepository(session).get)
+            except ValueError:
+                return None
+            resolutions = video_model_facts(
+                model_id, model_row.capability_overrides, entry_binding=model_row.entry_binding
+            ).resolutions
+        return declarative_resolution_options(endpoint_spec.definition, resolutions)
+
     async def _resolve_custom_resolution_default(
         self,
         session: AsyncSession,

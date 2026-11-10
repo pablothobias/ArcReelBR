@@ -88,8 +88,17 @@ class BgmLibraryService:
         self._project_dir(project_name)
         return self._projects.load_project(project_name)
 
-    async def upload(self, project_name: str, *, filename: str, content: bytes) -> BgmTrack:
-        """Register BGM: validate format/size, probe duration, measure loudness/derive gain, atomically save and register by bytes."""
+    async def upload(
+        self,
+        project_name: str,
+        *,
+        filename: str,
+        content: bytes,
+        change_source: Literal["webui", "worker"] = "webui",
+    ) -> BgmTrack:
+        """Register BGM: validate format/size, probe duration, measure loudness/derive gain, atomically save and register by bytes.
+
+        ``change_source`` labels the project-change event (Web uploads vs Agent tools)."""
         project_dir = await asyncio.to_thread(self._project_dir, project_name)
         extension = Path(filename).suffix.lower()
         if extension not in BGM_EXTENSIONS:
@@ -123,7 +132,7 @@ class BgmLibraryService:
                 content_digest=await asyncio.to_thread(sha256_file, staged),
                 uploaded_at=_utc_now(),
             )
-            await run_sync_transaction(self._commit, project_name, project_dir, staged, track)
+            await run_sync_transaction(self._commit, project_name, project_dir, staged, track, change_source)
         finally:
             await asyncio.to_thread(staged.unlink, missing_ok=True)  # hard-delete: temp -- Upload staging file
         return track
@@ -150,7 +159,14 @@ class BgmLibraryService:
             raise BgmError("bgm_silent", "BGM 几乎没有声音，测不出可用的响度")
         return integrated
 
-    def _commit(self, project_name: str, project_dir: Path, staged: Path, track: BgmTrack) -> None:
+    def _commit(
+        self,
+        project_name: str,
+        project_dir: Path,
+        staged: Path,
+        track: BgmTrack,
+        change_source: Literal["webui", "worker"] = "webui",
+    ) -> None:
         target = project_dir / track.file
 
         def mutate(project: dict) -> None:
@@ -167,7 +183,7 @@ class BgmLibraryService:
                 project_dir, bgm_key(track.id), artifact_path=track.file, basis=bgm_basis(track.content_digest)
             )
 
-        with project_change_source("webui"):
+        with project_change_source(change_source):
             self._projects.update_project(project_name, mutate, on_commit=install, formal_paths=(target,))
 
 

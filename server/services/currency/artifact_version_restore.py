@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Iterator, Mapping
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
 
@@ -27,6 +28,36 @@ _TYPED_MEDIA_ARTIFACT_KEYS: dict[str, Callable[[int, str], ArtifactKey]] = {
     "videos": ArtifactKey.episode_video,
     "reference_videos": ArtifactKey.episode_video,
 }
+
+
+class CurrentVersionChangedError(Exception):
+    """The resource's current version is not the one the caller based its selection on; nothing was changed."""
+
+    def __init__(self, resource_type: str, resource_id: str, *, expected: int, actual: int) -> None:
+        super().__init__(f"{resource_type}/{resource_id} current version is {actual}, expected {expected}")
+        self.resource_type = resource_type
+        self.resource_id = resource_id
+        self.expected = expected
+        self.actual = actual
+
+
+@contextmanager
+def expected_current_selection(
+    versions: VersionManager, resource_type: str, resource_id: str, expected: int | None
+) -> Iterator[None]:
+    """Hold the versions lock from the expected-current comparison through the selection it guards.
+
+    Callers enter this inside their metadata transaction (canonical order: metadata locks, then versions lock),
+    so a concurrent commit cannot land between the comparison and the write. ``expected`` 0 means "no current
+    version yet". Without an expectation there is nothing to compare, so no lock is taken here."""
+    if expected is None:
+        yield
+        return
+    with versions.locked_version_snapshot(resource_type, resource_id) as snapshot:
+        actual = int(snapshot.get("current_version") or 0)
+        if actual != expected:
+            raise CurrentVersionChangedError(resource_type, resource_id, expected=expected, actual=actual)
+        yield
 
 
 def is_typed_media_restore_resource(resource_type: str) -> bool:
@@ -80,6 +111,7 @@ def restore_typed_media_version(
     version: int,
     current_file: Path,
     artifact_path: str,
+    expected_current_version: int | None = None,
 ) -> dict[str, Any]:
     """Restore a typed version as one script/media/pointer/Manifest transition.
 
@@ -114,15 +146,16 @@ def restore_typed_media_version(
                 basis=target.basis,
             )
 
-        restored.append(
-            versions.restore_version(
-                resource_type,
-                resource_id,
-                version,
-                current_file,
-                on_restore=_register,
+        with expected_current_selection(versions, resource_type, resource_id, expected_current_version):
+            restored.append(
+                versions.restore_version(
+                    resource_type,
+                    resource_id,
+                    version,
+                    current_file,
+                    on_restore=_register,
+                )
             )
-        )
 
     with project_manager.locked_episode_script(
         project_name,
@@ -201,7 +234,9 @@ def _apply_restored_asset(
 
 
 __all__ = [
+    "CurrentVersionChangedError",
     "TypedMediaRestoreTarget",
+    "expected_current_selection",
     "get_typed_media_restore_target",
     "is_typed_media_restore_resource",
     "is_typed_media_version_restorable",

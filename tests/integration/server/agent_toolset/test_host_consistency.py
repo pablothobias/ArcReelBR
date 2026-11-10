@@ -64,6 +64,7 @@ from server.agent_toolset.envelope import json_value
 from server.agent_toolset.generation_batches import CANCEL_GENERATION_BATCH, GET_GENERATION_BATCH
 from server.agent_toolset.grid_storyboards import GENERATE_GRID, SPLIT_GRIDS
 from server.agent_toolset.image_review import INSPECT_IMAGES
+from server.agent_toolset.media_transport import MEDIA_TRANSPORT_TOOL_IDS
 from server.agent_toolset.orientation import GET_PROMPT_PREVIEW, GET_VIDEO_CAPABILITIES
 from server.agent_toolset.project_entry import CREATE_PROJECT, EDIT_SOURCE_TEXT
 from server.agent_toolset.project_trash import DELETE_PROJECT_FILE, RESTORE_TRASH_RECORD
@@ -198,6 +199,61 @@ SAMPLE_ARGUMENTS: dict[str, dict[str, Any]] = {
     "delete_project_file": {"path": "notes.txt"},
     "list_trash_records": {},
     "restore_trash_record": {"record_id": "20261025T000000Z-0000abcd"},
+    "get_generation_diagnostics": {"task_id": "task-1"},
+    "retry_artifact_download": {"task_id": "task-1"},
+    "list_tts_voices": {},
+    "generate_voice_sample": {"character": "甲", "voice": "Cherry", "text": "你好，我是甲。", "preview": True},
+    "list_voice_samples": {"character": "甲"},
+    "confirm_voice_sample": {"task_id": "task-1", "character": "甲", "expect_unbound": True},
+    "inspect_voice_reference": {"character": "甲"},
+    "upload_product_reference_images": {
+        "product": "Bottle",
+        "images": [{"filename": "front.png", "content_base64": "iVBORw0KGgo="}],
+    },
+    "list_product_reference_images": {"product": "Bottle"},
+    "arrange_product_reference_images": {
+        "product": "Bottle",
+        "expected_order": ["Bottle_1.png"],
+        "order": ["Bottle_1.png"],
+    },
+    "install_finished_media": {
+        "target": {"kind": "storyboard_image", "script": "episode_1.json", "item_id": "E1S01"},
+        "file": {"filename": "board.png", "content_base64": "iVBORw0KGgo="},
+    },
+    "set_end_frame": {
+        "script": "episode_1.json",
+        "item_id": "E1S01",
+        "source": {"kind": "storyboard_image", "script": "episode_1.json", "item_id": "E1S02"},
+    },
+    "clear_end_frame": {"script": "episode_1.json", "item_id": "E1S01"},
+    "upload_bgm": {"file": {"filename": "theme.mp3", "content_base64": "AAAA"}},
+    "list_grids": {"episode": 1},
+    "inspect_grid": {"grid_id": "grid_a1b2c3d4e5f6"},
+    "replace_grid_composite": {
+        "grid_id": "grid_a1b2c3d4e5f6",
+        "filename": "composite.png",
+        "content_base64": "iVBORw0KGgo=",
+    },
+    "list_media_versions": {"kind": "character", "id": "甲"},
+    "select_media_version": {"kind": "character", "id": "甲", "version": 1},
+    "list_global_library_assets": {},
+    "get_global_library_asset": {"asset_id": "a1"},
+    "save_asset_to_global_library": {"resource_type": "character", "name": "甲"},
+    "apply_global_library_assets": {"asset_ids": ["a1"], "conflict_policy": "skip"},
+    "start_blank_script": {"episode_id": 1},
+    "get_asset_prompt_preview": {"asset_type": "character", "name": "甲"},
+    "generate_project_overview": {"confirm_text_model_call": False},
+    "get_episode_layout": {},
+    "create_episode": {"title": "Interlude"},
+    "move_episode": {"episode_id": 1, "after_episode_id": None},
+    "delete_episode": {"episode_id": 1},
+    "edit_episode_boundaries": {"action": "clear_after", "episode_id": 1, "dry_run": True},
+    "move_source_file": {"filename": "novel.txt", "direction": "down"},
+    "get_episode_replan": {},
+    "start_episode_replan": {"episode_id": 1, "dry_run": True},
+    "continue_episode_replan": {"candidate_id": "c1"},
+    "adopt_episode_replan": {"candidate_id": "c1"},
+    "discard_episode_replan": {"candidate_id": "c1"},
 }
 
 _DECLARATIONS = pytest.mark.parametrize("declaration", AGENT_TOOLSET, ids=lambda declaration: declaration.name)
@@ -449,9 +505,10 @@ async def test_every_tool_both_hosts_expose_is_defined_by_a_declaration(
     remote = {tool.name for tool in await build_remote_mcp_server(services=services).list_tools()}
     declared = {declaration.name for declaration in AGENT_TOOLSET}
 
-    assert embedded == remote - SESSION_MCP_TOOL_IDS == declared == set(ARCREEL_MCP_TOOL_IDS) == set(SAMPLE_ARGUMENTS)
-    assert SESSION_MCP_TOOL_IDS.isdisjoint(embedded)
-    assert remote >= SESSION_MCP_TOOL_IDS
+    remote_only = SESSION_MCP_TOOL_IDS | MEDIA_TRANSPORT_TOOL_IDS
+    assert embedded == remote - remote_only == declared == set(ARCREEL_MCP_TOOL_IDS) == set(SAMPLE_ARGUMENTS)
+    assert remote_only.isdisjoint(embedded)
+    assert remote >= remote_only
 
 
 @_DECLARATIONS
@@ -542,7 +599,11 @@ async def test_unblocked_declarations_reach_the_handler_on_a_migration_failed_pr
         RuntimeError("清单预检失败"),
         schema_version=CURRENT_PROJECT_SCHEMA_VERSION,
     )
+    # Only reaching the handler matters here: shape-specific renderers (typed values, attached
+    # images or resources) are neutralised so the stub value encodes the same way for every tool.
     answering = _answering(declaration, ToolOutcome(value={"answered": True}), [])
+    if isinstance(answering, ToolDeclaration):
+        answering = replace(answering, summary=lambda _value: "answered", projection=None, images=None, resources=None)
 
     embedded = await _call_embedded(answering, SAMPLE_ARGUMENTS[declaration.name], services)
     remote = await _call_remote(answering, _remote_arguments(answering, SAMPLE_ARGUMENTS[declaration.name]), services)
@@ -639,6 +700,10 @@ def _twin_services(seeded_projects: ProjectManager, tmp_path: Path) -> Services:
 # Real handler outputs vary with call times and cannot compare verbatim; other fake-handler cases cover passthrough consistency.
 _TIME_DEPENDENT_RESULTS = frozenset({CREATE_PROJECT.name, CREATE_TIMELINE.name})
 
+# The global asset library is process-wide (shared database and library store), not per project root, so the twin
+# root cannot isolate a second write: the remote call legitimately sees the embedded call's entry.
+_SHARED_GLOBAL_STATE_RESULTS = frozenset({"save_asset_to_global_library"})
+
 # Declarations legitimately returning problems under sample arguments lack required objects/configuration; all others must succeed.
 _PROBLEM_ON_SAMPLE = frozenset(
     {
@@ -676,6 +741,31 @@ _PROBLEM_ON_SAMPLE = frozenset(
         UPLOAD_TO_PROVIDER_ASSET_LIBRARY.name,
         SELECT_PROVIDER_LIBRARY_ASSET.name,
         RELEASE_PROVIDER_ASSET_LINK.name,
+        # New coverage tools whose sample targets (tasks, products, shots, grids, versions, library entries,
+        # episode-ledger entries, replan candidates, valid media bytes, video capabilities) are absent from the seed,
+        # or which refuse a paid action without explicit confirmation.
+        "get_generation_diagnostics",
+        "retry_artifact_download",
+        "confirm_voice_sample",
+        "upload_product_reference_images",
+        "list_product_reference_images",
+        "arrange_product_reference_images",
+        "install_finished_media",
+        "set_end_frame",
+        "clear_end_frame",
+        "upload_bgm",
+        "inspect_grid",
+        "replace_grid_composite",
+        "select_media_version",
+        "get_global_library_asset",
+        "start_blank_script",
+        "generate_project_overview",
+        "move_episode",
+        "delete_episode",
+        "edit_episode_boundaries",
+        "move_source_file",
+        "adopt_episode_replan",
+        "discard_episode_replan",
     }
 )
 
@@ -687,6 +777,7 @@ _PROBLEM_ON_SAMPLE = frozenset(
         for declaration in AGENT_TOOLSET
         if not (isinstance(declaration, ToolDeclaration) and declaration.long_task)
         and declaration.name not in _TIME_DEPENDENT_RESULTS
+        and declaration.name not in _SHARED_GLOBAL_STATE_RESULTS
     ],
     ids=lambda declaration: declaration.name,
 )

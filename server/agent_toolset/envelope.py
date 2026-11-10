@@ -1,6 +1,6 @@
 """Encode a ``ToolOutcome`` into the result envelope shared by both hosts.
 
-There is one structured result: success is ``{domain_key: value}`` (provided by ``projection`` when declared), failure is ``{problem: ...}``. The text block contains the optional summary followed by this structured result’s JSON. The embedded host writes text blocks into content; the remote host also writes the structured result into ``structuredContent``. When ``images`` is declared, MCP image content blocks follow the text block identically for both hosts."""
+There is one structured result: success is ``{domain_key: value}`` (provided by ``projection`` when declared), failure is ``{problem: ...}``. The text block contains the optional summary followed by this structured result’s JSON. The embedded host writes text blocks into content; the remote host also writes the structured result into ``structuredContent``. When ``images`` is declared, MCP image content blocks follow the text block identically for both hosts; declared ``resources`` follow as embedded blob resources."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ from dataclasses import asdict, dataclass, is_dataclass
 from typing import Any
 
 from lib.project.project_migration_failure import MIGRATION_FAILURE_CODE
-from server.agent_toolset.declaration import AgentToolDeclaration, ToolDeclaration, ToolImage
+from server.agent_toolset.declaration import AgentToolDeclaration, ToolDeclaration, ToolImage, ToolResource
 from server.tool_runtime import ToolOutcome, ToolProblem
 
 _PROBLEM_SUMMARIES: dict[str, str] = {
@@ -40,6 +40,7 @@ class ToolEnvelope:
     texts: tuple[str, ...]
     is_error: bool
     images: tuple[ToolImage, ...] = ()
+    resources: tuple[ToolResource, ...] = ()
 
 
 def problem_summary(problem: ToolProblem) -> str | None:
@@ -48,6 +49,7 @@ def problem_summary(problem: ToolProblem) -> str | None:
 
 def encode_outcome(declaration: AgentToolDeclaration, outcome: ToolOutcome[Any]) -> ToolEnvelope:
     images: tuple[ToolImage, ...] = ()
+    resources: tuple[ToolResource, ...] = ()
     if outcome.problem is not None:
         structured = {"problem": outcome.problem.model_dump(mode="json")}
         summary = problem_summary(outcome.problem)
@@ -64,12 +66,15 @@ def encode_outcome(declaration: AgentToolDeclaration, outcome: ToolOutcome[Any])
         is_error = scoped.is_error(value) if scoped is not None and scoped.is_error is not None else False
         if scoped is not None and scoped.images is not None:
             images = tuple(scoped.images(value))
+        if scoped is not None and scoped.resources is not None:
+            resources = tuple(scoped.resources(value))
     encoded = json.dumps(structured, ensure_ascii=False)
     return ToolEnvelope(
         structured=structured,
         texts=(summary, encoded) if summary else (encoded,),
         is_error=is_error,
         images=images,
+        resources=resources,
     )
 
 

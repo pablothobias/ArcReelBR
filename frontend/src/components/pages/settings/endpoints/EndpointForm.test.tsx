@@ -7,7 +7,7 @@ import { EndpointForm } from "./EndpointForm";
 
 const IMAGE_DEFINITION: EndpointDefinition = {
   kind: "declarative",
-  schema_version: "1.2.0",
+  schema_version: "1.3.0",
   media_type: "image",
   meta: { name: "Async Image", author: "ArcReel", version: "1.0.0" },
   auth: { headers: { Authorization: "Bearer {{ api_key }}" } },

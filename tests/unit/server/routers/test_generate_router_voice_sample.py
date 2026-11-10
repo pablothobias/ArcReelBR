@@ -11,10 +11,12 @@ import lib.project.project_manager as project_manager_module
 from lib.backends.audio_backends.base import VoiceOption
 from lib.catalog.errors import ModelNotInCatalogError
 from lib.config.resolver import ConfigResolver, ProviderModel
+from lib.generation.generation_queue import ActiveTaskRequestConflict
 from lib.project.resource_paths import resource_relative_path
 from server.auth import CurrentUserInfo, get_current_user
 from server.error_handlers import register_error_handlers
 from server.routers import generate
+from server.services import voice_references
 from server.services.tasks.generation_context import AudioLaneResult, GenerationContext
 from tests.auth_deps import AUTH_DEPENDENCIES
 from tests.fakes import use_generation_queue, use_project_manager
@@ -120,7 +122,7 @@ class TestAudioBackendVoices:
         async def _resolve_ctx(*args, **kwargs):
             return ctx
 
-        monkeypatch.setattr(generate, "resolve_generation_context", _resolve_ctx)
+        monkeypatch.setattr(voice_references, "resolve_generation_context", _resolve_ctx)
 
         with client:
             res = client.get("/api/v1/projects/demo/audio-backend/voices")
@@ -143,7 +145,7 @@ class TestAudioBackendVoices:
         async def _resolve_ctx(*args, **kwargs):
             return ctx
 
-        monkeypatch.setattr(generate, "resolve_generation_context", _resolve_ctx)
+        monkeypatch.setattr(voice_references, "resolve_generation_context", _resolve_ctx)
 
         with client:
             res = client.get(
@@ -179,6 +181,30 @@ class TestGenerateCharacterVoiceSample:
         assert call["resource_id"] == "艾莉"
         assert call["payload"]["prompt"] == "你好，这是一段声音示例。"
         assert call["payload"]["voice"] == "Cherry"
+
+    def test_conflicting_active_sample_names_the_voice_sample_task(self, tmp_path, monkeypatch):
+        """A different sample still active for the character: 409 with the voice-sample cause, never the video text."""
+
+        class _ConflictQueue(_FakeQueue):
+            async def enqueue_task(self, **kwargs):
+                self.calls.append(kwargs)
+                raise ActiveTaskRequestConflict(resource_id="艾莉", existing_task_id="task-busy")
+
+        fake_pm = _FakePM(tmp_path / "projects" / "demo")
+        client = _client(monkeypatch, fake_pm, _ConflictQueue())
+
+        with client:
+            res = client.post(
+                "/api/v1/projects/demo/characters/艾莉/voice-sample",
+                json={"text": "你好，这是一段声音示例。", "voice": "Cherry"},
+                headers={"Accept-Language": "en"},
+            )
+
+        assert res.status_code == 409
+        detail = res.json()["detail"]
+        assert "task-busy" in detail
+        assert "voice sample" in detail
+        assert "video" not in detail
 
     def test_character_not_found(self, tmp_path, monkeypatch):
         fake_pm = _FakePM(tmp_path / "projects" / "demo")

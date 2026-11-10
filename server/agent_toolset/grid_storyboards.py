@@ -4,7 +4,7 @@
 
 from __future__ import annotations
 
-from server.agent_toolset.declaration import BLOCKED, ToolDeclaration
+from server.agent_toolset.declaration import BLOCKED, READ_CHECK, ToolDeclaration
 from server.agent_toolset.media_generation import generation_tool
 from server.media_tools.grid import (
     GenerateGridRequest,
@@ -14,6 +14,20 @@ from server.media_tools.grid import (
     grid_structured,
     grid_summary,
     split_grids,
+)
+from server.media_tools.grid_review import (
+    MAX_COMPOSITE_EDGE,
+    InspectGridRequest,
+    ListGridsRequest,
+    ReplaceGridCompositeRequest,
+    inspect_grid,
+    inspect_grid_images,
+    inspect_grid_projection,
+    inspect_grid_summary,
+    list_grids,
+    list_grids_summary,
+    replace_grid_composite,
+    replace_grid_composite_summary,
 )
 
 GENERATE_GRID = generation_tool(
@@ -31,7 +45,7 @@ GENERATE_GRID = generation_tool(
 SPLIT_GRIDS = ToolDeclaration(
     name="split_grids",
     description=(
-        "Split one or more composite grids into storyboard images for all covered shots; old storyboard images remain in version history for rollback. Call only with explicit user agreement: after generate_grid, ask the user to review the composite in the grid panel (regenerate, replace by upload, or roll back if desired), then pass grid_id values after confirmation. Do not call automatically after generation. Obtain grid_id from generate_grid grid_ids_awaiting_split, successful-shot artifact_path (grids/<grid_id>.png), or list_only preview. Returns per-grid results: split grids list written shots; generating grids, grids without composites, or absent grids are skipped with reasons. If none are split, returns a problem with per-grid reasons in params.results."
+        "Split one or more composite grids into storyboard images for all covered shots; old storyboard images remain in version history for rollback. Call only with explicit user agreement: after generate_grid, show the user the composite (inspect_grid, or the grid panel), let them regenerate, replace (replace_grid_composite) or roll back (select_media_version kind=grid_composite) if desired, then pass grid_id values after confirmation. Do not call automatically after generation, upload or restore. Pass reviewed_composites with each grid's inspect_grid split_guard (sha256, version) so only the composite the user saw is split; a changed composite is skipped with status composite_changed. Obtain grid_id from generate_grid grid_ids_awaiting_split, successful-shot artifact_path (grids/<grid_id>.png), list_grids, or list_only preview. Returns per-grid results: split grids list written shots; generating grids, grids without composites, changed composites, or absent grids are skipped with reasons. If none are split, returns a problem with per-grid reasons in params.results."
     ),
     request_model=SplitGridsRequest,
     migration=BLOCKED,
@@ -39,6 +53,54 @@ SPLIT_GRIDS = ToolDeclaration(
     handler=split_grids,
 )
 
-GRID_STORYBOARD_TOOLS = (GENERATE_GRID, SPLIT_GRIDS)
+LIST_GRIDS = ToolDeclaration(
+    name="list_grids",
+    description=(
+        "List the project's composite grid records with the grid capability. Read-only, free, triggers no generation. Returns capability (large_grid_allowed, max_cell_count from the project's image tier), writable/write_block (ad_grid_not_supported or grid_storyboard_not_enabled when grid writes are refused; existing records stay readable), and per grid: grid_id, episode, script_file, state (generating, failed, no_composite, awaiting_split, split), scene_ids, rows, cols, grid_size, split_at, current composite version, and in_flight (an active generation task owns it). Use inspect_grid to look at one composite before asking the user to approve a split."
+    ),
+    request_model=ListGridsRequest,
+    migration=READ_CHECK,
+    domain_key="list_grids",
+    handler=list_grids,
+    summary=list_grids_summary,
+)
 
-__all__ = ["GENERATE_GRID", "GRID_STORYBOARD_TOOLS", "SPLIT_GRIDS"]
+INSPECT_GRID = ToolDeclaration(
+    name="inspect_grid",
+    description=(
+        f"Inspect one composite grid before splitting: attaches the composite as an image content block (JPEG, longest edge at most {MAX_COMPOSITE_EDGE} px) and returns the record: state, layout (rows, cols, grid_size, cell_count, video_aspect_ratio), cells (index, row, col, frame_type, scene_id each cell writes, split_image_path after a split), split_at, in_flight, and composite (version, current_version, available_versions, is_current, source, sha256 and size of the original composite bytes, width, height, status ok/missing/unreadable). Read-only, free, triggers no generation and never splits. version inspects a historical composite for comparison. For the current composite, split_guard {{grid_id, sha256, version}} is returned: show the image to the user and, only after explicit approval, pass it to split_grids reviewed_composites. Missing grids return grid_not_found; absent versions return version_not_found with params.available_versions."
+    ),
+    request_model=InspectGridRequest,
+    migration=READ_CHECK,
+    domain_key="inspect_grid",
+    handler=inspect_grid,
+    summary=inspect_grid_summary,
+    projection=inspect_grid_projection,
+    images=inspect_grid_images,
+)
+
+REPLACE_GRID_COMPOSITE = ToolDeclaration(
+    name="replace_grid_composite",
+    description=(
+        "Replace a grid's composite with a user-supplied, user-approved image (filename with an image extension plus exactly one of content_base64 or staged_upload_id from begin_media_upload for larger files), through the same native transaction as the Web upload: size/image validation, PNG/EXIF normalization without resizing (rows x cols layout remains the user's responsibility), a new composite version (previous versions stay restorable), and the record reset to awaiting_split. Never splits and never changes storyboard cells; previous_split_at reports a split that the new composite no longer matches. No charges or generation. Refuses ad projects or projects without grid storyboards (ad_grid_not_supported, grid_storyboard_not_enabled), grids with an active generation task (grid_generation_in_progress), invalid images (invalid_image_file, image_pixels_too_large), version_conflict when expected_current_version differs or another commit changed the composite meanwhile, and staging refusals (upload_not_found, upload_expired, upload_incomplete, upload_digest_mismatch). Returns version, sha256, and split_guard; show the composite to the user (inspect_grid) and split only after explicit approval."
+    ),
+    request_model=ReplaceGridCompositeRequest,
+    migration=BLOCKED,
+    domain_key="replace_grid_composite",
+    handler=replace_grid_composite,
+    summary=replace_grid_composite_summary,
+)
+
+GRID_STORYBOARD_TOOLS = (GENERATE_GRID, SPLIT_GRIDS)
+#: Composite review tools (MCP-014); registered separately so existing GRID_STORYBOARD_TOOLS consumers stay unchanged.
+GRID_REVIEW_TOOLS = (LIST_GRIDS, INSPECT_GRID, REPLACE_GRID_COMPOSITE)
+
+__all__ = [
+    "GENERATE_GRID",
+    "GRID_REVIEW_TOOLS",
+    "GRID_STORYBOARD_TOOLS",
+    "INSPECT_GRID",
+    "LIST_GRIDS",
+    "REPLACE_GRID_COMPOSITE",
+    "SPLIT_GRIDS",
+]

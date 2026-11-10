@@ -343,6 +343,12 @@ MESSAGES = {
     "val_ce_enum_map_value_missing": "enum_maps.{name} has no entry for '{value}'",
     "val_ce_template_text_variable_null": "Variable {name} is null and cannot be embedded in text",
     "val_ce_each_value_not_list": "$each.in points at {name}, whose runtime value is not a list",
+    "val_ce_asset_container_unrecognized": "Input {input}: the file {asset} is not a recognizable or intact audio container (supported: {supported})",
+    "val_ce_asset_container_unsupported": "Input {input}: the file {asset} is {detected} audio, which this endpoint does not accept (supported: {supported})",
+    "val_ce_asset_container_extension_mismatch": "Input {input}: the file {asset} contains {detected} audio but its extension claims {claimed}; fix the file instead of renaming it",
+    "val_ce_container_mime_source_not_audio": "container_mime applies only to reference_audio_files inputs, not {source}",
+    "val_ce_error_code_sets_overlap": "A provider code cannot be in both fix_input_codes and configure_codes: {codes}",
+    "val_ce_url_authority_placeholder": "The URL host must be fixed by the definition, but {fragment} lets a rendered value change it: start the URL with the base_url placeholder followed by /, ? or #, or write the http(s) scheme and host literally",
     "val_ce_each_key_duplicate": "Object-form $each produced the key {field}, which another key in the same object already uses, so the request cannot carry every input",
     # ---- ComfyUI endpoint: node bindings and import routing ----
     "val_ce_comfyui_binding_required": (

@@ -12,7 +12,11 @@
     "first_frame": {"source": "start_image", "encoding": "data_uri"},
     "last_frame": {"source": "end_image", "encoding": "data_uri"},
     "refs": {"source": "reference_images", "encoding": "data_uri"},
-    "ref_audio": {"source": "reference_audio_files", "encoding": "data_uri"}
+    "ref_audio": {
+      "source": "reference_audio_files",
+      "encoding": "data_uri",
+      "container_mime": {"wav": "audio/wav", "mp3": "audio/mp3"}
+    }
   },
   "enum_maps": {"resolution": {"480p": "480P", "768p": "768P", "2k": "2K"}},
   "defaults": {"resolution": "768p"},
@@ -54,7 +58,16 @@
       "duration": "{{ duration }}",
       "ratio": "{{ aspect_ratio }}"
     },
-    "extract": {"task_id": ["$.task_id"], "error": ["$.base_resp.status_msg"]}
+    "extract": {
+      "task_id": ["$.task_id"],
+      "error": ["$.base_resp.status_msg", "$.error.message"],
+      "error_code": {
+        "paths": ["$[?@.status_code && @.status_code != 0].status_code"],
+        "accept": "scalar",
+        "fix_input_codes": ["2013", "1026", "1027"],
+        "configure_codes": ["1004", "1008"]
+      }
+    }
   },
   "poll": {
     "method": "GET",
@@ -63,7 +76,13 @@
     "extract": {
       "status": ["$.task.status"],
       "video_url": ["$.task.content.url"],
-      "error": ["$.task.error", "$.task.status_msg", "$.base_resp.status_msg"],
+      "error": ["$.task.error.message", "$.task.error", "$.task.status_msg", "$.base_resp.status_msg"],
+      "error_code": {
+        "paths": ["$.task.error.code", "$[?@.status_code && @.status_code != 0].status_code"],
+        "accept": "scalar",
+        "fix_input_codes": ["2013", "1026", "1027"],
+        "configure_codes": ["1004", "1008"]
+      },
       "failure": ["$[?@.status_code && @.status_code != 0].status_msg"]
     }
   },

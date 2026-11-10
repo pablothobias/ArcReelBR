@@ -9,7 +9,7 @@ start with a minimal definition, then correct the field paths and error codes re
 ```json
 {
   "kind": "declarative",
-  "schema_version": "1.2.0",
+  "schema_version": "1.3.0",
   "meta": {"name": "Demo Video", "author": "user", "version": "1.0.0"},
   "auth": {"headers": {"Authorization": "Bearer {{ api_key }}"}},
   "submit": {
@@ -51,6 +51,16 @@ start with a minimal definition, then correct the field paths and error codes re
 - `extract` is a priority-ordered JSONPath array. Paths start at `$`, using only child segments and simple filters;
   no recursive descent, unions, stepped slices, or functions. For response fields containing JSON strings, use
   `{"path":"$.data","json_decode":true,"then":["$.id"]}`.
+- `inputs.<name>.container_mime` (schema 1.3.0+; only for `source: "reference_audio_files"`) maps a container detected from the
+  file bytes (`wav`, `mp3`) to the MIME the provider documents, e.g. `{"wav":"audio/wav","mp3":"audio/mp3"}`.
+  Unrecognized or corrupt bytes, containers missing from the map, and suffixes contradicting the bytes fail before
+  submission; bytes are never transcoded. Omit it to keep the host-guessed MIME. Endpoints copied from the built-in
+  MiniMax H3 before this field existed lack it and still send host-guessed types such as `audio/x-wav`; add it.
+- Optional `extract.error_code` (schema 1.3.0+; submit, poll, or result) reads the provider's own error code next to `error`; use
+  `"accept":"scalar"` for numeric codes. Its object form may add `fix_input_codes` (the inputs or content must change)
+  and `configure_codes` (credentials, balance, or endpoint configuration must change); the sets must not overlap and
+  codes compare as strings. Any other extracted code keeps its value and message, but a resubmission needs the user's
+  authorization. List only codes the provider documents or that you observed, and note the source.
 - `status_map` targets only `queued`, `running`, `succeeded`, `failed`. If success requires another retrieval,
   extract `result_id` in poll and add `result` to obtain `video_url` from `task_id` / `result_id`.
 - Image definitions set `"media_type": "image"`; omission means video. Their variables are only `base_url`, `api_key` (auth only),

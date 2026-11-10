@@ -114,6 +114,7 @@ from server.services.admission.prompt_preview import ScriptItemNotFound, preview
 from server.services.project import workflow_planner as workflow_plan_service
 from server.services.project.episode_display import present_episode_diagnostics
 from server.services.project.episode_id_records import recorded_episode_ids_on
+from server.services.project.model_settings_validation import raise_for_unsupported_model_settings
 from server.services.project.narration_settings import (
     NarrationSettingsInput,
     new_project_narration_fields,
@@ -727,6 +728,8 @@ async def create_project(
             )
         except NarrationConfigError as exc:
             raise UnprocessableError(exc.code) from exc
+        # Validate before create_project so an unrenderable model setting leaves no partial directory.
+        await raise_for_unsupported_model_settings(req.model_settings, ConfigResolver(async_session_factory))
 
         def _sync():
             manager = get_project_manager()
@@ -1078,6 +1081,16 @@ async def reset_agent_profile(name: str, _t: Translator):
 @router.patch("/projects/{name}")
 async def update_project(name: str, req: UpdateProjectRequest, _t: Translator):
     """Update project metadata."""
+    if "model_settings" in req.model_fields_set:
+        # Refuse unrenderable values before the transaction, like configure_project; nothing is written.
+        # Unchanged entries are exempt: the form sends the whole map, and a stale entry must not block other edits.
+        try:
+            stored = (await asyncio.to_thread(get_project_manager().load_project, name)).get("model_settings")
+        except FileNotFoundError:
+            stored = None  # update_project_settings answers the missing project with its own 404.
+        await raise_for_unsupported_model_settings(
+            req.model_settings, ConfigResolver(async_session_factory), stored=stored
+        )
     return await update_project_settings(name, req, _t, manager=None, source="webui")
 
 

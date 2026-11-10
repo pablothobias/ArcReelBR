@@ -337,6 +337,12 @@ MESSAGES = {
     "val_ce_enum_map_value_missing": "В enum_maps.{name} нет записи для «{value}»",
     "val_ce_template_text_variable_null": "Переменная {name} равна null, её нельзя вставить в текст",
     "val_ce_each_value_not_list": "$each.in указывает на {name}, значение которого во время выполнения не является списком",
+    "val_ce_asset_container_unrecognized": "Вход {input}: файл {asset} не является распознаваемым или целым аудиоконтейнером (поддерживается: {supported})",
+    "val_ce_asset_container_unsupported": "Вход {input}: файл {asset} содержит аудио {detected}, которое этот эндпоинт не принимает (поддерживается: {supported})",
+    "val_ce_asset_container_extension_mismatch": "Вход {input}: файл {asset} содержит аудио {detected}, но расширение указывает {claimed}; исправьте файл, а не переименовывайте его",
+    "val_ce_container_mime_source_not_audio": "container_mime применяется только к входам reference_audio_files, а не к {source}",
+    "val_ce_error_code_sets_overlap": "Один код ошибки провайдера не может одновременно входить в fix_input_codes и configure_codes: {codes}",
+    "val_ce_url_authority_placeholder": "Хост URL должен быть зафиксирован определением, но {fragment} позволяет подставленному значению его изменить: начните URL с плейсхолдера base_url, за которым следует /, ? или #, либо укажите схему http(s) и хост буквально",
     "val_ce_each_key_duplicate": "Объектная форма $each повторно создала ключ {field} в том же объекте, поэтому запрос не может передать все материалы",
     # ---- ComfyUI endpoint: node bindings and import routing ----
     "val_ce_comfyui_binding_required": (

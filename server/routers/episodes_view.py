@@ -6,26 +6,14 @@ from __future__ import annotations
 import asyncio
 import logging
 from collections.abc import Callable
-from dataclasses import asdict
-from pathlib import Path
 from typing import Annotated, Any, Literal
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from pydantic import BaseModel, Field
 
-from lib.episode.episode_layout import build_episode_layout
 from lib.episode.episode_manual_split import (
     ManualSplitError,
-    ManualSplitOutcome,
-    ManualSplitResult,
-    clear_cuts_after,
-    cut_unsplit_source,
-    merge_with_next_episode,
-    move_episode_boundary,
-    render_manual_split_impact_text,
-    split_episode,
 )
-from lib.episode.episode_replan import replan_candidate_summary
 from lib.episode.episode_source_commands import (
     EpisodeSourceError,
     adopt_source_file_as_episode,
@@ -50,13 +38,16 @@ from lib.project.project_manager import ProjectManager, get_project_manager
 from server.dependencies import require_project_migration_ok
 from server.i18n import Translator
 from server.routers._episode_source_errors import episode_source_http_error
-from server.routers._source_file_changes import (
-    ensure_no_displaced_tasks,
-    source_file_change_http_error,
-    source_file_change_payload,
-)
+from server.routers._source_file_changes import source_file_change_http_error
 from server.routers._source_uploads import extract_uploaded_source_text
 from server.routers.episode_management import episode_has_active_tasks
+from server.services.project.episode_operations import (
+    EpisodeOperationRefused,
+    ManualSplitCommand,
+    apply_manual_split,
+    episodes_view_payload,
+    run_source_file_change,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -73,38 +64,8 @@ async def get_episodes_view(name: str, _t: Translator) -> dict[str, Any]:
     affected-episode list including server-written ``text``; pass ``revision`` unchanged to ``accept-external`` to confirm.
     If impact cannot be computed, both are null and ``problem`` gives the reason."""
 
-    def _external_change(manager: ProjectManager, project: dict[str, Any], filename: str) -> dict[str, Any]:
-        try:
-            outcome = accept_external_source_change(manager, name, filename, dry_run=True)
-        except SourceFileChangeError as exc:
-            return {
-                "source_file": f"source/{filename}",
-                "impact": None,
-                "revision": None,
-                "problem": _t(f"source_file_change_{exc.code}"),
-            }
-        payload = source_file_change_payload(outcome, project, _t)
-        return {
-            "source_file": f"source/{filename}",
-            "impact": payload["impact"],
-            "revision": payload["revision"],
-            "problem": None,
-        }
-
     def _sync() -> dict[str, Any]:
-        manager = get_project_manager()
-        if not manager.project_exists(name):
-            raise NotFoundError("project_not_found", name=name)
-        project = manager.load_project(name)
-        project_dir = manager.get_project_path(name)
-        layout = build_episode_layout(project_dir, project)
-        return {
-            **asdict(layout),
-            "replan": replan_candidate_summary(project_dir, project),
-            "external_changes": [
-                _external_change(manager, project, file.name) for file in layout.files if file.changed_outside
-            ],
-        }
+        return episodes_view_payload(get_project_manager(), name, _t)
 
     try:
         return await run_sync_transaction(_sync)
@@ -204,19 +165,19 @@ _MANUAL_SPLIT_STATUS: dict[str, int] = {
 }
 
 
-def _run_manual_split(project_dir: Path, req: _ManualSplitBody) -> ManualSplitOutcome:
-    options = {"confirm_episodes": req.confirm_episodes, "dry_run": req.dry_run}
+def _manual_split_command(req: _ManualSplitBody) -> ManualSplitCommand:
+    options: dict[str, Any] = {"confirm_episodes": tuple(req.confirm_episodes), "dry_run": req.dry_run}
     if isinstance(req, CutRequest):
-        return cut_unsplit_source(project_dir, source_file=req.source_file, end=req.end, title=req.title, **options)
-    if isinstance(req, SplitRequest):
-        return split_episode(project_dir, req.episode, at=req.at, source_file=req.source_file, **options)
-    if isinstance(req, MoveBoundaryRequest):
-        return move_episode_boundary(project_dir, req.episode, at=req.at, source_file=req.source_file, **options)
-    if isinstance(req, MergeNextRequest):
-        return merge_with_next_episode(
-            project_dir, req.episode, confirm_merged_units=req.confirm_merged_units, **options
+        return ManualSplitCommand(action="cut", source_file=req.source_file, end=req.end, title=req.title, **options)
+    if isinstance(req, (SplitRequest, MoveBoundaryRequest)):
+        return ManualSplitCommand(
+            action=req.action, episode=req.episode, at=req.at, source_file=req.source_file, **options
         )
-    return clear_cuts_after(project_dir, req.episode, **options)
+    if isinstance(req, MergeNextRequest):
+        return ManualSplitCommand(
+            action="merge_next", episode=req.episode, confirm_merged_units=req.confirm_merged_units, **options
+        )
+    return ManualSplitCommand(action="clear_after", episode=req.episode, **options)
 
 
 @router.post(
@@ -230,32 +191,17 @@ async def manual_split(name: str, req: ManualSplitRequest, _t: Translator) -> di
     ``status=confirmation_required`` with server-written ``impact.text``, without writing. After confirmation, resubmit
     ``confirm_episodes`` / ``confirm_merged_units``. Queued/running tasks in removed or newly sourceless episodes return 409 without writing."""
 
-    def _displaced_episodes() -> list[int]:
-        manager = get_project_manager()
-        if not manager.project_exists(name):
-            raise NotFoundError("project_not_found", name=name)
-        preview = _run_manual_split(manager.get_project_path(name), req.model_copy(update={"dry_run": True}))
-        return [*preview.impact.retired, *preview.impact.removed]
-
-    def _sync() -> dict[str, Any]:
-        manager = get_project_manager()
-        if not manager.project_exists(name):
-            raise NotFoundError("project_not_found", name=name)
-        with project_change_source("webui"):
-            outcome = _run_manual_split(manager.get_project_path(name), req)
-        impact = outcome.impact.to_dict()
-        if isinstance(outcome, ManualSplitResult):
-            return {"status": "applied", "episode": outcome.episode, "impact": impact}
-        project = manager.load_project(name)
-        text = render_manual_split_impact_text(impact, project, _t)
-        return {"status": "confirmation_required", "impact": {**impact, "text": text}}
-
     try:
-        if not req.dry_run:
-            for episode in await asyncio.to_thread(_displaced_episodes):
-                if await episode_has_active_tasks(name, episode):
-                    raise HTTPException(status_code=409, detail=_t("manual_split_tasks_active"))
-        return await run_sync_transaction(_sync)
+        with project_change_source("webui"):
+            return await apply_manual_split(
+                get_project_manager(),
+                name,
+                _manual_split_command(req),
+                is_active=lambda episode: episode_has_active_tasks(name, episode),
+                translate=_t,
+            )
+    except EpisodeOperationRefused as exc:
+        raise HTTPException(status_code=409, detail=_t(exc.code)) from exc
     except ManualSplitError as exc:
         raise HTTPException(
             status_code=_MANUAL_SPLIT_STATUS.get(exc.code, 409), detail=_t(f"manual_split_{exc.code}")
@@ -339,22 +285,18 @@ async def _run_source_file_change(
 ) -> dict[str, Any]:
     """``command(manager, dry_run)`` runs a whole-source file-change command with ``revision`` already supplied."""
 
-    def _manager() -> ProjectManager:
-        manager = get_project_manager()
-        if not manager.project_exists(name):
-            raise NotFoundError("project_not_found", name=name)
-        return manager
-
-    def _sync() -> dict[str, Any]:
-        manager = _manager()
-        project = manager.load_project(name)
-        with project_change_source("webui"):
-            outcome = command(manager, False)
-        return source_file_change_payload(outcome, project, _t)
-
     try:
-        await ensure_no_displaced_tasks(name, revision, lambda: command(_manager(), True), _t)
-        return await run_sync_transaction(_sync)
+        with project_change_source("webui"):
+            return await run_source_file_change(
+                get_project_manager(),
+                name,
+                revision,
+                command,
+                is_active=lambda episode: episode_has_active_tasks(name, episode),
+                translate=_t,
+            )
+    except EpisodeOperationRefused as exc:
+        raise HTTPException(status_code=409, detail=_t(exc.code)) from exc
     except SourceFileChangeError as exc:
         raise source_file_change_http_error(exc, _t) from exc
     except (HTTPException, ApiError):

@@ -21,6 +21,7 @@ from lib.config.service import ConfigService
 from lib.db import get_async_session
 from lib.db.repositories.credential_repository import CredentialRepository
 from lib.db.repositories.custom_provider_repo import CustomProviderRepository
+from server.error_handlers import register_error_handlers
 from server.routers import catalog as catalog_router
 from server.routers import provider_models
 from tests.auth_deps import AUTH_DEPENDENCIES, override_auth
@@ -31,6 +32,7 @@ from tests.http_capture import capture_http
 @pytest.fixture
 def models_client(db_factory: async_sessionmaker[AsyncSession]) -> Generator[TestClient]:
     app = FastAPI()
+    register_error_handlers(app)
 
     async def _override_session():
         async with db_factory() as session:

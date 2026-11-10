@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from collections.abc import AsyncGenerator, Awaitable, Callable
+from collections.abc import AsyncGenerator, Awaitable, Callable, Iterable
 from contextlib import asynccontextmanager
+from dataclasses import replace
 from typing import Any
 
 from fastapi.responses import PlainTextResponse
@@ -19,10 +20,19 @@ from starlette.types import ASGIApp, Receive, Scope, Send
 from lib.project.project_manager import ProjectManager, get_project_manager
 from lib.script.source_loader import SourceLoader
 from server.agent_runtime.service import AssistantService
+from server.agent_toolset.global_config import (
+    GLOBAL_CONFIG_TOOL_IDS,
+    GatedToolsFastMCP,
+    build_global_config_tools,
+    global_config_authorized,
+)
+from server.agent_toolset.media_transport import MEDIA_TRANSPORT_TOOLS, register_media_resources
 from server.agent_toolset.remote import remote_tools
 from server.agent_toolset.toolset import AGENT_TOOLSET
 from server.auth import API_KEY_PREFIX
 from server.auth import verify_api_key as default_verify_api_key
+from server.services.configuration.custom_providers import ReloadLimits
+from server.services.tasks.artifact_download_retry import ArtifactDownloadWorker
 from server.session_mcp import default_session_service, session_tools
 from server.tool_runtime import Services
 
@@ -55,22 +65,42 @@ def build_remote_mcp_server(
     services: Services | None = None,
     token_verifier: TokenVerifier | None = None,
     session_service_factory: Callable[[], AssistantService] = default_session_service,
+    reload_limits: ReloadLimits = None,
+    global_config_key_names: Iterable[str] | None = None,
+    artifact_download_worker: ArtifactDownloadWorker | None = None,
 ) -> FastMCP:
-    """Build one restart-safe MCP server instance for the host lifespan."""
+    """Build one restart-safe MCP server instance for the host lifespan.
+
+    Remote-only surfaces join the shared toolset here: media transport (byte delivery/staging for external clients,
+    which the embedded agent does not need) and global endpoint/provider configuration. Configuration tools are
+    registered only for API-key names granted by the operator (``ARCREEL_MCP_GLOBAL_CONFIG_API_KEYS`` or
+    ``global_config_key_names``) and are hidden and refused for every other key; default is deny. ``reload_limits`` is
+    the running generation worker's limit refresh, injected at app assembly; without it, provider configuration writes
+    are refused rather than leaving worker limits stale. ``artifact_download_worker`` is the same worker's
+    retrieval-resume surface for ``retry_artifact_download``; without it that tool refuses with a stable problem."""
     if services is not None:
         if projects is not None and projects.data_root.resolve() != services.projects.data_root.resolve():
             raise ValueError("projects 与 services.projects 必须属于同一项目根")
         projects = services.projects
+        if artifact_download_worker is not None:
+            services = replace(services, artifact_download_worker=artifact_download_worker)
     else:
         projects = projects or get_project_manager()
-        services = Services.defaults(projects)
+        services = Services.defaults(projects, artifact_download_worker=artifact_download_worker)
 
-    return FastMCP(
+    names = None if global_config_key_names is None else frozenset(global_config_key_names)
+    server = GatedToolsFastMCP(
         "arcreel",
         tools=[
             *remote_tools(AGENT_TOOLSET, projects=projects, services=services),
+            *remote_tools(MEDIA_TRANSPORT_TOOLS, projects=projects, services=services),
             *session_tools(projects=projects, service_factory=session_service_factory),
+            *build_global_config_tools(
+                projects=projects, services=services, reload_limits=reload_limits, authorized_names=names
+            ),
         ],
+        gated_tool_names=GLOBAL_CONFIG_TOOL_IDS,
+        is_authorized=lambda: global_config_authorized(names),
         token_verifier=token_verifier or ArcApiKeyVerifier(),
         # ArcReel accepts only static arc- API keys, with no OAuth authorization server (ADR 0065), and declares no RFC 9728
         # protected-resource metadata: MCP requires metadata to list at least one authorization server, so declaring it would direct discovering clients
@@ -92,12 +122,14 @@ def build_remote_mcp_server(
         # Disabling this switch does not affect the SDK’s POST Content-Type validation.
         transport_security=TransportSecuritySettings(enable_dns_rebinding_protection=False),
     )
+    register_media_resources(server, projects, services=services)
+    return server
 
 
 class RemoteMCPHost:
     """Stable ASGI mount whose one-shot SDK manager is rebuilt per host lifespan."""
 
-    def __init__(self, server_factory: Callable[[], FastMCP] = build_remote_mcp_server) -> None:
+    def __init__(self, server_factory: Callable[..., FastMCP] = build_remote_mcp_server) -> None:
         self._server_factory = server_factory
         self._app: Any | None = None
 
@@ -108,8 +140,17 @@ class RemoteMCPHost:
         await self._app(scope, receive, send)
 
     @asynccontextmanager
-    async def run(self) -> AsyncGenerator[None]:
-        server = self._server_factory()
+    async def run(
+        self, *, reload_limits: ReloadLimits = None, artifact_download_worker: ArtifactDownloadWorker | None = None
+    ) -> AsyncGenerator[None]:
+        """Serve for one host lifespan; the app's generation-worker hooks (``reload_limits`` limit refresh and the
+        ``artifact_download_worker`` retrieval resume) reach the factory only when given."""
+        hooks: dict[str, Any] = {
+            key: value
+            for key, value in (("reload_limits", reload_limits), ("artifact_download_worker", artifact_download_worker))
+            if value is not None
+        }
+        server = self._server_factory(**hooks)
         child_app = server.streamable_http_app()
         async with server.session_manager.run():
             self._app = child_app

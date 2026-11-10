@@ -19,7 +19,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, StrictInt
 from pydantic.json_schema import SkipJsonSchema
 
 from lib.artifacts.artifact_activation import (
@@ -28,6 +28,7 @@ from lib.artifacts.artifact_activation import (
     resolve_artifact_episode,
 )
 from lib.artifacts.artifact_manifest import ArtifactKey
+from lib.artifacts.version_manager import VersionManager
 from lib.config.resolver import ConfigResolver
 from lib.generation.generation_queue import GenerationQueue
 from lib.generation.generation_queue_client import BatchTaskResult, TaskSpec
@@ -69,7 +70,7 @@ from server.media_tools.context import (
     tool_error,
     tool_problem,
 )
-from server.services.grid.grid_split import GridImageNotReadyError, apply_grid_split
+from server.services.grid.grid_split import GridCompositeChangedError, GridImageNotReadyError, apply_grid_split
 from server.services.grid.grid_submission import (
     GRID_IN_FLIGHT_STATUSES,
     GridChunkAction,
@@ -532,11 +533,34 @@ def _report_in_flight_in_refused_batch(
         builder.block(scene_id, problem=problem, artifact_key=key, artifact_path=path, artifact_status=status)
 
 
+class ReviewedComposite(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    grid_id: str = Field(min_length=1, description="Grid ID whose composite the user reviewed")
+    sha256: str = Field(
+        pattern=r"^[0-9a-fA-F]{64}$",
+        description="sha256 of the composite the user reviewed, as returned by inspect_grid composite.sha256 / split_guard",
+    )
+    version: StrictInt | None = Field(
+        default=None,
+        ge=1,
+        description="Composite version the user reviewed (inspect_grid composite.version); when given, the current version must match",
+    )
+
+
 class SplitGridsRequest(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     grid_ids: RequestedIds = Field(
         description="Grid IDs to split into storyboard images (for example grid_a1b2c3d4e5f6)"
+    )
+    reviewed_composites: list[ReviewedComposite] | SkipJsonSchema[None] = Field(
+        default=None,
+        description=(
+            "Bind the split to the composites the user actually reviewed: one entry per grid_id with the sha256 (and optionally version) "
+            "from inspect_grid split_guard. When given, every grid_id needs an entry, and a grid whose current composite no longer matches "
+            "is not split (status composite_changed). Strongly recommended."
+        ),
     )
 
 
@@ -548,16 +572,31 @@ async def split_grids(
 ) -> ToolOutcome[dict[str, Any]]:
     try:
         grid_ids = normalize_requested_ids(request.value.grid_ids, field="grid_ids") or []
+        reviewed: dict[str, ReviewedComposite] | None = None
+        if request.value.reviewed_composites is not None:
+            reviewed = {}
+            for entry in request.value.reviewed_composites:
+                if entry.grid_id in reviewed:
+                    return tool_problem(f"reviewed_composites lists {entry.grid_id} more than once")
+                reviewed[entry.grid_id] = entry
+            unbound = [grid_id for grid_id in grid_ids if grid_id not in reviewed]
+            extra = [grid_id for grid_id in reviewed if grid_id not in grid_ids]
+            if unbound or extra:
+                return tool_problem(
+                    "reviewed_composites must have exactly one entry per grid_id",
+                    params={"missing": unbound, "unexpected": extra},
+                )
         project = await asyncio.to_thread(services.projects.load_project, scope.project_name)
         try:
             ensure_grid_writable(project)
         except ApiError as exc:
             return _gate_problem(exc)
 
-        def open_grids() -> GridManager:
-            return GridManager(services.projects.get_project_path(scope.project_name))
+        def open_grids() -> tuple[Path, GridManager]:
+            project_path = services.projects.get_project_path(scope.project_name)
+            return project_path, GridManager(project_path)
 
-        gm = await asyncio.to_thread(open_grids)
+        project_path, gm = await asyncio.to_thread(open_grids)
         # Split images sequentially: each commits under the project metadata lock, so concurrency is no faster.
         results = [
             await _split_one(
@@ -566,6 +605,8 @@ async def split_grids(
                 grid_id,
                 queue=services.queue,
                 user_id=_caller.user_id,
+                reviewed=reviewed.get(grid_id) if reviewed is not None else None,
+                project_path=project_path,
             )
             for grid_id in grid_ids
         ]
@@ -590,6 +631,8 @@ async def _split_one(
     *,
     queue: GenerationQueue,
     user_id: str,
+    reviewed: ReviewedComposite | None = None,
+    project_path: Path,
 ) -> dict[str, Any]:
     async with grid_submission_section(project_name):
         try:
@@ -609,9 +652,37 @@ async def _split_one(
                 "status": "in_progress",
                 "detail": "联合图仍在生成，等它完成并经用户审阅后再切分",
             }
+        if reviewed is not None and reviewed.version is not None:
+            current_version = await asyncio.to_thread(
+                lambda: VersionManager(project_path).get_current_version("grids", grid_id)
+            )
+            if current_version != reviewed.version:
+                return {
+                    "grid_id": grid_id,
+                    "status": "composite_changed",
+                    "detail": (
+                        f"current composite is version {current_version}, not the reviewed version {reviewed.version}; "
+                        "inspect_grid again and ask the user to review the current composite"
+                    ),
+                    "current_version": current_version,
+                }
         try:
             with project_change_source("worker"):
-                split = await apply_grid_split(project_name, grid)
+                split = await apply_grid_split(
+                    project_name,
+                    grid,
+                    expected_composite_sha256=reviewed.sha256 if reviewed is not None else None,
+                )
+        except GridCompositeChangedError as exc:
+            return {
+                "grid_id": grid_id,
+                "status": "composite_changed",
+                "detail": (
+                    "current composite differs from the reviewed one; storyboard images unchanged. "
+                    "inspect_grid again and ask the user to review the current composite"
+                ),
+                "current_sha256": exc.actual_sha256,
+            }
         except GridImageNotReadyError:
             return {"grid_id": grid_id, "status": "not_ready", "detail": "尚无可用的联合图，先生成或在面板上传"}
         except Exception:
@@ -634,6 +705,7 @@ __all__ = [
     "GenerateGridRequest",
     "GridPlanPreview",
     "GridToolValue",
+    "ReviewedComposite",
     "SplitGridsRequest",
     "generate_grid",
     "grid_is_error",

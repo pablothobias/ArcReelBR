@@ -24,7 +24,12 @@ WORKFLOW_ACCESS_TOOLS = (
             "Upload supplied character image/audio or style-reference bytes through the native upload validation. "
             "No server-local paths accepted. Character references require an existing named character. "
             "Image references guide image-to-image sheet generation; audio references require compatible voice binding/model/route. "
-            "Uploading does not regenerate media. Style uploads require confirm_style_analysis and invoke the configured text model."
+            "Uploading does not regenerate media. Style uploads require confirm_style_analysis and invoke the configured text model. "
+            "Bytes arrive inline as content_base64 or, for larger files on remote MCP, as a complete staged_upload_id "
+            "(purpose asset_image for images, reference_audio for audio; staging refusals such as upload_not_found or "
+            "upload_purpose_mismatch are returned unchanged). The result includes sha256 of the installed file: images "
+            "are normalized on install, so read them back with describe_media (kind character_reference_image or "
+            "style_image) rather than comparing with the sent bytes."
         ),
         request_model=UploadReferenceRequest,
         migration=BLOCKED,

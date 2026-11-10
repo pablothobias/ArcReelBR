@@ -7,6 +7,7 @@ drafts, deleting confirmation records too: future plans have no confirmed finger
 from __future__ import annotations
 
 from contextlib import ExitStack
+from dataclasses import dataclass
 from typing import Any
 
 from lib.artifacts.artifact_currency import active_artifact_currency_resolver
@@ -38,8 +39,27 @@ class BlankScriptError(ValueError):
         self.code = code
 
 
+@dataclass(frozen=True)
+class BlankScriptResult:
+    """Outcome of starting from blank: the created script and the unconfirmed planning moved to project trash."""
+
+    episode: int
+    script_file: str
+    #: The unconfirmed formal script plan was moved to project trash.
+    discarded_script_plan: bool
+    #: Quarantine draft kinds moved to project trash (creator-owned drafts only; Agent-owned drafts refuse the call).
+    discarded_drafts: tuple[str, ...]
+    #: A previous script-plan confirmation record was cleared from the episode ledger.
+    cleared_review: bool
+
+
 def start_blank_script(pm: ProjectManager, project_name: str, episode: int) -> str:
-    """Create an empty formal episode script and return its filename.
+    """Create an empty formal episode script and return its filename (see :func:`start_blank_script_detailed`)."""
+    return start_blank_script_detailed(pm, project_name, episode).script_file
+
+
+def start_blank_script_detailed(pm: ProjectManager, project_name: str, episode: int) -> BlankScriptResult:
+    """Create an empty formal episode script and report what unconfirmed planning was discarded.
 
     Lock order matches content confirmation: draft → formal script plan → formal script. Write the script before discarding
     plans: discard failure leaves an unconfirmed plan, never deleted planning with no script. Script files at canonical
@@ -78,20 +98,30 @@ def start_blank_script(pm: ProjectManager, project_name: str, episode: int) -> s
             if draft is not None and draft_owner(draft) == DRAFT_OWNER_AGENT:
                 raise BlankScriptError("draft_agent_owned", f"集（id={episode}）的草稿正由 Agent 编辑")
 
+        cleared_review = False
+
         def _drop_review(p: dict[str, Any]) -> None:
+            nonlocal cleared_review
             entry = find_episode(p, episode)
             if entry is None:
                 raise BlankScriptError("episode_not_found", f"集（id={episode}）不在分集账本里")
             # Old confirmation belongs to the discarded plan; retaining it would falsely confirm later identical plans.
-            entry.pop(script_review.REVIEW_FIELD, None)
+            cleared_review = entry.pop(script_review.REVIEW_FIELD, None) is not None
 
         pm.save_script(project_name, build_blank_script(project, episode), filename, project_update=_drop_review)
 
+        discarded_script_plan = False
         if plan_path is not None and plan_path.exists():
             script_review.trash_script_plan_locked(project_path, episode, plan_path)
-        for kind in draft_kinds:
-            discard_quarantine(project_path, episode, kind)
-    return filename
+            discarded_script_plan = True
+        discarded_drafts = tuple(kind for kind in draft_kinds if discard_quarantine(project_path, episode, kind))
+    return BlankScriptResult(
+        episode=episode,
+        script_file=filename,
+        discarded_script_plan=discarded_script_plan,
+        discarded_drafts=discarded_drafts,
+        cleared_review=cleared_review,
+    )
 
 
-__all__ = ["BlankScriptError", "start_blank_script"]
+__all__ = ["BlankScriptError", "BlankScriptResult", "start_blank_script", "start_blank_script_detailed"]

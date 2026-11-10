@@ -19,6 +19,7 @@ from arcreel_market_core.aspect_size import (
 from arcreel_market_core.definition_diagnostics import DefinitionErrorCode, message_key
 from arcreel_market_core.validation_messages import ValidationMessage
 
+from .audio_container import detect_audio_container, suffix_container
 from .media_type import DEFAULT_DECLARATIVE_MEDIA_TYPE
 
 _PLACEHOLDER = re.compile(r"{{\s*([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*)\s*}}")
@@ -43,10 +44,15 @@ class TemplateRenderError(ValueError):
 
 @dataclass(frozen=True)
 class AssetData:
-    """Asset contents already read and MIME-identified by the caller."""
+    """Asset contents already read and MIME-identified by the caller.
+
+    ``name`` is the source file name when known; inputs declaring ``container_mime`` use it to reject a suffix that
+    contradicts the bytes. It never affects encoding otherwise.
+    """
 
     mime_type: str
     content: bytes
+    name: str | None = None
 
 
 @dataclass(frozen=True)
@@ -64,17 +70,69 @@ def encode_inputs(
     declarations: Mapping[str, Mapping[str, str]],
     assets: Mapping[str, AssetData | Sequence[AssetData] | None],
 ) -> dict[str, str | list[str] | None]:
-    """Encode assets as data URIs or bare base64 according to inputs declarations."""
+    """Encode assets as data URIs or bare base64 according to inputs declarations.
+
+    An input declaring ``container_mime`` identifies each asset's container from its bytes and emits the declared MIME for
+    it; unrecognized/corrupt bytes, undeclared containers, or a contradicting file suffix fail before any request. Inputs
+    without the declaration keep the caller-supplied MIME unchanged.
+    """
     encoded: dict[str, str | list[str] | None] = {}
     for name, declaration in declarations.items():
         raw = assets.get(declaration["source"])
+        container_mime = declaration.get("container_mime")
         if raw is None:
             encoded[name] = None
         elif isinstance(raw, AssetData):
-            encoded[name] = _encode_asset(raw, declaration["encoding"])
+            encoded[name] = _encode_asset(_with_container_mime(raw, container_mime, name), declaration["encoding"])
         else:
-            encoded[name] = [_encode_asset(asset, declaration["encoding"]) for asset in raw]
+            encoded[name] = [
+                _encode_asset(_with_container_mime(asset, container_mime, name), declaration["encoding"])
+                for asset in raw
+            ]
     return encoded
+
+
+def asset_container_mime(asset: AssetData, container_mime: Mapping[str, str], input_name: str) -> str:
+    """MIME declared for the asset's real container; raise a render error when the bytes cannot be sent as declared.
+
+    Shared by request rendering and endpoint-test previews so both accept or reject the same files. Production
+    reference-video requests reach it at execution, before any provider request; admission does not bind speaker
+    audio files yet, so it cannot run there.
+    """
+    detected = detect_audio_container(asset.content)
+    if detected is None:
+        raise TemplateRenderError(
+            DefinitionErrorCode.ASSET_CONTAINER_UNRECOGNIZED,
+            input=input_name,
+            asset=asset.name or "",
+            supported=", ".join(sorted(container_mime)),
+        )
+    claimed = suffix_container(asset.name)
+    if claimed is not None and claimed != detected:
+        raise TemplateRenderError(
+            DefinitionErrorCode.ASSET_CONTAINER_EXTENSION_MISMATCH,
+            input=input_name,
+            asset=asset.name or "",
+            detected=detected,
+            claimed=claimed,
+            supported=", ".join(sorted(container_mime)),
+        )
+    mime = container_mime.get(detected)
+    if mime is None:
+        raise TemplateRenderError(
+            DefinitionErrorCode.ASSET_CONTAINER_UNSUPPORTED,
+            input=input_name,
+            asset=asset.name or "",
+            detected=detected,
+            supported=", ".join(sorted(container_mime)),
+        )
+    return mime
+
+
+def _with_container_mime(asset: AssetData, container_mime: object, input_name: str) -> AssetData:
+    if not isinstance(container_mime, Mapping) or not container_mime:
+        return asset
+    return AssetData(asset_container_mime(asset, container_mime, input_name), asset.content, asset.name)
 
 
 def build_context(

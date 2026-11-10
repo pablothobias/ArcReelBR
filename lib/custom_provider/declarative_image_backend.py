@@ -128,6 +128,7 @@ def extract_image_state(
             image_url=extract_text(extract.get("image_url"), body),
             image_b64=extract_text(extract.get("image_b64"), body),
             error=extract_text(extract.get("error"), body),
+            provider_error_code=extract_text(extract.get("error_code"), body),
             result_id=extract_text(extract.get("result_id"), body),
         )
 

@@ -32,6 +32,7 @@ from lib.script.draft_quarantine import QUARANTINE_KIND_DRAMA_SCRIPT_PLAN, read_
 from lib.workflow.workflow_plan import WorkflowPlanRequest, build_workflow_plan
 from lib.workflow.workflow_state import WorkflowStatus
 from server.agent_toolset.declaration import invoke_declaration
+from server.agent_toolset.media_transport import MEDIA_TRANSPORT_TOOL_IDS
 from server.agent_toolset.script_authoring import GENERATE_EPISODE_SCRIPT
 from server.agent_toolset.toolset import ARCREEL_MCP_TOOL_IDS
 from server.auth import create_download_token, create_token
@@ -423,7 +424,8 @@ async def test_remote_mcp_returns_typed_workflow_plan_and_rejects_bad_project(
         "generate_video_selected",
     }
     listed = {tool.name: tool for tool in tools.tools}
-    assert set(listed) == set(ARCREEL_MCP_TOOL_IDS) | SESSION_MCP_TOOL_IDS
+    # Remote-only: session tools and media transport; global configuration tools are absent without an operator grant.
+    assert set(listed) == set(ARCREEL_MCP_TOOL_IDS) | SESSION_MCP_TOOL_IDS | MEDIA_TRANSPORT_TOOL_IDS
     assert migrated | readers | drafts | text_and_script | batches <= listed.keys()
     assert retired.isdisjoint(listed)
     assert all(

@@ -290,7 +290,9 @@ async def test_batch_query_and_cancellation_read_the_durable_queue(db_factory, t
     cancelled = await cancel_generation_batch(request, scope, caller, services)
 
     assert read.value is not None
-    assert [member.model_dump(mode="json") for member in read.value.members] == [
+    members = [member.model_dump(mode="json") for member in read.value.members]
+    checkpoints = [member.pop("provider_checkpoint") for member in members]
+    assert members == [
         {
             "unit_id": "E1S01",
             "task_id": enqueued["task_id"],
@@ -301,6 +303,10 @@ async def test_batch_query_and_cancellation_read_the_durable_queue(db_factory, t
             "admission": {},
         }
     ]
+    # A queued member has not reached the provider: the persisted checkpoint says so without any provider call.
+    assert checkpoints[0]["submitted"] is False
+    assert checkpoints[0]["provider_job_id"] is None
+    assert checkpoints[0]["checkpoint_state"] is None
     assert read.value.done is False
     assert cancelled.value is not None
     assert cancelled.value.model_dump(mode="json") == {

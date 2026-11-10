@@ -78,6 +78,10 @@ MESSAGES = {
     # Lý do tác vụ thất bại (GenerationWorker lưu mã lỗi + tham số; tasks API kết xuất theo ngôn ngữ khi đọc)
     "task_fail_provider_unsupported_media": "Nhà cung cấp {provider_id} không hỗ trợ tạo {media_type}",
     "subscription_quota_paused": "Đã hết hạn mức đăng ký Claude. Giữ nguyên trạng thái sản xuất và tiếp tục rõ ràng sau khi hạn mức được đặt lại. Không chuyển sang API trả phí.",
+    "task_fail_provider_job_rejected": "Nhà cung cấp đã từ chối tác vụ tạo này ở giai đoạn {stage} và trả về mã lỗi riêng (hiển thị cùng lỗi này); hãy sửa đầu vào hoặc nội dung yêu cầu trước khi gửi lại",
+    "model_setting_value_unsupported": "{model} ({provider}) không hỗ trợ độ phân giải {value}; hãy chọn một trong: {allowed_values}",
+    "task_fail_provider_job_configuration_rejected": "Nhà cung cấp đã từ chối tác vụ tạo này ở giai đoạn {stage} do thông tin xác thực, số dư hoặc cấu hình endpoint (mã lỗi riêng hiển thị cùng lỗi này); hãy sửa cấu hình nhà cung cấp trước khi gửi lại",
+    "task_fail_provider_job_failed_coded": "Nhà cung cấp đã làm tác vụ tạo này thất bại ở giai đoạn {stage} với mã lỗi riêng (hiển thị cùng lỗi này) mà endpoint không phân loại; gửi lại là một lần thử mới có tính phí, hãy kiểm tra mã lỗi trước khi thử lại",
     "task_fail_provider_rejected": "Nhà cung cấp đã từ chối yêu cầu tạo này (HTTP {status})",
     "task_fail_dispatch_provider_requeue_failed": "Nhà cung cấp tác vụ đã đổi từ {claimed_provider_id} sang {actual_provider_id}, nhưng không thể đưa tác vụ trở lại hàng đợi để nhận khe mới; vui lòng thử lại",
     "task_fail_project_deleted_during_task": "Dự án đã bị xóa trong khi tác vụ đang chạy; kết quả tạo ra không được lưu",
@@ -97,6 +101,7 @@ MESSAGES = {
         "Endpoint của mô hình này đã thay đổi nên không thể tiếp tục tác vụ đã gửi trước đó: {detail}"
     ),
     "task_fail_declarative_template_render_failed": "Không thể kết xuất yêu cầu endpoint: {detail}",
+    "task_fail_credential_host_mismatch": "Yêu cầu {section} của endpoint đã bị chặn trước khi gửi vì URL sẽ trỏ tới máy chủ khác với máy chủ mà mẫu endpoint cố định; hãy sửa mẫu URL của endpoint để giá trị không thể thay đổi máy chủ",
     "task_fail_declarative_response_extract_failed": "Không thể trích xuất phản hồi endpoint: {detail}",
     "task_fail_declarative_image_save_failed": "Nhà cung cấp đã tạo ảnh nhưng không thể lưu về máy; tạo lại sẽ bị tính phí thêm lần nữa: {detail}",
     "task_fail_comfyui_image_drop_unsupported": "Chuỗi tạo thành phẩm của workflow này phụ thuộc vào ảnh do node {node} đọc vào, nên không thể chỉnh lại đồ thị khi thiếu ảnh; hãy bổ sung ảnh hoặc dùng workflow khác",
@@ -194,6 +199,10 @@ MESSAGES = {
     "voice_sample_task_submitted": "Đã gửi tác vụ tạo mẫu giọng đọc thử cho nhân vật '{name}'",
     "voice_sample_not_ready": "Mẫu giọng đọc thử chưa tạo thành công, chưa thể xác nhận",
     "voice_sample_file_missing": "Tệp mẫu giọng đọc thử không còn tồn tại, vui lòng tạo lại",
+    "voice_sample_content_changed": "Tệp mẫu giọng đọc đã thay đổi sau khi tạo, không còn là mẫu đã ghi nhận (tác vụ {id})",
+    "voice_sample_in_progress": "Nhân vật '{name}' đã có tác vụ tạo mẫu giọng đang xử lý với văn bản hoặc giọng khác (tác vụ {id}); hãy đợi tác vụ hoàn tất rồi thử lại (tác vụ còn đang xếp hàng có thể hủy trước).",
+    "voice_reference_revision_conflict": "Âm thanh tham chiếu của nhân vật {name} đã thay đổi sau khi kiểm tra; hãy kiểm tra lại trước khi xác nhận",
+    "voice_reference_path_invalid": "Âm thanh tham chiếu của nhân vật {name} trỏ ra ngoài characters/refs_audio nên không dùng được",
     "scene_task_submitted": "Đã gửi tác vụ tạo hình tài sản cảnh cho '{name}'",
     "prop_task_submitted": "Đã gửi tác vụ tạo hình tài sản đạo cụ cho '{name}'",
     "product_task_submitted": "Đã gửi tác vụ tạo hình tài sản hàng hóa cho '{name}'",
@@ -511,6 +520,7 @@ MESSAGES = {
     "end_frame_source_not_found": "Không tìm thấy ảnh nguồn cho khung hình cuối: {path}",
     "end_frame_source_too_large": "Ảnh khung hình cuối vượt quá giới hạn dung lượng ({max_mb} MB): {path}",
     "end_frame_reference_video_unsupported": "Chế độ video tham chiếu không có khái niệm khung hình đầu/cuối, không hỗ trợ đặt khung hình cuối",
+    "end_frame_unsupported_by_video_model": "Mô hình video hiện tại ({provider}/{model}) không hỗ trợ khung hình cuối nên khung hình cuối sẽ không được gửi; hãy đổi mô hình video trong cài đặt dự án trước",
     # Reference Video
     "ref_missing_asset": "Tham chiếu đến {type} '{name}' không có trong thư viện tài nguyên dự án, vui lòng tạo trước",
     "ref_duration_exceeded": "Kịch bản dài {total}s, vượt mức thời lượng lớn nhất của {model}; đã tạo ở {duration}s nên video ngắn hơn kịch bản",

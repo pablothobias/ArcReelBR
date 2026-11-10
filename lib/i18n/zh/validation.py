@@ -259,6 +259,12 @@ MESSAGES = {
     "val_ce_enum_map_value_missing": "enum_maps.{name} 缺少 '{value}' 的映射",
     "val_ce_template_text_variable_null": "变量 {name} 为空，不能嵌入混合文本",
     "val_ce_each_value_not_list": "$each.in 指向的 {name} 在运行时不是列表",
+    "val_ce_asset_container_unrecognized": "素材 {input}：文件 {asset} 不是可识别或完整的音频容器（支持：{supported}）",
+    "val_ce_asset_container_unsupported": "素材 {input}：文件 {asset} 是 {detected} 音频，此端点不接受（支持：{supported}）",
+    "val_ce_asset_container_extension_mismatch": "素材 {input}：文件 {asset} 实际为 {detected} 音频，扩展名却声称是 {claimed}；请修正文件而不是改名",
+    "val_ce_container_mime_source_not_audio": "container_mime 只能用于 reference_audio_files 素材，不能用于 {source}",
+    "val_ce_error_code_sets_overlap": "同一个供应商错误码不能同时出现在 fix_input_codes 和 configure_codes 中：{codes}",
+    "val_ce_url_authority_placeholder": "URL 的主机必须由定义固定，但 {fragment} 会让渲染值改变主机：请以 base_url 占位符开头并紧接 /、? 或 #，或直接写出 http(s) 协议和主机",
     "val_ce_each_key_duplicate": "对象式 $each 铺出的键 {field} 与同一对象里的其他键重名，请求无法承载全部素材",
     # ---- ComfyUI endpoints · Node binding and import dispatch ----
     "val_ce_comfyui_binding_required": "语义键 {binding_key} 必须绑定到节点后才能保存：提示词决定画什么，产物决定取哪个文件",

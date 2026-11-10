@@ -181,6 +181,7 @@ ArcReel 在应用启动时运行 Alembic 迁移，将数据库结构升级到当
 | `ARCREEL_DATA_DIR` | `projects` | 数据根；项目、默认 SQLite 数据库、日志和 Vertex 凭据都在其下 |
 | `CORS_ORIGINS` | 通配 | 设为白名单时，浏览器型 MCP 客户端的 Origin 也须列入 |
 | `ARCREEL_OFFICIAL_SERVICE_URL` | 内置官方服务地址 | 市场安装量、评分与分享提交所用的官方服务；设为空即整体关闭，市场回到只读取市场源的形态 |
+| `ARCREEL_MCP_GLOBAL_CONFIG_API_KEYS` | 空 | 逗号分隔的 API Key 名称（「访问令牌」中的名称）；只有列出的 Key 能在远程 MCP 上看到并调用全局配置工具，留空时不注册这些工具 |
 
 注意：
 
@@ -191,6 +192,7 @@ ArcReel 在应用启动时运行 Alembic 迁移，将数据库结构升级到当
 - Vertex 凭据文件应只授予运行 ArcReel 的用户读取权限。
 - 文件日志固定写入数据根下的 `logs/`。旧变量 `ARCREEL_LOG_DIR` 已不再生效，仍设置时启动日志会提示一次；只需要 stdout 日志时设置 `ARCREEL_LOG_FILE_DISABLED=true`。
 - 第三方模型 API Key 通常在 ArcReel 设置页中管理，不要写入公开文档。
+- `ARCREEL_MCP_GLOBAL_CONFIG_API_KEYS` 只控制远程 MCP 暴露哪些工具，不是安全边界：任何 `arc-` API Key 本来就能调用管理 REST 接口。只列出已获准修改供应商配置的 Key。项目会话和内置 Agent 不会获得这些工具。
 
 远程 MCP 端点为 `/mcp`，始终要求 `arc-` 前缀 API Key；即使 `AUTH_ENABLED=false` 也不会匿名放行。外部接入不需要额外的 `MCP_*` 配置：把设置页「外部 Agent 接入」给出的端点地址，与在「访问令牌」创建的 API Key 填进客户端即可，通过保留 SSE 长连接的 HTTPS 反向代理、VPN 或安全隧道访问。
 

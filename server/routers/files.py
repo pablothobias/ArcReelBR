@@ -11,7 +11,6 @@ import stat
 import tempfile
 from collections.abc import AsyncIterator, Callable
 from contextlib import ExitStack
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Annotated, Literal
 
@@ -20,7 +19,6 @@ logger = logging.getLogger(__name__)
 from fastapi import APIRouter, Body, Depends, File, HTTPException, Query, Request, UploadFile
 from fastapi.responses import PlainTextResponse
 
-from lib.bgm.library import BGM_DIR, BGM_EXTENSIONS, BGM_MAX_BYTES, BgmTrack
 from lib.bgm.service import BgmError, BgmLibraryService
 from lib.catalog.errors import ModelNotInCatalogError
 from lib.config.resolver import NoAvailableProviderError, VisionCapabilityError
@@ -54,13 +52,12 @@ from lib.infra.api_errors import ApiError, BadRequestError, NotFoundError
 from lib.infra.async_thread import run_sync_transaction
 from lib.infra.data_root_layout import GLOBAL_ASSETS_DIRNAME
 from lib.infra.image_thumbnails import ensure_image_thumbnail, is_thumbnail_source, snap_thumbnail_width
-from lib.infra.image_utils import IMAGE_FILE_EXTENSIONS, normalize_uploaded_image, validate_image_bytes
+from lib.infra.image_utils import IMAGE_FILE_EXTENSIONS, normalize_uploaded_image
 from lib.infra.json_io import atomic_write_bytes
 from lib.infra.path_safety import PathTraversalError, safe_join
-from lib.material.formal_objects import formal_commit
 from lib.material.global_library import ensure_global_image
 from lib.material.work_files import ensure_work_file, hold_work_file
-from lib.project.asset_types import ASSET_SPECS, GLOBAL_LIBRARY_ASSET_TYPES, resolve_asset_key, validate_asset_name
+from lib.project.asset_types import GLOBAL_LIBRARY_ASSET_TYPES
 from lib.project.project_change_hints import (
     build_change_label,
     emit_project_change_batch,
@@ -79,12 +76,7 @@ from lib.script.source_loader import (
     SourceLoader,
     UnsupportedFormatError,
 )
-from lib.speech.audio_utils import (
-    AUDIO_REFERENCE_MAX_BYTES,
-    AUDIO_REFERENCE_MAX_SECONDS,
-    AUDIO_REFERENCE_MIN_SECONDS,
-    probe_audio_duration_seconds,
-)
+from lib.speech.audio_utils import AUDIO_REFERENCE_MAX_BYTES as AUDIO_REFERENCE_MAX_BYTES
 from server.dependencies import require_project_migration_ok
 from server.i18n import Translator
 from server.routers._episode_source_errors import episode_source_http_error
@@ -96,7 +88,22 @@ from server.routers._source_file_changes import (
     source_file_change_payload,
 )
 from server.routers._source_uploads import extract_uploaded_source_text, source_loader_http_error
-from server.services.currency.upload_finalize import install_manual_asset_sheet_upload
+from server.services.currency.upload_finalize import UploadValidationError
+from server.services.project.asset_uploads import (
+    ALLOWED_EXTENSIONS as ALLOWED_EXTENSIONS,
+)
+from server.services.project.asset_uploads import (
+    FORMAL_SHEET_UPLOAD_TYPES,
+    UPLOAD_SPECS,
+    bgm_error_message,
+    bgm_view,
+    check_upload_target,
+    install_project_bgm,
+    persist_asset_upload,
+)
+from server.services.project.asset_uploads import (
+    UploadSpec as UploadSpec,
+)
 from server.services.project.script_review import ScriptReviewError, ScriptReviewService
 
 router = APIRouter()
@@ -172,137 +179,8 @@ def _require_filename(file: UploadFile, _t: Callable[..., str]) -> str:
     return file.filename
 
 
-# Persisted filename policies.
-#   stable_png: stable single-image `{name}.png` (actual extension follows image normalization).
-#   keep_ext: stable single-file name retaining uploaded extension (audio is not transcoded).
-#   sequenced: accumulate images using numbered unique names.
-#   delegated: dedicated type branches own naming.
-Naming = Literal["stable_png", "keep_ext", "sequenced", "delegated"]
-
-# Pre-persistence content handling.
-#   normalize_image: validate/compress by threshold, possibly changing extension.
-#   validate_image: check decodability only, preserving original bytes.
-#   audio: validate duration without transcoding (max_bytes independently checks size).
-#   delegated: dedicated type branches own content handling.
-ContentCheck = Literal["normalize_image", "validate_image", "audio", "delegated"]
-
-MetadataSetter = Callable[[ProjectManager, str, str, str], object]
-
-
-@dataclass(frozen=True)
-class UploadSpec:
-    """Persistence rules for one upload_type: destination, extension allowlist, size cap, processing, and metadata writeback.
-
-    Register new types only in ``UPLOAD_SPECS``, without copying branches. ``source`` is the sole exception:
-    ``_handle_source_upload`` owns its flow; registration supplies only type checks/extension allowlists.
-
-    Uploads addressed by script_file + shot_id that update script metadata use their own storyboard-level
-    routes, sharing validation/persistence helpers in ``server.services.currency.upload_finalize`` rather than this table."""
-
-    allowed_exts: tuple[str, ...]
-    subdir: tuple[str, ...]
-    naming: Naming
-    content_check: ContentCheck
-    unsupported_ext_key: str = "unsupported_image_type"
-    # Request-body limit, None for unlimited; applies to all types independently of content_check.
-    max_bytes: int | None = None
-    metadata_setter: MetadataSetter | None = None
-    # Nonempty means a host-asset field is the file's sole pointer; reject absent hosts
-    # (including concurrent-deletion windows), avoiding UI-invisible orphan files. Stable single-image paths
-    # tolerate later asset creation, so have no such constraint.
-    host_bucket: str | None = None
-    host_not_found_key: str = ""
-    # Reference-audio byte replacement/field writeback use ProjectManager project-lock transactions; remove old-extension files after commit.
-    tracks_stale_audio: bool = False
-
-    def __post_init__(self) -> None:
-        # Register host constraints together with 404 wording, or rejection would look up an empty translation key.
-        if (self.host_bucket is None) != (not self.host_not_found_key):
-            raise ValueError("host_bucket 与 host_not_found_key 必须成对登记")
-        if self.tracks_stale_audio and self.host_bucket is None:
-            raise ValueError("tracks_stale_audio 必须登记宿主约束")
-
-
-UPLOAD_SPECS: dict[str, UploadSpec] = {
-    "source": UploadSpec(
-        allowed_exts=(".txt", ".md", ".docx", ".epub", ".pdf"),
-        subdir=("source",),
-        naming="delegated",
-        content_check="delegated",
-    ),
-    "character": UploadSpec(
-        allowed_exts=_IMAGE_EXTS,
-        subdir=(ASSET_SPECS["character"].subdir,),
-        naming="stable_png",
-        content_check="normalize_image",
-        metadata_setter=ProjectManager.update_project_character_sheet,
-    ),
-    "character_ref": UploadSpec(
-        allowed_exts=_IMAGE_EXTS,
-        subdir=(ASSET_SPECS["character"].subdir, "refs"),
-        naming="stable_png",
-        content_check="normalize_image",
-        metadata_setter=ProjectManager.update_character_reference_image,
-    ),
-    "character_audio_ref": UploadSpec(
-        allowed_exts=(".wav", ".mp3"),
-        subdir=(ASSET_SPECS["character"].subdir, "refs_audio"),
-        naming="keep_ext",
-        content_check="audio",
-        unsupported_ext_key="unsupported_audio_type",
-        max_bytes=AUDIO_REFERENCE_MAX_BYTES,
-        metadata_setter=ProjectManager.update_character_reference_audio,
-        host_bucket=ASSET_SPECS["character"].bucket_key,
-        host_not_found_key="character_not_found",
-        tracks_stale_audio=True,
-    ),
-    "scene": UploadSpec(
-        allowed_exts=_IMAGE_EXTS,
-        subdir=(ASSET_SPECS["scene"].subdir,),
-        naming="stable_png",
-        content_check="normalize_image",
-        metadata_setter=ProjectManager.update_scene_sheet,
-    ),
-    "prop": UploadSpec(
-        allowed_exts=_IMAGE_EXTS,
-        subdir=(ASSET_SPECS["prop"].subdir,),
-        naming="stable_png",
-        content_check="normalize_image",
-        metadata_setter=ProjectManager.update_prop_sheet,
-    ),
-    "product": UploadSpec(
-        allowed_exts=_IMAGE_EXTS,
-        subdir=(ASSET_SPECS["product"].subdir,),
-        naming="stable_png",
-        content_check="normalize_image",
-        metadata_setter=ProjectManager.update_product_sheet,
-    ),
-    # Project BGM is owned by BgmLibraryService (measured loudness, atomic persistence, byte registration); table supplies only type/extension checks.
-    "bgm": UploadSpec(
-        allowed_exts=BGM_EXTENSIONS,
-        subdir=(BGM_DIR,),
-        naming="delegated",
-        content_check="delegated",
-        unsupported_ext_key="unsupported_audio_type",
-        max_bytes=BGM_MAX_BYTES,
-    ),
-    "product_ref": UploadSpec(
-        allowed_exts=_IMAGE_EXTS,
-        subdir=(ASSET_SPECS["product"].subdir, "refs"),
-        naming="sequenced",
-        # Product originals anchor fidelity acceptance (ADR 0034): check decodability only, preserving original bytes/extensions,
-        # without threshold compression/reencoding. Presubmission reference compression separately guarantees request-body limits.
-        content_check="validate_image",
-        metadata_setter=ProjectManager.add_product_reference_image,
-        host_bucket=ASSET_SPECS["product"].bucket_key,
-        host_not_found_key="product_not_found",
-    ),
-}
-
-_FORMAL_SHEET_UPLOAD_TYPES = frozenset(ASSET_SPECS)
-
-# Allowed file types (frontend/src/utils/source-files.ts mirrors source).
-ALLOWED_EXTENSIONS = {upload_type: list(spec.allowed_exts) for upload_type, spec in UPLOAD_SPECS.items()}
+# Upload persistence rules live in ``server.services.project.asset_uploads`` (shared with Agent media-ingest tools).
+_FORMAL_SHEET_UPLOAD_TYPES = FORMAL_SHEET_UPLOAD_TYPES
 
 
 async def _media_work_files() -> AsyncIterator[ExitStack]:
@@ -496,27 +374,17 @@ async def upload_project_file(
         revision: role=whole_source only: approved affected-episode-list revision. If insertion falls inside a cross-file
             episode, or on_conflict=replace overwrites a registered whole-source file, and episodes are affected,
             missing/stale revision prevents writes and returns ``status=confirmation_required`` with affected episodes."""
-    spec = UPLOAD_SPECS.get(upload_type)
-    if spec is None:
+    if upload_type not in UPLOAD_SPECS:
         raise HTTPException(status_code=400, detail=_t("invalid_upload_type", upload_type=upload_type))
 
     original_filename = _require_filename(file, _t)
 
-    # Check file extension.
-    ext = Path(original_filename).suffix.lower()
-    if ext not in spec.allowed_exts:
-        raise HTTPException(
-            status_code=400,
-            detail=_t(spec.unsupported_ext_key, ext=ext, allowed=", ".join(spec.allowed_exts)),
-        )
-
-    # Names enter persisted paths; reject unsafe separators / .. / controls at the boundary.
-    # Omitted names fall back to original stems without validation.
-    if name:
-        try:
-            name = validate_asset_name(name)
-        except ValueError as exc:
-            raise HTTPException(status_code=400, detail=_t("asset_invalid_name", name=name)) from exc
+    # Check extension and asset name before reading bytes (shared with Agent media-ingest tools).
+    try:
+        target = check_upload_target(upload_type, original_filename, name)
+    except UploadValidationError as exc:
+        raise _upload_http_error(exc, _t) from exc
+    name = target.name
 
     # Source branch returns early through SourceLoader normalization.
     if upload_type == "source":
@@ -540,6 +408,7 @@ async def upload_project_file(
         manager = manager or get_project_manager()
         content = await file.read()
 
+        spec = target.spec
         if spec.max_bytes is not None and len(content) > spec.max_bytes:
             raise HTTPException(
                 status_code=400,
@@ -549,129 +418,18 @@ async def upload_project_file(
         if upload_type == "bgm":
             return await _handle_bgm_upload(project_name, original_filename, content, _t)
 
-        if spec.content_check == "audio":
-            try:
-                duration = await probe_audio_duration_seconds(content, ext)
-            except ValueError as exc:
-                raise HTTPException(status_code=400, detail=_t("invalid_audio_file")) from exc
-            if duration is not None and not (AUDIO_REFERENCE_MIN_SECONDS <= duration <= AUDIO_REFERENCE_MAX_SECONDS):
-                raise HTTPException(
-                    status_code=400,
-                    detail=_t(
-                        "audio_duration_out_of_range",
-                        min_seconds=int(AUDIO_REFERENCE_MIN_SECONDS),
-                        max_seconds=int(AUDIO_REFERENCE_MAX_SECONDS),
-                    ),
-                )
+        return await persist_asset_upload(
+            manager=manager,
+            project_name=project_name,
+            target=target,
+            original_filename=original_filename,
+            content=content,
+            change_source=change_source,
+            require_reference_host=require_reference_host,
+        )
 
-        def _sync():
-            project_dir = manager.get_project_path(project_name)
-
-            if require_reference_host and upload_type == "character_ref":
-                hosts = manager.load_project(project_name).get("characters") or {}
-                if not name or resolve_asset_key(hosts, name) is None:
-                    raise HTTPException(status_code=404, detail=_t("character_not_found", name=name or ""))
-
-            if spec.host_bucket is not None:
-                hosts = manager.load_project(project_name).get(spec.host_bucket) or {}
-                # validate_asset_name normalized name to NFC; existing host keys may be NFD, so resolve existence in the coordinate system.
-                if not name or resolve_asset_key(hosts, name) is None:
-                    raise HTTPException(status_code=404, detail=_t(spec.host_not_found_key, name=name or ""))
-
-            target_dir = project_dir.joinpath(*spec.subdir)
-            # Stable filenames avoid jpg/png version-restoration/reference mismatches; omitted names use original stems.
-            stem = name or Path(original_filename).stem
-            filename = f"{stem}.png" if spec.naming == "stable_png" else f"{stem}{ext}"
-
-            target_dir.mkdir(parents=True, exist_ok=True)
-
-            # Save files (compress to JPEG above 2MB, otherwise validate and preserve).
-            nonlocal content
-            if spec.content_check == "normalize_image":
-                try:
-                    content, normalized_ext = normalize_uploaded_image(content, ext)
-                except ValueError as exc:
-                    raise HTTPException(status_code=400, detail=_t("invalid_image_file")) from exc
-                filename = Path(filename).with_suffix(normalized_ext).name
-            elif spec.content_check == "validate_image":
-                try:
-                    validate_image_bytes(content)
-                except ValueError as exc:
-                    raise HTTPException(status_code=400, detail=_t("invalid_image_file")) from exc
-
-            if spec.naming == "sequenced":
-                # Allocate numbered unique names using atomic exclusive placeholders: concurrent uploads for one host
-                # receive distinct numbers without silently overwriting each other.
-                seq = 1
-                while True:
-                    candidate = target_dir / f"{stem}_{seq}{ext or '.png'}"
-                    try:
-                        candidate.touch(exist_ok=False)
-                        break
-                    except FileExistsError:
-                        seq += 1
-                filename = candidate.name
-
-            target_path = target_dir / filename
-            relative_path = "/".join((*spec.subdir, filename))
-
-            if require_reference_host and upload_type == "character_ref" and name:
-                try:
-                    with project_change_source(change_source):
-                        manager.install_character_reference_image(project_name, name, relative_path, content)
-                except KeyError as exc:
-                    raise HTTPException(status_code=404, detail=_t("character_not_found", name=name)) from exc
-            elif spec.tracks_stale_audio and name:
-                try:
-                    with project_change_source(change_source):
-                        manager.install_character_reference_audio(project_name, name, relative_path, content)
-                except KeyError as exc:
-                    raise HTTPException(status_code=404, detail=_t(spec.host_not_found_key, name=name)) from exc
-            else:
-                if upload_type in _FORMAL_SHEET_UPLOAD_TYPES and name:
-                    with project_change_source(change_source):
-                        install_manual_asset_sheet_upload(
-                            project_manager=manager,
-                            project_name=project_name,
-                            asset_type=upload_type,
-                            name=name,
-                            sheet_path=relative_path,
-                            content=content,
-                            original_filename=original_filename,
-                        )
-                else:
-                    with open(target_path, "wb") as f:
-                        f.write(content)
-
-                    # Update metadata.
-                    if spec.metadata_setter is not None and name:
-                        try:
-                            with project_change_source(change_source):
-                                spec.metadata_setter(manager, project_name, name, relative_path)
-                        except KeyError as exc:
-                            if spec.host_bucket is not None:
-                                # Entry validation established host existence; concurrent-deletion races return 404,
-                                # cleaning persisted files to avoid orphans.
-                                # hard-delete: rollback -- Remove new uploads when host assets disappear.
-                                target_path.unlink(missing_ok=True)
-                                raise HTTPException(
-                                    status_code=404, detail=_t(spec.host_not_found_key, name=name)
-                                ) from exc
-                            # Single-image types ignore absent assets: deterministic paths remain referencable when assets are created later.
-
-            return {
-                "success": True,
-                "filename": filename,
-                "path": relative_path,
-                "url": f"/api/v1/files/{project_name}/{relative_path}",
-            }
-
-        if upload_type in _FORMAL_SHEET_UPLOAD_TYPES and name:
-            # Finished sheets follow global new-content-version storage settings (local by default).
-            async with formal_commit(project_name):
-                return await run_sync_transaction(_sync)
-        return await run_sync_transaction(_sync)
-
+    except UploadValidationError as exc:
+        raise _upload_http_error(exc, _t) from exc
     except FileNotFoundError as exc:
         raise NotFoundError("project_not_found", name=project_name) from exc
     except (HTTPException, ApiError):
@@ -681,41 +439,25 @@ async def upload_project_file(
         raise HTTPException(status_code=500, detail=_t("internal_server_error")) from exc
 
 
-_BGM_ERROR_STATUS: dict[str, tuple[int, str]] = {
-    "bgm_unsupported_type": (400, "unsupported_audio_type"),
-    "bgm_too_large": (400, "upload_too_large"),
-    "bgm_invalid_audio": (400, "invalid_audio_file"),
-    "bgm_silent": (400, "bgm_silent"),
-    "bgm_ffmpeg_unavailable": (503, "bgm_ffmpeg_unavailable"),
-}
+def _upload_http_error(exc: UploadValidationError, _t: Translator) -> HTTPException:
+    return HTTPException(status_code=exc.status_code, detail=_t(exc.key, **exc.params))
 
 
 def _bgm_http_error(exc: BgmError, _t: Translator) -> HTTPException:
-    if exc.code == "project_not_found":
-        return HTTPException(status_code=404, detail=_t("project_not_found", name=exc.params.get("project", "")))
-    status, key = _BGM_ERROR_STATUS[exc.code]
-    return HTTPException(status_code=status, detail=_t(key, **exc.params))
+    status, key, params = bgm_error_message(exc)
+    return HTTPException(status_code=status, detail=_t(key, **params))
 
 
 async def _handle_bgm_upload(project_name: str, filename: str, content: bytes, _t: Translator) -> dict[str, object]:
     """Register project-level BGM and return its BGM-list shape."""
-    await asyncio.to_thread(assert_project_migration_ok, project_name)
     try:
-        track = await BgmLibraryService(get_project_manager()).upload(project_name, filename=filename, content=content)
+        track = await install_project_bgm(get_project_manager(), project_name, filename=filename, content=content)
     except BgmError as exc:
         raise _bgm_http_error(exc, _t) from exc
     return {"success": True, "bgm": _bgm_view(project_name, track)}
 
 
-def _bgm_view(project_name: str, track: BgmTrack) -> dict[str, object]:
-    return {
-        "id": track.id,
-        "name": track.name,
-        "duration": track.duration,
-        "gain": round(track.gain, 6),
-        "path": track.file,
-        "url": f"/api/v1/files/{project_name}/{track.file}",
-    }
+_bgm_view = bgm_view
 
 
 @router.get("/projects/{project_name}/bgm")

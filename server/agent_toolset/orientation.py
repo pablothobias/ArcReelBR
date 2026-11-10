@@ -39,7 +39,15 @@ GET_VIDEO_CAPABILITIES = ToolDeclaration(
 GET_PROMPT_PREVIEW = ToolDeclaration(
     name="get_prompt_preview",
     description=(
-        "Read the final prompt text that a storyboard entry will send to the image / video model. It uses the same rendering exit as execution and exactly matches the prompt actually sent during generation. If either side’s prompt is pending or empty, that side contains a stable unavailable reason code instead of text. Read-only: no provider request or charges. Returns project_migration_failed if project-data upgrade failed."
+        "Read the final prompt text that a script entry would send to the image / video model if generated now, routed by the entry's generation route. "
+        "Storyboard entries (segment / scene / shot IDs) use the storyboard execution renderer; storyboard_image.references lists the images actually sent in 图N order with logical identity and content digest. "
+        "Reference-video units (unit_id such as E1U1) use the same request projector and unit renderer as the Web unit preview and execution: video holds the prompt, storyboard_image is prompt_preview_not_applicable, "
+        "and reference_video lists images in @图片N send order (type, name, base_name, is_derivative, sha256), audio in @音频N order bound to base-character speakers (with target_image_index for per-image backends), "
+        "unavailable_references, projection problems, provider/model and request duration. Markers @图片N / @音频N are functional prompt syntax and are returned verbatim. "
+        "If either side's prompt is pending, empty or blocked, that side contains a stable unavailable reason code instead of text. "
+        "preview_basis is always current_configuration: this is not the payload of a historical task. Pass task_id of a submitted video task for this entry to also receive captured_submission, the prompt and ordered media digests frozen in that task's execution checkpoint "
+        "(task_not_found / task_target_mismatch / captured_submission_unavailable when it cannot be read). "
+        "Read-only: no provider request, charges, task submission or file changes. Returns project_migration_failed if project-data upgrade failed."
     ),
     request_model=PromptPreviewRequest,
     migration=READ_CHECK,

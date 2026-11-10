@@ -8,29 +8,39 @@ references using the same backend limit and render matching ``图N`` numbering. 
 runtime results so users know before generation that some references will not be sent. Video previews resolve content mode
 and voice bindings using execution rules.
 
-Read-only: no provider requests, costs or manifest writes. Reference-video unit bodies are the prompt’s main content;
-their previews use ``lib.script.reference_video.script_preview``, outside this module."""
+Read-only: no provider requests, costs or manifest writes. Reference-video units are rendered by
+``server.services.admission.reference_prompt_preview``; :func:`preview_entry_prompts` routes an entry to its route's
+preview."""
 
 from __future__ import annotations
 
 import asyncio
 import logging
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
 from lib.artifacts.artifact_input_claims import resolve_usable_episode_script_input
 from lib.artifacts.generation_input import (
+    AssembledReference,
     StoryboardImageInput,
     project_input_observation,
     storyboard_image_input,
 )
+from lib.config.resolver import ConfigResolver
 from lib.infra.async_thread import run_sync_transaction
 from lib.project.project_manager import ProjectManager, get_project_manager
 from lib.prompts.prompt_utils import render_storyboard_video_prompt
 from lib.script.script_models import resolve_content_mode
 from lib.script.storyboard_sequence import find_storyboard_item, get_storyboard_items
 from server.services.admission.reference_admission import input_refusal_error
+from server.services.admission.reference_prompt_preview import (
+    PREVIEW_BASIS_CURRENT,
+    ReferenceUnitNotFound,
+    ReferenceVideoRequestPreview,
+    preview_reference_unit,
+)
 from server.services.admission.video_batch_admission import resolve_voice_context
 from server.services.tasks.generation_context import ImageLaneRequest, resolve_generation_context
 
@@ -42,6 +52,8 @@ UNAVAILABLE_PENDING = "prompt_preview_pending"
 UNAVAILABLE_MISSING = "prompt_preview_missing"
 #: Unavailability for present malformed prompts rejected by rendering.
 UNAVAILABLE_INVALID = "prompt_preview_invalid"
+#: The side does not exist on this route (reference-video units have no storyboard image).
+UNAVAILABLE_NOT_APPLICABLE = "prompt_preview_not_applicable"
 
 
 class ScriptItemNotFound(LookupError):
@@ -61,6 +73,9 @@ class RenderedPrompt:
     unavailable_params: dict[str, object] = field(default_factory=dict)
     is_text_form: bool = False
     warnings: tuple[dict[str, Any], ...] = ()
+    #: Reference images actually sent with this side, in request order (``图N`` numbering); only filled where the
+    #: shared generation input exposes them (storyboard images). Each entry carries logical identity and digest.
+    references: tuple[dict[str, Any], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -69,6 +84,14 @@ class ItemPromptPreview:
     content_mode: str
     storyboard_image: RenderedPrompt
     video: RenderedPrompt
+    #: Project generation route that owns the entry: ``storyboard`` or ``reference_video``.
+    generation_mode: str = "storyboard"
+    #: Always ``current_configuration``: rendered from current files and configuration, never a historical task payload.
+    preview_basis: str = PREVIEW_BASIS_CURRENT
+    #: Reference-video request projection (images/audio in send order, bindings, unavailable inputs); ``None`` for storyboards.
+    reference_video: ReferenceVideoRequestPreview | None = None
+    #: Inputs captured by a submitted task's execution checkpoint, only when a ``task_id`` was requested.
+    captured_submission: dict[str, Any] | None = None
 
 
 def _unavailable_before_rendering(prompt: object) -> str | None:
@@ -114,6 +137,22 @@ async def reference_image_limit(
         logger.info("预览无法解析 image lane，参考图不按后端上限裁剪：%s", exc)
         return None, ""
     return ctx.image.max_reference_images, ctx.image.backend_model
+
+
+def _sent_references(references: Sequence[AssembledReference]) -> tuple[dict[str, Any], ...]:
+    """Machine-readable identity of the images actually sent, from the shared generation input (never inferred from text)."""
+    return tuple(
+        {
+            "index": index,
+            "role": reference.visual.role,
+            "logical_type": reference.visual.logical_type,
+            "logical_id": reference.visual.logical_id,
+            "kind": reference.visual.kind,
+            "artifact_path": reference.artifact_path,
+            "content_digest": reference.visual.content_digest,
+        }
+        for index, reference in enumerate(references, start=1)
+    )
 
 
 async def preview_item_prompts(
@@ -202,6 +241,7 @@ async def preview_item_prompts(
                     text=rendered.prompt,
                     is_text_form=is_text_form,
                     warnings=rendered.warnings,
+                    references=_sent_references(generation_input.references[: rendered.sent_count]),
                 )
         video = _render(
             item.get("video_prompt"),
@@ -222,12 +262,65 @@ async def preview_item_prompts(
     return await asyncio.to_thread(_render_both)
 
 
+async def preview_entry_prompts(
+    project_name: str,
+    script_file: str,
+    item_id: str,
+    *,
+    projects: ProjectManager,
+    resolver: ConfigResolver | None = None,
+) -> ItemPromptPreview:
+    """Route one script entry to its generation route's native preview (Agent/MCP entry).
+
+    ``video_units`` entries use the reference-video request projector and renderer shared with the Web unit preview and
+    execution; every other entry uses :func:`preview_item_prompts`. Read-only on both routes."""
+
+    def _is_reference_unit() -> bool:
+        script = projects.load_script(project_name, script_file)
+        units = script.get("video_units")
+        return isinstance(units, list) and any(
+            isinstance(unit, dict) and unit.get("unit_id") == item_id for unit in units
+        )
+
+    if not await run_sync_transaction(_is_reference_unit):
+        return await preview_item_prompts(project_name, script_file, item_id, projects=projects)
+
+    def _content_mode() -> str:
+        return resolve_content_mode(
+            projects.load_script(project_name, script_file), projects.load_project(project_name)
+        )
+
+    try:
+        unit_preview = await preview_reference_unit(
+            project_name, script_file, item_id, projects=projects, resolver=resolver
+        )
+    except ReferenceUnitNotFound as exc:
+        raise ScriptItemNotFound(item_id) from exc
+    content_mode = await run_sync_transaction(_content_mode)
+    return ItemPromptPreview(
+        item_id=item_id,
+        content_mode=content_mode,
+        storyboard_image=RenderedPrompt(unavailable=UNAVAILABLE_NOT_APPLICABLE, is_text_form=True),
+        video=RenderedPrompt(
+            text=unit_preview.text,
+            unavailable=unit_preview.unavailable,
+            unavailable_params=unit_preview.unavailable_params,
+            is_text_form=True,
+            warnings=unit_preview.warnings,
+        ),
+        generation_mode="reference_video",
+        reference_video=unit_preview.request,
+    )
+
+
 __all__ = [
     "UNAVAILABLE_INVALID",
     "UNAVAILABLE_MISSING",
+    "UNAVAILABLE_NOT_APPLICABLE",
     "UNAVAILABLE_PENDING",
     "ItemPromptPreview",
     "RenderedPrompt",
     "ScriptItemNotFound",
+    "preview_entry_prompts",
     "preview_item_prompts",
 ]

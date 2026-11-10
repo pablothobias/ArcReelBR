@@ -13,6 +13,8 @@ type JianyingDraftErrorCode = Literal[
     "jianying_draft_acceptance_failed",
     "jianying_draft_not_exported",
     "jianying_draft_invalid",
+    # MCP package preparation only (server/services/media_transport/jianying_packages.py); never raised on Web routes.
+    "jianying_draft_version_changed",
 ]
 
 

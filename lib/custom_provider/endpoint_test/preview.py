@@ -14,8 +14,10 @@ from typing import Any
 from urllib.parse import quote
 
 from arcreel_market_core.endpoint_definition import (
+    AssetData,
     RenderedRequest,
     TemplateRenderError,
+    asset_container_mime,
     build_context,
     definition_media_type,
     render_request,
@@ -167,12 +169,17 @@ def asset_summaries(
     for name, declaration in declarations.items():
         source = declaration["source"]
         encoding = declaration["encoding"]
+        container_mime = declaration.get("container_mime")
         if ASSET_SOURCES.get(source, False):
             items = assets.items(source) if assets else []
             if items:
-                summaries[name] = [_summary(encoding, item.mime_type, len(item.content)) for item in items]
+                summaries[name] = [
+                    _summary(encoding, _sent_mime(item, container_mime, name), len(item.content)) for item in items
+                ]
             else:
-                summaries[name] = [_placeholder_summary(encoding, source)] if placeholder_missing else None
+                summaries[name] = (
+                    [_placeholder_summary(encoding, source, container_mime)] if placeholder_missing else None
+                )
             continue
         raw = assets.single(source) if assets else None
         if raw is not None:
@@ -242,8 +249,26 @@ def _summary(encoding: str, mime_type: str, size: int) -> str:
     return f"<{_encoding_label(encoding, mime_type)}, {size} bytes>"
 
 
-def _placeholder_summary(encoding: str, source: str) -> str:
-    return f"<{_encoding_label(encoding, _PLACEHOLDER_MIME_TYPES[source])}, {source} not uploaded>"
+def _sent_mime(item: AssetData, container_mime: object, input_name: str) -> str:
+    """The MIME submission would send: byte-identified for ``container_mime`` inputs, so preview never diverges.
+
+    Unrecognized, corrupt, or misnamed files fail here exactly as they would before submission.
+    """
+    if not isinstance(container_mime, Mapping) or not container_mime:
+        return item.mime_type
+    try:
+        return asset_container_mime(item, container_mime, input_name)
+    except TemplateRenderError as exc:
+        raise EndpointTestDefinitionError.from_render_failure(f"inputs.{input_name}", exc) from exc
+
+
+def _placeholder_summary(encoding: str, source: str, container_mime: object = None) -> str:
+    mime = (
+        " | ".join(container_mime.values())
+        if isinstance(container_mime, Mapping) and container_mime
+        else _PLACEHOLDER_MIME_TYPES[source]
+    )
+    return f"<{_encoding_label(encoding, mime)}, {source} not uploaded>"
 
 
 def _encoding_label(encoding: str, mime_type: str) -> str:

@@ -52,6 +52,7 @@ class DefinitionErrorCode(StrEnum):
     AUTH_HEADER_CONFLICT = "auth_header_conflict"
     HEADER_NAME_DUPLICATE = "header_name_duplicate"
     AUTH_QUERY_CONFLICT = "auth_query_conflict"
+    URL_AUTHORITY_PLACEHOLDER = "url_authority_placeholder"
     AUTH_QUERY_RESERVED = "auth_query_reserved"
     TASK_ID_OUT_OF_SCOPE = "task_id_out_of_scope"
     RESULT_ID_OUT_OF_SCOPE = "result_id_out_of_scope"
@@ -66,6 +67,8 @@ class DefinitionErrorCode(StrEnum):
     EACH_ALIAS_RESERVED = "each_alias_reserved"
     WHEN_UNKNOWN_INPUT = "when_unknown_input"
     INPUT_NOT_REFERENCED = "input_not_referenced"
+    CONTAINER_MIME_SOURCE_NOT_AUDIO = "container_mime_source_not_audio"
+    ERROR_CODE_SETS_OVERLAP = "error_code_sets_overlap"
 
     # ---- Dictionaries and capabilities ----
     ENUM_MAP_VARIABLE_NOT_ALLOWED = "enum_map_variable_not_allowed"
@@ -104,6 +107,9 @@ class DefinitionErrorCode(StrEnum):
     TEMPLATE_TEXT_VARIABLE_NULL = "template_text_variable_null"
     EACH_VALUE_NOT_LIST = "each_value_not_list"
     EACH_KEY_DUPLICATE = "each_key_duplicate"
+    ASSET_CONTAINER_UNRECOGNIZED = "asset_container_unrecognized"
+    ASSET_CONTAINER_UNSUPPORTED = "asset_container_unsupported"
+    ASSET_CONTAINER_EXTENSION_MISMATCH = "asset_container_extension_mismatch"
 
     # ---- ComfyUI node bindings ----
     COMFYUI_BINDING_REQUIRED = "comfyui_binding_required"

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 from pathlib import Path
 
 import httpx
@@ -17,12 +18,18 @@ PNG_START = b"\x89PNG\r\n\x1a\nSTART"
 PNG_END = b"\x89PNG\r\n\x1a\nEND"
 PNG_REF1 = b"\x89PNG\r\n\x1a\nREF1"
 PNG_REF2 = b"\x89PNG\r\n\x1a\nREF2"
-WAV = b"RIFF\x00\x00\x00\x00WAVEA"
+# Minimal structurally valid PCM WAV (RIFF/WAVE, fmt and data chunks): H3 identifies the container from bytes.
+WAV = (
+    b"RIFF\x28\x00\x00\x00WAVE"
+    b"fmt \x10\x00\x00\x00\x01\x00\x01\x00\x40\x1f\x00\x00\x80\x3e\x00\x00\x02\x00\x10\x00"
+    b"data\x04\x00\x00\x00\x00\x00\x00\x00"
+)
 START_URI = "data:image/png;base64,iVBORw0KGgpTVEFSVA=="
 END_URI = "data:image/png;base64,iVBORw0KGgpFTkQ="
 REF1_URI = "data:image/png;base64,iVBORw0KGgpSRUYx"
 REF2_URI = "data:image/png;base64,iVBORw0KGgpSRUYy"
-AUDIO_URI = "data:audio/x-wav;base64,UklGRgAAAABXQVZFQQ=="
+# H3 declares container_mime: WAV bytes always go out as lowercase audio/wav, never the host-guessed audio/x-wav.
+AUDIO_URI = "data:audio/wav;base64," + base64.b64encode(WAV).decode("ascii")
 
 
 def _hailuo_body(*, model: str = "MiniMax-Hailuo-2.3", resolution: str = "768P", image: str | None = None) -> dict:

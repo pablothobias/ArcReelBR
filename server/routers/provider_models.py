@@ -73,14 +73,13 @@ from lib.db.repositories.custom_endpoint_repo import CustomEndpointRepository
 from lib.db.repositories.custom_provider_repo import CustomProviderRepository
 from server.i18n import Translator
 from server.routers.catalog import NewEntryBody, build_new_entry
-from server.routers.custom_providers import (
+from server.routers.custom_providers import discover_custom_provider_models, invalidate_provider_caches
+from server.services.configuration.custom_providers import (
     CUSTOM_MODEL_SETTING_FIELDS,
     EndpointRequestDescriptor,
     add_custom_model,
     cleanup_project_model_refs,
     custom_model_settings,
-    discover_custom_provider_models,
-    invalidate_provider_caches,
     remove_custom_model,
     rename_project_model_refs,
     update_custom_model,

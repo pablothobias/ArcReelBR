@@ -54,11 +54,12 @@ from .jsonpath_subset import JsonPathSubsetError, parse_json_path
 from .kinds import COMFYUI_KIND, DECLARATIVE_KIND
 from .media_type import definition_media_type
 from .template_engine import enum_map_key
+from .url_authority import url_authority_violation
 
 SCHEMA_PATH = Path(__file__).parent / "schema.json"
 
 #: Definition-format version itself; writes do not rewrite file ``schema_version``, and validators do not migrate definitions.
-CURRENT_SCHEMA_VERSION = "1.2.0"
+CURRENT_SCHEMA_VERSION = "1.3.0"
 
 #: Reserved variables always available to video request templates. ``width`` / ``height`` derive from ratio and resolution, not parameters.
 BASE_VARIABLES = frozenset(
@@ -384,6 +385,8 @@ class _SemanticChecker:
         scope = _Scope(section=section)
         url = request.get("url")
         self._scan_template(url, join_path(section, "url"), scope)
+        if isinstance(url, str) and (fragment := url_authority_violation(url)) is not None:
+            self._error(join_path(section, "url"), DefinitionErrorCode.URL_AUTHORITY_PLACEHOLDER, fragment=fragment)
         for name, template in (request.get("headers") or {}).items():
             self._scan_template(template, join_path(join_path(section, "headers"), name), scope)
         self._check_header_names(join_path(section, "headers"), request.get("headers") or {})
@@ -421,7 +424,18 @@ class _SemanticChecker:
                 for usage_key, usage_spec in spec.items():
                     self._check_extract_spec(usage_spec, join_path(join_path(base, "usage"), usage_key))
                 continue
+            if key == "error_code":
+                self._check_error_code_sets(spec, join_path(base, key))
             self._check_extract_spec(spec, join_path(base, key))
+
+    def _check_error_code_sets(self, spec: object, path: str) -> None:
+        """One provider code cannot both demand an input fix and a configuration fix."""
+        if not isinstance(spec, Mapping):
+            return
+        fix_input = {str(code) for code in spec.get("fix_input_codes") or ()}
+        configure = {str(code) for code in spec.get("configure_codes") or ()}
+        if overlap := sorted(fix_input & configure):
+            self._error(path, DefinitionErrorCode.ERROR_CODE_SETS_OVERLAP, codes=", ".join(overlap))
 
     def _check_extract_spec(self, spec: object, path: str) -> None:
         items = spec.get("paths", []) if isinstance(spec, dict) else spec
@@ -618,6 +632,13 @@ class _SemanticChecker:
             source = str(declaration.get("source"))
             if source not in self._rules.input_sources:
                 self.errors.append(self._media_type_mismatch(join_path(join_path("inputs", name), "source"), source))
+            # Byte-identified containers exist only for audio; on image sources every asset would fail at render time.
+            if "container_mime" in declaration and source != "reference_audio_files":
+                self._error(
+                    join_path(join_path("inputs", name), "container_mime"),
+                    DefinitionErrorCode.CONTAINER_MIME_SOURCE_NOT_AUDIO,
+                    source=source,
+                )
 
     def _check_artifact_extract(self) -> None:
         """The artifact section must contain at least one artifact-extraction key for this media type.

@@ -131,6 +131,9 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+#: Total source characters sent to overview generation; later files are not read once the budget is exhausted.
+OVERVIEW_SOURCE_MAX_CHARS = 50000
+
 PROJECT_SLUG_SANITIZER = re.compile(r"[^a-zA-Z0-9]+")
 
 # Generation mode: two required values, fixed at creation and immutable thereafter (enforced by PATCH model structure).
@@ -3878,8 +3881,13 @@ class ProjectManager:
         char_name: str,
         ref_path: str,
         content: bytes,
+        *,
+        precondition: Callable[[dict], None] | None = None,
     ) -> dict:
         """Atomically install reference-audio bytes and point the character at them.
+
+        ``precondition`` runs on the locked project snapshot before any change; raising aborts with nothing installed.
+        Callers use it to recheck the current binding (concurrent-revision protection) inside the same lock.
 
         Video currency selection hashes reference-audio bytes while holding the project lock.  Keeping every
         physical replacement in that same lock makes the project pointer and the bytes one coherent input snapshot.
@@ -3897,6 +3905,8 @@ class ProjectManager:
             key = resolve_asset_key(project.get("characters"), char_name)
             if key is None:
                 raise KeyError(f"角色 '{char_name}' 不存在")
+            if precondition is not None:
+                precondition(project)
             old_audio = project["characters"][key].get("reference_audio")
             stale_audio = resolve_stale_reference_audio(project_dir, refs_audio_dir, old_audio, target)
             self._set_character_reference_audio(project, char_name, ref_path)
@@ -4111,8 +4121,8 @@ class ProjectManager:
 
     # ==================== Project-overview generation ====================
 
-    def _read_source_files(self, project_name: str, max_chars: int = 50000) -> str:
-        r"""Read all UTF-8 text-file contents in the project's source directory.
+    def _overview_source_parts(self, project_name: str, max_chars: int) -> list[tuple[str, str, int]]:
+        r"""Source files feeding overview generation in read order: ``(filename, used_content, total_chars)``.
 
         Non-UTF-8 files raise SourceDecodeError. Uploads normalize to UTF-8 and startup migrations repaired
         historical projects; remaining non-UTF-8 means users copied files directly, bypassing APIs. Report
@@ -4123,9 +4133,9 @@ class ProjectManager:
         source_dir = project_dir / "source"
 
         if not source_dir.exists():
-            return ""
+            return []
 
-        contents = []
+        parts: list[tuple[str, str, int]] = []
         total_chars = 0
         for file_path in sorted(source_dir.glob("*")):
             if not (file_path.is_file() and file_path.suffix.lower() in SOURCE_TEXT_SUFFIXES):
@@ -4143,12 +4153,29 @@ class ProjectManager:
             remaining = max_chars - total_chars
             if remaining <= 0:
                 break
-            if len(content) > remaining:
+            full_length = len(content)
+            if full_length > remaining:
                 content = content[:remaining]
-            contents.append(f"--- {file_path.name} ---\n{content}")
+            parts.append((file_path.name, content, full_length))
             total_chars += len(content)
 
-        return "\n\n".join(contents)
+        return parts
+
+    def _read_source_files(self, project_name: str, max_chars: int = OVERVIEW_SOURCE_MAX_CHARS) -> str:
+        r"""Read all UTF-8 text-file contents in the project's source directory, truncated to ``max_chars`` in total."""
+        return "\n\n".join(
+            f"--- {name} ---\n{content}"
+            for name, content, _total in self._overview_source_parts(project_name, max_chars)
+        )
+
+    def describe_overview_sources(self, project_name: str) -> list[dict[str, Any]]:
+        r"""Read-only scope of the sources :meth:`generate_overview` sends: file, characters used, total, truncation.
+
+        Files after the character budget is exhausted are not read and do not appear."""
+        return [
+            {"filename": name, "chars_used": len(content), "total_chars": total, "truncated": len(content) < total}
+            for name, content, total in self._overview_source_parts(project_name, OVERVIEW_SOURCE_MAX_CHARS)
+        ]
 
     async def generate_overview(self, project_name: str) -> dict:
         r"""Generate a project overview asynchronously using the Gemini API.

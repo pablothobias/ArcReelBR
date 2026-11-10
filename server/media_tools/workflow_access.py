@@ -6,19 +6,26 @@ No production sequencing lives here: the native workflow remains the caller.
 from __future__ import annotations
 
 import asyncio
-from typing import Any, Literal
+from contextlib import suppress
+from pathlib import Path
+from typing import Any, Literal, Self
 
 from fastapi import HTTPException
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from lib.db.repositories.usage_repo import UsageRepository
 from lib.i18n import _
 from lib.infra.api_errors import ApiError
+from lib.infra.content_digest import sha256_file
 from server.media_tools.assets import GenerateAssetsRequest
 from server.routers.projects import ProjectSettingsRequest, UpdateProjectRequest, update_project_settings
 from server.services.admission.asset_sheet_batch import AssetSheetScope, load_asset_sheet_batch_plan
 from server.services.admission.cost_estimation import CostEstimationService, estimate_image_batch_cost
 from server.services.admission.storyboard_batch import load_storyboard_image_batch_plan
+from server.services.project.model_settings_validation import (
+    MODEL_SETTING_VALUE_UNSUPPORTED,
+    find_unsupported_model_setting,
+)
 from server.services.tasks.formal_image_commit import get_aspect_ratio
 from server.tool_runtime import (
     CallerContext,
@@ -47,6 +54,23 @@ async def configure_project(
 ) -> ToolOutcome[dict[str, Any]]:
     try:
         validated = ConfigureProjectRequest.model_validate(request.value.model_dump(exclude_unset=True))
+        if "model_settings" in validated.model_fields_set and (
+            unsupported := await find_unsupported_model_setting(
+                validated.model_settings,
+                services.capabilities,
+                stored=(await asyncio.to_thread(services.projects.load_project, scope.project_name)).get(
+                    "model_settings"
+                ),
+            )
+        ):
+            return ToolOutcome(
+                problem=ToolProblem(
+                    MODEL_SETTING_VALUE_UNSUPPORTED,
+                    unsupported.detail(),
+                    action="fix_input",
+                    params=unsupported.params(),
+                )
+            )
         settings = UpdateProjectRequest.model_validate(validated.model_dump(exclude_unset=True))
         value = await update_project_settings(
             scope.project_name, settings, _, manager=services.projects, source="worker"
@@ -242,19 +266,64 @@ class UploadReferenceRequest(BaseModel):
     filename: str = Field(
         min_length=1, max_length=255, description="Original filename with a supported reference extension"
     )
-    content_base64: str = Field(
+    content_base64: str | None = Field(
+        default=None,
         min_length=1,
         max_length=20 * 1024 * 1024,
-        description="Base64 file bytes supplied by the client, never a server filesystem path",
+        description=(
+            "Base64 file bytes supplied by the client, never a server filesystem path; give exactly one of "
+            "content_base64 or staged_upload_id"
+        ),
+    )
+    staged_upload_id: str | None = Field(
+        default=None,
+        min_length=1,
+        max_length=64,
+        description=(
+            "Complete staged upload from begin_media_upload/append_media_upload_chunk (remote MCP), staged with "
+            "purpose asset_image for image references or reference_audio for character audio; give exactly one of "
+            "content_base64 or staged_upload_id. The staging is discarded after a successful install"
+        ),
     )
     confirm_style_analysis: bool = Field(
         default=False, description="Style uploads invoke the configured text model; explicit authorization is required"
     )
 
+    @model_validator(mode="after")
+    def _exactly_one_source(self) -> Self:
+        if (self.content_base64 is None) == (self.staged_upload_id is None):
+            raise ValueError("give exactly one of content_base64 or staged_upload_id")
+        return self
+
+
+#: Staging purposes each reference kind installs; the staging's size ceiling matches the native install limit.
+_REFERENCE_STAGING_PURPOSES: dict[str, tuple[str, ...]] = {
+    "character_image": ("asset_image",),
+    "style_image": ("asset_image",),
+    "character_audio": ("reference_audio",),
+}
+
+
+def _installed_digest(project_dir: Path, relative: object) -> str | None:
+    """sha256 of the installed (normalized) bytes at a project-relative pointer, or ``None`` when unreadable."""
+    if not isinstance(relative, str) or not relative or "\\" in relative:
+        return None
+    parts = relative.split("/")
+    if any(part in {"", ".", ".."} or part.startswith(".") for part in parts):
+        return None
+    path = project_dir.joinpath(*parts)
+    if path.is_symlink() or not path.is_file():
+        return None
+    return sha256_file(path)
+
 
 async def upload_reference(
     request: ToolRequest[UploadReferenceRequest], scope: ProjectScope, caller: CallerContext, services: Services
 ) -> ToolOutcome[dict[str, Any]]:
+    """Install one reference through the native upload transaction; the result adds ``sha256`` of the installed bytes.
+
+    Image references are normalized on install, so ``sha256`` names the stored file (readable back through
+    ``describe_media``), not necessarily the bytes the client sent."""
     import base64
     import binascii
     from io import BytesIO
@@ -262,6 +331,7 @@ async def upload_reference(
     from fastapi import UploadFile
 
     from server.routers.files import upload_project_file, upload_project_style_image
+    from server.services.media_transport import MediaTransportError, discard_staged_upload, resolve_staged_upload
 
     value = request.value
     if "/" in value.filename or "\\" in value.filename or value.filename in {".", ".."}:
@@ -272,16 +342,30 @@ async def upload_reference(
         return ToolOutcome(
             problem=ToolProblem("confirmation_required", "Style analysis invokes the configured text model")
         )
-    try:
-        content = await asyncio.to_thread(base64.b64decode, value.content_base64, validate=True)
-    except (binascii.Error, ValueError):
-        return ToolOutcome(problem=ToolProblem("invalid_request", "Invalid base64 content"))
-    file = UploadFile(file=BytesIO(content), filename=value.filename, size=len(content))
+    staged = None
+    if value.staged_upload_id is not None:
+        try:
+            staged = await resolve_staged_upload(
+                services.projects,
+                scope.project_name,
+                value.staged_upload_id,
+                purposes=_REFERENCE_STAGING_PURPOSES[value.kind],
+            )
+        except MediaTransportError as exc:
+            return ToolOutcome(problem=ToolProblem(exc.code, exc.detail, params=exc.params or None))
+        file = UploadFile(file=staged.stream, filename=value.filename, size=staged.size_bytes)
+    else:
+        try:
+            content = await asyncio.to_thread(base64.b64decode, value.content_base64 or "", validate=True)
+        except (binascii.Error, ValueError):
+            return ToolOutcome(problem=ToolProblem("invalid_request", "Invalid base64 content"))
+        file = UploadFile(file=BytesIO(content), filename=value.filename, size=len(content))
     try:
         if value.kind == "style_image":
             result = await upload_project_style_image(
                 scope.project_name, _, file, manager=services.projects, change_source="worker"
             )
+            installed = result.get("style_image")
         else:
             result = await upload_project_file(
                 project_name=scope.project_name,
@@ -298,8 +382,15 @@ async def upload_reference(
                 manager=services.projects,
                 change_source="worker",
             )
-        return ToolOutcome(value=result)
+            installed = result.get("path")
     except (HTTPException, ApiError, ValueError) as exc:
         return ToolOutcome(problem=ToolProblem("reference_upload_failed", str(getattr(exc, "detail", exc))))
     finally:
         await file.close()
+    if value.staged_upload_id is not None:
+        with suppress(Exception):
+            # Installed; a failed discard only leaves the staging to the TTL sweep.
+            await discard_staged_upload(services.projects, scope.project_name, value.staged_upload_id)
+    project_dir = await asyncio.to_thread(services.projects.get_project_path, scope.project_name)
+    digest = await asyncio.to_thread(_installed_digest, project_dir, installed)
+    return ToolOutcome(value={**result, "sha256": digest})

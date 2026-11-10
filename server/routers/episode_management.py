@@ -9,7 +9,6 @@ from typing import Annotated, Any
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, ConfigDict, Field
 
-from lib.episode.episode_deletion import EpisodeDeletionResult, delete_episode, render_episode_deletion_text
 from lib.episode.episode_management import EpisodeManagementError, create_episode, move_episode
 from lib.episode.episode_source_commands import EpisodeSourceError
 from lib.episode.source_kinds import SourceKind
@@ -21,6 +20,7 @@ from lib.project.project_manager import ProjectManager, get_project_manager
 from server.dependencies import require_project_migration_ok
 from server.i18n import Translator
 from server.routers._episode_source_errors import episode_source_http_error
+from server.services.project.episode_operations import EpisodeOperationRefused, delete_episode_reviewed
 from server.services.tasks.episode_activity import episode_has_active_tasks as episode_tasks_active
 
 logger = logging.getLogger(__name__)
@@ -116,15 +116,24 @@ async def delete_episode_endpoint(name: str, episode: int, req: DeleteEpisodeReq
     First call without ``revision`` for ``status=confirmation_required`` and the server-written loss list ``impact.text``.
     After creator confirmation, resubmit with ``impact.revision``. If the list changed between calls, request confirmation again without deleting."""
 
-    if req.revision is not None and await episode_has_active_tasks(name, episode):
-        raise HTTPException(status_code=409, detail=_t("episode_manage_tasks_active"))
-
-    def _delete(manager: ProjectManager) -> dict[str, Any]:
-        outcome = delete_episode(manager, name, episode, revision=req.revision)
-        impact = outcome.impact.to_dict()
-        if isinstance(outcome, EpisodeDeletionResult):
-            return {"status": "deleted", "impact": impact}
-        text = render_episode_deletion_text(impact, manager.load_project(name), _t)
-        return {"status": "confirmation_required", "impact": {**impact, "text": text}}
-
-    return await _run(name, _t, _delete, episode=episode)
+    try:
+        with project_change_source("webui"):
+            return await delete_episode_reviewed(
+                get_project_manager(),
+                name,
+                episode,
+                revision=req.revision,
+                is_active=lambda episode_id: episode_has_active_tasks(name, episode_id),
+                translate=_t,
+            )
+    except EpisodeOperationRefused as exc:
+        raise HTTPException(status_code=409, detail=_t(exc.code)) from exc
+    except EpisodeManagementError as exc:
+        raise HTTPException(status_code=_STATUS.get(exc.code, 409), detail=_t(f"episode_manage_{exc.code}")) from exc
+    except EpisodeSourceError as exc:
+        raise episode_source_http_error(exc, _t, episode=episode) from exc
+    except (HTTPException, ApiError):
+        raise
+    except Exception as exc:
+        logger.exception("请求处理失败")
+        raise HTTPException(status_code=500, detail=_t("internal_server_error")) from exc

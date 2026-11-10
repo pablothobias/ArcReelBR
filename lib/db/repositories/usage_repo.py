@@ -818,6 +818,22 @@ class UsageRepository(BaseRepository):
         row = (await self.session.execute(self._scope_query(stmt, ApiCall))).first()
         return _record_detail_to_dict(row[0], row[1]) if row is not None else None
 
+    async def get_latest_record_for_task(self, project_name: str, task_id: str) -> dict[str, Any] | None:
+        """Most recent call detail recorded for one task in one project, including pending calls; ``None`` if absent.
+
+        Diagnostic readers need the in-flight call too (its last provider response), unlike financial lists that omit
+        pending task calls. Scoped like :meth:`get_record`, plus an explicit project match.
+        """
+        stmt = (
+            select(ApiCall, Task.task_type)
+            .outerjoin(Task, Task.task_id == ApiCall.task_id)
+            .where(ApiCall.task_id == task_id, ApiCall.project_name == project_name)
+            .order_by(ApiCall.started_at.desc(), ApiCall.id.desc())
+            .limit(1)
+        )
+        row = (await self.session.execute(self._scope_query(stmt, ApiCall))).first()
+        return _record_detail_to_dict(row[0], row[1]) if row is not None else None
+
     # --- Summary read API (GET /usage/summary) ------------------------------------------------
     # Read rows without SQL aggregation: lib/billing/usage_summary.py handles day boundaries and bucket filling, avoiding SQLite/PostgreSQL
     # date-function differences and allowing timezone/exception boundaries to be exercised independently of the database.

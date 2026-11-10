@@ -96,6 +96,24 @@ class ToolImage:
         return base64.b64encode(self.data).decode("ascii")
 
 
+#: Media type for every binary resource block: hosts that decode image-typed blobs as images or write other blobs to disk
+#: must treat these bytes as opaque; the real media type travels only in the structured result.
+OPAQUE_BLOB_MIME_TYPE = "application/octet-stream"
+
+
+@dataclass(frozen=True, slots=True)
+class ToolResource:
+    """A result binary resource, delivered on both hosts as an MCP embedded resource with blob contents, never as base64 inside text or structured JSON."""
+
+    uri: str
+    data: bytes
+    mime_type: str = OPAQUE_BLOB_MIME_TYPE
+
+    @property
+    def base64_data(self) -> str:
+        return base64.b64encode(self.data).decode("ascii")
+
+
 @dataclass(frozen=True, slots=True, kw_only=True)
 class ToolDeclaration[RequestT: BaseModel, ResultT]:
     """An Agent tool acting on an existing project.
@@ -105,7 +123,8 @@ class ToolDeclaration[RequestT: BaseModel, ResultT]:
     - ``summary``: human-readable summary; an empty result omits the summary block.
     - ``projection``: structured result, defaulting to ``{domain_key: JSON projection of the value}``.
     - ``is_error``: True when the value itself represents failure (such as an entirely blocked batch); defaults to False.
-    - ``images``: images delivered to the Agent after text blocks; none by default."""
+    - ``images``: images delivered to the Agent after text blocks; none by default.
+    - ``resources``: binary embedded resources delivered after images; none by default."""
 
     name: str
     description: str
@@ -118,6 +137,7 @@ class ToolDeclaration[RequestT: BaseModel, ResultT]:
     projection: Callable[[ResultT], dict[str, Any]] | None = None
     is_error: Callable[[ResultT], bool] | None = None
     images: Callable[[ResultT], Sequence[ToolImage]] | None = None
+    resources: Callable[[ResultT], Sequence[ToolResource]] | None = None
 
     @property
     def input_schema(self) -> dict[str, Any]:
@@ -213,6 +233,7 @@ async def invoke_unscoped_declaration(
 __all__ = [
     "BLOCKED",
     "MIGRATION_REFUSAL_NOTE",
+    "OPAQUE_BLOB_MIME_TYPE",
     "READ_CHECK",
     "TEXT_OUTPUT_TRUNCATED_NOTE",
     "AgentToolDeclaration",
@@ -223,6 +244,7 @@ __all__ = [
     "ScopedHandler",
     "ToolDeclaration",
     "ToolImage",
+    "ToolResource",
     "UnscopedHandler",
     "UnscopedToolDeclaration",
     "invalid_request_problem",

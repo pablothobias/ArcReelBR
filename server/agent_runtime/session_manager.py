@@ -56,6 +56,7 @@ from server.agent_runtime.sdk_frames import CommandLifecycle
 from server.agent_runtime.session_actor import SessionActor, SessionCommand
 from server.agent_runtime.session_store import SessionMetaStore
 from server.agent_runtime.usage_extraction import ModelTurnUsage, TurnUsageMeter
+from server.services.tasks.artifact_download_retry import ArtifactDownloadWorker
 from server.sse_channel import IDLE, EvictNonCriticalAndSignal, SseChannel
 
 logger = logging.getLogger(__name__)
@@ -627,6 +628,7 @@ class SessionManager:
         # Notification when autonomous CLI turns return sessions to running (project name, session ID);
         # see _persist_cli_resumed.
         self._autonomous_turn_listener: Callable[[str, str], None] | None = None
+        self._artifact_download_worker: ArtifactDownloadWorker | None = None
         # Evicting session → completion event; reconnect cold only after eviction, without interleaving.
         self._disconnecting: dict[str, asyncio.Event] = {}
         # Graceful send_disconnect timeout; callers then use unbounded cancel fallback.
@@ -668,6 +670,7 @@ class SessionManager:
             resolve_project_cwd=self._resolve_project_cwd,
             session_factory_provider=lambda: getattr(self, "_session_factory", None),
             user_id_provider=lambda: getattr(self, "_user_id", DEFAULT_USER_ID),
+            artifact_download_worker_provider=lambda: getattr(self, "_artifact_download_worker", None),
         )
 
     def configure_sandbox_runtime(self, *, in_docker: bool, sandbox_enabled: bool) -> None:
@@ -1760,6 +1763,10 @@ class SessionManager:
                 "reported_auto_memory_dir": str(reported),
             },
         )
+
+    def set_artifact_download_worker(self, worker: ArtifactDownloadWorker | None) -> None:
+        """Register the running generation worker so later sessions' ArcReel tools can resume artifact retrieval."""
+        self._artifact_download_worker = worker
 
     def set_autonomous_turn_listener(self, listener: Callable[[str, str], None] | None) -> None:
         """Register notifications when autonomous CLI turns return sessions to running (project name, session ID)."""

@@ -219,6 +219,19 @@ describe("describeTaskFailure", () => {
     );
   });
 
+  it("appends the provider's own code and message for a provider-reported job failure", () => {
+    const text = describeFailure(
+      t,
+      makeTask({
+        task_type: "storyboard",
+        resource_id: "E1S01",
+        error_code: "provider_job_rejected",
+        error_params: { provider_error_code: "2013", provider_error_message: "invalid params", stage: "poll" },
+      }),
+    );
+    expect(text).toBe("storyboard_task_failed|未命名集 · 2|boomtask_failed_provider_reason_suffix||2013: invalid params");
+  });
+
   it("renders the provider reason after the per-type text with the real i18n bundle", async () => {
     await i18n.loadNamespaces("dashboard");
     const realT = i18n.getFixedT("zh", "dashboard");

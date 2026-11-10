@@ -351,6 +351,12 @@ MESSAGES = {
     "val_ce_enum_map_value_missing": "enum_maps.{name} không có ánh xạ cho '{value}'",
     "val_ce_template_text_variable_null": "Biến {name} rỗng nên không thể chèn vào văn bản",
     "val_ce_each_value_not_list": "$each.in trỏ tới {name}, có giá trị khi chạy không phải danh sách",
+    "val_ce_asset_container_unrecognized": "Đầu vào {input}: tệp {asset} không phải vùng chứa âm thanh nhận dạng được hoặc còn nguyên vẹn (hỗ trợ: {supported})",
+    "val_ce_asset_container_unsupported": "Đầu vào {input}: tệp {asset} là âm thanh {detected}, endpoint này không chấp nhận (hỗ trợ: {supported})",
+    "val_ce_asset_container_extension_mismatch": "Đầu vào {input}: tệp {asset} chứa âm thanh {detected} nhưng phần mở rộng ghi là {claimed}; hãy sửa tệp thay vì đổi tên",
+    "val_ce_container_mime_source_not_audio": "container_mime chỉ áp dụng cho đầu vào reference_audio_files, không áp dụng cho {source}",
+    "val_ce_error_code_sets_overlap": "Một mã lỗi của nhà cung cấp không thể nằm đồng thời trong fix_input_codes và configure_codes: {codes}",
+    "val_ce_url_authority_placeholder": "Máy chủ của URL phải được định nghĩa cố định, nhưng {fragment} cho phép giá trị được điền thay đổi nó: hãy bắt đầu URL bằng placeholder base_url theo sau là /, ? hoặc #, hoặc viết trực tiếp giao thức http(s) và máy chủ",
     "val_ce_each_key_duplicate": "$each dạng đối tượng tạo ra khóa {field} trùng với một khóa khác trong cùng đối tượng, nên yêu cầu không thể mang đủ mọi tư liệu",
     # ---- Điểm cuối ComfyUI: liên kết node và phân loại khi nhập ----
     "val_ce_comfyui_binding_required": (

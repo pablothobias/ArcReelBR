@@ -100,14 +100,14 @@ ID parameters, pass the former and **omit the parameter** for the latter; never 
 
 | `next_action.type` | Execution entry point |
 |---|---|
-| `collect_project_input` | Guide Web input completion (upload whole source; for ads, enter creative brief or register products) |
-| `create_episode` | Guide the user to create an episode in Web |
+| `collect_project_input` | Guide Web input completion (upload whole source; for ads, enter creative brief or register products). When the user provides the source file or text, it can also be supplied with `mcp__arcreel__upload_source`; products can be registered with `mcp__arcreel__patch_project` and their photos added with `mcp__arcreel__upload_product_reference_images` |
+| `create_episode` | Guide the user to create an episode in Web; when the user asks for a new episode, `mcp__arcreel__create_episode` creates it |
 | `draft_selling_points` | Draft on user request and write through `mcp__arcreel__patch_project` (ad) |
 | `reset_episode_planning` | `mcp__arcreel__reset_episode_planning`, forwarding `next_action.args` unchanged (no `episode_id` means full reset) |
 | `plan_episodes` | `mcp__arcreel__plan_episodes` |
 | `resolve_draft` | Target episode has a draft (`args.draft_kind`): true `args.needs_repair` means a repair draft from a failed write; explain and rerun the corresponding operation. False means an Agent-editable draft; finish through its skill |
 | `prepare_script_plan` | Dispatch the subagent named by `next_action.args.preprocessor` |
-| `start_blank_script` | Guide the user to “Start from blank” on the Web episode page and handwrite formal script entries on the timeline |
+| `start_blank_script` | Only after the user chooses manual authoring: `mcp__arcreel__start_blank_script` with `next_action.args.episode_id` (same transaction as the Web “Start from blank”; unconfirmed planning moves to trash), then the user handwrites formal script entries on the timeline or asks for them through `mcp__arcreel__patch_episode_script` |
 | `provide_episode_source` | Guide the user to supply episode source (`source/episode_{集 ID}.txt`), enabling AI script planning |
 | `confirm_script_plan` | `mcp__arcreel__confirm_script_review` |
 | `generate_script` | Dispatch `create-episode-script` (for ads call `mcp__arcreel__generate_episode_script` directly) |
@@ -143,7 +143,7 @@ with the complete admission conclusion in `next_action.args.admission`. Thus act
 | `configure_provider` | Current provider or tier does not support the request: identify the setting to change; **retrying the same request yields the same rejection** |
 | `repair_artifact_state` | Unreadable artifact state: report as a separate gap, never treat as missing and regenerate |
 | `retry` | Safe to resend the same request |
-| `retry_artifact_download` | Provider generated the artifact but retrieval failed: use `POST /tasks/{id}/retry-download` to resume retrieval; **never resubmit generation**, which creates another paid task |
+| `retry_artifact_download` | Provider generated the artifact but retrieval failed: `mcp__arcreel__retry_artifact_download` with the failed task's `task_id` resumes retrieval of the same task (no new task or charge); **never resubmit generation**, which creates another paid task |
 
 For `retry` and `configure_provider`, explain the reason before enqueueing a new batch;
 obtain explicit user consent for any action incurring new charges.

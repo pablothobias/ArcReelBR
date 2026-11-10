@@ -35,7 +35,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 # whose parser returns starlette.datastructures.UploadFile; checking the subclass would miss every file.
 from starlette.datastructures import FormData, UploadFile
 
-from arcreel_market_core.endpoint_definition import AssetData, DefinitionDiagnostics, validate_definition
+from arcreel_market_core.endpoint_definition import AssetData
 from lib.backends.backend_assembly.specs import builtin_declarative_video_diagnostics
 from lib.catalog import query as catalog
 from lib.config.registry import PROVIDER_REGISTRY, ProviderMeta
@@ -50,7 +50,6 @@ from lib.custom_provider.endpoint_test import (
     EndpointTestDefinitionError,
     EndpointTestMode,
     EndpointTestParameters,
-    KindTestSupport,
     TrialRun,
     TrialRunBusyError,
     TrialRunManager,
@@ -60,8 +59,6 @@ from lib.custom_provider.endpoint_test import (
     model_ref_target,
     parse_response_body,
     stage_report_payload,
-    support_for_kind,
-    supports_test_mode,
     trial_run_manager,
 )
 from lib.custom_provider.path_overrides import NO_PATH_OVERRIDES, PathOverrides, effective_path_overrides
@@ -72,9 +69,15 @@ from lib.db.repositories.custom_provider_repo import CustomProviderRepository
 from lib.generation.generation_result import problem_from_task_failure
 from lib.generation.task_failure import encode_failure, parse_failure, render_failure
 from lib.i18n.display_names import DisplayNames
-from lib.infra.api_errors import BadRequestError, ConflictError, NotFoundError, UnprocessableError
+from lib.infra.api_errors import BadRequestError, ConflictError, NotFoundError
 from lib.infra.async_thread import run_sync_transaction
 from server.i18n import DisplayNamesCatalog, Translator
+from server.services.configuration.endpoint_preview import (
+    accepted_test_definition,
+    invalid_definition,
+    kind_support,
+    preview_definition_request,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -270,29 +273,6 @@ async def _read_upload(upload: UploadFile) -> AssetData:
     return AssetData(upload.content_type or "application/octet-stream", content)
 
 
-def _accepted_definition(definition: object, _t: Translator, *, mode: EndpointTestMode) -> dict[str, Any]:
-    """Run shared validation, then check whether definition ``kind`` supports this mode.
-
-    Validation shares saving's decisions/codes, with no additional definition threshold here. An unsupported
-    mode for a kind is not an invalid definition; reject separately with 400, outside definition diagnostics."""
-    diagnostics = validate_definition(definition)
-    if diagnostics.errors or not isinstance(definition, dict):
-        raise _invalid(diagnostics, _t)
-    kind = str(definition["kind"])
-    if not supports_test_mode(kind, mode):
-        raise BadRequestError("endpoint_test_mode_unsupported_for_kind", kind=kind)
-    return definition
-
-
-def _support(definition: Mapping[str, Any]) -> KindTestSupport:
-    """Endpoint-test implementation for this definition kind, already admitted by :func:`_accepted_definition` mode checks."""
-    return support_for_kind(str(definition["kind"]))
-
-
-def _invalid(diagnostics: DefinitionDiagnostics, _t: Translator) -> UnprocessableError:
-    return UnprocessableError("custom_endpoint_definition_invalid").with_diagnostic(diagnostics.to_payload(_t))
-
-
 async def _resolve_credentials(
     body_credentials: TestCredentialsInput | None,
     session: AsyncSession,
@@ -371,16 +351,16 @@ async def preview_endpoint_request(
 ) -> PreviewResponse:
     """Render the outgoing request without sending it. Mask credentials, replace assets with size summaries, and retain placeholders for postsubmission IDs."""
     body, assets = await _parse_body(request, PreviewRequestInput)
-    definition = _accepted_definition(body.definition, _t, mode=EndpointTestMode.PREVIEW_REQUEST)
-    support = _support(definition)
+    definition = accepted_test_definition(body.definition, _t, mode=EndpointTestMode.PREVIEW_REQUEST)
+    support = kind_support(definition)
     require_base_url, require_api_key = support.credential_needs(definition)
     credentials = await _resolve_credentials(
         body.credentials, session, require_base_url=require_base_url, require_api_key=require_api_key
     )
     try:
-        preview = support.preview(definition, body.parameters.to_parameters(), credentials=credentials, assets=assets)
-    except EndpointTestDefinitionError as exc:
-        raise _invalid(exc.diagnostics, _t) from exc
+        preview = preview_definition_request(
+            definition, body.parameters.to_parameters(), _t, credentials=credentials, assets=assets
+        )
     except ComfyuiError as exc:
         # Construction-time ComfyUI failures (e.g. fewer references than cells, graph cascades reaching output nodes) mean this definition
         # cannot render with these parameters, not an invalid definition. Use existing trilingual failure-code wording rather than separate prose.
@@ -401,11 +381,11 @@ async def check_endpoint_response(
     _t: Translator,
 ) -> dict[str, Any]:
     """Validate extraction paths and status mappings against a real provider response, without sending requests. Zero cost."""
-    definition = _accepted_definition(body.definition, _t, mode=EndpointTestMode.CHECK_RESPONSE)
+    definition = accepted_test_definition(body.definition, _t, mode=EndpointTestMode.CHECK_RESPONSE)
     try:
         report = check_response(definition, body.stage, parse_response_body(body.response_body))
     except EndpointTestDefinitionError as exc:
-        raise _invalid(exc.diagnostics, _t) from exc
+        raise invalid_definition(exc.diagnostics, _t) from exc
     return stage_report_payload(report)
 
 
@@ -440,8 +420,8 @@ async def start_trial_run(
         parameters = replace(parameters, model=body.model_ref.model_id)
     elif body.definition is not None:
         path_overrides = NO_PATH_OVERRIDES
-        definition = _accepted_definition(body.definition, _t, mode=EndpointTestMode.TRIAL_RUN)
-        support = _support(definition)
+        definition = accepted_test_definition(body.definition, _t, mode=EndpointTestMode.TRIAL_RUN)
+        support = kind_support(definition)
         require_base_url, require_api_key = support.credential_needs(definition)
         credentials = await _required_credentials(
             body.credentials, session, require_base_url=require_base_url, require_api_key=require_api_key
@@ -580,7 +560,7 @@ async def _model_ref_target(
         diagnostics = builtin_declarative_video_diagnostics(model_ref.provider_id, model_ref.model_id, config)
         if diagnostics is not None:
             builtin_definition, base_url, api_key = diagnostics
-            definition = _accepted_definition(dict(builtin_definition), _t, mode=EndpointTestMode.TRIAL_RUN)
+            definition = accepted_test_definition(dict(builtin_definition), _t, mode=EndpointTestMode.TRIAL_RUN)
             credentials = EndpointTestCredentials(base_url=base_url, api_key=api_key)
         target = model_ref_target(model_ref.provider_id, model_ref.model_id, resolver=resolver, definition=definition)
         return target, credentials, definition, NO_PATH_OVERRIDES
@@ -600,7 +580,7 @@ async def _model_ref_target(
     # an untranslatable Chinese sentence in a detached background task, copied verbatim to result error; without api_key,
     # requests send empty auth headers and pay for calls certain to be rejected.
     if endpoint_spec.definition is not None:
-        require_base_url, require_api_key = _support(endpoint_spec.definition).credential_needs(
+        require_base_url, require_api_key = kind_support(endpoint_spec.definition).credential_needs(
             endpoint_spec.definition
         )
         if require_base_url and not provider.base_url:
@@ -611,7 +591,7 @@ async def _model_ref_target(
     if endpoint_spec.definition is not None:
         # Built-in declarative endpoints (newapi-video / v2 / minimax families) have definitions like ce-*:
         # use the same rendered-request/per-stage-extraction/presubmission gate path, preserving diagnostics for bundled definitions too.
-        definition = _accepted_definition(dict(endpoint_spec.definition), _t, mode=EndpointTestMode.TRIAL_RUN)
+        definition = accepted_test_definition(dict(endpoint_spec.definition), _t, mode=EndpointTestMode.TRIAL_RUN)
     credentials = EndpointTestCredentials(base_url=provider.base_url, api_key=provider.api_key)
     target = model_ref_target(
         model_ref.provider_id,
@@ -639,7 +619,7 @@ def _preview_payload(
     without this section (ComfyUI; see ``KindTestSupport``)."""
     if definition is None or credentials is None:
         return None
-    support = _support(definition)
+    support = kind_support(definition)
     if not support.trial_run_request_preview:
         return None
     try:
@@ -652,7 +632,7 @@ def _preview_payload(
             path_overrides=path_overrides,
         )
     except EndpointTestDefinitionError as exc:
-        raise _invalid(exc.diagnostics, _t) from exc
+        raise invalid_definition(exc.diagnostics, _t) from exc
     return {
         "method": preview.submit.method,
         "url": preview.submit.url,

@@ -23,25 +23,19 @@ from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from arcreel_market_core.endpoint_definition import (
-    DefinitionDiagnostics,
     SchemaVersionLevel,
-    VersionRelation,
     current_schema_version,
     meets_min_app_version,
     parse_semver,
     schema_version_level,
-    validate_definition,
-    version_relation,
 )
-from lib.custom_provider import make_endpoint_key, make_provider_id
-from lib.custom_provider.comfyui.import_shapes import ImportShape, route_import_payload, ui_workflow_refusal
-from lib.custom_provider.discovery_formats import endpoint_attachment_holds
-from lib.custom_provider.endpoint_resolution import derive_mirror_columns
+from lib.custom_provider import make_endpoint_key
+from lib.custom_provider.comfyui.import_shapes import ImportShape
 from lib.db import get_async_session
 from lib.db.base import dt_to_iso
 from lib.db.models.custom_endpoint import CustomEndpoint
-from lib.db.repositories.custom_endpoint_repo import CustomEndpointRepository, EndpointReference
-from lib.infra.api_errors import ConflictError, NotFoundError, UnprocessableError
+from lib.db.repositories.custom_endpoint_repo import CustomEndpointRepository
+from lib.infra.api_errors import NotFoundError
 from server.i18n import Translator
 from server.routers import comfyui_inference, endpoint_tests
 from server.routers._market_installations import (
@@ -50,6 +44,18 @@ from server.routers._market_installations import (
     endpoint_installations,
 )
 from server.routers.system_config import get_app_version_reader
+from server.services.configuration.endpoint_definitions import (
+    DuplicateDescriptor,
+    accepted,
+    accepted_definition,
+    create_custom_endpoint,
+    delete_custom_endpoint,
+    duplicates_of,
+    hints_of,
+    replace_custom_endpoint,
+    routed_import,
+    schema_version_of,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -93,17 +99,6 @@ class CustomEndpointListResponse(BaseModel):
     endpoints: list[CustomEndpointResponse]
 
 
-class DuplicateDescriptor(BaseModel):
-    """Existing endpoint matching the import definition's author/name (``meta.author`` + ``meta.name``)."""
-
-    id: int
-    key: str
-    display_name: str
-    version: str
-    # Existing definition age relative to the import file.
-    relation: VersionRelation
-
-
 class SchemaVersionInfo(BaseModel):
     """File/current-version comparison. ``level`` is only a hint; the schema validator remains the gate."""
 
@@ -135,15 +130,6 @@ class ValidateResponse(BaseModel):
     wrapped_definition: dict[str, Any] | None = None
 
 
-class EndpointReferenceDescriptor(BaseModel):
-    """Model row referencing the endpoint. Return with deletion-denied 409 responses to show users where to detach it."""
-
-    provider_id: int
-    provider_display_name: str
-    model_id: str
-    model_display_name: str
-
-
 # ---------------------------------------------------------------------------
 # Helpers.
 # ---------------------------------------------------------------------------
@@ -166,100 +152,6 @@ def endpoint_response(
     )
 
 
-def _routed_import(body: object, media_type: str) -> tuple[ImportShape, Any, DefinitionDiagnostics]:
-    """Route by payload shape, returning the definition to validate plus diagnostics.
-
-    UI-format workflows bypass the validator: they lack ``class_type``, so definition-schema validation
-    would flood the screen with field errors unrelated to choosing the wrong export menu item.
-    One structured refusal instead explains the next action."""
-    shape, definition = route_import_payload(body, media_type=media_type)
-    if shape is ImportShape.COMFYUI_UI_WORKFLOW:
-        return shape, definition, ui_workflow_refusal()
-    return shape, definition, validate_definition(definition)
-
-
-def _accepted(definition: object, diagnostics: DefinitionDiagnostics, _t: Translator) -> dict[str, Any]:
-    """Errors yield 422 + structured diagnostics; only accepted definitions may be persisted.
-
-    Saving and ``validate`` share :func:`validate_definition`, preventing divergent decisions. Eliminating
-    “validate accepts, saving rejects” is precisely why the validator is shared. Warnings do not block saving."""
-    if diagnostics.errors or not isinstance(definition, dict):
-        raise UnprocessableError("custom_endpoint_definition_invalid").with_diagnostic(diagnostics.to_payload(_t))
-    return definition
-
-
-def _accepted_definition(body: object, _t: Translator) -> dict[str, Any]:
-    """Full-replacement entry point: accept endpoint definitions only, without import routing.
-
-    Overwriting an existing endpoint with raw workflow would erase confirmed node bindings too; this must not happen silently."""
-    return _accepted(body, validate_definition(body), _t)
-
-
-def _lineage(definition: object) -> tuple[str | None, str | None, str | None]:
-    """Extract ``(author, name, version)`` from any input shape.
-
-    Database rows are validated, but request bodies may not yet be. Duplicate detection must still work
-    on erroneous definitions, or a single name typo would hide the fact that a copy was already imported."""
-    if not isinstance(definition, Mapping):
-        return None, None, None
-    meta = definition.get("meta")
-    if not isinstance(meta, Mapping):
-        return None, None, None
-    author, name, version = meta.get("author"), meta.get("name"), meta.get("version")
-    return (
-        author if isinstance(author, str) else None,
-        name if isinstance(name, str) else None,
-        version if isinstance(version, str) else None,
-    )
-
-
-async def _duplicates_of(
-    repo: CustomEndpointRepository, definition: object, exclude_id: int | None
-) -> list[DuplicateDescriptor]:
-    """Find existing endpoints by matching ``meta.author + meta.name``.
-
-    Match only these: keys are system-assigned and absent from shared files; display names are not unique.
-    Author/name is the only file information identifying the same definition across instances.
-    Versions explain relative age only and do not participate in matching."""
-    author, name, version = _lineage(definition)
-    if author is None or name is None:
-        return []
-    duplicates: list[DuplicateDescriptor] = []
-    for row in await repo.list_all():
-        if row.id == exclude_id:
-            continue
-        row_author, row_name, row_version = _lineage(row.definition)
-        if row_author != author or row_name != name:
-            continue
-        duplicates.append(
-            DuplicateDescriptor(
-                id=row.id,
-                key=make_endpoint_key(row.id),
-                display_name=row.display_name,
-                version=row_version or "",
-                relation=version_relation(row_version, version),
-            )
-        )
-    return duplicates
-
-
-def _hints_of(definition: object) -> dict[str, Any] | None:
-    if not isinstance(definition, Mapping):
-        return None
-    meta = definition.get("meta")
-    if not isinstance(meta, Mapping):
-        return None
-    hints = meta.get("hints")
-    return dict(hints) if isinstance(hints, Mapping) else None
-
-
-def _schema_version_of(definition: object) -> str | None:
-    if not isinstance(definition, Mapping):
-        return None
-    value = definition.get("schema_version")
-    return value if isinstance(value, str) else None
-
-
 def _min_app_version_of(definition: object, read_app_version: Callable[[], str]) -> MinAppVersionInfo | None:
     if not isinstance(definition, Mapping):
         return None
@@ -273,20 +165,6 @@ def _min_app_version_of(definition: object, read_app_version: Callable[[], str])
         logger.exception("Failed to read app version")
         return None
     return MinAppVersionInfo(required=required, current=current, satisfied=meets_min_app_version(required, current))
-
-
-def _reference_descriptors(references: list[EndpointReference]) -> list[dict[str, Any]]:
-    return [EndpointReferenceDescriptor(**ref._asdict()).model_dump() for ref in references]
-
-
-async def _invalidate_backend_cache() -> None:
-    """Apply in-place definition updates to new tasks immediately by clearing backend instances cached by provider/model.
-
-    Polling tasks retain construction-time specs; changes affect only new tasks. This accepted behavior
-    uses no in-flight version lock."""
-    from server.services.tasks.generation_context import invalidate_backend_cache
-
-    invalidate_backend_cache()
 
 
 # ---------------------------------------------------------------------------
@@ -305,20 +183,8 @@ async def create_endpoint(
 
     Bodies may also be raw ComfyUI API workflows; the server wraps them as ComfyUI endpoint definitions
     using ``media_type``. Wrapped node bindings are empty, so required prompt/output binding checks reject them."""
-    _, routed, diagnostics = _routed_import(body, media_type)
-    definition = _accepted(routed, diagnostics, _t)
-    mirror = derive_mirror_columns(definition)
-    repo = CustomEndpointRepository(session)
-    row = await repo.create(
-        definition=definition,
-        kind=mirror.kind,
-        schema_version=mirror.schema_version,
-        media_type=mirror.media_type,
-        display_name=mirror.display_name,
-    )
-    await session.commit()
-    await _invalidate_backend_cache()
-    await session.refresh(row)
+    _, routed, diagnostics = routed_import(body, media_type)
+    row = await create_custom_endpoint(session, accepted(routed, diagnostics, _t))
     return endpoint_response(row, await endpoint_installation(session, row.id))
 
 
@@ -343,15 +209,15 @@ async def validate_endpoint_definition(
 
     ``exclude_id`` excludes the edited endpoint itself; otherwise it always reports itself as a duplicate.
     For raw API workflow payloads, compute every returned item from the wrapped result, which the client then takes forward."""
-    shape, definition, diagnostics = _routed_import(body, media_type)
+    shape, definition, diagnostics = routed_import(body, media_type)
     payload = diagnostics.to_payload(_t)
-    file_version = _schema_version_of(definition)
+    file_version = schema_version_of(definition)
     current_version = current_schema_version(definition)
     return ValidateResponse(
         errors=payload["errors"],
         warnings=payload["warnings"],
-        duplicates=await _duplicates_of(CustomEndpointRepository(session), definition, exclude_id),
-        hints=_hints_of(definition),
+        duplicates=await duplicates_of(CustomEndpointRepository(session), definition, exclude_id),
+        hints=hints_of(definition),
         schema_version=SchemaVersionInfo(
             file=file_version,
             current=current_version,
@@ -383,78 +249,8 @@ async def update_endpoint(
     session: AsyncSession = Depends(get_async_session),
 ) -> CustomEndpointResponse:
     """Replace the entire definition in place: retain its key and model-row attachments; new tasks use the new definition immediately."""
-    definition = _accepted_definition(body, _t)
-    mirror = derive_mirror_columns(definition)
-    repo = CustomEndpointRepository(session)
-    current = await repo.get(endpoint_id)
-    if current is None:
-        raise NotFoundError("custom_endpoint_not_found")
-    if mirror.kind != current.kind:
-        await _check_kind_change_keeps_attachments(repo, endpoint_id, mirror.kind, _t)
-    if mirror.media_type != current.media_type:
-        await _check_media_type_change_has_no_attachments(repo, endpoint_id, mirror.media_type)
-    row = await repo.update(
-        endpoint_id,
-        definition=definition,
-        kind=mirror.kind,
-        schema_version=mirror.schema_version,
-        media_type=mirror.media_type,
-        display_name=mirror.display_name,
-    )
-    if row is None:
-        raise NotFoundError("custom_endpoint_not_found")
-    await session.commit()
-    await _invalidate_backend_cache()
-    await session.refresh(row)
+    row = await replace_custom_endpoint(session, endpoint_id, accepted_definition(body, _t))
     return endpoint_response(row, await endpoint_installation(session, row.id))
-
-
-async def _check_kind_change_keeps_attachments(
-    repo: CustomEndpointRepository,
-    endpoint_id: int,
-    new_kind: str,
-    _t: Callable[..., str],
-) -> None:
-    """Changing definition container kind must not break active attachments.
-
-    Endpoint × provider-protocol bidirectional compatibility was previously checked only on provider-side
-    writes (``docs/adr/0081``). Full replacement changes ``kind`` in place without changing keys/model-row
-    references: ComfyUI can overwrite a declarative endpoint attached to an OpenAI-protocol provider,
-    and vice versa, with neither side warning at save. Share the provider-side predicate to reject bad
-    attachments on both write paths. Changing model-row attachments first, then replacing the definition,
-    remains possible as two separate operations."""
-    for attachment in await repo.list_attachments(make_endpoint_key(endpoint_id)):
-        if endpoint_attachment_holds(endpoint_kind=new_kind, discovery_format=attachment.discovery_format):
-            continue
-        raise UnprocessableError(
-            "custom_endpoint_kind_conflicts_with_attachment",
-            model=attachment.model_id,
-            provider=make_provider_id(attachment.provider_id),
-        )
-
-
-async def _check_media_type_change_has_no_attachments(
-    repo: CustomEndpointRepository,
-    endpoint_id: int,
-    new_media_type: str,
-) -> None:
-    """Changing definition media type must not reclassify attached model rows in place.
-
-    Model rows have no own media type; their endpoint determines it. Replacing an image-producing
-    ComfyUI definition with video-producing content reclassifies every attached row as video. Providers
-    with one image and one video default then have two video defaults; default lookup finds two rows and
-    fails only during generation. Duration-tier normalization also follows media type and becomes misaligned.
-
-    Unlike changing ``kind``, no still-valid case exists: this changes model-row membership, not pairing.
-    Detach first, then replace the definition; both separate operations remain possible."""
-    attachments = await repo.list_attachments(make_endpoint_key(endpoint_id))
-    if attachments:
-        raise UnprocessableError(
-            "custom_endpoint_media_type_conflicts_with_attachment",
-            media_type=new_media_type,
-            model=attachments[0].model_id,
-            provider=make_provider_id(attachments[0].provider_id),
-        )
 
 
 @router.delete("/{endpoint_id}", status_code=204)
@@ -466,15 +262,4 @@ async def delete_endpoint(
 
     Do not cascade-delete referencing model rows: they carry manual user configuration (pricing, capability
     overrides), and cascading loses that work. Do not leave dangling references either, delaying failure until generation."""
-    repo = CustomEndpointRepository(session)
-    row = await repo.get(endpoint_id)
-    if row is None:
-        raise NotFoundError("custom_endpoint_not_found")
-    references = await repo.list_references(make_endpoint_key(endpoint_id))
-    if references:
-        raise ConflictError("custom_endpoint_referenced_by_models", count=len(references)).with_diagnostic(
-            {"references": _reference_descriptors(references)}
-        )
-    await repo.delete(endpoint_id)
-    await session.commit()
-    await _invalidate_backend_cache()
+    await delete_custom_endpoint(session, endpoint_id)

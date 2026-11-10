@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Mapping, Sequence
-from typing import Any
+from typing import Any, Literal
 
 from jsonpath_rfc9535 import JSONPathError, find
 
@@ -84,6 +84,26 @@ def normalize_extract_spec(spec: object) -> tuple[Sequence[object], str]:
     if accept not in {"string", "scalar"}:
         raise ValueError(f"未知 accept：{accept}")
     return paths, accept
+
+
+#: Declared classification of a provider error code; see :func:`classify_provider_error_code`.
+ProviderErrorClass = Literal["fix_input", "configure", "unclassified"]
+
+
+def classify_provider_error_code(spec: object, code: str) -> ProviderErrorClass:
+    """Classify an extracted provider code by the ``error_code`` spec's declared code sets.
+
+    ``fix_input_codes`` mean the request content or inputs must change; ``configure_codes`` mean credentials,
+    balance or endpoint configuration must change. Anything else, including every code of the shorthand array form,
+    is ``unclassified``: the code and message stay available, but no repair is implied. Codes compare as strings,
+    exactly as ``accept: scalar`` stringifies them.
+    """
+    if isinstance(spec, Mapping):
+        if code in {str(value) for value in spec.get("fix_input_codes") or ()}:
+            return "fix_input"
+        if code in {str(value) for value in spec.get("configure_codes") or ()}:
+            return "configure"
+    return "unclassified"
 
 
 def _first_acceptable(path: str, target: Any, accept: str) -> object | None:

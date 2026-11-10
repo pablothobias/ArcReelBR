@@ -11,7 +11,7 @@ window without changing the episode ledger. Interrupted generation can continue 
 
 import asyncio
 import logging
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from dataclasses import asdict
 from typing import Annotated, Any
 
@@ -19,23 +19,19 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, ConfigDict, Field
 
 from lib.episode.episode_replan import (
-    ReplanAdoptionResult,
-    ReplanConfirmationRequired,
     ReplanError,
     ReplanScope,
-    adopt_replan_candidate,
-    discard_replan_candidate,
-    render_replan_adoption_text,
 )
 from lib.infra.api_errors import ApiError, ConflictError, NotFoundError, UnprocessableError
-from lib.infra.async_thread import run_sync_transaction
 from lib.project.project_change_hints import project_change_source
-from lib.project.project_manager import ProjectManager, get_project_manager
+from lib.project.project_manager import get_project_manager
 from server.agent_toolset.envelope import json_value
 from server.auth import CurrentUser
 from server.dependencies import require_project_migration_ok
 from server.i18n import Translator
 from server.routers.episode_management import episode_has_active_tasks
+from server.services.project.episode_operations import EpisodeOperationRefused, adopt_replan_reviewed
+from server.services.project.episode_operations import discard_replan as discard_replan_candidate_reviewed
 from server.text_generation import MAX_INSTRUCTIONS_LEN
 from server.tool_runtime import (
     CallerContext,
@@ -207,20 +203,16 @@ class ReplanDiscardRequest(BaseModel):
     candidate_id: str
 
 
-async def _run_replan[T](name: str, user_id: str, _t: Translator, action: Callable[[ProjectManager], T]) -> T:
-    """Reject while candidate generation is active; otherwise execute in a thread and map ``ReplanError`` to its status/message."""
+async def _run_replan[T](name: str, user_id: str, _t: Translator, action: Callable[..., Awaitable[T]]) -> T:
+    """Run a shared adopt/discard operation; map planning/task conflicts and ``ReplanError`` to their status/message."""
     scope, caller, services = _context(name, user_id)
     if not await asyncio.to_thread(services.projects.project_exists, name):
         raise NotFoundError("project_not_found", name=name)
-    if await episode_planning_active(scope, caller, services):
-        raise HTTPException(status_code=409, detail=_t("episode_replan_generating"))
-
-    def _sync() -> T:
-        with project_change_source("webui"):
-            return action(services.projects)
-
     try:
-        return await run_sync_transaction(_sync)
+        with project_change_source("webui"):
+            return await action(services.projects, lambda: episode_planning_active(scope, caller, services))
+    except EpisodeOperationRefused as exc:
+        raise HTTPException(status_code=409, detail=_t(exc.code)) from exc
     except ReplanError as exc:
         raise _replan_http_error(exc.code, _t) from exc
     except (HTTPException, ApiError):
@@ -237,41 +229,31 @@ async def adopt_replan(project_name: str, req: ReplanAdoptRequest, user: Current
     First omit ``revision`` for ``status=confirmation_required``, server-written adoption consequences in ``impact.text`` and
     content lost by selecting deletion in ``impact.delete_text``. After confirmation, resubmit with ``impact.revision``.
     If lists change between calls, request confirmation again without adopting."""
-    if req.revision is not None:
-        # Share manual-split checks: reject active tasks in retiring/removing episodes so tasks cannot persist into replaced episodes.
-        preview = await _run_replan(
+    return await _run_replan(
+        project_name,
+        user.id,
+        _t,
+        lambda manager, planning_active: adopt_replan_reviewed(
+            manager,
             project_name,
-            user.id,
-            _t,
-            lambda manager: adopt_replan_candidate(manager.get_project_path(project_name), req.candidate_id),
-        )
-        if isinstance(preview, ReplanConfirmationRequired):
-            for episode in (*preview.impact.retired, *preview.impact.removed):
-                if await episode_has_active_tasks(project_name, episode):
-                    raise HTTPException(status_code=409, detail=_t("episode_replan_tasks_active"))
-
-    def _adopt(manager: ProjectManager) -> dict[str, Any]:
-        outcome = adopt_replan_candidate(
-            manager.get_project_path(project_name),
             req.candidate_id,
             revision=req.revision,
             delete_retired=req.delete_retired,
-        )
-        if isinstance(outcome, ReplanAdoptionResult):
-            return {"status": "adopted", "episodes": outcome.episodes, "deleted": outcome.deleted}
-        impact = outcome.impact.to_dict()
-        texts = render_replan_adoption_text(impact, manager.load_project(project_name), _t)
-        return {"status": "confirmation_required", "impact": {**impact, **texts}}
-
-    return await _run_replan(project_name, user.id, _t, _adopt)
+            planning_active=planning_active,
+            is_active=lambda episode: episode_has_active_tasks(project_name, episode),
+            translate=_t,
+        ),
+    )
 
 
 @router.post("/projects/{project_name}/episode-replan/discard", dependencies=[Depends(require_project_migration_ok)])
 async def discard_replan(project_name: str, req: ReplanDiscardRequest, user: CurrentUser, _t: Translator):
     """Discard the new episode plan without changing the ledger."""
-
-    def _discard(manager: ProjectManager) -> dict[str, Any]:
-        discard_replan_candidate(manager.get_project_path(project_name), req.candidate_id)
-        return {"status": "discarded"}
-
-    return await _run_replan(project_name, user.id, _t, _discard)
+    return await _run_replan(
+        project_name,
+        user.id,
+        _t,
+        lambda manager, planning_active: discard_replan_candidate_reviewed(
+            manager, project_name, req.candidate_id, planning_active=planning_active
+        ),
+    )

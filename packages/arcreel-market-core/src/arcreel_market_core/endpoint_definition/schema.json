@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://arcreel.dev/schemas/custom-endpoint/1.2.0.json",
+  "$id": "https://arcreel.dev/schemas/custom-endpoint/1.3.0.json",
   "title": "ArcReel custom invocation endpoint · Declarative definition",
   "description": "Complete protocol description for the JSON in/out plus submit/poll family. JSON Schema governs structure only; arcreel_market_core.endpoint_definition.validator checks semantic rules such as placeholder references, the JSONPath subset, api_key scope, and capability consistency. Together they form the complete gate.",
   "type": "object",
@@ -218,6 +218,13 @@
           "description": "Whether this asset is required by this request shape. Default false means optional; required image inputs cause text_to_video to derive as false.",
           "type": "boolean",
           "default": false
+        },
+        "container_mime": {
+          "description": "Optional, reference_audio_files only: identify each asset's real container from its bytes (wav: RIFF/WAVE, mp3: MPEG audio Layer III) and emit the MIME declared here instead of the host-guessed type. Unrecognized or corrupt bytes, containers missing from this map, and file suffixes contradicting the bytes fail before submission. Bytes are never transcoded. Omit to keep the host-guessed MIME.",
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": { "enum": ["wav", "mp3"] },
+          "additionalProperties": { "type": "string", "pattern": "^[a-z0-9]+/[a-z0-9.+-]+$" }
         }
       }
     },
@@ -268,6 +275,39 @@
         }
       ]
     },
+    "errorCodeExtractSpec": {
+      "description": "Provider error code extraction (an extractSpec), optionally classifying the code. Extracted codes are compared as strings (accept scalar stringifies numbers). Codes in fix_input_codes mean the request content or inputs must change; codes in configure_codes mean credentials, balance or endpoint configuration must change; any other code keeps its value and message but has no declared repair, so a resubmission needs the user's authorization. The two sets must not overlap.",
+      "oneOf": [
+        { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/pathItem" } },
+        {
+          "type": "object",
+          "required": ["paths"],
+          "additionalProperties": false,
+          "properties": {
+            "paths": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/pathItem" } },
+            "accept": {
+              "description": "Accepted match types: string (default; skip arrays, objects, null, and numbers), or scalar (strings, numbers, booleans; stringify numbers and booleans for downstream consumers).",
+              "enum": ["string", "scalar"],
+              "default": "string"
+            },
+            "fix_input_codes": {
+              "description": "Provider codes whose verdict is fixed by changing the request inputs or content.",
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": { "type": "string", "pattern": "^[A-Za-z0-9_.:-]{1,64}$" }
+            },
+            "configure_codes": {
+              "description": "Provider codes whose verdict is fixed by changing credentials, balance, or endpoint configuration.",
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": { "type": "string", "pattern": "^[A-Za-z0-9_.:-]{1,64}$" }
+            }
+          }
+        }
+      ]
+    },
     "requestBase": {
       "type": "object",
       "required": ["method", "url"],
@@ -300,7 +340,11 @@
               "additionalProperties": false,
               "properties": {
                 "task_id": { "$ref": "#/$defs/extractSpec" },
-                "error": { "$ref": "#/$defs/extractSpec" }
+                "error": { "$ref": "#/$defs/extractSpec" },
+                "error_code": {
+                  "description": "Optional provider error code (accept scalar recommended), read only when the job failed or submission returned no task id. Carried as structured data next to error; never concatenated into the message.",
+                  "$ref": "#/$defs/errorCodeExtractSpec"
+                }
               }
             }
           }
@@ -338,6 +382,10 @@
                   "$ref": "#/$defs/extractSpec"
                 },
                 "error": { "$ref": "#/$defs/extractSpec" },
+                "error_code": {
+                  "description": "Optional provider error code (accept scalar recommended), read only when the job failed or submission returned no task id. Carried as structured data next to error; never concatenated into the message.",
+                  "$ref": "#/$defs/errorCodeExtractSpec"
+                },
                 "failure": {
                   "description": "Failure criteria beyond the state string: any path yielding an acceptable match means failed; extract error details through error.",
                   "$ref": "#/$defs/extractSpec"
@@ -374,6 +422,7 @@
             "image_url": { "$ref": "#/$defs/extractSpec" },
             "image_b64": { "$ref": "#/$defs/extractSpec" },
             "error": { "$ref": "#/$defs/extractSpec" },
+            "error_code": { "$ref": "#/$defs/errorCodeExtractSpec" },
             "usage": {
               "type": "object",
               "propertyNames": { "$ref": "#/$defs/identifier" },

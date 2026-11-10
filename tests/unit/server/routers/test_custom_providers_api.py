@@ -1557,9 +1557,8 @@ def _custom_endpoint_spec(key: str, media_type: str) -> EndpointSpec:
 
 def test_check_unique_defaults_reads_the_media_type_from_the_resolved_spec():
     """Conflicts between two ce- defaults depend on spec media types, never key prefixes."""
-    from fastapi import HTTPException
-
-    from server.routers.custom_providers import ModelInput, _check_unique_defaults
+    from lib.infra.api_errors import ApiError
+    from server.services.configuration.custom_providers import ModelInput, check_unique_defaults
 
     models = [
         ModelInput(model_id="m1", display_name="m1", endpoint="ce-7", is_default=True),
@@ -1570,12 +1569,12 @@ def test_check_unique_defaults_reads_the_media_type_from_the_resolved_spec():
         return f"{key}:{params}"
 
     same_lane = {"ce-7": _custom_endpoint_spec("ce-7", "audio"), "ce-8": _custom_endpoint_spec("ce-8", "audio")}
-    with pytest.raises(HTTPException) as excinfo:
-        _check_unique_defaults(models, same_lane, t)
+    with pytest.raises(ApiError) as excinfo:
+        check_unique_defaults(models, same_lane, t)
     assert excinfo.value.status_code == 422
 
     split_lanes = {"ce-7": _custom_endpoint_spec("ce-7", "audio"), "ce-8": _custom_endpoint_spec("ce-8", "video")}
-    _check_unique_defaults(models, split_lanes, t)
+    check_unique_defaults(models, split_lanes, t)
 
 
 def test_check_unique_defaults_refuses_two_image_defaults_that_declare_no_capabilities():
@@ -1583,9 +1582,8 @@ def test_check_unique_defaults_refuses_two_image_defaults_that_declare_no_capabi
 
     Built-in lookup cannot find ``ce-`` capability flags; previously entire endpoints were skipped, excluding defaults from mutual-exclusion checks.
     """
-    from fastapi import HTTPException
-
-    from server.routers.custom_providers import ModelInput, _check_unique_defaults
+    from lib.infra.api_errors import ApiError
+    from server.services.configuration.custom_providers import ModelInput, check_unique_defaults
 
     models = [
         ModelInput(model_id="m1", display_name="m1", endpoint="ce-7", is_default=True),
@@ -1596,8 +1594,8 @@ def test_check_unique_defaults_refuses_two_image_defaults_that_declare_no_capabi
     def t(key, **params):
         return f"{key}:{params}"
 
-    with pytest.raises(HTTPException) as excinfo:
-        _check_unique_defaults(models, specs, t)
+    with pytest.raises(ApiError) as excinfo:
+        check_unique_defaults(models, specs, t)
 
     assert excinfo.value.status_code == 422
 
@@ -1618,7 +1616,7 @@ def _comfyui_image_spec(key: str, *, reference_slots: int) -> EndpointSpec:
 
 def test_check_unique_defaults_separates_two_comfyui_image_endpoints_by_capability():
     """One text-to-image and one image-to-image workflow may each default; disjoint capabilities do not conflict."""
-    from server.routers.custom_providers import ModelInput, _check_unique_defaults
+    from server.services.configuration.custom_providers import ModelInput, check_unique_defaults
 
     models = [
         ModelInput(model_id="t2i", display_name="t2i", endpoint="ce-7", is_default=True),
@@ -1629,14 +1627,13 @@ def test_check_unique_defaults_separates_two_comfyui_image_endpoints_by_capabili
         "ce-8": _comfyui_image_spec("ce-8", reference_slots=1),
     }
 
-    _check_unique_defaults(models, specs, lambda key, **params: key)
+    check_unique_defaults(models, specs, lambda key, **params: key)
 
 
 def test_check_unique_defaults_rejects_two_comfyui_text_to_image_defaults():
     """Two text-to-image-only workflows create two defaults in one slot, returning two default-model rows."""
-    from fastapi import HTTPException
-
-    from server.routers.custom_providers import ModelInput, _check_unique_defaults
+    from lib.infra.api_errors import ApiError
+    from server.services.configuration.custom_providers import ModelInput, check_unique_defaults
 
     models = [
         ModelInput(model_id="m1", display_name="m1", endpoint="ce-7", is_default=True),
@@ -1647,26 +1644,25 @@ def test_check_unique_defaults_rejects_two_comfyui_text_to_image_defaults():
         "ce-8": _comfyui_image_spec("ce-8", reference_slots=0),
     }
 
-    with pytest.raises(HTTPException) as excinfo:
-        _check_unique_defaults(models, specs, lambda key, **params: f"{key}:{params}")
+    with pytest.raises(ApiError) as excinfo:
+        check_unique_defaults(models, specs, lambda key, **params: f"{key}:{params}")
 
     assert excinfo.value.status_code == 422
 
 
 def test_check_unique_defaults_allows_one_image_default_without_capabilities():
     """A single such default has no indistinguishable counterpart and passes normally."""
-    from server.routers.custom_providers import ModelInput, _check_unique_defaults
+    from server.services.configuration.custom_providers import ModelInput, check_unique_defaults
 
     models = [ModelInput(model_id="m1", display_name="m1", endpoint="ce-7", is_default=True)]
 
-    _check_unique_defaults(models, {"ce-7": _custom_endpoint_spec("ce-7", "image")}, lambda key, **params: key)
+    check_unique_defaults(models, {"ce-7": _custom_endpoint_spec("ce-7", "image")}, lambda key, **params: key)
 
 
 def test_check_unique_defaults_rejects_two_generations_defaults():
     """Two same-provider -generations defaults return 422."""
-    from fastapi import HTTPException
-
-    from server.routers.custom_providers import ModelInput, _check_unique_defaults
+    from lib.infra.api_errors import ApiError
+    from server.services.configuration.custom_providers import ModelInput, check_unique_defaults
 
     models = [
         ModelInput(model_id="m1", display_name="m1", endpoint="openai-images-generations", is_default=True),
@@ -1676,16 +1672,15 @@ def test_check_unique_defaults_rejects_two_generations_defaults():
     def t(key, **params):
         return f"{key}:{params}"
 
-    with pytest.raises(HTTPException) as excinfo:
-        _check_unique_defaults(models, _builtin_specs(models), t)
+    with pytest.raises(ApiError) as excinfo:
+        check_unique_defaults(models, _builtin_specs(models), t)
     assert excinfo.value.status_code == 422
 
 
 def test_check_unique_defaults_rejects_wildcard_with_split():
     """Wildcard plus -generations defaults forbidden: wildcard occupies T2I, conflicting with -generations."""
-    from fastapi import HTTPException
-
-    from server.routers.custom_providers import ModelInput, _check_unique_defaults
+    from lib.infra.api_errors import ApiError
+    from server.services.configuration.custom_providers import ModelInput, check_unique_defaults
 
     models = [
         ModelInput(model_id="m1", display_name="m1", endpoint="openai-images", is_default=True),
@@ -1695,15 +1690,14 @@ def test_check_unique_defaults_rejects_wildcard_with_split():
     def t(key, **params):
         return f"{key}:{params}"
 
-    with pytest.raises(HTTPException):
-        _check_unique_defaults(models, _builtin_specs(models), t)
+    with pytest.raises(ApiError):
+        check_unique_defaults(models, _builtin_specs(models), t)
 
 
 def test_check_unique_defaults_text_still_media_type_exclusive():
     """text/video retain old rules: one default per media_type."""
-    from fastapi import HTTPException
-
-    from server.routers.custom_providers import ModelInput, _check_unique_defaults
+    from lib.infra.api_errors import ApiError
+    from server.services.configuration.custom_providers import ModelInput, check_unique_defaults
 
     models = [
         ModelInput(model_id="m1", display_name="m1", endpoint="openai-chat", is_default=True),
@@ -1713,8 +1707,8 @@ def test_check_unique_defaults_text_still_media_type_exclusive():
     def t(key, **params):
         return f"{key}:{params}"
 
-    with pytest.raises(HTTPException):
-        _check_unique_defaults(models, _builtin_specs(models), t)
+    with pytest.raises(ApiError):
+        check_unique_defaults(models, _builtin_specs(models), t)
 
 
 # ---------------------------------------------------------------------------

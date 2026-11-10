@@ -527,13 +527,12 @@ async def read_jianying_draft(
 
 
 def _draft_root(value: str, _t: Translator) -> str:
-    if not value or not value.strip():
-        raise HTTPException(status_code=422, detail=_t("jianying_path_invalid"))
-    if len(value) > 1024:
-        raise HTTPException(status_code=422, detail=_t("jianying_path_too_long"))
-    if any(ord(character) < 32 for character in value):
-        raise HTTPException(status_code=422, detail=_t("jianying_path_illegal"))
-    return value.strip()
+    from server.services.presentation.timeline_jianying_draft import JianyingDraftRootError, validate_draft_root
+
+    try:
+        return validate_draft_root(value)
+    except JianyingDraftRootError as exc:
+        raise HTTPException(status_code=422, detail=_t(exc.key)) from exc
 
 
 @self_auth_router.get("/projects/{project_name}/edit-timelines/{timeline_id}/jianying-draft/download")

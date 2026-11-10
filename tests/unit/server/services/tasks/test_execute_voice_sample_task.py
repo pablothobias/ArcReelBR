@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 from pathlib import Path
 
 import pytest
@@ -105,6 +106,9 @@ class TestExecuteCharacterVoiceSampleTask:
         assert result["voice"] == "Cherry"
         assert result["duration_seconds"] == 5.0
         assert result["file_path"] == resource_relative_path("audio", "voice_sample__艾莉__task-1")
+        # Provenance and digest let samples be listed, inspected and confirmed later without regenerating.
+        assert (result["provider_id"], result["model"]) == ("dashscope", "qwen3-tts-flash")
+        assert result["sha256"] == hashlib.sha256(b"fake-wav-bytes").hexdigest()
 
     async def test_provider_changed_since_claim_is_raised_before_synthesis(self, voice_sample_env):
         """If resolved audio provider differs from the claimed slot, do not synthesize; let the worker update the record and requeue."""

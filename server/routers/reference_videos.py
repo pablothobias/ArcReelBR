@@ -6,7 +6,6 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
@@ -14,7 +13,6 @@ from fastapi import APIRouter, File, HTTPException, Request, Response, UploadFil
 from pydantic import BaseModel, ConfigDict, Field, PositiveInt
 
 from lib.artifacts.artifact_activation import resolve_artifact_episode
-from lib.artifacts.version_manager import VersionManager
 from lib.config.resolver import ConfigResolver
 from lib.db import async_session_factory
 from lib.generation.batch_admission import BatchAdmission, BatchAdmissionDecision, refused_ticket
@@ -35,10 +33,8 @@ from lib.i18n import render_message
 from lib.i18n.display_names import DisplayNames
 from lib.infra.api_errors import ApiError, BadRequestError, NotFoundError
 from lib.infra.async_thread import run_sync_transaction
-from lib.infra.path_safety import PathTraversalError, safe_join
 from lib.project.project_change_hints import project_change_source
-from lib.project.project_manager import get_project_manager, is_reference_video_project
-from lib.project.resource_paths import resource_relative_path
+from lib.project.project_manager import get_project_manager
 from lib.script.reference_video.request_projection import (
     ReferenceRequestFactsLookup,
     ReferenceRequestOptions,
@@ -68,15 +64,14 @@ from server.services.admission.video_batch_admission import (
     resolve_reference_batch_targets,
     screen_script_entries,
 )
+from server.services.currency.manual_media_install import (
+    install_reference_unit_video,
+    resolve_reference_episode_script,
+)
 from server.services.currency.upload_finalize import (
     UploadValidationError,
-    commit_manual_video_upload,
-    stage_uploaded_video_stream,
-    validate_upload,
 )
-from server.services.tasks.generation_tasks import emit_generation_success_batch
 from server.services.tasks.reference_video_tasks import (
-    apply_unit_video_assets,
     default_unit_duration,
 )
 from server.services.tasks.video_caps import (
@@ -140,25 +135,14 @@ class GenerateUnitsBatchRequest(BaseModel):
 def _load_episode_script(
     project_name: str, episode: int, _t: Translator, *, readonly: bool = False
 ) -> tuple[dict, dict, str]:
-    """Load project.json and the selected episode script; return (project, script, script_file)."""
+    """Load project.json and the selected episode script; return (project, script, script_file).
+
+    Single implementation: ``resolve_reference_episode_script`` (shared with unit-video installs); this wrapper only
+    translates its domain errors for HTTP."""
     try:
-        project = get_project_manager().load_project(project_name)
-    except FileNotFoundError as exc:
-        raise NotFoundError("project_not_found", name=project_name) from exc
-    episodes = project.get("episodes") or []
-    meta = next((e for e in episodes if e.get("episode") == episode), None)
-    if meta is None or not meta.get("script_file"):
-        raise HTTPException(status_code=404, detail=_t("ref_episode_not_found", episode=episode))
-    script_file = meta["script_file"]
-    try:
-        pm = get_project_manager()
-        load = pm.load_script_readonly if readonly else pm.load_script
-        script = load(project_name, script_file)
-    except FileNotFoundError as exc:
-        raise NotFoundError("script_not_found", name=script_file) from exc
-    if not is_reference_video_project(project):
-        raise HTTPException(status_code=409, detail=_t("ref_not_reference_video_mode"))
-    return project, script, script_file
+        return resolve_reference_episode_script(get_project_manager(), project_name, episode, readonly=readonly)
+    except UploadValidationError as exc:
+        raise HTTPException(status_code=exc.status_code, detail=_t(exc.key, **exc.params)) from exc
 
 
 async def _read_episode_script(project_name: str, episode: int, _t: Translator) -> tuple[dict, dict, str]:
@@ -366,10 +350,6 @@ def _find_unit(script: dict, unit_id: str, _t: Translator) -> dict:
         if u.get("unit_id") == unit_id:
             return u
     raise HTTPException(status_code=404, detail=_t("ref_unit_not_found", unit_id=unit_id))
-
-
-def _find_unit_for_project(_project: dict, script: dict, unit_id: str, _t: Translator) -> dict:
-    return _find_unit(script, unit_id, _t)
 
 
 @router.patch("/episodes/{episode}/units/{unit_id}")
@@ -809,79 +789,24 @@ async def upload_unit_video(
     """Upload a unit clip to replace its AI-generated video.
 
     Reuse generation finalization for thumbnails, old video_uri cleanup and status=completed, with version tracking.
-    Reference images use existing project-asset upload paths, outside this endpoint."""
+    Reference images use existing project-asset upload paths, outside this endpoint. The install transaction is
+    ``install_reference_unit_video``, shared with the Agent ``install_finished_media`` tool."""
     try:
-        max_bytes = validate_upload(file.filename, file.size, kind="video")
-
-        relative_path = resource_relative_path("reference_videos", unit_id)
-
-        def _validate_unit() -> tuple[Path, VersionManager, str]:
-            project, script, script_file = _load_episode_script(project_name, episode, _t)
-            _find_unit_for_project(project, script, unit_id, _t)  # raises 404 if missing
-            project_path = get_project_manager().get_project_path(project_name)
-            # Path traversal guard: unit_id-derived absolute paths must stay inside projects, matching versions.py.
-            try:
-                safe_join(project_path, relative_path)
-            except PathTraversalError as exc:
-                raise HTTPException(status_code=400, detail=_t("invalid_resource_id", resource_id=unit_id)) from exc
-            return project_path, VersionManager(project_path), script_file
-
-        project_path, versions, script_file = await run_sync_transaction(_validate_unit)
-        target = project_path / relative_path
-
-        with project_change_source("webui"):
-            staged_video = await stage_uploaded_video_stream(file.file, target, max_bytes=max_bytes)
-
-            # Uploads can span hundreds of MB and seconds, allowing concurrent episode→script rebinding
-            # through PATCH/Agent script synchronization. Re-resolve after staging to write metadata into the active script.
-            def _recheck_binding() -> str:
-                project2, script2, script_file2 = _load_episode_script(project_name, episode, _t)
-                _find_unit_for_project(project2, script2, unit_id, _t)
-                return script_file2
-
-            try:
-                script_file = await run_sync_transaction(_recheck_binding)
-
-                def _commit_metadata(thumb_rel: str | None, on_commit: Callable[[Path], None]) -> None:
-                    pm = get_project_manager()
-                    with pm.locked_script(
-                        project_name,
-                        script_file,
-                        validate=False,
-                        on_commit=on_commit,
-                    ) as script:
-                        apply_unit_video_assets(script, unit_id, video_uri=None, thumb_rel=thumb_rel)
-
-                version = await commit_manual_video_upload(
-                    project_path=project_path,
-                    versions=versions,
-                    resource_type="reference_videos",
-                    resource_id=unit_id,
-                    script_file=script_file,
-                    staged_video=staged_video,
-                    current_video=target,
-                    thumbnail_file=project_path / "reference_videos" / "thumbnails" / f"{unit_id}.jpg",
-                    thumbnail_rel=f"reference_videos/thumbnails/{unit_id}.jpg",
-                    original_filename=file.filename,
-                    commit_metadata=_commit_metadata,
-                )
-            finally:
-                await asyncio.to_thread(staged_video.unlink, missing_ok=True)  # hard-delete: temp -- staged upload file
-            # emit reads scripts/resolves episodes/computes fingerprints; use a thread pool to avoid event-loop blocking;
-            # reuse returned fingerprints in responses without recomputation.
-            fingerprints = await run_sync_transaction(
-                emit_generation_success_batch,
-                task_type="reference_video",
-                project_name=project_name,
-                resource_id=unit_id,
-                payload={"script_file": script_file},
-            )
-
+        installed = await install_reference_unit_video(
+            manager=get_project_manager(),
+            project_name=project_name,
+            episode=episode,
+            unit_id=unit_id,
+            filename=file.filename,
+            stream=file.file,
+            declared_size=file.size,
+            change_source="webui",
+        )
         return {
             "success": True,
-            "path": relative_path,
-            "version": version,
-            "asset_fingerprints": fingerprints,
+            "path": installed.path,
+            "version": installed.version,
+            "asset_fingerprints": installed.asset_fingerprints,
         }
     except UploadValidationError as exc:
         raise HTTPException(status_code=exc.status_code, detail=_t(exc.key, **exc.params)) from exc

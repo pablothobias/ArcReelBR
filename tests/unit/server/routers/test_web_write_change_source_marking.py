@@ -95,7 +95,12 @@ _EXEMPT: dict[str, str] = {
     "provider_asset_links:unlink_provider_asset": _ASSET_LINK,
     "provider_asset_links:upload_to_asset_library": _ASSET_LINK,
     # Source markers live in services.
+    "derivative_uploads:upload_derivative_sheet": _SERVICE.format("server.services.currency.manual_media_install"),
     "end_frames:delete_end_frame": _SERVICE.format("server.services.project.end_frame"),
+    "generate:confirm_character_voice_sample": _SERVICE.format("server.services.voice_references"),
+    "grids:upload_grid_image": _SERVICE.format("server.services.grid.grid_composite"),
+    "versions:restore_derivative_version": _SERVICE.format("server.services.currency.media_version_selection"),
+    "versions:restore_version": _SERVICE.format("server.services.currency.media_version_selection"),
     "end_frames:select_end_frame": _SERVICE.format("server.services.project.end_frame"),
     "end_frames:upload_end_frame": _SERVICE.format("server.services.project.end_frame"),
     "provider_asset_links:import_from_asset_library": _SERVICE.format("server.services.project.provider_asset_import"),
@@ -103,6 +108,8 @@ _EXEMPT: dict[str, str] = {
         "server.services.project.episode_instructions"
     ),
     "script_plan:save_script_plan_instructions": _SERVICE.format("server.services.project.episode_instructions"),
+    "reference_videos:upload_unit_video": _SERVICE.format("server.services.currency.manual_media_install"),
+    "shot_uploads:upload_shot_media": _SERVICE.format("server.services.currency.manual_media_install"),
 }
 
 

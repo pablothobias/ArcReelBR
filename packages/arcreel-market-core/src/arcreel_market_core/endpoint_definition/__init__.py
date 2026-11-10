@@ -15,18 +15,29 @@ from arcreel_market_core.definition_diagnostics import (
     message_key,
 )
 
+from .audio_container import SUPPORTED_AUDIO_CONTAINERS, AudioContainer, detect_audio_container, suffix_container
 from .jsonpath_subset import JsonPathSubsetError, ParsedJsonPath, parse_json_path
 from .kinds import COMFYUI_KIND, DECLARATIVE_KIND
 from .media_type import DEFAULT_DECLARATIVE_MEDIA_TYPE, definition_media_type
-from .response_extractor import JsonPathEvaluationError, extract_value, map_status, normalize_extract_spec
+from .resolution_options import declarative_resolution_options, resolution_suggestion
+from .response_extractor import (
+    JsonPathEvaluationError,
+    ProviderErrorClass,
+    classify_provider_error_code,
+    extract_value,
+    map_status,
+    normalize_extract_spec,
+)
 from .template_engine import (
     AssetData,
     RenderedRequest,
     TemplateRenderError,
+    asset_container_mime,
     build_context,
     encode_inputs,
     render_request,
 )
+from .url_authority import ORIGIN_PLACEHOLDERS, url_authority_is_fixed, url_authority_violation
 from .validator import (
     CURRENT_SCHEMA_VERSION,
     IMAGE_INPUT_SOURCES,
@@ -51,21 +62,29 @@ __all__ = [
     "DEFAULT_DECLARATIVE_MEDIA_TYPE",
     "IMAGE_INPUT_SOURCES",
     "MESSAGE_KEY_PREFIX",
+    "ORIGIN_PLACEHOLDERS",
     "ROOT_PATH",
+    "SUPPORTED_AUDIO_CONTAINERS",
     "AssetData",
+    "AudioContainer",
     "DefinitionDiagnostics",
     "DefinitionErrorCode",
     "DefinitionIssue",
     "JsonPathEvaluationError",
     "JsonPathSubsetError",
     "ParsedJsonPath",
+    "ProviderErrorClass",
     "RenderedRequest",
     "SchemaVersionLevel",
     "TemplateRenderError",
     "VersionRelation",
+    "asset_container_mime",
     "build_context",
+    "classify_provider_error_code",
     "current_schema_version",
+    "declarative_resolution_options",
     "definition_media_type",
+    "detect_audio_container",
     "encode_inputs",
     "extract_value",
     "load_schema",
@@ -77,7 +96,11 @@ __all__ = [
     "parse_semver",
     "render_request",
     "requires_image_input",
+    "resolution_suggestion",
     "schema_version_level",
+    "suffix_container",
+    "url_authority_is_fixed",
+    "url_authority_violation",
     "validate_definition",
     "version_relation",
 ]

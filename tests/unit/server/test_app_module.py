@@ -21,6 +21,9 @@ class _FakeWorker:
     async def stop(self):
         self.stopped = True
 
+    async def reload_limits(self):
+        """Limit refresh handed to the remote MCP host at startup; never called by these lifespan tests."""
+
 
 class TestAppModule:
     def test_create_generation_worker_injects_server_executors(self, monkeypatch):

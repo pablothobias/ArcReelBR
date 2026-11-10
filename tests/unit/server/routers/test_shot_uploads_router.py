@@ -18,7 +18,7 @@ from server.auth import CurrentUserInfo, get_current_user
 from server.error_handlers import register_error_handlers
 from server.routers import reference_videos, shot_uploads
 from server.routers import versions as versions_router
-from server.services.currency import upload_finalize
+from server.services.currency import manual_media_install, upload_finalize
 from server.services.tasks import formal_image_commit, reference_video_tasks
 from tests.auth_deps import AUTH_DEPENDENCIES
 from tests.fakes import use_project_manager, use_upload_claim_registration
@@ -267,7 +267,7 @@ class TestShotStoryboardUpload:
             calls.append({**kw, "resolved_source": get_project_change_source()})
             return {}
 
-        monkeypatch.setattr(shot_uploads, "emit_generation_success_batch", _fake_emit)
+        monkeypatch.setattr(manual_media_install, "emit_generation_success_batch", _fake_emit)
         with client:
             resp = _upload(client, "storyboard", "x.png", _img_bytes("PNG"))
             assert resp.status_code == 200
@@ -303,7 +303,7 @@ class TestShotStoryboardUpload:
         started = threading.Event()
         release = threading.Event()
         staged = threading.Event()
-        original_stage = shot_uploads.stage_uploaded_bytes
+        original_stage = manual_media_install.stage_uploaded_bytes
 
         def _stage(*args, **kwargs):
             started.set()
@@ -313,7 +313,7 @@ class TestShotStoryboardUpload:
             finally:
                 staged.set()
 
-        monkeypatch.setattr(shot_uploads, "stage_uploaded_bytes", _stage)
+        monkeypatch.setattr(manual_media_install, "stage_uploaded_bytes", _stage)
         content = _img_bytes("PNG")
         task = asyncio.create_task(
             shot_uploads.upload_shot_media(
@@ -663,7 +663,7 @@ class TestReferenceUnitVideoUpload:
             calls.append({**kw, "resolved_source": get_project_change_source()})
             return {}
 
-        monkeypatch.setattr(reference_videos, "emit_generation_success_batch", _fake_emit)
+        monkeypatch.setattr(manual_media_install, "emit_generation_success_batch", _fake_emit)
         with client:
             resp = _upload_unit(client)
             assert resp.status_code == 200
