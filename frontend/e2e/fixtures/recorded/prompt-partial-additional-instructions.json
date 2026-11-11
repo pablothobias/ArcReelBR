@@ -4,7 +4,7 @@
   "status": 200,
   "body": {
     "name": "shared/additional_instructions",
-    "source": "# 附加指令\n{{ instructions }}",
+    "source": "# Additional instructions\n{{ instructions }}\n",
     "protected": true,
     "referenced_by": [
       "text/ad_reference_video_prompt_authoring",

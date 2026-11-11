@@ -7,8 +7,8 @@
       {
         "id": "asset/sheet",
         "category": "asset",
-        "title": "资产图",
-        "description": "角色、角色衍生、场景、道具与商品资产图的完整提示词。",
+        "title": "Asset sheet",
+        "description": "Complete prompts for character, character-derivative, scene, prop, and product asset sheets.",
         "stage": "asset_sheet",
         "invoked_by": {
           "kind": "generation_task",
@@ -24,11 +24,11 @@
           ]
         },
         "slots": {
-          "asset_type": "资产类型",
-          "name": "资产名称，衍生为空",
-          "description": "外观描述或相对本体的变化",
-          "style": "项目画风",
-          "style_description": "项目风格描述"
+          "asset_type": "Asset type",
+          "name": "Asset name; empty for derivatives",
+          "description": "Appearance description or changes relative to the base",
+          "style": "Project visual style",
+          "style_description": "Project style description"
         },
         "protected": false,
         "output_schema": null
@@ -36,8 +36,8 @@
       {
         "id": "reference_video/unit",
         "category": "video",
-        "title": "参考生视频",
-        "description": "参考生视频单元的完整提示词，由参考素材声明、单元正文、风格与负向约束三段组成。",
+        "title": "Reference video",
+        "description": "Complete prompt for a reference-video unit, arranged in three parts: reference-material declarations, unit body, and style with negative constraints.",
         "stage": "reference_video",
         "invoked_by": {
           "kind": "generation_task",
@@ -45,12 +45,12 @@
         },
         "applies_to": {},
         "slots": {
-          "declarations": "第一段：主体绑定（<X>@图片N）、同一角色的形态声明与声音声明（@音频N）；无参考素材时为空",
-          "body": "第二段：单元正文，mention 已换成主体记号，台词记号已重组，旁白记号已丢弃",
-          "style": "项目画风",
-          "style_description": "项目风格描述",
-          "co_present_characters": "同框的不同角色，本体与衍生合并计一个；不足两个时为空",
-          "products": "随请求发出参考图的商品名，按首现顺序去重；无商品参考图时为空"
+          "declarations": "First part: subject bindings (<X>@Image N), appearance declarations for the same character, and voice declarations (@Audio N); empty without reference material",
+          "body": "Second part: unit body, with mentions replaced by subject tokens, dialogue tokens reassembled, and narration tokens discarded",
+          "style": "Project visual style",
+          "style_description": "Project style description",
+          "co_present_characters": "Distinct characters sharing the frame, counting a base and its derivatives as one; empty if fewer than two",
+          "products": "Product names whose reference images are sent with the request, deduplicated in first-appearance order; empty without product reference images"
         },
         "protected": false,
         "output_schema": null
@@ -58,8 +58,8 @@
       {
         "id": "storyboard/grid",
         "category": "storyboard",
-        "title": "宫格联合图",
-        "description": "把一组分镜按首尾帧链画进一张宫格联合图的提示词，生成后按画格切回各分镜。",
+        "title": "Composite storyboard grid",
+        "description": "Prompt for drawing a group of shots into one composite grid using a first/last-frame chain, then splitting the generated panels back into individual shots.",
         "stage": "grid",
         "invoked_by": {
           "kind": "generation_task",
@@ -67,18 +67,18 @@
         },
         "applies_to": {},
         "slots": {
-          "reference_images": "参考图类型声明，按随请求发出的参考图序位编号为「图N」；无参考图为空",
-          "rows": "宫格行数",
-          "cols": "宫格列数",
-          "cell_count": "画格总数",
-          "grid_aspect_ratio": "整张联合图的比例",
-          "panel_aspect_ratio": "单个画格的比例，由整图比例与行列数算出",
-          "last_chain_cell": "帧链最后一格的序号；只有开场一格时为 0，过渡帧行不渲染",
-          "opening": "格0 的开场分镜（scene_id、description）",
-          "transitions": "过渡格列表（index、row、col、from_id、to_id、action、description）",
-          "placeholders": "空占位格列表（index、row、col）",
-          "style": "项目画风",
-          "style_description": "项目风格描述"
+          "reference_images": "Reference-image type declarations, numbered “图N” by the order sent with the request; empty without reference images",
+          "rows": "Number of grid rows",
+          "cols": "Number of grid columns",
+          "cell_count": "Total panel count",
+          "grid_aspect_ratio": "Aspect ratio of the whole composite image",
+          "panel_aspect_ratio": "Individual panel aspect ratio, calculated from the whole-image ratio and row/column counts",
+          "last_chain_cell": "Index of the final frame-chain panel; 0 when there is only an opening panel, omitting transition-frame lines",
+          "opening": "Opening shot in panel 0 (scene_id, description)",
+          "transitions": "Transition panel list (index, row, col, from_id, to_id, action, description)",
+          "placeholders": "Empty placeholder panel list (index, row, col)",
+          "style": "Project visual style",
+          "style_description": "Project style description"
         },
         "protected": false,
         "output_schema": null
@@ -86,8 +86,8 @@
       {
         "id": "storyboard/image",
         "category": "storyboard",
-        "title": "分镜图",
-        "description": "分镜图的完整提示词，由风格、参考图声明与分镜画面组成。",
+        "title": "Storyboard image",
+        "description": "Complete storyboard-image prompt combining style, reference-image declarations, and shot imagery.",
         "stage": "storyboard_image",
         "invoked_by": {
           "kind": "generation_task",
@@ -95,11 +95,11 @@
         },
         "applies_to": {},
         "slots": {
-          "style": "项目画风",
-          "style_description": "项目风格描述",
-          "reference_images": "已序列化的参考图类型声明，无参考图为空",
-          "structured_body": "已序列化的 Scene 与 Composition，纯文本形态为空",
-          "text_body": "纯文本正文，结构化形态为空"
+          "style": "Project visual style",
+          "style_description": "Project style description",
+          "reference_images": "Serialized reference-image type declarations; empty without reference images",
+          "structured_body": "Serialized Scene and Composition; empty for the plain-text form",
+          "text_body": "Plain-text body; empty for the structured form"
         },
         "protected": false,
         "output_schema": null
@@ -107,8 +107,8 @@
       {
         "id": "storyboard/video",
         "category": "video",
-        "title": "分镜视频",
-        "description": "分镜生视频的完整提示词，由视频正文与负向约束组成。",
+        "title": "Storyboard video",
+        "description": "Complete storyboard-video prompt combining the video body and negative constraints.",
         "stage": "storyboard_video",
         "invoked_by": {
           "kind": "generation_task",
@@ -116,7 +116,7 @@
         },
         "applies_to": {},
         "slots": {
-          "body": "已序列化或纯文本的视频正文，含按门控派生的发声声明"
+          "body": "Serialized or plain-text video body, including speech declarations derived according to admission rules"
         },
         "protected": false,
         "output_schema": null
@@ -124,8 +124,8 @@
       {
         "id": "style/live_cinematic_ancient",
         "category": "style",
-        "title": "精品古装",
-        "description": "真人画风，专业打光 · 电视剧质感。",
+        "title": "Cinematic Historical",
+        "description": "Live action, professional lighting · television-drama texture.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -139,8 +139,8 @@
       {
         "id": "style/live_zhang_yimou",
         "category": "style",
-        "title": "张艺谋风格",
-        "description": "真人画风，极致用色 · 仪式感。",
+        "title": "Zhang Yimou",
+        "description": "Live action, masterful color · ritual.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -154,8 +154,8 @@
       {
         "id": "style/live_ancient_xianxia",
         "category": "style",
-        "title": "古装仙侠",
-        "description": "真人画风，临江仙 · 美白滤镜。",
+        "title": "Ancient Xianxia",
+        "description": "Live action, Lin Jiang Xian · skin-brightening filter.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -169,8 +169,8 @@
       {
         "id": "style/live_premium_drama",
         "category": "style",
-        "title": "精品短剧",
-        "description": "真人画风，真人电视剧 · 大师构图。",
+        "title": "Premium Drama",
+        "description": "Live action, television drama · masterful composition.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -184,8 +184,8 @@
       {
         "id": "style/live_cinema",
         "category": "style",
-        "title": "院线电影",
-        "description": "真人画风，达芬奇调色 · 电影色调。",
+        "title": "Theatrical Film",
+        "description": "Live action, DaVinci grading · cinematic tones.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -199,8 +199,8 @@
       {
         "id": "style/live_spartan",
         "category": "style",
-        "title": "斯巴达史诗",
-        "description": "真人画风，角斗士 · 浓重明暗。",
+        "title": "Spartan Epic",
+        "description": "Live action, gladiators · strong chiaroscuro.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -214,8 +214,8 @@
       {
         "id": "style/live_bladerunner",
         "category": "style",
-        "title": "银翼杀手",
-        "description": "真人画风，极简野蛮 · 赛博粒子。",
+        "title": "Blade Runner",
+        "description": "Live action, minimal brutalism · cyberpunk particles.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -229,8 +229,8 @@
       {
         "id": "style/live_got",
         "category": "style",
-        "title": "权力的游戏",
-        "description": "真人画风，冷色史诗 · 权谋。",
+        "title": "Game of Thrones",
+        "description": "Live action, cool-toned epic · political intrigue.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -244,8 +244,8 @@
       {
         "id": "style/live_breaking_bad",
         "category": "style",
-        "title": "绝命毒师",
-        "description": "真人画风，南美滤镜 · 犯罪美学。",
+        "title": "Breaking Bad",
+        "description": "Live action, South American filter · crime aesthetics.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -259,8 +259,8 @@
       {
         "id": "style/live_kdrama",
         "category": "style",
-        "title": "韩剧偶像",
-        "description": "真人画风，柔光美颜 · 浪漫偶像。",
+        "title": "K-Drama Idol",
+        "description": "Live action, soft beauty lighting · romantic idol drama.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -274,8 +274,8 @@
       {
         "id": "style/live_kurosawa",
         "category": "style",
-        "title": "黑泽明",
-        "description": "真人画风，黑白高对比 · 人性史诗。",
+        "title": "Kurosawa",
+        "description": "Live action, high-contrast black and white · human epic.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -289,8 +289,8 @@
       {
         "id": "style/live_nolan",
         "category": "style",
-        "title": "诺兰",
-        "description": "真人画风，IMAX · 冷蓝灰。",
+        "title": "Nolan",
+        "description": "Live action, IMAX · cool blue-gray.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -304,8 +304,8 @@
       {
         "id": "style/live_tarantino",
         "category": "style",
-        "title": "昆汀",
-        "description": "真人画风，高对比 · 暴力美学。",
+        "title": "Tarantino",
+        "description": "Live action, high contrast · aesthetics of violence.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -319,8 +319,8 @@
       {
         "id": "style/live_lynch",
         "category": "style",
-        "title": "大卫林奇",
-        "description": "真人画风，平淡日常 · 超现实。",
+        "title": "David Lynch",
+        "description": "Live action, ordinary daily life · surrealism.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -334,8 +334,8 @@
       {
         "id": "style/live_anderson",
         "category": "style",
-        "title": "韦斯安德森",
-        "description": "真人画风，糖果色 · 马卡龙。",
+        "title": "Wes Anderson",
+        "description": "Live action, candy colors · macarons.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -349,8 +349,8 @@
       {
         "id": "style/live_wong",
         "category": "style",
-        "title": "王家卫",
-        "description": "真人画风，胶片颗粒 · 东方都市。",
+        "title": "Wong Kar-wai",
+        "description": "Live action, film grain · East Asian city.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -364,8 +364,8 @@
       {
         "id": "style/live_shaw",
         "category": "style",
-        "title": "邵氏武侠",
-        "description": "真人画风，港式武侠 · 电影感。",
+        "title": "Shaw Brothers",
+        "description": "Live action, Hong Kong wuxia · cinematic.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -379,8 +379,8 @@
       {
         "id": "style/live_cyberpunk",
         "category": "style",
-        "title": "真人赛博朋克",
-        "description": "真人画风，电影质感 · 极致高清。",
+        "title": "Live Cyberpunk",
+        "description": "Live action, cinematic texture · ultra-high definition.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -394,8 +394,8 @@
       {
         "id": "style/anim_3d_cg",
         "category": "style",
-        "title": "3D 游戏 CG",
-        "description": "动画画风，影视级 · 虚幻引擎。",
+        "title": "3D Game CG",
+        "description": "Animation, cinematic · Unreal Engine.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -409,8 +409,8 @@
       {
         "id": "style/anim_cn_3d",
         "category": "style",
-        "title": "国风 3D",
-        "description": "动画画风，影视级 · 虚幻引擎。",
+        "title": "Chinese 3D",
+        "description": "Animation, cinematic · Unreal Engine.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -424,8 +424,8 @@
       {
         "id": "style/anim_kyoto",
         "category": "style",
-        "title": "商业动画 京都",
-        "description": "动画画风，柔和赛璐珞 · 石立太一。",
+        "title": "Kyoto Animation",
+        "description": "Animation, soft cel shading · Taichi Ishidate.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -439,8 +439,8 @@
       {
         "id": "style/anim_arcane",
         "category": "style",
-        "title": "油画三渲二",
-        "description": "动画画风，双城之战 · Arcane。",
+        "title": "Arcane (Oil 3D)",
+        "description": "Animation, Arcane · Fortiche.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -454,8 +454,8 @@
       {
         "id": "style/anim_us_3d",
         "category": "style",
-        "title": "美式 3D 动画",
-        "description": "动画画风，影视级 · 皮克斯。",
+        "title": "US 3D Animation",
+        "description": "Animation, cinematic · Pixar.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -469,8 +469,8 @@
       {
         "id": "style/anim_ink_wushan",
         "category": "style",
-        "title": "硬核水墨",
-        "description": "动画画风，雾山五行 · 枯笔。",
+        "title": "Hardcore Ink",
+        "description": "Animation, Fog Hill of Five Elements · dry brush.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -484,8 +484,8 @@
       {
         "id": "style/anim_ink_papercut",
         "category": "style",
-        "title": "水墨剪纸",
-        "description": "动画画风，雾山五行 · 重彩。",
+        "title": "Ink & Papercut",
+        "description": "Animation, Fog Hill of Five Elements · rich colors.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -499,8 +499,8 @@
       {
         "id": "style/anim_felt",
         "category": "style",
-        "title": "羊毛毡",
-        "description": "动画画风，定格 · 真实光影。",
+        "title": "Felt Stopmotion",
+        "description": "Animation, stop motion · realistic lighting.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -514,8 +514,8 @@
       {
         "id": "style/anim_clay",
         "category": "style",
-        "title": "黏土定格",
-        "description": "动画画风，定格 · 大师构图。",
+        "title": "Clay Stopmotion",
+        "description": "Animation, stop motion · masterful composition.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -529,8 +529,8 @@
       {
         "id": "style/anim_jp_horror",
         "category": "style",
-        "title": "日式惊悚",
-        "description": "动画画风，低饱和 · 动画美学。",
+        "title": "JP Horror",
+        "description": "Animation, low saturation · anime aesthetics.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -544,8 +544,8 @@
       {
         "id": "style/anim_kr_webtoon",
         "category": "style",
-        "title": "韩漫风格",
-        "description": "动画画风，半写实 · 浪漫光影。",
+        "title": "KR Webtoon",
+        "description": "Animation, semi-realism · romantic lighting.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -559,8 +559,8 @@
       {
         "id": "style/anim_zzz",
         "category": "style",
-        "title": "次世代三渲二",
-        "description": "动画画风，绝区零 · 法线调整。",
+        "title": "Zenless Zone Zero",
+        "description": "Animation, Zenless Zone Zero · adjusted normals.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -574,8 +574,8 @@
       {
         "id": "style/anim_ghibli",
         "category": "style",
-        "title": "吉卜力",
-        "description": "动画画风，宫崎骏 · 温暖质感。",
+        "title": "Ghibli",
+        "description": "Animation, Hayao Miyazaki · warm texture.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -589,8 +589,8 @@
       {
         "id": "style/anim_demon_slayer",
         "category": "style",
-        "title": "鬼灭 Ufotable",
-        "description": "动画画风，粗描边 · 战斗番。",
+        "title": "Demon Slayer",
+        "description": "Animation, thick outlines · battle anime.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -604,8 +604,8 @@
       {
         "id": "style/anim_cyberpunk",
         "category": "style",
-        "title": "动画赛博朋克",
-        "description": "动画画风，电影质感 · 高清。",
+        "title": "Anim Cyberpunk",
+        "description": "Animation, cinematic texture · high definition.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -619,8 +619,8 @@
       {
         "id": "style/anim_bloodborne",
         "category": "style",
-        "title": "血源克苏鲁",
-        "description": "动画画风，哥特 · 阴冷雾气。",
+        "title": "Bloodborne",
+        "description": "Animation, Gothic · cold mist.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -634,8 +634,8 @@
       {
         "id": "style/anim_itojunji",
         "category": "style",
-        "title": "伊藤润二",
-        "description": "动画画风，惊悚诡异 · 线条锐利。",
+        "title": "Junji Ito",
+        "description": "Animation, uncanny horror · sharp lines.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -649,8 +649,8 @@
       {
         "id": "style/anim_90s_retro",
         "category": "style",
-        "title": "90 年代日漫",
-        "description": "动画画风，渡边信一郎 · 神山健治。",
+        "title": "90s Retro Anime",
+        "description": "Animation, Shinichiro Watanabe · Kenji Kamiyama.",
         "stage": "style",
         "invoked_by": {
           "kind": "user_action",
@@ -664,8 +664,8 @@
       {
         "id": "text/ad_reference_video_prompt_authoring",
         "category": "text",
-        "title": "广告 / 短片 · 参考生视频单元编写",
-        "description": "为广告参考生视频脚本里待编写的单元写出引用语法正文。",
+        "title": "Ad / short film · reference-video unit authoring",
+        "description": "Write reference-syntax bodies for pending units in an ad reference-video script.",
         "stage": "prompt_authoring",
         "invoked_by": {
           "kind": "agent_tool",
@@ -680,22 +680,22 @@
           ]
         },
         "slots": {
-          "target_language": "输出语言",
-          "project_overview": "项目概述，键齐全的对象 {synopsis, genre, theme}；缺值传 null",
-          "style": "项目风格",
-          "style_description": "项目风格描述",
-          "aspect_ratio": "画面比例",
-          "aspect_ratio_label": "比例的文字标签",
-          "brief": "创作 brief；未填写时传 null",
-          "products": "商品信息块（名称 / 品牌 / 描述 / 卖点），由代码按商品数据渲染；无商品时传 null",
-          "product_names": "候选商品名列表",
-          "character_names": "候选角色名列表",
-          "scene_names": "候选场景名列表",
-          "prop_names": "候选道具名列表",
-          "units_content": "整份视频单元的渲染文本（由代码投影：序号 + 待编写标记 + 时长 + 正文）",
-          "pending_count": "待编写单元数",
-          "episode": "集号，广告片恒为单视频",
-          "instructions": "附加指令正文；缺值传 null"
+          "target_language": "Output language",
+          "project_overview": "Project overview, an object with all keys {synopsis, genre, theme}; use null for missing values",
+          "style": "Project style",
+          "style_description": "Project style description",
+          "aspect_ratio": "Aspect ratio",
+          "aspect_ratio_label": "Text label for the aspect ratio",
+          "brief": "Creative brief; null if not provided",
+          "products": "Product-information block (name / brand / description / selling points), rendered by code from product data; null without products",
+          "product_names": "Candidate product names",
+          "character_names": "Candidate character names",
+          "scene_names": "Candidate scene names",
+          "prop_names": "Candidate prop names",
+          "units_content": "Rendered text for all video units (projected by code: sequence number + pending marker + duration + body)",
+          "pending_count": "Pending unit count",
+          "episode": "Episode number; ads are always a single video",
+          "instructions": "Additional-instruction body; null if missing"
         },
         "protected": false,
         "output_schema": "lib.script.script_models:ReferencePromptAuthoringFlatScript"
@@ -703,8 +703,8 @@
       {
         "id": "text/ad_reference_video_script",
         "category": "text",
-        "title": "广告 / 短片 · 参考生视频单元",
-        "description": "按 brief 与资产候选一次产出广告片的参考生视频单元，每个单元含引用语法正文。",
+        "title": "Ad / short film · reference-video units",
+        "description": "Produce ad reference-video units in one pass from the brief and asset candidates, each with a reference-syntax body.",
         "stage": "script_plan",
         "invoked_by": {
           "kind": "agent_tool",
@@ -725,26 +725,26 @@
           ]
         },
         "slots": {
-          "target_language": "输出语言",
-          "project_overview": "项目概述，键齐全的对象 {synopsis, genre, theme}；缺值传 null",
-          "style": "项目风格",
-          "style_description": "项目风格描述",
-          "aspect_ratio": "画面比例",
-          "aspect_ratio_label": "比例的文字标签",
-          "brief": "创作 brief；未填写时传 null",
-          "assets": "已登记资产，对象 {characters, scenes, props}，每项是 [{name, aliases, appearance}] 列表（尖括号已中和；衍生写作「本体/衍生」）",
-          "products": "商品信息块（名称 / 品牌 / 描述 / 卖点），由代码按商品数据渲染；无商品时传 null",
-          "product_names": "候选商品名列表",
-          "character_names": "候选角色名列表",
-          "scene_names": "候选场景名列表",
-          "prop_names": "候选道具名列表",
-          "target_duration": "全片目标总时长（秒）",
-          "ad_duration_tier": "距目标总时长最近的审定档位（15 / 30 / 60 / 90），等距时取更接近 30 秒的一侧，用于解析配比表变体",
-          "off_tier_target_duration": "目标总时长不在审定档位内时的目标秒数，用于按比例适配说明；恰为档位时传 null",
-          "min_unit_duration": "单个 unit 编排时长下限（秒）",
-          "max_unit_duration": "单个 unit 编排时长上限（秒）",
-          "episode": "集号，广告片恒为单视频",
-          "instructions": "附加指令正文；缺值传 null"
+          "target_language": "Output language",
+          "project_overview": "Project overview, an object with all keys {synopsis, genre, theme}; use null for missing values",
+          "style": "Project style",
+          "style_description": "Project style description",
+          "aspect_ratio": "Aspect ratio",
+          "aspect_ratio_label": "Text label for the aspect ratio",
+          "brief": "Creative brief; null if not provided",
+          "assets": "Registered assets, an object {characters, scenes, props}, each a [{name, aliases, appearance}] list (angle brackets neutralized; derivatives written as “base/derivative”)",
+          "products": "Product-information block (name / brand / description / selling points), rendered by code from product data; null without products",
+          "product_names": "Candidate product names",
+          "character_names": "Candidate character names",
+          "scene_names": "Candidate scene names",
+          "prop_names": "Candidate prop names",
+          "target_duration": "Target total duration of the film (seconds)",
+          "ad_duration_tier": "Approved tier nearest the target total duration (15 / 30 / 60 / 90); ties favor the side nearer 30 seconds; used to resolve allocation-table variants",
+          "off_tier_target_duration": "Target seconds when the total target is not an approved tier, for proportional-adaptation instructions; null for an exact tier",
+          "min_unit_duration": "Minimum planned duration per unit (seconds)",
+          "max_unit_duration": "Maximum planned duration per unit (seconds)",
+          "episode": "Episode number; ads are always a single video",
+          "instructions": "Additional-instruction body; null if missing"
         },
         "protected": false,
         "output_schema": "lib.script.script_models:AdReferenceFlatScript"
@@ -752,8 +752,8 @@
       {
         "id": "text/ad_storyboard_prompt_authoring",
         "category": "text",
-        "title": "广告 / 短片 · 分镜提示词编写",
-        "description": "为广告分镜脚本里待编写的分镜补全画面与视频提示词（image_prompt / video_prompt）。",
+        "title": "Ad / short film · storyboard prompt authoring",
+        "description": "Complete image and video prompts (image_prompt / video_prompt) for pending shots in an ad shot script.",
         "stage": "prompt_authoring",
         "invoked_by": {
           "kind": "agent_tool",
@@ -768,20 +768,20 @@
           ]
         },
         "slots": {
-          "target_language": "输出语言",
-          "project_overview": "项目概述，键齐全的对象 {synopsis, genre, theme, world_setting}；缺值传 null",
-          "style": "项目风格",
-          "style_description": "项目风格描述",
-          "aspect_ratio": "画面比例",
-          "aspect_ratio_label": "比例的文字标签",
-          "brief": "创作 brief；未填写时传 null",
-          "character_names": "候选角色名列表（本体在前、衍生紧随其后），尖括号已中和",
-          "scene_names": "候选场景名列表",
-          "prop_names": "候选道具名列表",
-          "products": "商品信息块（名称 / 品牌 / 描述 / 卖点），由代码按商品数据渲染；无商品时传 null",
-          "shots_content": "整份分镜的渲染文本（由代码投影：待编写分镜带标记，其余分镜附已有画面与动作摘要）",
-          "episode": "集号，广告片恒为单视频",
-          "instructions": "附加指令正文；缺值传 null"
+          "target_language": "Output language",
+          "project_overview": "Project overview, an object with all keys {synopsis, genre, theme, world_setting}; use null for missing values",
+          "style": "Project style",
+          "style_description": "Project style description",
+          "aspect_ratio": "Aspect ratio",
+          "aspect_ratio_label": "Text label for the aspect ratio",
+          "brief": "Creative brief; null if not provided",
+          "character_names": "Candidate character names (base first, followed immediately by its derivatives), with angle brackets neutralized",
+          "scene_names": "Candidate scene names",
+          "prop_names": "Candidate prop names",
+          "products": "Product-information block (name / brand / description / selling points), rendered by code from product data; null without products",
+          "shots_content": "Rendered text for all shots (projected by code: pending shots marked, others include summaries of existing imagery and action)",
+          "episode": "Episode number; ads are always a single video",
+          "instructions": "Additional-instruction body; null if missing"
         },
         "protected": false,
         "output_schema": "lib.script.script_models:AdVisualScript"
@@ -789,8 +789,8 @@
       {
         "id": "text/ad_storyboard_script",
         "category": "text",
-        "title": "广告 / 短片 · 分镜脚本",
-        "description": "按 brief 与商品信息一次产出广告片的平铺分镜脚本。",
+        "title": "Ad / short film · shot script",
+        "description": "Produce a flat ad shot script in one pass from the brief and product information.",
         "stage": "script_plan",
         "invoked_by": {
           "kind": "agent_tool",
@@ -811,27 +811,27 @@
           ]
         },
         "slots": {
-          "target_language": "输出语言",
-          "project_overview": "项目概述，键齐全的对象 {synopsis, genre, theme, world_setting}；缺值传 null",
-          "style": "项目风格",
-          "style_description": "项目风格描述",
-          "aspect_ratio": "画面比例",
-          "aspect_ratio_label": "比例的文字标签",
-          "brief": "创作 brief；未填写时传 null",
-          "assets": "已登记资产，对象 {characters, scenes, props}，每项是 [{name, aliases, appearance}] 列表（尖括号已中和；衍生写作「本体/衍生」）",
-          "character_names": "候选角色名列表（本体在前、衍生紧随其后），尖括号已中和",
-          "scene_names": "候选场景名列表",
-          "prop_names": "候选道具名列表",
-          "products": "商品信息块（名称 / 品牌 / 描述 / 卖点），由代码按商品数据渲染；无商品时传 null",
-          "product_names": "候选商品名列表；无商品时传空列表",
-          "target_duration": "全片目标总时长（秒）",
-          "ad_duration_tier": "距目标总时长最近的审定档位（15 / 30 / 60 / 90），等距时取更接近 30 秒的一侧，用于解析配比表变体",
-          "off_tier_target_duration": "目标总时长不在审定档位内时的目标秒数，用于按比例适配说明；恰为档位时传 null",
-          "duration_constraint": "单分镜时长约束句，由视频模型支持的时长集合算出",
-          "speech_rate": "口播语速数值（项目覆盖优先，否则按语言默认），已格式化为文本",
-          "unit_noun": "阅读单位量词（字 / 词），随输出语言",
-          "episode": "集号，广告片恒为单视频",
-          "instructions": "附加指令正文；缺值传 null"
+          "target_language": "Output language",
+          "project_overview": "Project overview, an object with all keys {synopsis, genre, theme, world_setting}; use null for missing values",
+          "style": "Project style",
+          "style_description": "Project style description",
+          "aspect_ratio": "Aspect ratio",
+          "aspect_ratio_label": "Text label for the aspect ratio",
+          "brief": "Creative brief; null if not provided",
+          "assets": "Registered assets, an object {characters, scenes, props}, each a [{name, aliases, appearance}] list (angle brackets neutralized; derivatives written as “base/derivative”)",
+          "character_names": "Candidate character names (base first, followed immediately by its derivatives), with angle brackets neutralized",
+          "scene_names": "Candidate scene names",
+          "prop_names": "Candidate prop names",
+          "products": "Product-information block (name / brand / description / selling points), rendered by code from product data; null without products",
+          "product_names": "Candidate product names; empty list without products",
+          "target_duration": "Target total duration of the film (seconds)",
+          "ad_duration_tier": "Approved tier nearest the target total duration (15 / 30 / 60 / 90); ties favor the side nearer 30 seconds; used to resolve allocation-table variants",
+          "off_tier_target_duration": "Target seconds when the total target is not an approved tier, for proportional-adaptation instructions; null for an exact tier",
+          "duration_constraint": "Per-shot duration constraint sentence, calculated from the video model’s supported durations",
+          "speech_rate": "Speaking-rate value (project override first, otherwise language default), formatted as text",
+          "unit_noun": "Reading-unit noun (characters / words), following the output language",
+          "episode": "Episode number; ads are always a single video",
+          "instructions": "Additional-instruction body; null if missing"
         },
         "protected": false,
         "output_schema": "lib.script.script_models:AdEpisodeScript"
@@ -839,8 +839,8 @@
       {
         "id": "text/draft_repair",
         "category": "text",
-        "title": "待修复草稿 AI 修复",
-        "description": "按违约报告修改待修复草稿：违约落在条目上时只改这些条目，落在整集层面时整份修改。脚本规划草稿与参考生视频的提示词编写草稿共用。",
+        "title": "AI repair of a draft requiring repair",
+        "description": "Revise a draft using its violation report: edit only affected entries for entry-level violations, or the whole document for episode-level violations. Shared by script-plan drafts and reference-video prompt-authoring drafts.",
         "stage": "script_plan",
         "invoked_by": {
           "kind": "user_action",
@@ -848,13 +848,13 @@
         },
         "applies_to": {},
         "slots": {
-          "document": "草稿是哪种文档、条目数组的结构说明",
-          "root": "草稿正文里条目数组的键名（scenes / segments / units）",
-          "draft_json": "完整草稿正文的 JSON",
-          "targets": "条目模式下要修改的条目，键齐全的对象列表 {index, item_json, messages}；整集模式传 null",
-          "messages": "整集模式下的全部违约消息列表；条目模式传 null",
-          "source_text": "本集源文正文；没有源文可参照时传 null",
-          "instructions": "附加指令正文；无时传 null"
+          "document": "Draft document type and entry-array structure description",
+          "root": "Key of the entry array in the draft body (scenes / segments / units)",
+          "draft_json": "Full draft-body JSON",
+          "targets": "Entries to revise in entry mode, a list of objects with all keys {index, item_json, messages}; null in whole-episode mode",
+          "messages": "All violation messages in whole-episode mode; null in entry mode",
+          "source_text": "This episode’s source body; null without source text for reference",
+          "instructions": "Additional-instruction body; null if absent"
         },
         "protected": false,
         "output_schema": null
@@ -862,8 +862,8 @@
       {
         "id": "text/drama_prompt_authoring",
         "category": "text",
-        "title": "剧情演绎 · 提示词编写",
-        "description": "为剧情演绎已定稿的分镜补全画面与视频提示词（image_prompt / video_prompt）。",
+        "title": "Drama · prompt authoring",
+        "description": "Complete image and video prompts (image_prompt / video_prompt) for finalized drama shots.",
         "stage": "prompt_authoring",
         "invoked_by": {
           "kind": "agent_tool",
@@ -878,16 +878,16 @@
           ]
         },
         "slots": {
-          "target_language": "输出语言（自然语言字符串值所用语言）",
-          "project_overview": "项目概述，键齐全的对象 {synopsis, genre, theme, world_setting}；缺值传 null",
-          "style": "项目风格值",
-          "style_description": "项目风格描述",
-          "aspect_ratio": "画面比例（如 16:9）",
-          "aspect_ratio_label": "画面比例的文字说明（竖屏构图 / 横屏构图 / \"<比例> 构图\"），由代码按比例产出",
-          "assets": "出场资产外观，对象 {characters, scenes, props}，每项是 [{name, appearance}] 列表（尖括号已中和）；调用方不提供资产块时传 null",
-          "scenes_content": "script_plan 已定稿分镜内容的渲染文本（由代码投影，含口播与原文锚）",
-          "episode": "集号",
-          "instructions": "附加指令正文；无时传 null"
+          "target_language": "Output language for natural-language string values",
+          "project_overview": "Project overview, an object with all keys {synopsis, genre, theme, world_setting}; use null for missing values",
+          "style": "Project style value",
+          "style_description": "Project style description",
+          "aspect_ratio": "Aspect ratio (such as 16:9)",
+          "aspect_ratio_label": "Aspect-ratio description (portrait composition / landscape composition / \"<ratio> composition\"), produced by code from the ratio",
+          "assets": "Appearance of appearing assets, an object {characters, scenes, props}, each a [{name, appearance}] list (angle brackets neutralized); null if the caller provides no asset block",
+          "scenes_content": "Rendered finalized script_plan shot content (projected by code, including spoken content and source anchors)",
+          "episode": "Episode number",
+          "instructions": "Additional-instruction body; null if absent"
         },
         "protected": false,
         "output_schema": "lib.script.script_models:DramaVisualScript"
@@ -895,8 +895,8 @@
       {
         "id": "text/drama_script_plan",
         "category": "text",
-        "title": "剧情演绎脚本规划",
-        "description": "把本集源文拆为剧情演绎的结构化分镜内容：分镜边界、出场资产、画面描述、逐字口播与原文锚。",
+        "title": "Drama script planning",
+        "description": "Split this episode’s source into structured drama shot content: boundaries, appearing assets, visual descriptions, verbatim spoken content, and source anchors.",
         "stage": "script_plan",
         "invoked_by": {
           "kind": "agent_tool",
@@ -915,25 +915,25 @@
           ]
         },
         "slots": {
-          "source_kind": "源文类型",
-          "target_language": "输出语言，取项目源语言",
-          "project_overview": "项目概述，键齐全的对象 {synopsis, genre, theme, world_setting}；缺值传 null",
-          "style": "项目画风",
-          "assets": "已登记资产，对象 {characters, scenes, props}，每项是 [{name, aliases, appearance}] 列表（尖括号已中和；衍生写作「本体/衍生」）",
-          "character_names": "可引用的角色名，衍生写作「本体/衍生」",
-          "scene_names": "可引用的场景名",
-          "prop_names": "可引用的道具名",
-          "novel_text": "本集源文",
-          "episode": "集号",
-          "durations": "视频模型支持的秒数档位",
-          "max_duration": "最长档位秒数",
-          "default_duration": "单个分镜的默认秒数；未设置为空",
-          "speech_rate": "口播语速（每秒阅读单位数）",
-          "speech_unit": "阅读单位量词（字或词）",
-          "episode_target_duration": "单集目标时长秒数；未设置为空",
-          "episode_outline": "本集大纲（title、story_beats、hook、next_episode_teaser）；未规划为空",
-          "next_episode_outline": "下集大纲，形状同本集大纲；未规划为空",
-          "instructions": "附加指令；未提供为空"
+          "source_kind": "Source kind",
+          "target_language": "Output language, taken from the project source language",
+          "project_overview": "Project overview, an object with all keys {synopsis, genre, theme, world_setting}; use null for missing values",
+          "style": "Project visual style",
+          "assets": "Registered assets, an object {characters, scenes, props}, each a [{name, aliases, appearance}] list (angle brackets neutralized; derivatives written as “base/derivative”)",
+          "character_names": "Referenceable character names; derivatives written as “base/derivative”",
+          "scene_names": "Referenceable scene names",
+          "prop_names": "Referenceable prop names",
+          "novel_text": "This episode’s source",
+          "episode": "Episode number",
+          "durations": "Duration tiers in seconds supported by the video model",
+          "max_duration": "Longest tier in seconds",
+          "default_duration": "Default seconds per shot; empty if not set",
+          "speech_rate": "Speaking rate (reading units per second)",
+          "speech_unit": "Reading-unit noun (characters or words)",
+          "episode_target_duration": "Target episode duration in seconds; empty if not set",
+          "episode_outline": "This episode’s outline (title, story_beats, hook, next_episode_teaser); empty if unplanned",
+          "next_episode_outline": "Next episode’s outline, same shape as this episode’s; empty if unplanned",
+          "instructions": "Additional instructions; empty if not provided"
         },
         "protected": false,
         "output_schema": "lib.script.script_models:DramaNormalizedScript"
@@ -941,8 +941,8 @@
       {
         "id": "text/episode_plan",
         "category": "text",
-        "title": "分集规划",
-        "description": "把源文切分为若干集，每集给出标题、集尾钩子与结尾锚点，剧情演绎另给故事节点与下集预告语。",
+        "title": "Episode planning",
+        "description": "Split the source into episodes with a title, end hook, and end anchor for each; drama also includes story beats and a next-episode teaser.",
         "stage": "episode_plan",
         "invoked_by": {
           "kind": "agent_tool",
@@ -959,20 +959,20 @@
           ]
         },
         "slots": {
-          "content_mode": "创作类型轴值（drama / narration），用于解析命名变体片段",
-          "source_kind": "源文类型轴值（novel / screenplay），用于解析命名变体片段",
-          "synopsis": "故事概述；无时传 null",
-          "genre": "题材；无时传 null",
-          "unit_noun": "阅读单位量词（字 / 词），随源文语言",
-          "target_volume": "每集目标体量，键齐全的对象 {units, seconds, units_per_second}；seconds 与 units_per_second 仅按单集目标时长折算时有值，语速已格式化为文本；未设置时传 null",
-          "max_episodes": "本批最多规划的集数，由文本模型的输出上限推导",
-          "context_entries": "已规划末尾若干集，键齐全的对象列表 {episode, title, hook}，标题缺失时 title 为 null；无时传空列表",
-          "instructions": "附加指令正文；无时传 null",
-          "progress": "全局进度，键齐全的对象 {planned_count, remaining_units, window_units}；仅在有附加指令时传入，否则传 null",
-          "window_is_final": "本窗口是否已含全文结尾（规划一段未切分的原文时，是否已含这段原文的结尾）",
-          "followed_by_episode": "本窗口结尾之后紧接着已规划的集（规划一段未切分的原文且本窗口已含其结尾时为 true）",
-          "failure": "上一轮输出未通过校验的原因列表；首轮传 null",
-          "window": "本批源文窗口正文"
+          "content_mode": "Content-mode axis value (drama / narration), used to resolve named variant fragments",
+          "source_kind": "Source-kind axis value (novel / screenplay), used to resolve named variant fragments",
+          "synopsis": "Synopsis; null if absent",
+          "genre": "Genre; null if absent",
+          "unit_noun": "Reading-unit noun (characters / words), following the source language",
+          "target_volume": "Target volume per episode, an object with all keys {units, seconds, units_per_second}; seconds and units_per_second are populated only when converted from target episode duration, and the speaking rate is formatted as text; null if not set",
+          "max_episodes": "Maximum episodes to plan in this batch, derived from the text model’s output limit",
+          "context_entries": "Last few planned episodes, objects with all keys {episode, title, hook}, with null title when absent; empty list if none",
+          "instructions": "Additional-instruction body; null if absent",
+          "progress": "Overall progress, an object with all keys {planned_count, remaining_units, window_units}; supplied only with additional instructions, otherwise null",
+          "window_is_final": "Whether this window contains the full source’s ending (or the end of the unsplit source range being planned)",
+          "followed_by_episode": "An already planned episode immediately follows this window’s end (true when planning an unsplit source range and this window includes its ending)",
+          "failure": "Reasons the previous output failed validation; null on the first round",
+          "window": "Source-window body for this batch"
         },
         "protected": false,
         "output_schema": "lib.episode.episode_planner:DramaPlanDraft"
@@ -980,8 +980,8 @@
       {
         "id": "text/narration_prompt_authoring",
         "category": "text",
-        "title": "旁白解说 · 提示词编写",
-        "description": "为旁白解说已定稿的分镜补全画面与视频提示词（image_prompt / video_prompt）。",
+        "title": "Narration · prompt authoring",
+        "description": "Complete image and video prompts (image_prompt / video_prompt) for finalized narration shots.",
         "stage": "prompt_authoring",
         "invoked_by": {
           "kind": "agent_tool",
@@ -996,16 +996,16 @@
           ]
         },
         "slots": {
-          "target_language": "输出语言",
-          "project_overview": "项目概述，键齐全的对象 {synopsis, genre, theme, world_setting}；缺值传 null",
-          "style": "项目风格",
-          "style_description": "项目风格描述",
-          "aspect_ratio": "画面比例",
-          "aspect_ratio_label": "比例的文字标签",
-          "assets": "出场资产外观 {characters, scenes, props}，每项为 [{name, appearance}]，尖括号已中和",
-          "segments_content": "已定稿旁白分镜的只读内容投影",
-          "episode": "当前集号",
-          "instructions": "附加指令正文；缺值传 null"
+          "target_language": "Output language",
+          "project_overview": "Project overview, an object with all keys {synopsis, genre, theme, world_setting}; use null for missing values",
+          "style": "Project style",
+          "style_description": "Project style description",
+          "aspect_ratio": "Aspect ratio",
+          "aspect_ratio_label": "Text label for the aspect ratio",
+          "assets": "Appearing asset appearances {characters, scenes, props}, each [{name, appearance}], with angle brackets neutralized",
+          "segments_content": "Read-only content projection of finalized narration shots",
+          "episode": "Current episode number",
+          "instructions": "Additional-instruction body; null if missing"
         },
         "protected": false,
         "output_schema": "lib.script.script_models:NarrationVisualEpisodeScript"
@@ -1013,8 +1013,8 @@
       {
         "id": "text/narration_script_plan",
         "category": "text",
-        "title": "旁白解说 · 片段切分",
-        "description": "按朗读节奏把源文逐字切分为旁白解说分镜，并登记出场资产与时长。",
+        "title": "Narration · segment splitting",
+        "description": "Split the source verbatim into narration shots by reading rhythm, registering appearing assets and durations.",
         "stage": "script_plan",
         "invoked_by": {
           "kind": "agent_tool",
@@ -1029,19 +1029,19 @@
           ]
         },
         "slots": {
-          "target_language": "输出语言",
-          "project_overview": "项目概述，键齐全的对象 {synopsis, genre, theme, world_setting}；缺值传 null",
-          "novel_text": "逐字源文",
-          "assets": "已登记资产，对象 {characters, scenes, props}，每项是 [{name, aliases, appearance}] 列表（尖括号已中和；衍生写作「本体/衍生」）",
-          "character_names": "角色候选引用名列表",
-          "scene_names": "场景候选引用名列表",
-          "prop_names": "道具候选引用名列表",
-          "episode": "当前集号",
-          "durations": "排序去重后的合法秒数档位",
-          "max_duration": "最长合法秒数",
-          "default_duration": "默认秒数偏好；缺值或不在合法档位时传 null",
-          "episode_target_duration": "单集目标秒数；缺值传 null",
-          "instructions": "附加指令正文；缺值传 null"
+          "target_language": "Output language",
+          "project_overview": "Project overview, an object with all keys {synopsis, genre, theme, world_setting}; use null for missing values",
+          "novel_text": "Verbatim source text",
+          "assets": "Registered assets, an object {characters, scenes, props}, each a [{name, aliases, appearance}] list (angle brackets neutralized; derivatives written as “base/derivative”)",
+          "character_names": "Candidate referenceable character names",
+          "scene_names": "Candidate referenceable scene names",
+          "prop_names": "Candidate referenceable prop names",
+          "episode": "Current episode number",
+          "durations": "Sorted, deduplicated valid duration tiers in seconds",
+          "max_duration": "Longest valid duration in seconds",
+          "default_duration": "Preferred default seconds; null if missing or not a valid tier",
+          "episode_target_duration": "Target episode seconds; null if missing",
+          "instructions": "Additional-instruction body; null if missing"
         },
         "protected": false,
         "output_schema": "lib.script.script_models:NarrationScriptPlanDraft"
@@ -1049,8 +1049,8 @@
       {
         "id": "text/reference_video_prompt_authoring",
         "category": "text",
-        "title": "参考生视频 · 提示词编写",
-        "description": "把已确认的参考生视频单元正文扩写出景别、构图、运镜与画面细节。",
+        "title": "Reference video · prompt authoring",
+        "description": "Expand confirmed reference-video unit bodies with shot size, composition, camera movement, and visual details.",
         "stage": "prompt_authoring",
         "invoked_by": {
           "kind": "agent_tool",
@@ -1066,19 +1066,19 @@
           ]
         },
         "slots": {
-          "target_language": "输出语言",
-          "project_overview": "项目概述，键齐全的对象 {synopsis, genre, theme, world_setting}；缺值传 null",
-          "style": "项目风格值",
-          "style_description": "项目风格描述",
-          "aspect_ratio": "画面比例（如 9:16）",
-          "assets": "资产外观，对象 {characters, scenes, props}，每项是 [{name, appearance}] 列表（尖括号已中和）",
-          "character_names": "角色候选引用名列表（含 本体/衍生）",
-          "scene_names": "场景候选引用名列表",
-          "prop_names": "道具候选引用名列表",
-          "units_content": "已确认视频单元的渲染文本（由代码投影：序号 + 时长 + 正文）",
-          "episode": "当前集号",
-          "max_refs": "单个视频单元的参考图上限；不限时传 null",
-          "instructions": "附加指令正文；缺值传 null"
+          "target_language": "Output language",
+          "project_overview": "Project overview, an object with all keys {synopsis, genre, theme, world_setting}; use null for missing values",
+          "style": "Project style value",
+          "style_description": "Project style description",
+          "aspect_ratio": "Aspect ratio (such as 9:16)",
+          "assets": "Asset appearances, an object {characters, scenes, props}, each a [{name, appearance}] list (angle brackets neutralized)",
+          "character_names": "Candidate referenceable character names (including base/derivative)",
+          "scene_names": "Candidate referenceable scene names",
+          "prop_names": "Candidate referenceable prop names",
+          "units_content": "Rendered confirmed video units (projected by code: sequence number + duration + body)",
+          "episode": "Current episode number",
+          "max_refs": "Reference-image limit per video unit; null if unlimited",
+          "instructions": "Additional-instruction body; null if missing"
         },
         "protected": false,
         "output_schema": "lib.script.script_models:ReferencePromptAuthoringFlatScript"
@@ -1086,8 +1086,8 @@
       {
         "id": "text/reference_video_script_plan",
         "category": "text",
-        "title": "参考生视频 · 单元拆分",
-        "description": "把源文拆分为参考生视频单元表，每个单元含时长、原文锚与引用语法正文。",
+        "title": "Reference video · unit splitting",
+        "description": "Split the source into a reference-video unit table, each unit with duration, source anchor, and reference-syntax body.",
         "stage": "script_plan",
         "invoked_by": {
           "kind": "agent_tool",
@@ -1107,26 +1107,26 @@
           ]
         },
         "slots": {
-          "source_kind": "源文类型；只有剧情演绎会取 screenplay",
-          "target_language": "输出语言",
-          "project_overview": "项目概述，键齐全的对象 {synopsis, genre, theme, world_setting}；缺值传 null",
-          "assets": "已登记资产，对象 {characters, scenes, props}，每项是 [{name, aliases, appearance}] 列表（尖括号已中和；衍生写作「本体/衍生」）",
-          "character_names": "角色候选引用名列表（含 本体/衍生）",
-          "scene_names": "场景候选引用名列表",
-          "prop_names": "道具候选引用名列表",
-          "novel_text": "逐字源文",
-          "episode_outline": "本集大纲，键齐全的对象 {title, story_beats, hook, next_episode_teaser}；无有效内容时传 null",
-          "next_episode_outline": "下集大纲，形状同上；无有效内容时传 null",
-          "episode": "当前集号",
-          "durations": "排序去重后的合法秒数档位，已格式化为文本",
-          "duration_tiers": "「参考图↔时长」两套档位，对象 {with_references, without_references, default_with_references_only, default_without_references_only}，档位已格式化为文本，后两项表示默认秒数只落在其中一套档位内；两套相同或型号未声明时传 null",
-          "default_duration": "默认秒数偏好；未设置时传 null",
-          "speech_rate": "口播语速（阅读单位 / 秒），已格式化为文本",
-          "speech_unit": "阅读单位量词（字 / 词）",
-          "max_duration": "单次生成的时长上限（秒）",
-          "max_reference_images": "单个视频单元的参考图上限；不限时传 null",
-          "episode_target_duration": "单集目标秒数；未设置时传 null",
-          "instructions": "附加指令正文；缺值传 null"
+          "source_kind": "Source kind; only drama uses screenplay",
+          "target_language": "Output language",
+          "project_overview": "Project overview, an object with all keys {synopsis, genre, theme, world_setting}; use null for missing values",
+          "assets": "Registered assets, an object {characters, scenes, props}, each a [{name, aliases, appearance}] list (angle brackets neutralized; derivatives written as “base/derivative”)",
+          "character_names": "Candidate referenceable character names (including base/derivative)",
+          "scene_names": "Candidate referenceable scene names",
+          "prop_names": "Candidate referenceable prop names",
+          "novel_text": "Verbatim source text",
+          "episode_outline": "This episode’s outline, an object with all keys {title, story_beats, hook, next_episode_teaser}; null without valid content",
+          "next_episode_outline": "Next episode’s outline, same shape as above; null without valid content",
+          "episode": "Current episode number",
+          "durations": "Sorted, deduplicated valid duration tiers in seconds, formatted as text",
+          "duration_tiers": "Two reference-image/duration tier sets, an object {with_references, without_references, default_with_references_only, default_without_references_only}; tiers formatted as text, with the last two fields indicating that default seconds belong to only one set; null when sets are identical or the model declares none",
+          "default_duration": "Preferred default seconds; null if not set",
+          "speech_rate": "Speaking rate (reading units / second), formatted as text",
+          "speech_unit": "Reading-unit noun (characters / words)",
+          "max_duration": "Maximum duration per generation call (seconds)",
+          "max_reference_images": "Reference-image limit per video unit; null if unlimited",
+          "episode_target_duration": "Target episode seconds; null if not set",
+          "instructions": "Additional-instruction body; null if missing"
         },
         "protected": false,
         "output_schema": "lib.script.script_models:ReferenceScriptPlanFlatDraft"
@@ -1134,8 +1134,8 @@
       {
         "id": "text/source_overview",
         "category": "text",
-        "title": "源文总览",
-        "description": "从项目源文提炼项目概述（故事梗概、题材、主题、世界观与源语言），供之后所有生成环节的提示词使用。",
+        "title": "Source overview",
+        "description": "Derive a project overview (synopsis, genre, theme, world setting, and source language) from project source text for prompts in all later generation stages.",
         "stage": "source_overview",
         "invoked_by": {
           "kind": "user_action",
@@ -1148,9 +1148,9 @@
           ]
         },
         "slots": {
-          "source_kind": "源文类型",
-          "target_language": "输出语言，取项目源语言，缺省为中文",
-          "source_content": "项目 source 目录下全部源文拼接的正文"
+          "source_kind": "Source kind",
+          "target_language": "Output language, taken from the project source language, defaulting to Chinese",
+          "source_content": "Concatenated body of all source text in the project source directory"
         },
         "protected": false,
         "output_schema": "lib.project.project_manager:ProjectOverview"
@@ -1158,8 +1158,8 @@
       {
         "id": "text/style_analysis",
         "category": "text",
-        "title": "风格参考图分析",
-        "description": "从用户上传的风格参考图提炼画风描述，写入项目的风格描述。",
+        "title": "Style-reference image analysis",
+        "description": "Extract a visual-style description from the user’s uploaded style-reference image and write it to the project style description.",
         "stage": "style_analysis",
         "invoked_by": {
           "kind": "user_action",

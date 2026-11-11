@@ -369,7 +369,7 @@ defineRegionScenarios("全局设置", [
     path: `${PROMPT_TEMPLATES}&template=text/episode_plan`,
     ready: async (page) => {
       await settingsReady(page);
-      await page.getByRole("heading", { name: "分集规划", level: 2 }).waitFor();
+      await page.getByRole("heading", { name: "Episode planning", level: 2 }).waitFor();
     },
     act: async (page) => {
       const main = page.getByRole("main");
@@ -385,7 +385,7 @@ defineRegionScenarios("全局设置", [
     path: `${PROMPT_TEMPLATES}&template=text/episode_plan`,
     ready: async (page) => {
       await settingsReady(page);
-      await page.getByRole("heading", { name: "分集规划", level: 2 }).waitFor();
+      await page.getByRole("heading", { name: "Episode planning", level: 2 }).waitFor();
     },
     act: async (page) => {
       const main = page.getByRole("main");
