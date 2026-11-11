@@ -100,7 +100,7 @@ The Markdown audit intentionally reports translated human placeholders, example 
 ## Compatibility choices
 
 - Preserve the three style-template bodies expanded by historical v13→v14 migration, while translating their metadata. New fixed-value tests prevent an indirect migration-data change.
-- Preserve historical Chinese diagnostics, matchers, `图N` / `@图片N` / `@音频N` syntax, pending markers, locale values and source-language defaults.
+- Preserve historical Chinese diagnostics, matchers, `图N` syntax (the former reference-video markers `@图片N` / `@音频N` are now `@Image N` / `@Audio N`, [ADR 0126](../../adr/0126-english-reference-video-prompt-markers.md)), pending markers, locale values and source-language defaults.
 - Normalize only the exact historical built-in image Avoid declaration at render time, preventing duplicate system trailers without rewriting stored prompts or removing customized restrictions.
 - Existing customized profiles may retain Chinese content through the existing three-way synchronization rules. No forced reset distributes this translation.
 
