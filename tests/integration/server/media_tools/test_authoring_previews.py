@@ -155,15 +155,16 @@ async def test_reference_unit_preview_reports_send_order_bindings_and_digests(tm
     assert preview["captured_submission"] is None
     assert preview["storyboard_image"]["unavailable"] == "prompt_preview_not_applicable"
     text = preview["video"]["text"]
-    # MCP-007: markers stay verbatim Chinese functional syntax in send order.
-    assert "<酒馆>@图片1、<张三/劲装>@图片2" in text
-    assert "@音频1" in text
-    assert "@音频2" in text
+    # Reference markers use the English form Seedance documents, in send order (resolves MCP-007).
+    assert "<酒馆>@Image 1, <张三/劲装>@Image 2." in text
+    assert "@Audio 1" in text
+    assert "@Audio 2" in text
+    assert "@图片" not in text and "@音频" not in text
     request = preview["reference_video"]
     images = request["images"]
     assert [(image["marker"], image["type"], image["name"]) for image in images] == [
-        ("@图片1", "scene", "酒馆"),
-        ("@图片2", "character", "张三/劲装"),
+        ("@Image 1", "scene", "酒馆"),
+        ("@Image 2", "character", "张三/劲装"),
     ]
     derivative = images[1]
     assert (derivative["base_name"], derivative["is_derivative"], derivative["kind"]) == ("张三", True, "sheet")
@@ -172,10 +173,12 @@ async def test_reference_unit_preview_reports_send_order_bindings_and_digests(tm
     # Speech binds to base characters; audio numbers follow first speaker mention and match the request order.
     audio = request["audio"]
     assert [(entry["marker"], entry["speaker"], entry["artifact_path"]) for entry in audio] == [
-        ("@音频1", "张三", "characters/refs_audio/张三.mp3"),
-        ("@音频2", "李四", "characters/refs_audio/李四.mp3"),
+        ("@Audio 1", "张三", "characters/refs_audio/张三.mp3"),
+        ("@Audio 2", "李四", "characters/refs_audio/李四.mp3"),
     ]
     assert all(entry["sha256"] for entry in audio)
+    # Every reported marker is literally present in the rendered text: preview rows and prompt cannot drift.
+    assert all(entry["marker"] in text for entry in [*images, *audio])
     assert request["provider_id"] == "fake"
     assert request["request_duration_seconds"] == 3
     assert _files_unchanged(project_dir, before)

@@ -21,7 +21,12 @@ from lib.infra.async_thread import run_sync_transaction
 from lib.infra.content_digest import sha256_file_with_size
 from lib.project.project_manager import ProjectManager
 from lib.references.reference_catalog import build_reference_catalog
+
+# IMAGE_MARKER / AUDIO_MARKER: the renderer's own marker forms, reported verbatim so preview rows and the
+# rendered prompt cannot drift.
 from lib.script.reference_video.prompt_render import (
+    AUDIO_MARKER,
+    IMAGE_MARKER,
     RenderedUnitPrompt,
     render_video_unit_prompt,
     resolve_reference_audio_paths,
@@ -40,11 +45,6 @@ UNAVAILABLE_REFERENCE_CAPABILITY = "reference_capability_unavailable"
 
 #: Machine-readable statement that a preview reflects current project files and configuration, not a captured submission.
 PREVIEW_BASIS_CURRENT = "current_configuration"
-
-#: Image/audio reference markers emitted by ``lib.script.reference_video.prompt_render``. They are functional
-#: prompt syntax bound to request order and are reported verbatim (never translated).
-IMAGE_MARKER = "@图片{index}"
-AUDIO_MARKER = "@音频{index}"
 
 
 class ReferenceUnitNotFound(LookupError):
@@ -150,7 +150,7 @@ def render_reference_prompt_preview(
 
 @dataclass(frozen=True)
 class ReferenceImageInput:
-    """One reference image in request order; ``index`` is the ``@图片N`` number (1-based)."""
+    """One reference image in request order; ``index`` is the ``@Image N`` number (1-based)."""
 
     index: int
     marker: str
@@ -169,7 +169,7 @@ class ReferenceImageInput:
 
 @dataclass(frozen=True)
 class ReferenceAudioInput:
-    """One reference-audio segment in request order; ``index`` is the ``@音频N`` number (1-based).
+    """One reference-audio segment in request order; ``index`` is the ``@Audio N`` number (1-based).
 
     Voice always binds to the base character (``speaker``), independent of the derivative appearance shown in images."""
 
@@ -179,7 +179,7 @@ class ReferenceAudioInput:
     artifact_path: str | None
     sha256: str | None
     size_bytes: int | None
-    #: ``@图片N`` number the backend attaches this audio to, for backends binding audio per image; otherwise ``None``.
+    #: ``@Image N`` number the backend attaches this audio to, for backends binding audio per image; otherwise ``None``.
     target_image_index: int | None
 
 
@@ -248,7 +248,7 @@ def _image_inputs(
 
 
 def _audio_inputs(project_path: Path, rendering: ReferenceUnitRendering) -> tuple[ReferenceAudioInput, ...]:
-    """Audio in ``@音频N`` order, filtered like execution's request wiring for per-image backends."""
+    """Audio in ``@Audio N`` order, filtered like execution's request wiring for per-image backends."""
 
     rendered = rendering.rendered
     pairs = list(zip(rendered.audio_speakers, rendered.audio_speaker_reference_index, strict=True))

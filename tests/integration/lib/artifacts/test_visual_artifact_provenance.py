@@ -1145,3 +1145,28 @@ def test_dropping_asset_names_from_a_frozen_basis_matches_the_builder(tmp_path: 
             without_asset_names(basis.kind, unnamed[kind].to_evidence_dict()["inputs"])
             == json.loads(unnamed[kind].normalized_bytes())["inputs"]
         ), kind
+
+
+def test_reference_video_staleness_basis_ignores_the_prompt_marker_form(tmp_path: Path, monkeypatch) -> None:
+    """Selected reference videos stay current when the rendered marker form changes (Chinese → English):
+    the staleness basis projects unit text and sent images, never the rendered prompt, so a marker-only
+    change suggests no paid regeneration."""
+    from lib.script.reference_video import prompt_render
+
+    reference = tmp_path / "ref.png"
+    reference.write_bytes(b"png")
+
+    def build() -> str:
+        return build_reference_video_artifact_visual_basis(
+            unit={"unit_id": "E1U01", "text": "@[阿黎] 走入雨巷。\n@[阿黎]：{走吧。}"},
+            request_assets=(_request_asset(reference, asset_type="character", name="阿黎"),),
+            style="水墨",
+            aspect_ratio="9:16",
+        ).digest
+
+    english = build()
+    monkeypatch.setattr(prompt_render, "IMAGE_MARKER", "@图片{index}")
+    monkeypatch.setattr(prompt_render, "AUDIO_MARKER", "@音频{index}")
+    monkeypatch.setattr(prompt_render, "BINDING_JOINER", "、")
+    monkeypatch.setattr(prompt_render, "BINDING_TERMINATOR", "。")
+    assert build() == english

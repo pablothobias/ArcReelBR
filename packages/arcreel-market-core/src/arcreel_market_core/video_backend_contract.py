@@ -311,7 +311,7 @@ class VideoGenerationRequest:
     # (such as ``asset://<id>``) instead of image contents, preserving position and prompt image numbering. Only backends declaring
     # asset-reference support for reference-image slots receive non-None items; other backends do not read this field.
     reference_image_asset_uris: list[str | None] | None = None
-    # Reference audio (voice replication). List order is the prompt's “音频N” reference contract: orchestration builds identification
+    # Reference audio (voice replication). List order is the prompt's “Audio N” reference contract: orchestration builds identification
     # text in this order and backends send in the same order; neither side may reorder or skip. Character-to-audio bindings are absent from requests
     # because prompt text expresses them; provider APIs have no structured character-to-audio field.
     reference_audio_files: list[Path] | None = None

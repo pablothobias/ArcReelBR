@@ -560,6 +560,7 @@ def _reference_checkpoint(
     *,
     endpoint_guard: str | None = None,
     legacy_narration: dict[str, Any] | None = None,
+    prompt: str = "frozen actual prompt",
 ) -> str:
     from lib.script.reference_video.execution_checkpoint import ReferenceSubmissionCheckpoint
 
@@ -593,7 +594,7 @@ def _reference_checkpoint(
         provider_model_id="cinema-v1",
         backend_model_id="cinema-v1-resolved",
         endpoint_guard=endpoint_guard,
-        prompt="frozen actual prompt",
+        prompt=prompt,
         duration_seconds=12,
         aspect_ratio="16:9",
         resolution="1080p",
@@ -695,6 +696,56 @@ async def test_reference_resume_reads_only_strict_checkpoint_request_and_cleans_
     finalize.assert_awaited_once()
     assert finalize.await_args.kwargs["script_file"] == "scripts/frozen.json"
     assert not (fake_pm.project_path / ".arcreel" / "tasks" / "T-ref" / "provider_media").exists()
+
+
+@pytest.mark.asyncio
+async def test_reference_resume_replays_pre_switch_chinese_marker_prompt(monkeypatch, fake_pm):
+    """A job submitted before the English-marker switch resumes with its stored prompt verbatim: polling only,
+    never a re-render or resubmission, so the provider job and its charge stay the original ones."""
+    from server.services.tasks import resume_executor
+    from server.services.tasks.resume_executor import execute_resume_video_task
+
+    pre_switch_prompt = "<酒馆>@图片1、<张三>@图片2。\n<张三>: Dialogue voice reference @音频1; use only timbre."
+    fake_gen = _FakeGenerator()
+    monkeypatch.setattr(resume_executor, "get_project_manager", lambda: fake_pm)
+
+    async def _resolve(project_name: str, payload: dict, **kwargs: Any):
+        return _fake_video_context(
+            fake_gen,
+            endpoint="dashscope-async-video",
+            provider_id="custom-7",
+            provider_model_id="cinema-v1",
+            backend_model_id="cinema-v1-resolved",
+        )
+
+    monkeypatch.setattr(resume_executor, "resolve_generation_context", _resolve)
+    monkeypatch.setattr(
+        resume_executor,
+        "finalize_reference_video_unit",
+        AsyncMock(return_value={"resource_type": "reference_videos", "resource_id": "E1U1"}),
+    )
+    monkeypatch.setattr(resume_executor, "emit_generation_success_batch", lambda **_kwargs: None)
+    task = {
+        "task_id": "T-ref",
+        "task_type": "reference_video",
+        "media_type": "video",
+        "project_name": "demo",
+        "resource_id": "E1U1",
+        "script_file": "scripts/frozen.json",
+        "provider_id": "custom-7",
+        "provider_job_id": "job-1",
+        "provider_endpoint": "dashscope-async-video",
+        "submitted_base_url": "https://submitted.example/v1",
+        "execution_checkpoint_json": _reference_checkpoint(
+            fake_pm.project_path, endpoint_guard="dashscope-async-video", prompt=pre_switch_prompt
+        ),
+        "payload": {"script_file": "scripts/frozen.json", "video_provider_r2v": "custom-7/cinema-v1"},
+    }
+
+    await execute_resume_video_task(task, job_id="job-1")
+
+    assert len(fake_gen.resume_calls) == 1
+    assert fake_gen.resume_calls[0]["prompt"] == pre_switch_prompt
 
 
 @pytest.mark.asyncio

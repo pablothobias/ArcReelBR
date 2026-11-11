@@ -644,7 +644,7 @@ class DashScopeVideoBackend(EntryBoundCapabilities, ProviderJobIdPersistenceMixi
 
         Both attachment forms (separate media items and per-clip ``reference_voice``) share decoding here:
         unsupported audio capabilities, unsupported extensions, or any unreadable clip fail loudly.
-        Never skip clips: order defines prompt “音频N” references; silently omitting clips breaks character-voice declarations
+        Never skip clips: order defines prompt “Audio N” references; silently omitting clips breaks character-voice declarations
         while still charging. ``gate_video_request`` validates count/total-duration limits before billing.
         """
         audio_files = list(request.reference_audio_files or [])

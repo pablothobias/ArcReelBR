@@ -455,7 +455,7 @@ async def test_execute_reference_video_task_rechecks_text_to_video_capability(
 async def test_execute_reference_video_task_sends_reference_audio_in_prompt_order(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ):
-    """Class A tracer bullet: request reference_audio_files order exactly matches first-section @音频N declarations."""
+    """Class A tracer bullet: request reference_audio_files order exactly matches first-section @Audio N declarations."""
     proj_dir = write_project(tmp_path)
 
     project = json.loads((proj_dir / "project.json").read_text(encoding="utf-8"))
@@ -519,17 +519,17 @@ async def test_execute_reference_video_task_sends_reference_audio_in_prompt_orde
     prompt = captured["prompt"]
     # Speaker first-occurrence order = audio numbering = request-field order (李四 speaks first although 张三 appears first).
     assert (
-        "<李四>: Dialogue voice reference @音频1; use only timbre, speech rate, and emotion; the body text is authoritative for dialogue; Voice characteristics: 清亮少女音."
+        "<李四>: Dialogue voice reference @Audio 1; use only timbre, speech rate, and emotion; the body text is authoritative for dialogue; Voice characteristics: 清亮少女音."
         in prompt
     )
     assert (
-        "<张三>: Dialogue voice reference @音频2; use only timbre, speech rate, and emotion; the body text is authoritative for dialogue; Voice characteristics: 低沉沙哑的男声."
+        "<张三>: Dialogue voice reference @Audio 2; use only timbre, speech rate, and emotion; the body text is authoritative for dialogue; Voice characteristics: 低沉沙哑的男声."
         in prompt
     )
     assert [p.name for p in captured["reference_audio_files"]] == ["李四.mp3", "张三.wav"]
-    # Speaker slots derive no reference image: 李四 has no @图片N binding.
-    assert "<张三>@图片1。" in prompt
-    assert "<李四>@图片" not in prompt
+    # Speaker slots derive no reference image: 李四 has no @Image N binding.
+    assert "<张三>@Image 1." in prompt
+    assert "<李四>@Image" not in prompt
 
     frozen_speech_paths: dict[str, Path] = {}
     submitted_audio_paths: list[Path] = []
@@ -623,10 +623,10 @@ async def test_execute_reference_video_task_omits_reference_audio_when_episode_i
     assert captured["reference_audio_files"] is None
     assert captured["reference_audio_targets"] is None
     prompt = captured["prompt"]
-    assert "@音频" not in prompt
+    assert "@Audio" not in prompt
     # Dialogue and image bindings remain; only voice-reference lines disappear.
     assert "<张三> says {今晚的酒，我请。}" in prompt
-    assert "<张三>@图片1。" in prompt
+    assert "<张三>@Image 1." in prompt
     assert {"key": "ref_warn_silent_episode", "params": {}} in result["warnings"]
 
 
@@ -867,7 +867,7 @@ async def test_execute_reference_video_task_omits_audio_field_for_soft_tier(
 
     assert captured["reference_audio_files"] is None
     assert "<张三>: Voice characteristics: 低沉沙哑的男声." in captured["prompt"]
-    assert "@音频" not in captured["prompt"]
+    assert "@Audio" not in captured["prompt"]
 
 
 @pytest.mark.asyncio
@@ -1795,7 +1795,7 @@ async def test_execute_reference_video_task_prompt_matches_clipped_refs(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ):
-    """Prompt `@图片N` indices match backend reference_images. After clipping references, slice again to `constrained_refs` length; rendering full `unit.references` would create out-of-range `@图片N` indices (five images clipped to one but prompt still contains `@图片5`)."""
+    """Prompt `@Image N` indices match backend reference_images. After clipping references, slice again to `constrained_refs` length; rendering full `unit.references` would create out-of-range `@Image N` indices (five images clipped to one but prompt still contains `@Image 5`)."""
     proj_dir = write_project(tmp_path)
 
     # Add a prop sheet for three references: character + scene + prop.
@@ -1857,17 +1857,17 @@ async def test_execute_reference_video_task_prompt_matches_clipped_refs(
         user_id="u1",
     )
 
-    # Clip three images to one: first section binds only @图片1, never @图片2/@图片3.
+    # Clip three images to one: first section binds only @Image 1, never @Image 2/@Image 3.
     assert len(captured["reference_images"]) == 1
     prompt = captured["prompt"]
-    assert "@图片1" in prompt
-    assert "@图片2" not in prompt
-    assert "@图片3" not in prompt
+    assert "@Image 1" in prompt
+    assert "@Image 2" not in prompt
+    assert "@Image 3" not in prompt
     # Clipped @酒馆 / @瓶子 remain visual subjects (<X> is independent of image numbering), without binding lines or outgoing images.
     assert "<酒馆>" in prompt
     assert "<瓶子>" in prompt
-    assert "<酒馆>@图片" not in prompt
-    assert "<瓶子>@图片" not in prompt
+    assert "<酒馆>@Image" not in prompt
+    assert "<瓶子>@Image" not in prompt
     from lib.script.reference_video.request_projection import clamp_reference_assets
     from server.services.tasks.reference_video_tasks import reference_video_visual_basis_digest
 
@@ -1903,7 +1903,7 @@ async def test_execute_reference_video_task_prompt_matches_deduped_refs(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ):
-    """If unit.references has NFC/NFD duplicates for one character, prompt `@图片N` numbering matches deduplicated reference_images. Use the same deduplication count for images and logical render references; otherwise `@图片2` rebinds `@图片1`'s asset and a genuinely different later image loses its number."""
+    """If unit.references has NFC/NFD duplicates for one character, prompt `@Image N` numbering matches deduplicated reference_images. Use the same deduplication count for images and logical render references; otherwise `@Image 2` rebinds `@Image 1`'s asset and a genuinely different later image loses its number."""
     import unicodedata
 
     proj_dir = write_project(tmp_path)
@@ -1969,9 +1969,9 @@ async def test_execute_reference_video_task_prompt_matches_deduped_refs(
     # Three references including an NFC/NFD duplicate yield two images; numbering must match.
     assert len(captured["reference_images"]) == 2
     prompt = captured["prompt"]
-    assert "@图片1" in prompt
-    assert "@图片2" in prompt
-    assert "@图片3" not in prompt
+    assert "@Image 1" in prompt
+    assert "@Image 2" in prompt
+    assert "@Image 3" not in prompt
 
 
 @pytest.mark.asyncio

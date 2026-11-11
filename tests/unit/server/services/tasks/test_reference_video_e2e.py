@@ -213,7 +213,7 @@ async def test_e2e_three_bucket_mentions_with_multi_line_body(three_bucket_clien
 
     # 5) Assert three-part rendering: first section binds by body mention order; replace all body @mentions with <X>.
     rendered = captured_backend_kwargs["prompt"]
-    assert rendered.startswith("<张三>@图片1、<酒馆>@图片2、<长剑>@图片3。")
+    assert rendered.startswith("<张三>@Image 1, <酒馆>@Image 2, <长剑>@Image 3.")
     assert "@张三" not in rendered  # All @ markers replaced.
     assert "@酒馆" not in rendered
     assert "@长剑" not in rendered

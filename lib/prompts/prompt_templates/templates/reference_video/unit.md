@@ -9,7 +9,7 @@ invoked_by:
   name: reference_video
 applies_to: {}
 slots:
-  declarations: "First part: subject bindings (<X>@图片N), appearance declarations for the same character, and voice declarations (@音频N); empty without reference material"
+  declarations: "First part: subject bindings (<X>@Image N), appearance declarations for the same character, and voice declarations (@Audio N); empty without reference material"
   body: "Second part: unit body, with mentions replaced by subject tokens, dialogue tokens reassembled, and narration tokens discarded"
   style: "Project visual style"
   style_description: "Project style description"

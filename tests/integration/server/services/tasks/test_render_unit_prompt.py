@@ -29,7 +29,7 @@ def test_render_unit_prompt_binds_subjects_in_first_mention_order():
         project,
         VoiceRenderSettings(model_id="m", audio_ready=set()),
     )
-    assert "<张三>@图片1、<酒馆>@图片2。" in rendered.prompt
+    assert "<张三>@Image 1, <酒馆>@Image 2." in rendered.prompt
     assert "@张三" not in rendered.prompt
     assert "[图1]" not in rendered.prompt
 
@@ -45,5 +45,5 @@ def test_render_unit_prompt_binds_all_product_images_and_adds_fidelity_guard():
         ],
     )
 
-    assert "<商品甲>@图片1、<商品甲>@图片2。" in rendered.prompt
+    assert "<商品甲>@Image 1, <商品甲>@Image 2." in rendered.prompt
     assert "High-fidelity product reproduction (highest priority" in rendered.prompt

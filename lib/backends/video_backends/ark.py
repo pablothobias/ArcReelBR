@@ -385,7 +385,7 @@ class ArkVideoBackend(ProviderJobIdPersistenceMixin):
         content.extend(await asyncio.to_thread(self._build_image_content, request))
 
         if request.reference_audio_files:
-            # Audio and image items share content arrays, independently numbered by type: prompt “音频N”
+            # Audio and image items share content arrays, independently numbered by type: prompt “Audio N”
             # means the Nth type="audio_url" item (official Quick Start prompt rules). Therefore preserve
             # original reference_audio_files order without skipping any clips; skipping shifts orchestration-authored
             # references and assigns character A's voice to B. gather returns input order, so
@@ -496,7 +496,7 @@ class ArkVideoBackend(ProviderJobIdPersistenceMixin):
                     model=self._model,
                     names=", ".join(p.name or str(p) for p in missing),
                 )
-            # Asset references replace image content at the same position, without insertion/deletion/reordering: prompt “图片N” still points to the Nth reference item.
+            # Asset references replace image content at the same position, without insertion/deletion/reordering: prompt “Image N” still points to the Nth reference item.
             content.extend(
                 {
                     "type": "image_url",

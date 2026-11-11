@@ -996,7 +996,7 @@ class MediaGenerator:
             reference_images: Reference-image list (multi-reference mode)
             reference_image_asset_uris: Same length/order as reference_images; non-None item i sends image i as that provider
                 asset reference, without content upload, compression or byte preflight. Requires backends declaring asset references for reference-image slots
-            reference_audio_files: Reference-audio list (voice cloning), ordered as prompt references 音频N
+            reference_audio_files: Reference-audio list (voice cloning), ordered as prompt references Audio N
             reference_audio_targets: Same length/order as reference_audio_files; item i is that audio segment's corresponding
                 reference_images index (0-based). Read only when backends declare reference_audio_per_image;
                 see VideoGenerationRequest.reference_audio_targets
@@ -1203,7 +1203,7 @@ class MediaGenerator:
                     # Compression preserves order/count; asset-reference entries pass through original paths, so references aligned to reference_images also align to ref_arg.
                     reference_image_asset_uris=asset_uris,
                     # Audio bypasses compressors (specs contain only images), so pass original lists directly: their order matches prompt
-                    # 音频N references; reordering assigns character A's voice to character B.
+                    # Audio N references; reordering assigns character A's voice to character B.
                     reference_audio_files=reference_audio_files,
                     # Array-reference compression preserves order/count, so targets calculated by callers from uncompressed
                     # reference_images indices remain valid for compressed ref_arg.

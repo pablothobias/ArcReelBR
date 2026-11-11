@@ -452,12 +452,12 @@ async def execute_reference_video_task(
         warnings.append(duration_warning)
 
     # 4. All content modes share three-part rendering. Resolved entries carry request paths and logical subjects; one logical product
-    #    reference can expand to several images. Pass truncated entries directly to rendering so 1-based `图片N` indices
+    #    reference can expand to several images. Pass truncated entries directly to rendering so 1-based `Image N` indices
     #    correspond exactly to actual reference_images sent to the call channel. Product-fidelity suffixes name only products with images actually sent.
     #    Always reconstruct prompts from scripts freshly read at execution (mutable scripts + queue dedup ignoring payload:
     #    enqueue snapshots would lose subsequent unit-body edits). Prompts serve only structural validation at enqueue
     #    and are not stored in task payloads.
-    #    Resolve reference-audio paths before rendering: bind only actually available audio, so `@音频N` numbering strictly matches
+    #    Resolve reference-audio paths before rendering: bind only actually available audio, so `@Audio N` numbering strictly matches
     #    the number of segments sent in requests (references to deleted files leave no numbers pointing to nonexistent segments).
     audio_paths = await asyncio.to_thread(resolve_reference_audio_paths, project, project_path)
     voice_settings = VoiceRenderSettings.from_request_facts(request_facts, audio_ready=audio_paths)

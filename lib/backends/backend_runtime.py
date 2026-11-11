@@ -903,7 +903,7 @@ async def download_resumable_video(url: str, output_path: Path, *, label: str) -
 def reference_audio_to_data_uri(path: Path, *, model: str, mime_types: Mapping[str, str]) -> str:
     """Audio references → base64 data URIs; reject unsupported formats/unreadable files.
 
-    Unlike reference images, missing audio cannot be skipped: prompt “音频N” follows audio-item occurrence order
+    Unlike reference images, missing audio cannot be skipped: prompt “Audio N” follows audio-item occurrence order
     in content arrays. Skipping clips shifts every later index and assigns character voices to other characters,
     silently incorrect while still billing.
 

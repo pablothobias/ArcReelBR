@@ -2058,8 +2058,8 @@ def test_prompt_preview_renders_draft_with_projected_references_without_saving(
     assert response.status_code == 200, response.text
     body = response.json()
     assert body["unavailable"] is None
-    assert "<酒馆>@图片1" in body["text"]
-    assert "@图片2" not in body["text"]
+    assert "<酒馆>@Image 1" in body["text"]
+    assert "@Image 2" not in body["text"]
     assert "<酒馆> 门口，<张三> 推开门。" in body["text"]
     assert body["references"] == [{"type": "scene", "name": "酒馆", "path": "scenes/酒馆.png"}]
     assert any("1 image limit" in warning for warning in body["warnings"])
@@ -2156,11 +2156,11 @@ def test_prompt_preview_binds_only_available_audio_from_projected_voice_capabili
     )
     assert response.status_code == 200
     body = response.json()
-    assert "<张三>@图片1" in body["text"]
+    assert "<张三>@Image 1" in body["text"]
     assert "<张三> says {进来吧}" in body["text"]
     assert "Voice characteristics: 低沉" in body["text"]
     assert "暖色电影质感" in body["text"]
-    assert ("@音频1" in body["text"]) is audio_exists
+    assert ("@Audio 1" in body["text"]) is audio_exists
     assert any("it is currently unavailable" in warning for warning in body["warnings"]) is not audio_exists
 
 

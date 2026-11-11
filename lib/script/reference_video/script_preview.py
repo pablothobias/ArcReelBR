@@ -96,7 +96,7 @@ class VoiceBindings:
 
     ``speakers`` lists registered dialogue speakers in first-appearance order, used to emit the first
     section's voice-characteristic declarations. ``audio_speakers`` is the subset actually bound to
-    reference audio. **Its order determines both ``@音频N`` numbering and
+    reference audio. **Its order determines both ``@Audio N`` numbering and
     ``VideoGenerationRequest.reference_audio_files`` field order**, from one derivation rather than
     separate recomputations.
     """
@@ -122,7 +122,7 @@ def derive_voice_bindings(
 
     False ``settings.requested_generate_audio`` produces no ``audio_speakers`` regardless of model tier,
     instead notifying that this episode is silent. Reference audio is centralized here, so prompt
-    ``@音频N`` and ``reference_audio_files`` disappear together: text cannot promise a voice reference
+    ``@Audio N`` and ``reference_audio_files`` disappear together: text cannot promise a voice reference
     without the corresponding audio segment in the request. Dialogue rendering is independent of
     this switch (see :func:`lib.script.reference_video.prompt_render
     ._render_segment_two`); providers can still use dialogue text for lip-sync guidance. The episode
@@ -132,7 +132,7 @@ def derive_voice_bindings(
     None ``settings.audio_ready`` checks whether character assets' ``reference_audio`` fields are nonempty.
     Execution supplies character names with resolved, existing files, keeping numbering exactly equal
     to the count of audio segments actually sent. Without synchronized numbering, deleted files make
-    ``@音频N`` point to absent segments. Both paths share this function to avoid preview/execution binding
+    ``@Audio N`` point to absent segments. Both paths share this function to avoid preview/execution binding
     divergence. For non-None values, distinguish two degradation reasons: unset ``reference_audio`` emits
     ``WARN_SPEAKER_WITHOUT_AUDIO``; a set field absent from the collection emits
     ``WARN_SPEAKER_AUDIO_UNAVAILABLE``. The first requires adding character audio; the second requires
@@ -247,7 +247,7 @@ def build_script_preview(
     character ``reference_audio`` fields.
 
     ``max_reference_images`` must match execution capabilities (``VideoLaneResult.max_reference_images``).
-    Execution clips body-derived images before rendering, keeping ``图片N`` indices exactly equal to
+    Execution clips body-derived images before rendering, keeping ``Image N`` indices exactly equal to
     sent images (see ``render_unit_prompt`` docstring). Deriving ``character_image_names`` from unclipped
     references delays offscreen degradation past the cutoff: previews show bound audio after images
     were removed, and execution alone warns. Neither ``None`` (unlisted/unresolvable capabilities) nor

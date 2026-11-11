@@ -40,3 +40,5 @@ These items are deliberately **not** implemented. Each one needs a product or au
 ## MCP-007: Chinese reference markers in rendered prompts (evidence only)
 
 The `@图片N` and `@音频N` markers are functional literals emitted by `prompt_render.py`. They were preserved in successful H3 output. The official H3 page examined does not say whether they are required or translatable, so they are left untouched. `get_prompt_preview` and the new captured-submission view (`get_prompt_preview` with `task_id`) let an agent see the exact rendered prompt without running a generation.
+
+Resolved 2026-11-11 by [ADR 0126](../../adr/0126-english-reference-video-prompt-markers.md): the markers are now `@Image N` / `@Audio N`.

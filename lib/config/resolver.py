@@ -459,7 +459,7 @@ def derive_voice_consistency(
 
     Native implies output audio: non-reference-video generation_mode or prompt-based soft constraints
     (``character_voice_binding == "prompt"``, default) always downgrade to soft, never none. Downgrades govern the whole chain:
-    script-preview reference-audio warnings, prompt ``@音频N`` numbering and execution reference-audio wiring recognize only
+    script-preview reference-audio warnings, prompt ``@Audio N`` numbering and execution reference-audio wiring recognize only
     ``native``, so binding modes need not traverse rendering layers. ``has_audio`` asks whether outputs have audio tracks,
     never switch controllability; always-audible models with uncontrollable switches also count. Callers obtain this
     through :func:`builtin_video_audio_track`, never independently interpret declarations.
