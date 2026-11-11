@@ -159,7 +159,8 @@ async def test_reference_unit_preview_reports_send_order_bindings_and_digests(tm
     assert "<酒馆>@Image 1, <张三/劲装>@Image 2." in text
     assert "@Audio 1" in text
     assert "@Audio 2" in text
-    assert "@图片" not in text and "@音频" not in text
+    assert "@图片" not in text
+    assert "@音频" not in text
     request = preview["reference_video"]
     images = request["images"]
     assert [(image["marker"], image["type"], image["name"]) for image in images] == [
