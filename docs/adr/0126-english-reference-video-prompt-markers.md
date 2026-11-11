@@ -21,5 +21,5 @@ ADR 0121 preserves "syntax recognized by code". These markers are not such synta
 
 - Jobs submitted before the change resume with their stored prompt (`resume_executor` replays the checkpoint prompt). Their captured-submission preview keeps showing `@图片N`.
 - Reference-video staleness bases project unit text and sent images, not the rendered prompt, so existing videos stay current.
-- Prompts grow by 4 characters per marker. Prompt-length limits (`gate_video_request`, Vidu `/reference2video`) still reject before any provider call.
+- Prompts grow by 4 characters per marker and 1 per binding joiner (`、` → `, `). Prompt-length limits (`gate_video_request`, Vidu `/reference2video`) still reject before any provider call.
 - Storyboard and grid image prompts keep their `图N` labels. Those labels are part of the storyboard-image staleness basis, so changing them would make existing images stale. They need their own decision.
