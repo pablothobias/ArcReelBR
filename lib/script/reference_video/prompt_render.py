@@ -56,6 +56,9 @@ AUDIO_MARKER = "@Audio {index}"
 #: Joiner and terminator of the generated subject-binding line (``<A>@Image 1, <B>@Image 2.``).
 BINDING_JOINER = ", "
 BINDING_TERMINATOR = "."
+#: Sentence-ending punctuation a user-written voice description may already end with; the voice line then
+#: gets no extra period (no ``host..`` / ``teasing!.``).
+_SENTENCE_ENDINGS = (".", "!", "?", "…", "。", "！", "？")
 
 
 def _character_bucket(project: dict) -> dict[str, Any]:
@@ -232,7 +235,8 @@ def _render_voice_declarations(
         if voice_style:
             parts.append(f"Voice characteristics: {voice_style}")
         if parts:
-            lines.append(f"<{name}>: " + "; ".join(parts) + ".")
+            line = f"<{name}>: " + "; ".join(parts)
+            lines.append(line if line.endswith(_SENTENCE_ENDINGS) else line + ".")
     return lines
 
 

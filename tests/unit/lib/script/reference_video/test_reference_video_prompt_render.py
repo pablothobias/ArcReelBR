@@ -13,6 +13,7 @@ from lib.backends.video_frame_slots import gate_video_request
 from lib.prompts.prompt_templates.builtin import builtin_templates
 from lib.script.reference_video.prompt_render import (
     _render_segment_one,
+    _render_voice_declarations,
     render_unit_prompt,
     resolve_reference_audio_paths,
 )
@@ -251,6 +252,36 @@ def test_soft_tier_declares_voice_style_without_audio_designation():
     assert "@Audio" not in rendered.prompt
     assert "<张三>: Voice characteristics: 低沉沙哑的男声." in rendered.prompt
     assert "<李四>: Voice characteristics: 清亮少女音." in rendered.prompt
+
+
+@pytest.mark.parametrize(
+    ("voice_style", "expected_line"),
+    [
+        ("Warm TV host.", "<Caio>: Voice characteristics: Warm TV host."),
+        ("Lively and teasing!", "<Caio>: Voice characteristics: Lively and teasing!"),
+        ("Is it ironic?", "<Caio>: Voice characteristics: Is it ironic?"),
+        ("Trailing off…", "<Caio>: Voice characteristics: Trailing off…"),
+        ("温和的男声。", "<Caio>: Voice characteristics: 温和的男声。"),
+        ("Warm TV host", "<Caio>: Voice characteristics: Warm TV host."),
+    ],
+)
+def test_voice_line_closes_with_one_sentence_end(voice_style, expected_line):
+    """A description that already ends a sentence is not followed by another period (no "host.."); one
+    without sentence-ending punctuation still gets the closing period."""
+    lines = _render_voice_declarations(
+        ["Caio"], {}, {"Caio": {"voice_style": voice_style}}, VoiceRenderSettings(voice_consistency="soft")
+    )
+    assert lines == [expected_line]
+
+
+def test_voice_line_with_audio_reference_closes_with_one_sentence_end():
+    lines = _render_voice_declarations(
+        ["Caio"], {"Caio": 1}, {"Caio": {"voice_style": "Warm TV host."}}, VoiceRenderSettings()
+    )
+    assert lines == [
+        "<Caio>: Dialogue voice reference @Audio 1; use only timbre, speech rate, and emotion; "
+        "the body text is authoritative for dialogue; Voice characteristics: Warm TV host."
+    ]
 
 
 def test_silent_tier_keeps_dialogue_lines_but_injects_no_voice_declaration():
