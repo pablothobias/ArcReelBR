@@ -2,13 +2,17 @@
 
 from __future__ import annotations
 
+import re
 import unicodedata
 from dataclasses import replace
 
 import pytest
 
+from arcreel_market_core.video_backend_contract import VideoCapabilities, VideoCapabilityError
+from lib.backends.video_frame_slots import gate_video_request
 from lib.prompts.prompt_templates.builtin import builtin_templates
 from lib.script.reference_video.prompt_render import (
+    _render_segment_one,
     render_unit_prompt,
     resolve_reference_audio_paths,
 )
@@ -74,20 +78,20 @@ def test_native_tier_binds_audio_in_speaker_first_appearance_order():
         _refs(("scene", "酒馆"), ("character", "张三"), ("prop", "长剑")),
         VoiceRenderSettings(voice_consistency="native", max_reference_audio=3, model_id="doubao-seedance-2-0"),
     )
-    # Audio order follows request fields and @音频N numbering.
+    # Audio order follows request fields and @Audio N numbering.
     assert rendered.audio_speakers == ["张三", "李四"]
     assert (
-        "<张三>: Dialogue voice reference @音频1; use only timbre, speech rate, and emotion; the body text is authoritative for dialogue; Voice characteristics: 低沉沙哑的男声."
+        "<张三>: Dialogue voice reference @Audio 1; use only timbre, speech rate, and emotion; the body text is authoritative for dialogue; Voice characteristics: 低沉沙哑的男声."
         in rendered.prompt
     )
     assert (
-        "<李四>: Dialogue voice reference @音频2; use only timbre, speech rate, and emotion; the body text is authoritative for dialogue; Voice characteristics: 清亮少女音."
+        "<李四>: Dialogue voice reference @Audio 2; use only timbre, speech rate, and emotion; the body text is authoritative for dialogue; Voice characteristics: 清亮少女音."
         in rendered.prompt
     )
 
 
 def test_silent_episode_sends_dialogue_without_any_audio_binding():
-    """Silent episode: assemble no reference audio or @音频N in prompts; still send dialogue for lip-sync reference."""
+    """Silent episode: assemble no reference audio or @Audio N in prompts; still send dialogue for lip-sync reference."""
     rendered = render_unit_prompt(
         _TEXT,
         _project(),
@@ -101,7 +105,7 @@ def test_silent_episode_sends_dialogue_without_any_audio_binding():
     )
     assert rendered.audio_speakers == []
     assert rendered.audio_speaker_reference_index == []
-    assert "@音频" not in rendered.prompt
+    assert "@Audio" not in rendered.prompt
     assert "<张三> says {今晚的酒，我请。}" in rendered.prompt
     assert "<李四> says {你终于来了。}" in rendered.prompt
 
@@ -196,7 +200,7 @@ def test_silent_preview_and_execution_reach_the_same_conclusion(silencing: dict,
     assert rendered.warnings == [expected]
     # Match promises to paid execution: if preview says no audible episode, execution must bind no clips.
     assert rendered.audio_speakers == []
-    assert "@音频" not in rendered.prompt
+    assert "@Audio" not in rendered.prompt
     assert [u.text for u in preview.utterances] == ["今晚的酒，我请。", "你终于来了。"]
 
 
@@ -220,7 +224,7 @@ def test_first_segment_binds_images_in_reference_order():
         _refs(("scene", "酒馆"), ("character", "张三"), ("prop", "长剑")),
         VoiceRenderSettings(voice_consistency="soft"),
     )
-    assert rendered.prompt.startswith("<酒馆>@图片1、<张三>@图片2、<长剑>@图片3。")
+    assert rendered.prompt.startswith("<酒馆>@Image 1, <张三>@Image 2, <长剑>@Image 3.")
 
 
 def test_speaker_position_never_produces_a_reference_image():
@@ -231,8 +235,8 @@ def test_speaker_position_never_produces_a_reference_image():
         _refs(("scene", "酒馆"), ("character", "张三"), ("prop", "长剑")),
         VoiceRenderSettings(voice_consistency="native", max_reference_audio=3),
     )
-    assert "<李四>@图片" not in rendered.prompt
-    assert "<李四>: Dialogue voice reference @音频2" in rendered.prompt
+    assert "<李四>@Image" not in rendered.prompt
+    assert "<李四>: Dialogue voice reference @Audio 2" in rendered.prompt
     assert "<李四> says {你终于来了。}" in rendered.prompt
 
 
@@ -244,7 +248,7 @@ def test_soft_tier_declares_voice_style_without_audio_designation():
         VoiceRenderSettings(voice_consistency="soft", max_reference_audio=3),
     )
     assert rendered.audio_speakers == []
-    assert "@音频" not in rendered.prompt
+    assert "@Audio" not in rendered.prompt
     assert "<张三>: Voice characteristics: 低沉沙哑的男声." in rendered.prompt
     assert "<李四>: Voice characteristics: 清亮少女音." in rendered.prompt
 
@@ -257,7 +261,7 @@ def test_silent_tier_keeps_dialogue_lines_but_injects_no_voice_declaration():
         VoiceRenderSettings(voice_consistency="none", model_id="minimax-01"),
     )
     assert "Voice characteristics" not in rendered.prompt
-    assert "@音频" not in rendered.prompt
+    assert "@Audio" not in rendered.prompt
     # Render dialogue normally for lip-sync and performance.
     assert "<张三> says {今晚的酒，我请。}" in rendered.prompt
     assert {"key": WARN_SILENT_MODEL, "params": {"provider": "", "model": "minimax-01"}} in rendered.warnings
@@ -386,8 +390,8 @@ def test_clipped_reference_still_renders_as_subject():
     assert "@[长剑]" not in rendered.prompt
     assert "<张三> 推门而入，手按 <长剑>。" in rendered.prompt
     # Subject markers and image numbers are independent; only images actually sent receive binding lines.
-    assert rendered.prompt.startswith("<酒馆>@图片1。")
-    assert "<张三>@图片" not in rendered.prompt
+    assert rendered.prompt.startswith("<酒馆>@Image 1.")
+    assert "<张三>@Image" not in rendered.prompt
 
 
 def test_unregistered_mention_kept_verbatim_with_warning():
@@ -450,8 +454,8 @@ def test_twin_exclusion_only_when_two_or_more_characters():
         _refs(("character", "张三")),
         _SOFT,
     )
-    assert clipped.prompt.startswith("<张三>@图片1。")
-    assert "<李四>@图片" not in clipped.prompt
+    assert clipped.prompt.startswith("<张三>@Image 1.")
+    assert "<李四>@Image" not in clipped.prompt
     assert (
         _avoid_line(clipped.prompt) == f"{_video_avoid_line()}, doubles or twins with identical appearance and clothing"
     )
@@ -484,7 +488,7 @@ def test_script_without_dialogue_still_renders_three_segments():
     )
     assert rendered.audio_speakers == []
     assert rendered.warnings == []
-    assert "<张三>@图片1、<酒馆>@图片2。" in rendered.prompt
+    assert "<张三>@Image 1, <酒馆>@Image 2." in rendered.prompt
     assert "镜头1：<张三> 走进 <酒馆>。\n镜头2：他坐下。" in rendered.prompt
 
 
@@ -498,7 +502,7 @@ def test_audio_ready_overrides_field_presence(tmp_path):
         VoiceRenderSettings(voice_consistency="native", max_reference_audio=3, audio_ready={"李四"}),
     )
     assert rendered.audio_speakers == ["李四"]
-    assert "<李四>: Dialogue voice reference @音频1" in rendered.prompt
+    assert "<李四>: Dialogue voice reference @Audio 1" in rendered.prompt
     assert {"key": WARN_SPEAKER_AUDIO_UNAVAILABLE, "params": {"name": "张三"}} in rendered.warnings
     assert {"key": WARN_SPEAKER_WITHOUT_AUDIO, "params": {"name": "张三"}} not in rendered.warnings
 
@@ -520,7 +524,7 @@ def test_audio_speaker_reference_index_tracks_image_slot_by_name_not_position():
 
 def test_requires_reference_image_downgrades_offscreen_speaker_with_warning():
     """When backends require per-image audio attachment (such as wan2.7-r2v), offscreen speakers without references bind no audio.
-    Generate numbering/warnings together during rendering so @音频N never promises an unsent binding."""
+    Generate numbering/warnings together during rendering so @Audio N never promises an unsent binding."""
     rendered = render_unit_prompt(
         _TEXT,
         _project(),
@@ -561,9 +565,9 @@ def test_combining_char_name_renders_identically_in_every_encoding_pairing(regis
     assert rendered.audio_speakers == [_NAME_NFC]
     assert rendered.audio_speaker_reference_index == [0]
     assert rendered.warnings == []
-    assert f"<{_NAME_NFC}>@图片1" in rendered.prompt
+    assert f"<{_NAME_NFC}>@Image 1" in rendered.prompt
     assert (
-        f"<{_NAME_NFC}>: Dialogue voice reference @音频1; use only timbre, speech rate, and emotion; the body text is authoritative for dialogue; Voice characteristics: 清亮少女音."
+        f"<{_NAME_NFC}>: Dialogue voice reference @Audio 1; use only timbre, speech rate, and emotion; the body text is authoritative for dialogue; Voice characteristics: 清亮少女音."
         in rendered.prompt
     )
     assert f"<{_NAME_NFC}> 推门而入" in rendered.prompt
@@ -582,7 +586,7 @@ def test_padded_mention_and_speaker_render_with_canonical_asset_name():
 
     assert rendered.audio_speakers == ["张三"]
     assert rendered.audio_speaker_reference_index == [0]
-    assert "<张三>@图片1" in rendered.prompt
+    assert "<张三>@Image 1" in rendered.prompt
     assert "<张三> 推门而入" in rendered.prompt
     assert "<张三> says {我来了}" in rendered.prompt
     assert "@[" not in rendered.prompt
@@ -661,7 +665,7 @@ def test_derivative_subject_marks_declare_one_character_in_several_forms():
         _SOFT,
     )
 
-    assert rendered.prompt.startswith("<张三>@图片1、<张三/劲装>@图片2。")
+    assert rendered.prompt.startswith("<张三>@Image 1, <张三/劲装>@Image 2.")
     assert (
         "<张三> and <张三/劲装> are different appearances of the same character; depict each according to its corresponding reference image."
         in rendered.prompt
@@ -742,3 +746,70 @@ def test_unregistered_speaker_derivative_falls_back_to_the_ontology_mark():
     )
 
     assert "<张三> says {今晚的酒，我请。}" in rendered.prompt
+
+
+# --- English reference markers -----------------------------------------------------------------------------
+#: Rendered on the pre-change code (Chinese markers) for the native ``_TEXT`` fixture below; the English renderer
+#: must differ from it only by mechanical marker substitution. Body text keeps its own 。/， untouched.
+_GOLDEN_ZH = (
+    "<酒馆>@图片1、<张三>@图片2、<长剑>@图片3。\n"
+    "<张三>: Dialogue voice reference @音频1; use only timbre, speech rate, and emotion; the body text is authoritative for dialogue; Voice characteristics: 低沉沙哑的男声.\n"
+    "<李四>: Dialogue voice reference @音频2; use only timbre, speech rate, and emotion; the body text is authoritative for dialogue; Voice characteristics: 清亮少女音.\n"
+    "\n"
+    "镜头1：夜色下的 <酒馆>，<张三> 推门而入，手按 <长剑>。\n"
+    "<张三> says {今晚的酒，我请。}\n"
+    "镜头2：吧台后有人抬头。\n"
+    "<李四> says {你终于来了。}\n"
+    "\n"
+    "Style: 写实电影感\n"
+    "Avoid: BGM, text subtitles, watermarks, logos"
+)
+_GOLDEN_AUDIO = (["张三", "李四"], [1, None])
+_BINDING_LINE = re.compile(r"^<.*@图片\d+.*。$")
+
+
+def _to_english(prompt: str) -> str:
+    lines = []
+    for line in prompt.split("\n"):
+        if _BINDING_LINE.match(line):  # only the generated bindings line; body text may contain 、/。
+            line = line.replace("、<", ", <").removesuffix("。") + "."
+        lines.append(line)
+    prompt = "\n".join(lines)
+    prompt = re.sub(r"@图片(\d+)", r"@Image \1", prompt)
+    return re.sub(r"@音频(\d+)", r"@Audio \1", prompt)
+
+
+def _render_native_fixture():
+    return render_unit_prompt(
+        _TEXT,
+        _project(),
+        _refs(("scene", "酒馆"), ("character", "张三"), ("prop", "长剑")),
+        VoiceRenderSettings(voice_consistency="native", max_reference_audio=3, model_id="doubao-seedance-2-0"),
+    )
+
+
+def test_english_markers_change_nothing_else():
+    rendered = _render_native_fixture()
+    assert rendered.prompt == _to_english(_GOLDEN_ZH)
+    assert (rendered.audio_speakers, rendered.audio_speaker_reference_index) == _GOLDEN_AUDIO
+
+
+def test_binding_line_uses_english_markers():
+    prompt = _render_native_fixture().prompt
+    assert prompt.splitlines()[0] == "<酒馆>@Image 1, <张三>@Image 2, <长剑>@Image 3."
+    assert "Dialogue voice reference @Audio 1;" in prompt
+    assert "@图片" not in prompt
+    assert "@音频" not in prompt
+
+
+def test_empty_label_keeps_numbering():
+    result = _render_segment_one(["A", "", "C"], [], {}, {}, VoiceRenderSettings(), {})
+    assert result == "<A>@Image 1, <C>@Image 3."
+
+
+def test_gate_rejects_longer_prompt_before_billing():
+    caps = VideoCapabilities(max_prompt_chars=len(_GOLDEN_ZH) + 1)
+    gate_video_request(caps=caps, provider="p", model="m", prompt=_GOLDEN_ZH)
+    with pytest.raises(VideoCapabilityError) as exc:
+        gate_video_request(caps=caps, provider="p", model="m", prompt=_render_native_fixture().prompt)
+    assert exc.value.code == "video_prompt_too_long"

@@ -6,8 +6,8 @@ projects the first two parts into slots. Pure rendering is never persisted, so l
 
 Three responsibilities:
 
-- **Part one**: shorthand ``<X>@图片N`` bindings (numbers follow sent reference-image order), plus centralized
-  voice declarations (``<X>: Dialogue voice reference @音频N; use only timbre, speech rate, and emotion; the body text is authoritative for dialogue; Voice characteristics: …``). Audible A/B models receive voice descriptions;
+- **Part one**: shorthand ``<X>@Image N`` bindings (numbers follow sent reference-image order), plus centralized
+  voice declarations (``<X>: Dialogue voice reference @Audio N; use only timbre, speech rate, and emotion; the body text is authoritative for dialogue; Voice characteristics: …``). Audible A/B models receive voice descriptions;
   neither silent path (class C models without audio or episode audio disabled) does
 - **Part two**: body with character-speech markers (``<X> says {台词}``); speakerless narration (bare ``{台词}``)
   never reaches video models, using TTS/post-production voiceover instead
@@ -49,6 +49,14 @@ from lib.speech.audio_utils import resolve_audio_ref_path
 #: Fixed project directory for character reference audio, shared with uploads/TTS samples.
 ASSET_AUDIO_SUBDIR = "characters/refs_audio"
 
+#: Reference markers in the form Seedance documents ("asset type + number", numbered per type in request order
+#: from 1). ``index`` is the 1-based position among sent reference images / reference-audio clips respectively.
+IMAGE_MARKER = "@Image {index}"
+AUDIO_MARKER = "@Audio {index}"
+#: Joiner and terminator of the generated subject-binding line (``<A>@Image 1, <B>@Image 2.``).
+BINDING_JOINER = ", "
+BINDING_TERMINATOR = "."
+
 
 def _character_bucket(project: dict) -> dict[str, Any]:
     """Project characters keyed by normalized comparison names; treat nondicts (externally corrupted project.json) as empty.
@@ -67,7 +75,7 @@ def _character_bucket(project: dict) -> dict[str, Any]:
 class RenderedUnitPrompt:
     """One unit's rendering result.
 
-    ``audio_speakers`` order determines ``@音频N`` numbers; callers assemble
+    ``audio_speakers`` order determines ``@Audio N`` numbers; callers assemble
     ``VideoGenerationRequest.reference_audio_files`` in the same order, the sole prompt/request binding
     contract (the request does not identify which character belongs to each audio segment).
 
@@ -93,7 +101,7 @@ def render_unit_prompt(
     """Render one unit's written body into a three-part backend prompt.
 
     ``references`` contains **actually sent** images after capability clamping; order gives
-    ``图片N``, matching ``reference_images`` length/order exactly. Clamped names fall back to text without
+    ``Image N``, matching ``reference_images`` length/order exactly. Clamped names fall back to text without
     dangling bindings. Callers derive order from the same body (first ``@mention``, excluding dialogue
     speaker positions); consume, never recompute, here.
 
@@ -101,10 +109,10 @@ def render_unit_prompt(
     .VoiceRenderSettings`), with no fallback: it determines audibility, and either default guesses for callers.
     Guessing audio injects voice traits into silent projects; requiring it catches new wiring mistakes immediately.
     True ``requires_reference_image`` (backend audio binds to specific reference items) excludes offscreen-only
-    speakers from audio binding with degradation/warnings. Bound ``@音频N`` enters prompt text, so filtering
+    speakers from audio binding with degradation/warnings. Bound ``@Audio N`` enters prompt text, so filtering
     later in backends would diverge promised bindings from actual ``reference_audio_files``; exclude before numbering.
 
-    Silent rendering (``settings.is_silent``) creates no audio bindings: neither ``@音频N`` nor voice descriptions
+    Silent rendering (``settings.is_silent``) creates no audio bindings: neither ``@Audio N`` nor voice descriptions
     enter prompts; ``audio_speakers`` and caller-built ``reference_audio_files`` stay empty. Part-two dialogue
     ignores this flag; silent models still receive words for lip-sync reference.
 
@@ -199,7 +207,7 @@ def _render_voice_declarations(
     characters: dict,
     settings: VoiceRenderSettings,
 ) -> list[str]:
-    """Voice declarations: ``<X>: Dialogue voice reference @音频N; use only timbre, speech rate, and emotion; the body text is authoritative for dialogue; Voice characteristics: …``. Shared by episodic/ad routes, whose
+    """Voice declarations: ``<X>: Dialogue voice reference @Audio N; use only timbre, speech rate, and emotion; the body text is authoritative for dialogue; Voice characteristics: …``. Shared by episodic/ad routes, whose
     subject bindings use mention-derived ``ReferenceResource``; voice declarations depend only on registered
     dialogue speakers, independent of image bindings and reusable whole.
 
@@ -217,7 +225,7 @@ def _render_voice_declarations(
         parts: list[str] = []
         if name in audio_no:
             parts.append(
-                f"Dialogue voice reference @音频{audio_no[name]}; use only timbre, speech rate, and emotion; the body text is authoritative for dialogue"
+                f"Dialogue voice reference {AUDIO_MARKER.format(index=audio_no[name])}; use only timbre, speech rate, and emotion; the body text is authoritative for dialogue"
             )
         char_data = characters.get(name)
         voice_style = str((char_data.get("voice_style") if isinstance(char_data, dict) else None) or "").strip()
@@ -231,11 +239,11 @@ def _render_voice_declarations(
 def _number_audio_speakers(
     audio_speakers: list[str], character_image_no: dict[str, int]
 ) -> tuple[dict[str, int], list[int | None]]:
-    """Derive ``@音频N`` numbering and each audio segment's image index consistently for both routes.
+    """Derive ``@Audio N`` numbering and each audio segment's image index consistently for both routes.
 
     Numbers are ``audio_speakers`` positions (first speaker occurrence) and request ``reference_audio_files``
     order. Indices have equal length/order, with None for offscreen speakers without images. Derive both
-    together so prompt ``@音频N`` numbers and request indices cannot drift independently.
+    together so prompt ``@Audio N`` numbers and request indices cannot drift independently.
     """
     audio_no = {name: i for i, name in enumerate(audio_speakers, start=1)}
     reference_index = [
@@ -269,9 +277,11 @@ def _render_segment_one(
     Return the ``reference_video/unit`` ``declarations`` slot.
     """
     lines: list[str] = []
-    bindings = "、".join(f"<{label}>@图片{i}" for i, label in enumerate(labels, start=1) if label)
+    bindings = BINDING_JOINER.join(
+        f"<{label}>{IMAGE_MARKER.format(index=i)}" for i, label in enumerate(labels, start=1) if label
+    )
     if bindings:
-        lines.append(bindings + "。")
+        lines.append(bindings + BINDING_TERMINATOR)
     lines.extend(_render_form_declarations(character_forms))
     lines.extend(_render_voice_declarations(speakers, audio_no, characters, settings))
     return "\n".join(lines)
