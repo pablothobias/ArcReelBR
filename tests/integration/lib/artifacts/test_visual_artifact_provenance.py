@@ -1147,10 +1147,10 @@ def test_dropping_asset_names_from_a_frozen_basis_matches_the_builder(tmp_path: 
         ), kind
 
 
-def test_reference_video_staleness_basis_ignores_the_prompt_marker_form(tmp_path: Path, monkeypatch) -> None:
-    """Selected reference videos stay current when the rendered marker form changes (Chinese → English):
-    the staleness basis projects unit text and sent images, never the rendered prompt, so a marker-only
-    change suggests no paid regeneration."""
+def test_reference_video_staleness_basis_does_not_read_the_marker_constants(tmp_path: Path, monkeypatch) -> None:
+    """Tripwire: the staleness basis projects unit text and sent images, not the rendered prompt, so the
+    marker constants cannot move its digest. This fails only if the basis starts rendering the prompt,
+    which would mark selected videos stale (and suggest paid regeneration) on any marker-form change."""
     from lib.script.reference_video import prompt_render
 
     reference = tmp_path / "ref.png"

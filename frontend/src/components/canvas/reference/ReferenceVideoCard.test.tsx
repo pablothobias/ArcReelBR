@@ -344,7 +344,7 @@ describe("ReferenceVideoCard final prompt preview", () => {
     useProjectsStore.setState({ assetFingerprints: { "scenes/酒馆.png": 1712345678901 } });
     const user = userEvent.setup();
     const preview = vi.spyOn(API, "previewReferenceUnitPrompt").mockResolvedValue({
-      text: "<酒馆>@图片1。\n草稿正文\n电影质感",
+      text: "<酒馆>@Image 1.\n草稿正文\n电影质感",
       unavailable: null,
       is_text_form: true,
       references: [{ type: "scene", name: "酒馆", path: "scenes/酒馆.png" }],

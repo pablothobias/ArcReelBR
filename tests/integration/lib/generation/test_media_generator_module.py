@@ -1244,6 +1244,24 @@ class TestMediaGenerator:
         assert len(gen.ledger.started) == started_before
 
     @pytest.mark.asyncio
+    async def test_prompt_over_the_model_limit_fails_before_the_provider_call(self, tmp_path):
+        """An over-long prompt (for example one lengthened by English reference markers) hard-fails at the
+        execution gate: no provider call and no cost accounting, rather than provider-side truncation."""
+        from arcreel_market_core.video_backend_contract import VideoCapabilities, VideoCapabilityError
+
+        prompt = "<A>@Image 1, <B>@Image 2.\n<A> says {Go.}"
+        gen = _build_generator(tmp_path)
+        gen._video_backend = _FakeVideoBackend(video_capabilities=VideoCapabilities(max_prompt_chars=len(prompt) - 1))
+        started_before = len(gen.ledger.started)
+
+        with pytest.raises(VideoCapabilityError) as exc:
+            await gen.generate_video_async(prompt=prompt, resource_type="videos", resource_id="E1S06")
+
+        assert exc.value.code == "video_prompt_too_long"
+        assert gen._video_backend.calls == []
+        assert len(gen.ledger.started) == started_before
+
+    @pytest.mark.asyncio
     async def test_end_image_forwarded_when_backend_reports_tier_aware_last_frame(self, tmp_path):
         """If video_capabilities_for_tier exists, narrow actual service_tier to decide end_image: pro permits it even when context-free video_capabilities says False."""
         from arcreel_market_core.video_backend_contract import VideoCapabilities

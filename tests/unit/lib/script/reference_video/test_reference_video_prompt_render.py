@@ -807,7 +807,18 @@ def test_empty_label_keeps_numbering():
     assert result == "<A>@Image 1, <C>@Image 3."
 
 
-def test_gate_rejects_longer_prompt_before_billing():
+def test_labels_containing_the_joiner_or_terminator_stay_bracketed_beside_their_marker():
+    """A label may itself contain ", " or "."; the angle brackets, not the joiner, delimit each subject,
+    so every marker still directly follows its own complete label."""
+    labels = ["Ana, Bia", "Dr. Lee", "St. Mary's."]
+    result = _render_segment_one(labels, [], {}, {}, VoiceRenderSettings(), {})
+    assert result == "<Ana, Bia>@Image 1, <Dr. Lee>@Image 2, <St. Mary's.>@Image 3."
+    assert re.findall(r"<([^<>]*)>@Image (\d+)", result) == [(label, str(i)) for i, label in enumerate(labels, 1)]
+
+
+def test_english_prompt_over_the_limit_fails_the_length_gate():
+    """The gate's own verdict for the 4-characters-per-marker growth; that MediaGenerator runs this gate
+    before any provider call is pinned in test_media_generator_module."""
     caps = VideoCapabilities(max_prompt_chars=len(_GOLDEN_ZH) + 1)
     gate_video_request(caps=caps, provider="p", model="m", prompt=_GOLDEN_ZH)
     with pytest.raises(VideoCapabilityError) as exc:
