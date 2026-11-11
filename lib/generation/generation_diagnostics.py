@@ -15,6 +15,10 @@ Sanitization is recursive and explicit:
   in ``truncation.paths``; a response already bounded at persistence (``{"truncated": true, "body": …}``) is
   reported as ``truncation.source_truncated``.
 
+``provider_error`` is chosen by explicit precedence with provenance (see :func:`_provider_error`); for historical
+failures that stored only a generic reason, the provider's real code and message are read from the persisted response
+body (:mod:`lib.generation.persisted_provider_error`).
+
 Timestamps the worker did not persist stay ``None`` with an explicit ``*_known: false`` flag; nothing is inferred.
 """
 
@@ -32,6 +36,7 @@ from lib.generation.generation_result import (
     GenerationProblem,
     problem_from_task_failure,
 )
+from lib.generation.persisted_provider_error import extract_persisted_provider_error, is_truncation_wrapper
 from lib.infra.logging_utils import sanitize_diagnostic_payload
 
 #: Longest string kept verbatim; longer strings keep a prefix plus a marker.
@@ -100,11 +105,6 @@ def sanitize_for_agent(value: object, *, path: str = "$") -> tuple[Any, list[str
     return _limit(redacted, path, 0, cut), cut.paths
 
 
-def _source_truncated(body: object) -> bool:
-    """Whether persistence already cut the response (``usage_repo.bound_provider_response`` marker)."""
-    return isinstance(body, Mapping) and body.get("truncated") is True and set(body) == {"truncated", "body"}
-
-
 #: Next-step wording per closed action. Agents dispatch on ``action``; ``guidance`` explains it without prose parsing.
 _ACTION_GUIDANCE: dict[str, str] = {
     GenerationAction.WAIT_FOR_TASK: (
@@ -134,6 +134,29 @@ _ACTION_GUIDANCE: dict[str, str] = {
 
 def _guidance(action: str) -> str:
     return _ACTION_GUIDANCE.get(action, "Follow the problem's action; no automatic resubmission is implied.")
+
+
+#: Added when a retry classification rests on a generic stored reason while the persisted response holds a verdict.
+PROVIDER_VERDICT_NOTE = (
+    "The provider's persisted verdict is more specific than the stored task reason, which did not classify it. "
+    "Inspect provider_error (and internal_error_code when present) before any resubmission: it may call for fixing "
+    "inputs or configuration rather than retrying. A resubmission is a new paid generation and requires the user's "
+    "spending authorization."
+)
+
+
+def _recovery(action: str, provider_error: Mapping[str, Any] | None) -> dict[str, Any]:
+    """Recovery advice; the action itself is never upgraded from a body-derived verdict."""
+    recovery: dict[str, Any] = {"action": action, "guidance": _guidance(action)}
+    if (
+        action == GenerationAction.RETRY
+        and provider_error is not None
+        and provider_error.get("source") == "last_provider_response"
+        # A message without a code (for example a quota text) is no evidence of a deterministic input rejection.
+        and provider_error.get("code_known") is True
+    ):
+        recovery["provider_verdict_note"] = PROVIDER_VERDICT_NOTE
+    return recovery
 
 
 def _stage(task: Mapping[str, Any] | None, record: Mapping[str, Any] | None) -> str:
@@ -171,22 +194,121 @@ def task_checkpoint_summary(task: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
-def _provider_error(problem: GenerationProblem | None, record: Mapping[str, Any] | None) -> dict[str, Any] | None:
+def _same_text(left: object, right: object) -> bool:
+    return str(left).strip() == str(right).strip()
+
+
+def _provider_error(
+    problem: GenerationProblem | None,
+    task: Mapping[str, Any] | None,
+    record: Mapping[str, Any] | None,
+) -> dict[str, Any] | None:
+    """The provider's own verdict with provenance, chosen by explicit precedence.
+
+    1. ``task_failure``: structured task failure params (``provider_error_code`` lifted by the backend);
+    2. ``last_provider_response``: a real error object in the persisted response body (well-known shapes,
+       :mod:`lib.generation.persisted_provider_error`), considered only when the task or record failed;
+    3. ``stored_message``: the generic stored failure text, with the code explicitly unknown.
+
+    The usage record's ``error_code`` is ArcReel's internal call-failure class (:mod:`lib.billing.call_failure`,
+    e.g. ``rate_limited``), not a provider code, so it never becomes ``code``; it is echoed as
+    ``internal_error_code`` and stays in ``usage_record.error_code``.
+
+    Lower-precedence sources never override the chosen one; when they carry a different non-null code or message they
+    are listed in ``conflicts``. A code is never inferred: ``code_known`` is false whenever the chosen source has none.
+    The generic stored text stays available as ``stored_message`` when a more specific source was chosen.
+    ``source_encoding`` is set for the body source: ``json`` when the stored body was structured, ``json_text`` when
+    it was a raw JSON string decoded here, in which case ``source_path`` addresses the decoded document. A body cut at
+    persistence never yields a verdict, so the body source is never truncated.
+    """
+    task_failed = task is not None and task.get("status") == "failed"
+    record_failed = record is not None and record.get("status") == "failed"
+
+    stored_message: str | None = None
+    stored_path: str | None = None
+    if record_failed and record is not None and record.get("error_message"):
+        stored_message, stored_path = record.get("error_message"), "$.usage_record.error_message"
+    elif (
+        task_failed
+        and task is not None
+        # Only with evidence of provider involvement: a task that never submitted a provider job failed inside ArcReel
+        # (missing input, storage, promotion), and its reason is not the provider's verdict.
+        and task.get("provider_job_id")
+        and problem is not None
+        and "provider_error_code" not in problem.params
+        and problem.detail
+    ):
+        stored_message, stored_path = problem.detail, "$.task.error_message"
+
+    candidates: list[dict[str, Any]] = []
     if problem is not None and "provider_error_code" in problem.params:
-        return {
-            "code": problem.params.get("provider_error_code"),
-            "message": problem.params.get("provider_error_message"),
-            "stage": problem.params.get("stage"),
-            "source": "task_failure",
-        }
-    if record is not None and record.get("status") == "failed" and record.get("error_message"):
-        return {
-            "code": record.get("error_code"),
-            "message": record.get("error_message"),
-            "stage": None,
-            "source": "usage_record",
-        }
-    return None
+        candidates.append(
+            {
+                "code": problem.params.get("provider_error_code"),
+                "message": problem.params.get("provider_error_message"),
+                "stage": problem.params.get("stage"),
+                "source": "task_failure",
+                "source_path": "$.task.error_message.params",
+                "source_truncated": False,
+                "source_encoding": None,
+            }
+        )
+    if (task_failed or record_failed) and record is not None:
+        found = extract_persisted_provider_error(record.get("last_provider_response"))
+        if found is not None:
+            candidates.append(
+                {
+                    "code": found.code,
+                    "message": found.message,
+                    "stage": None,
+                    "source": "last_provider_response",
+                    # Relative to this read model, where the sanitized body is exposed at ``$.last_provider_response.body``.
+                    "source_path": f"$.last_provider_response.body{found.path.removeprefix('$')}",
+                    # A verdict is only read from untruncated bodies (see persisted_provider_error).
+                    "source_truncated": False,
+                    "source_encoding": found.source_encoding,
+                }
+            )
+    if not candidates and stored_message is not None:
+        candidates.append(
+            {
+                "code": None,
+                "message": stored_message,
+                "stage": None,
+                "source": "stored_message",
+                "source_path": stored_path,
+                "source_truncated": False,
+                "source_encoding": None,
+            }
+        )
+    if not candidates:
+        return None
+
+    chosen, *others = candidates
+    conflicts = [
+        {key: other[key] for key in ("source", "source_path", "code", "message")}
+        for other in others
+        if (other["code"] is not None and chosen["code"] is not None and not _same_text(other["code"], chosen["code"]))
+        or (other["code"] is not None and chosen["code"] is None)
+        or (
+            other["message"] is not None
+            and chosen["message"] is not None
+            and not _same_text(other["message"], chosen["message"])
+        )
+    ]
+    code = chosen["code"]
+    result = {
+        **chosen,
+        "code": None if code is None else str(code),
+        "code_known": code is not None,
+        "conflicts": conflicts,
+    }
+    internal_error_code = record.get("error_code") if record is not None else None
+    if internal_error_code is not None:
+        result["internal_error_code"] = internal_error_code
+    if chosen["source"] != "stored_message" and stored_message is not None:
+        result["stored_message"] = stored_message
+    return result
 
 
 def build_generation_diagnostics(
@@ -248,7 +370,7 @@ def build_generation_diagnostics(
         }
         body = record.get("last_provider_response")
         if body is not None:
-            source_truncated = _source_truncated(body)
+            source_truncated = is_truncation_wrapper(body)
             last_response = {
                 "recorded": True,
                 # The worker overwrites the last response without a timestamp; the observation time is unknown.
@@ -267,7 +389,7 @@ def build_generation_diagnostics(
             "params": clean(problem.params, "$.problem.params"),
             "detail": clean(problem.detail, "$.problem.detail"),
         }
-    provider_error = _provider_error(problem, record)
+    provider_error = _provider_error(problem, task, record)
     if provider_error is not None:
         provider_error = clean(provider_error, "$.provider_error")
 
@@ -279,7 +401,7 @@ def build_generation_diagnostics(
         "problem": problem_view,
         "provider_error": provider_error,
         "last_provider_response": last_response,
-        "recovery": {"action": action, "guidance": _guidance(action)},
+        "recovery": _recovery(action, provider_error),
         "truncation": {
             "truncated": bool(truncated) or source_truncated,
             "paths": truncated,

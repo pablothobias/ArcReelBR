@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from collections.abc import AsyncGenerator, Awaitable, Callable, Iterable
 from contextlib import asynccontextmanager
 from dataclasses import replace
@@ -21,8 +22,10 @@ from lib.project.project_manager import ProjectManager, get_project_manager
 from lib.script.source_loader import SourceLoader
 from server.agent_runtime.service import AssistantService
 from server.agent_toolset.global_config import (
+    GLOBAL_CONFIG_INSTRUCTIONS,
     GLOBAL_CONFIG_TOOL_IDS,
     GatedToolsFastMCP,
+    authorized_key_names,
     build_global_config_tools,
     global_config_authorized,
 )
@@ -35,6 +38,14 @@ from server.services.configuration.custom_providers import ReloadLimits
 from server.services.tasks.artifact_download_retry import ArtifactDownloadWorker
 from server.session_mcp import default_session_service, session_tools
 from server.tool_runtime import Services
+
+logger = logging.getLogger(__name__)
+
+#: Sent to every client at initialize (no secret, identical for every key).
+REMOTE_MCP_INSTRUCTIONS = (
+    "ArcReel tools for producing short videos through the existing ArcReel Agent and native project transactions. "
+    + GLOBAL_CONFIG_INSTRUCTIONS
+)
 
 _UNPUBLISHED_ISSUER_URL = AnyHttpUrl("http://localhost/")
 
@@ -89,8 +100,12 @@ def build_remote_mcp_server(
         services = Services.defaults(projects, artifact_download_worker=artifact_download_worker)
 
     names = None if global_config_key_names is None else frozenset(global_config_key_names)
+    # Activation check for operators: count only, never the key names.
+    granted = len(authorized_key_names() if names is None else names)
+    logger.info("Remote MCP global configuration tools granted to %d API key name(s)", granted)
     server = GatedToolsFastMCP(
         "arcreel",
+        instructions=REMOTE_MCP_INSTRUCTIONS,
         tools=[
             *remote_tools(AGENT_TOOLSET, projects=projects, services=services),
             *remote_tools(MEDIA_TRANSPORT_TOOLS, projects=projects, services=services),
@@ -203,6 +218,7 @@ def mount_remote_mcp(app: Starlette, mcp_app: ASGIApp) -> None:
 
 
 __all__ = [
+    "REMOTE_MCP_INSTRUCTIONS",
     "REMOTE_MCP_PATH",
     "ArcApiKeyVerifier",
     "RemoteMCPHost",

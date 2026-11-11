@@ -244,7 +244,10 @@ class TestUsageRecordsList:
         """Extreme offset timestamps crossing UTC datetime bounds reject before overflow 500."""
         response = records_client.get(f"/api/v1/usage/records?{query}")
         assert response.status_code == 422
-        assert response.json()["detail"] == "起止时刻超出可表示的时间范围，请检查后重试"
+        assert (
+            response.json()["detail"]
+            == "The start or end time is outside the representable range; check it and try again"
+        )
 
     @pytest.mark.parametrize("cursor", ["not-base64!!", "e30"])
     def test_undecodable_cursor_rejected(self, records_client, cursor):

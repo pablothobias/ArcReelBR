@@ -185,12 +185,12 @@ class TestSummaryDailyBuckets:
     async def test_unknown_timezone_is_rejected(self, summary_client):
         response = summary_client.get("/api/v1/usage/summary?tz=Mars/Olympus")
         assert response.status_code == 422
-        assert response.json()["detail"] == "未知的 IANA 时区名，请检查 tz 参数"
+        assert response.json()["detail"] == "Unknown IANA time zone name; check the tz parameter"
 
     async def test_unknown_timezone_message_follows_request_locale(self, summary_client):
-        response = summary_client.get("/api/v1/usage/summary?tz=Mars/Olympus", headers={"Accept-Language": "en"})
+        response = summary_client.get("/api/v1/usage/summary?tz=Mars/Olympus", headers={"Accept-Language": "zh"})
         assert response.status_code == 422
-        assert response.json()["detail"] == "Unknown IANA time zone name; check the tz parameter"
+        assert response.json()["detail"] == "未知的 IANA 时区名，请检查 tz 参数"
 
     async def test_oversized_window_is_rejected(self, summary_client, db_factory):
         """Too many since/until day buckets return 422, never synchronously allocate millions of zero buckets."""
@@ -199,13 +199,18 @@ class TestSummaryDailyBuckets:
 
         response = summary_client.get("/api/v1/usage/summary?since=1900-01-01T00:00:00Z&until=2100-01-01T00:00:00Z")
         assert response.status_code == 422
-        assert response.json()["detail"] == "统计时间范围过大，请缩小起止时刻后重试"
+        assert (
+            response.json()["detail"] == "The requested time range is too wide; narrow the start and end and try again"
+        )
 
     def test_unrepresentable_instant_is_rejected(self, summary_client):
         """Unrepresentable instants return 422; half-open endpoint minus one microsecond must not underflow datetime minima."""
         response = summary_client.get("/api/v1/usage/summary?until=0001-01-01T00:00:00Z")
         assert response.status_code == 422
-        assert response.json()["detail"] == "起止时刻超出可表示的时间范围，请检查后重试"
+        assert (
+            response.json()["detail"]
+            == "The start or end time is outside the representable range; check it and try again"
+        )
 
 
 class TestSummaryCurrency:

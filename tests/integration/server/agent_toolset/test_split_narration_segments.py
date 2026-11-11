@@ -176,7 +176,7 @@ async def test_split_narration_segments_rejects_out_of_enum_duration(
 
     out = await run_declared_tool("generate_script_plan", fake_ctx, {"episode_id": 1})
     assert out.problem is not None
-    assert "不在模型档位" in said(out)
+    assert "[duration_off_tier]" in said(out)
     assert not (fake_ctx.project_path / "drafts" / "episode_1" / "script_plan_segments.json").exists()
 
 
@@ -190,7 +190,7 @@ async def test_split_narration_segments_rejects_duplicate_segment_ids(
 
     out = await run_declared_tool("generate_script_plan", fake_ctx, {"episode_id": 1})
     assert out.problem is not None
-    assert "segment_id 重复" in said(out)
+    assert "[duplicate_segment_id]" in said(out)
     assert not (fake_ctx.project_path / "drafts" / "episode_1" / "script_plan_segments.json").exists()
 
 
@@ -205,7 +205,7 @@ async def test_split_narration_segments_rejects_blank_novel_text(
 
     out = await run_declared_tool("generate_script_plan", fake_ctx, {"episode_id": 1})
     assert out.problem is not None
-    assert "novel_text 为空白" in said(out)
+    assert "[blank_novel_text]" in said(out)
     assert "E1S02" in said(out)
     assert not (fake_ctx.project_path / "drafts" / "episode_1" / "script_plan_segments.json").exists()
 
@@ -233,7 +233,7 @@ async def test_split_narration_segments_rejects_missing_field(
 
     out = await run_declared_tool("generate_script_plan", fake_ctx, {"episode_id": 1})
     assert out.problem is not None
-    assert "script_plan 拆分内容结构校验失败" in said(out)
+    assert "split script_plan content structure validation failed" in said(out)
     assert not (fake_ctx.project_path / "drafts" / "episode_1" / "script_plan_segments.json").exists()
 
 
@@ -248,7 +248,7 @@ async def test_split_narration_segments_rejects_unregistered_asset_reference(
 
     out = await run_declared_tool("generate_script_plan", fake_ctx, {"episode_id": 1})
     assert out.problem is not None
-    assert "未登记的资产名" in said(out)
+    assert "[unregistered_asset]" in said(out)
     assert "王五" in said(out)
     assert not (fake_ctx.project_path / "drafts" / "episode_1" / "script_plan_segments.json").exists()
 
@@ -298,7 +298,7 @@ async def test_split_narration_segments_rejects_truncated_novel_text(
         [nr_segment("E1S01", 4, "张三走向村口。")],
     )
     assert out.problem is not None
-    assert "未按序、逐字、完整覆盖小说原文" in said(out)
+    assert "[novel_text_coverage]" in said(out)
     assert not (fake_ctx.project_path / "drafts" / "episode_1" / "script_plan_segments.json").exists()
 
 
@@ -316,7 +316,7 @@ async def test_split_narration_segments_rejects_rewritten_novel_text(
         ],
     )
     assert out.problem is not None
-    assert "未按序、逐字、完整覆盖小说原文" in said(out)
+    assert "[novel_text_coverage]" in said(out)
     assert not (fake_ctx.project_path / "drafts" / "episode_1" / "script_plan_segments.json").exists()
 
 
@@ -334,7 +334,7 @@ async def test_split_narration_segments_rejects_reordered_novel_text(
         ],
     )
     assert out.problem is not None
-    assert "未按序、逐字、完整覆盖小说原文" in said(out)
+    assert "[novel_text_coverage]" in said(out)
     assert not (fake_ctx.project_path / "drafts" / "episode_1" / "script_plan_segments.json").exists()
 
 
@@ -349,7 +349,7 @@ async def test_split_narration_segments_rejects_dropped_word_space(
         [nr_segment("E1S01", 4, "Helloworld, this is fine.")],
     )
     assert out.problem is not None
-    assert "未按序、逐字、完整覆盖小说原文" in said(out)
+    assert "[novel_text_coverage]" in said(out)
     assert not (fake_ctx.project_path / "drafts" / "episode_1" / "script_plan_segments.json").exists()
 
 
@@ -419,7 +419,7 @@ async def test_split_narration_segments_rejects_dropped_space_after_punctuation(
         [nr_segment("E1S01", 4, "Hello,world. This is fine.")],
     )
     assert out.problem is not None
-    assert "未按序、逐字、完整覆盖小说原文" in said(out)
+    assert "[novel_text_coverage]" in said(out)
     assert not (fake_ctx.project_path / "drafts" / "episode_1" / "script_plan_segments.json").exists()
 
 

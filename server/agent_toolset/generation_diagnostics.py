@@ -10,7 +10,12 @@ GET_GENERATION_DIAGNOSTICS = ToolDeclaration(
     description=(
         "Diagnose one generation task or usage record of this project by task_id or record_id: queue status, stage, "
         "provider submission checkpoint (provider_job_id), the provider's own error code and message, timestamps, "
-        "the closed recovery action, and explicit truncation flags. Optionally includes the last recorded provider "
+        "the closed recovery action, and explicit truncation flags. provider_error is chosen by precedence: structured "
+        "task failure, then the persisted provider response body, then the generic stored reason (code unknown); "
+        "source/source_path name where it came from (paths under last_provider_response.body resolve only with "
+        "include_provider_response=true), code_known is false when no code exists, conflicts lists "
+        "disagreeing sources, and ArcReel's internal failure class appears only as internal_error_code. "
+        "Optionally includes the last recorded provider "
         "response, sanitized (credentials, signed URL queries and media payloads removed). Reads persisted records only: "
         "it never polls the provider, enqueues, or charges anything. Observation time of the last provider response is "
         "reported as unknown when not persisted. Returns generation_diagnostics_not_found for IDs outside this project."

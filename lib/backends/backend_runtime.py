@@ -357,17 +357,20 @@ def first_mapping_by_paths(payload: object, paths: tuple[tuple[str | int, ...], 
     return None
 
 
-# Common error locations: flat error or wrapped data.error.
-_ERROR_PATHS: tuple[tuple[str | int, ...], ...] = (("error",), ("data", "error"))
+# Common error locations: flat error or wrapped data.error. Shared with the persisted-response diagnostic reader
+# (lib/generation/persisted_provider_error.py), which extends these explicitly.
+PROVIDER_ERROR_PATHS: tuple[tuple[str | int, ...], ...] = (("error",), ("data", "error"))
+# Message fields of an error object, in priority order.
+PROVIDER_ERROR_MESSAGE_KEYS: tuple[str, ...] = ("message", "name")
 
 
 def extract_provider_error_message(state: object) -> str:
     """Best-effort provider error descriptions from dict message/name or direct strings; unknown if unavailable."""
-    for path in _ERROR_PATHS:
+    for path in PROVIDER_ERROR_PATHS:
         err = _dig(state, path)
         if isinstance(err, dict):
             # Check fields independently: blank/nonstring message still falls back to name.
-            for value in (err.get("message"), err.get("name")):
+            for value in (err.get(key) for key in PROVIDER_ERROR_MESSAGE_KEYS):
                 if isinstance(value, str) and value.strip():
                     return value.strip()
         elif isinstance(err, str) and err.strip():

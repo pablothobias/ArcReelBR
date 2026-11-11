@@ -414,7 +414,7 @@ class TestComfyuiCapabilityOverrides:
         assert resp.status_code == 422
         detail = resp.json()["detail"]
         assert "wan-t2v" in detail
-        assert "节点绑定" in detail
+        assert "node bindings" in detail
 
     async def test_the_full_update_path_refuses_it_for_the_same_reason(
         self, comfyui_client, custom_providers_app_session_factory
@@ -434,7 +434,7 @@ class TestComfyuiCapabilityOverrides:
             },
         )
         assert resp.status_code == 422
-        assert "节点绑定" in resp.json()["detail"]
+        assert "node bindings" in resp.json()["detail"]
 
     async def test_a_stored_override_is_ignored_on_read(self, comfyui_client, custom_providers_app_session_factory):
         """Write guards cannot prevent manual DB edits; responses also ignore overrides so UI never shows execution-unsupported values."""
@@ -563,7 +563,7 @@ class TestComfyuiDurationsOverrideApi:
         resp = self._create(comfyui_client, key, {"durations": [5, 10], "last_frame": True})
 
         assert resp.status_code == 422
-        assert "节点绑定" in resp.json()["detail"]
+        assert "node bindings" in resp.json()["detail"]
 
     async def test_an_image_row_refuses_durations(self, comfyui_client, custom_providers_app_session_factory):
         key = await _store_endpoint(

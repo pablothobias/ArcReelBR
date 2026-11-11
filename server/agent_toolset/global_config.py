@@ -292,6 +292,18 @@ GLOBAL_CONFIG_TOOLS = global_config_declarations(None)
 
 GLOBAL_CONFIG_TOOL_IDS = frozenset(declaration.name for declaration in GLOBAL_CONFIG_TOOLS)
 
+#: Non-secret discoverability note for the remote server's ``instructions`` (sent to every client at initialize), so an
+#: ungranted client can tell "not granted" from "not implemented". It names the setting, never the granted key names.
+GLOBAL_CONFIG_INSTRUCTIONS = (
+    "Global provider/endpoint configuration: operator-granted tools ("
+    + ", ".join(declaration.name for declaration in GLOBAL_CONFIG_TOOLS)
+    + f") exist on this server but are listed and callable only for API keys whose names the operator lists in "
+    f"{GLOBAL_CONFIG_API_KEYS_ENV} (comma-separated key names, never key values); the default grants none. "
+    "Granting takes effect only after a server restart. If tools/list omits them, or a call answers 'Unknown tool', "
+    "this API key is not granted. Ask for a grant only when the user requested a configuration change, and never "
+    "reconfigure through other surfaces instead."
+)
+
 
 # ---------------------------------------------------------------------------
 # Remote registration.
@@ -375,6 +387,7 @@ class GatedToolsFastMCP(FastMCP):
 
 __all__ = [
     "GLOBAL_CONFIG_API_KEYS_ENV",
+    "GLOBAL_CONFIG_INSTRUCTIONS",
     "GLOBAL_CONFIG_TOOLS",
     "GLOBAL_CONFIG_TOOL_IDS",
     "GatedToolsFastMCP",

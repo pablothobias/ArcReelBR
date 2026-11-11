@@ -1380,7 +1380,14 @@ class TestPatchProjectSettings:
         assert out.problem is None
         assert "source_language" not in ctx.pm.load_project("demo")
 
-    @pytest.mark.parametrize("bad", ["english", "ja", "ZH", "", 1, True, ["en"]])
+    @pytest.mark.parametrize(("raw", "stored"), [("ZH", "zh"), (" en ", "en"), ("pt_br", "pt-BR")])
+    async def test_source_language_codes_are_normalized(self, ctx: ToolHarness, raw: str, stored: str) -> None:
+        """Supported codes are accepted case-insensitively and stored in canonical form."""
+        out = await run_declared_tool(PATCH_PROJECT, ctx, {"settings": {"source_language": raw}})
+        assert out.problem is None
+        assert ctx.pm.load_project("demo")["source_language"] == stored
+
+    @pytest.mark.parametrize("bad", ["english", "ja", "", 1, True, ["en"]])
     async def test_invalid_source_language_rejected(self, ctx: ToolHarness, bad: Any) -> None:
         out = await run_declared_tool(PATCH_PROJECT, ctx, {"settings": {"source_language": bad}})
         assert out.problem is not None

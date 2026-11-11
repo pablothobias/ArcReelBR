@@ -26,7 +26,10 @@ from sqlalchemy import func, select
 
 from lib.config.service import ConfigService
 from lib.db.models.api_call import ApiCall
-from lib.db.models.custom_provider import CustomProvider
+from lib.db.models.config import ProviderConfig, SystemSetting
+from lib.db.models.credential import ProviderCredential
+from lib.db.models.custom_endpoint import CustomEndpoint
+from lib.db.models.custom_provider import CustomProvider, CustomProviderModel
 from lib.db.models.task import Task
 from lib.db.repositories.credential_repository import CredentialRepository
 from lib.db.repositories.custom_endpoint_repo import CustomEndpointRepository
@@ -34,11 +37,14 @@ from lib.project.project_manager import ProjectManager
 from server.agent_toolset.global_config import (
     GLOBAL_CONFIG_API_KEYS_ENV,
     GLOBAL_CONFIG_TOOL_IDS,
+    GLOBAL_CONFIG_TOOLS,
     GatedToolsFastMCP,
     build_global_config_tools,
 )
+from server.agent_toolset.media_transport import MEDIA_TRANSPORT_TOOLS
 from server.agent_toolset.toolset import AGENT_TOOLSET
-from server.remote_mcp import ArcApiKeyVerifier, build_remote_mcp_server, mount_remote_mcp
+from server.remote_mcp import REMOTE_MCP_INSTRUCTIONS, ArcApiKeyVerifier, build_remote_mcp_server, mount_remote_mcp
+from server.session_mcp import session_tools
 from server.tool_runtime import Services
 
 SECRET = "sk-fake-minimax-SECRET-0123456789abcdef"
@@ -120,7 +126,7 @@ class _Client:
         read, write, _ = await self._stream.__aenter__()
         self._session = ClientSession(read, write)
         session = await self._session.__aenter__()
-        await session.initialize()
+        self.initialized = await session.initialize()
         return session
 
     async def __aexit__(self, *exc: object) -> None:
@@ -402,7 +408,8 @@ async def test_global_config_tools_are_not_registered_without_granted_keys(
         tool.name for tool in build_global_config_tools(projects=projects, services=services, reload_limits=None)
     } == (GLOBAL_CONFIG_TOOL_IDS)
 
-    # The current remote host (not yet wired) and the embedded toolset expose none of them.
+    # Without a granted name the official remote host registers none of them; the embedded toolset never has them.
+    monkeypatch.delenv(GLOBAL_CONFIG_API_KEYS_ENV, raising=False)
     remote = build_remote_mcp_server(projects=projects, services=services, token_verifier=ArcApiKeyVerifier(_verify))
     assert {tool.name for tool in await remote.list_tools()}.isdisjoint(GLOBAL_CONFIG_TOOL_IDS)
     assert {declaration.name for declaration in AGENT_TOOLSET}.isdisjoint(GLOBAL_CONFIG_TOOL_IDS)
@@ -745,3 +752,209 @@ def test_url_authority_is_fixed_only_by_the_base_url_or_a_literal(template: str,
     from server.services.configuration.global_config import url_authority_is_fixed
 
     assert url_authority_is_fixed(template) is fixed
+
+
+# ---------------------------------------------------------------------------
+# The official remote server builder: gating, discoverability, offline previews and zero-write refusals.
+# ---------------------------------------------------------------------------
+
+
+async def _rows(db_factory) -> dict[str, list[str]]:
+    """Every configuration, task and usage row, for before/after comparisons (never printed: credentials are inside)."""
+    snapshot: dict[str, list[str]] = {}
+    async with db_factory() as session:
+        for model in (
+            CustomEndpoint,
+            CustomProvider,
+            CustomProviderModel,
+            ProviderCredential,
+            ProviderConfig,
+            SystemSetting,
+            Task,
+            ApiCall,
+        ):
+            rows = (await session.execute(select(model))).scalars().all()
+            columns = [attr.key for attr in model.__mapper__.column_attrs]
+            snapshot[model.__tablename__] = sorted(repr({c: getattr(row, c) for c in columns}) for row in rows)
+    return snapshot
+
+
+def _shared_catalog(projects: ProjectManager) -> set[str]:
+    return (
+        {declaration.name for declaration in AGENT_TOOLSET}
+        | {declaration.name for declaration in MEDIA_TRANSPORT_TOOLS}
+        | {tool.name for tool in session_tools(projects=projects)}
+    )
+
+
+def _startup_messages(caplog: pytest.LogCaptureFixture) -> list[str]:
+    return [record.getMessage() for record in caplog.records if record.name == "server.remote_mcp"]
+
+
+async def test_official_remote_server_grants_global_config_only_to_named_keys(
+    seeded, db_factory, outbound_http: list[str], caplog: pytest.LogCaptureFixture, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    projects, services = seeded
+    monkeypatch.delenv(GLOBAL_CONFIG_API_KEYS_ENV, raising=False)
+    caplog.set_level(logging.DEBUG)
+    reloads = _Reloads()
+    server = build_remote_mcp_server(
+        projects=projects,
+        services=services,
+        token_verifier=ArcApiKeyVerifier(_verify),
+        reload_limits=reloads,
+        global_config_key_names={"config-admin"},
+    )
+    # Startup logs how many key names are granted, never which.
+    assert _startup_messages(caplog) == ["Remote MCP global configuration tools granted to 1 API key name(s)"]
+    shared = _shared_catalog(projects)
+    app = _app(server)
+
+    async with server.session_manager.run():
+        denied_client = _Client(app, "arc-other")
+        async with denied_client as denied:
+            denied_names = {tool.name for tool in (await denied.list_tools()).tools}
+            denied_read = await denied.call_tool("list_global_providers", {})
+            denied_write = await denied.call_tool(
+                "configure_custom_provider",
+                {
+                    "display_name": "x",
+                    "discovery_format": "openai",
+                    "base_url": "https://api.minimax.io",
+                    "credential_ref": "minimax",
+                    "apply": True,
+                },
+            )
+
+        granted_client = _Client(app, "arc-admin")
+        async with granted_client as mcp:
+            granted_names = {tool.name for tool in (await mcp.list_tools()).tools}
+            providers = await mcp.call_tool("list_global_providers", {})
+            endpoints = await mcp.call_tool("list_global_endpoints", {})
+            builtin = _structured(await mcp.call_tool("get_endpoint_definition", {"endpoint_key": "minimax-h3"}))
+            definition = _wav_variant(builtin["endpoint"]["definition"])
+
+            # Offline checks: zero outbound HTTP, zero rows of any kind.
+            before_offline = await _rows(db_factory)
+            valid = _structured(await mcp.call_tool("validate_endpoint_definition", {"definition": definition}))
+            invalid = _structured(
+                await mcp.call_tool("validate_endpoint_definition", {"definition": {"kind": "declarative"}})
+            )
+            preview = await mcp.call_tool(
+                "preview_endpoint_request",
+                {
+                    "definition": definition,
+                    "parameters": {"model": "MiniMax-H3", "prompt": "capivara"},
+                    "base_url": "https://api.minimax.io",
+                },
+            )
+            after_offline = await _rows(db_factory)
+
+            copied = _structured(await mcp.call_tool("copy_builtin_endpoint", {"endpoint_key": "minimax-h3"}))
+            key = copied["endpoint"]["key"]
+            revision = copied["endpoint"]["revision"]
+
+            # Refusals write nothing.
+            before_refusals = await _rows(db_factory)
+            invalid_update = await mcp.call_tool(
+                "update_custom_endpoint",
+                {
+                    "endpoint_key": key,
+                    "definition": {"kind": "declarative"},
+                    "expected_revision": revision,
+                    "apply": True,
+                },
+            )
+            stale_update = await mcp.call_tool(
+                "update_custom_endpoint",
+                {"endpoint_key": key, "definition": definition, "expected_revision": "sha256-v1:stale", "apply": True},
+            )
+            provider_args = {
+                "display_name": "MiniMax official (WAV)",
+                "discovery_format": "openai",
+                "base_url": "https://api.minimax.io",
+                "credential_ref": "minimax",
+                "models": [{"model_id": "MiniMax-H3", "display_name": "MiniMax H3", "endpoint": key}],
+            }
+            other_host = await mcp.call_tool(
+                "configure_custom_provider", {**provider_args, "base_url": "https://api.minimaxi.com", "apply": True}
+            )
+            after_refusals = await _rows(db_factory)
+
+            created = await mcp.call_tool("configure_custom_provider", {**provider_args, "apply": True})
+            readback = await mcp.call_tool("list_global_providers", {})
+
+    # Discoverability: every key, granted or not, gets the same non-secret instructions at initialize.
+    for client in (denied_client, granted_client):
+        instructions = client.initialized.instructions
+        assert instructions == REMOTE_MCP_INSTRUCTIONS
+        assert GLOBAL_CONFIG_API_KEYS_ENV in instructions
+        assert "restart" in instructions
+        assert all(name in instructions for name in GLOBAL_CONFIG_TOOL_IDS)
+        assert "config-admin" not in instructions
+
+    # Ungranted catalog is exactly shared + media transport + session tools; the embedded toolset has none.
+    assert denied_names == shared
+    assert len(shared) == len(AGENT_TOOLSET) + len(MEDIA_TRANSPORT_TOOLS) + len(session_tools(projects=projects))
+    assert granted_names == shared | GLOBAL_CONFIG_TOOL_IDS
+    assert len(GLOBAL_CONFIG_TOOLS) == len(GLOBAL_CONFIG_TOOL_IDS) == 8
+    assert {declaration.name for declaration in AGENT_TOOLSET}.isdisjoint(GLOBAL_CONFIG_TOOL_IDS)
+    assert denied_read.isError
+    assert denied_write.isError
+    assert "Unknown tool: list_global_providers" in _text(denied_read)
+    assert "Unknown tool: configure_custom_provider" in _text(denied_write)
+
+    assert _structured(providers)["providers"]["builtin"]
+    assert any(item["key"] == "minimax-h3" for item in _structured(endpoints)["endpoints"])
+    assert valid["validation"]["valid"] is True
+    assert invalid["validation"]["valid"] is False
+    assert _structured(preview)["preview"]["submit"]["headers"]["Authorization"] == "Bearer ****"
+    assert after_offline == before_offline
+    assert outbound_http == []
+
+    assert _structured(invalid_update)["problem"]["code"] == "custom_endpoint_definition_invalid"
+    assert _structured(stale_update)["problem"]["code"] == "revision_conflict"
+    assert _structured(other_host)["problem"]["code"] == "credential_host_mismatch"
+    assert after_refusals == before_refusals
+
+    provider = _structured(created)["provider_configuration"]["provider"]
+    assert provider["credential"]["ref"] == provider["provider_id"]
+    async with db_factory() as session:
+        stored = (await session.execute(select(CustomProvider))).scalar_one()
+        assert stored.api_key == SECRET  # Reused server-side from the opaque "minimax" reference.
+        assert (await session.execute(select(func.count()).select_from(Task))).scalar_one() == 0
+        assert (await session.execute(select(func.count()).select_from(ApiCall))).scalar_one() == 0
+    assert reloads.count == 1
+
+    for result in (providers, endpoints, preview, created, readback, denied_read, denied_write, other_host):
+        text = _text(result)
+        assert SECRET not in text
+        assert SECRET[-4:] not in text
+        assert OTHER_SECRET not in text
+    logged = "\n".join(record.getMessage() + repr(record.__dict__) for record in caplog.records)
+    assert SECRET not in logged
+    assert OTHER_SECRET not in logged
+    assert "config-admin" not in "\n".join(_startup_messages(caplog))
+    audits = [record for record in caplog.records if record.name == "arcreel.audit.global_config"]
+    assert [(r.operation, r.target, r.identity) for r in audits] == [
+        ("copy_builtin_endpoint", key, "apikey:config-admin"),
+        ("create_custom_provider", provider["provider_id"], "apikey:config-admin"),
+    ]
+    assert audits[-1].changed_fields == ["display_name", "discovery_format", "base_url", "credential", "models"]
+
+
+@pytest.mark.parametrize(("granted", "count"), [(None, 0), (" , ", 0), ("config-admin, ops", 2)])
+async def test_remote_server_startup_logs_granted_key_count_without_names(
+    seeded, caplog: pytest.LogCaptureFixture, monkeypatch: pytest.MonkeyPatch, granted: str | None, count: int
+) -> None:
+    projects, services = seeded
+    if granted is None:
+        monkeypatch.delenv(GLOBAL_CONFIG_API_KEYS_ENV, raising=False)
+    else:
+        monkeypatch.setenv(GLOBAL_CONFIG_API_KEYS_ENV, granted)
+    caplog.set_level(logging.INFO, logger="server.remote_mcp")
+    build_remote_mcp_server(projects=projects, services=services, token_verifier=ArcApiKeyVerifier(_verify))
+    messages = _startup_messages(caplog)
+    assert messages == [f"Remote MCP global configuration tools granted to {count} API key name(s)"]
+    assert "config-admin" not in messages[0]
+    assert "ops" not in messages[0]

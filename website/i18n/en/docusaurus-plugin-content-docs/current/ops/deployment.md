@@ -181,6 +181,7 @@ The default deployment examples currently include these core variables:
 | `ARCREEL_DATA_DIR` | `projects` | Data root; projects, the default SQLite database, logs, and Vertex credentials all live under it |
 | `CORS_ORIGINS` | Wildcard | When narrowed to an allowlist, browser MCP client origins must be listed too |
 | `ARCREEL_OFFICIAL_SERVICE_URL` | Built-in official service address | The official service behind market install counts, ratings, and submissions; set it to empty to turn it off entirely, leaving the market to read market sources only |
+| `ARCREEL_MCP_GLOBAL_CONFIG_API_KEYS` | Empty | Comma-separated API key names (the names under "Access tokens"); only the listed keys can see and call the global configuration tools on remote MCP; when empty, these tools are not registered |
 
 Notes:
 
@@ -191,6 +192,7 @@ Notes:
 - Vertex credential files should be readable only by the user who runs ArcReel.
 - File logs are always written to `logs/` under the data root. The old `ARCREEL_LOG_DIR` variable no longer takes effect; if it is still set, startup logs a one-time notice. Set `ARCREEL_LOG_FILE_DISABLED=true` if you only want logs on stdout.
 - Third-party model API keys are normally managed on the ArcReel Settings page. Do not include them in public documentation.
+- `ARCREEL_MCP_GLOBAL_CONFIG_API_KEYS` only controls which tools remote MCP exposes; it is not a security boundary, because any `arc-` API key can already call the management REST API. List only keys approved to change provider configuration. Project sessions and the embedded Agent never receive these tools. Changes take effect only after a restart; the startup log prints `Remote MCP global configuration tools granted to N API key name(s)`, which gives the count but not the names, so you can use it to confirm the setting is active. Clients without the grant learn from the server instructions at initialization that these tools exist but require operator authorization.
 
 The remote MCP endpoint is `/mcp` and always requires an API Key with an `arc-` prefix; it never permits anonymous access, even when `AUTH_ENABLED=false`. Remote access needs no extra `MCP_*` configuration: paste the endpoint URL shown under "External agent access" in Settings, together with an API Key created under "Access tokens", into your client, and connect through an HTTPS reverse proxy, VPN, or secure tunnel that preserves long-lived SSE connections.
 

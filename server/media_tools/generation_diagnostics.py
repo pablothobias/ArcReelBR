@@ -2,7 +2,7 @@
 
 Reads the task row and the latest usage record through the native repositories (the same data the Web usage detail
 shows), sanitizes them through :mod:`lib.generation.generation_diagnostics`, and never polls a provider, enqueues a
-task, or writes anything. IDs outside the caller's project are reported as not found.
+task, or writes anything. IDs outside the caller's project, or owned by another user, are reported as not found.
 """
 
 from __future__ import annotations
@@ -64,10 +64,20 @@ async def get_generation_diagnostics(
             task = await TaskRepository(session).get(args.task_id)
             if task is None or task.get("project_name") != project_name or task.get("user_id") != caller.user_id:
                 return _not_found("task_id", args.task_id)
-            record = await UsageRepository(session).get_latest_record_for_task(project_name, args.task_id)
+            usage = UsageRepository(session)
+            record = await usage.get_latest_record_for_task(project_name, args.task_id)
+            # A call settled under another user is omitted rather than exposed through this user's task.
+            if record is not None and await usage.get_record_owner_id(int(record["id"])) != caller.user_id:
+                record = None
         else:
-            record = await UsageRepository(session).get_record(int(args.record_id or 0))
-            if record is None or record.get("project_name") != project_name:
+            usage = UsageRepository(session)
+            record_id = int(args.record_id or 0)
+            record = await usage.get_record(record_id)
+            if (
+                record is None
+                or record.get("project_name") != project_name
+                or await usage.get_record_owner_id(record_id) != caller.user_id
+            ):
                 return _not_found("record_id", args.record_id)
             if record.get("task_id"):
                 linked = await TaskRepository(session).get(str(record["task_id"]))

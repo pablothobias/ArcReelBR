@@ -818,6 +818,15 @@ class UsageRepository(BaseRepository):
         row = (await self.session.execute(self._scope_query(stmt, ApiCall))).first()
         return _record_detail_to_dict(row[0], row[1]) if row is not None else None
 
+    async def get_record_owner_id(self, record_id: int) -> str | None:
+        """Owning ``user_id`` of one call, scoped like :meth:`get_record`; ``None`` if absent.
+
+        Kept apart from the record projections, which deliberately omit ``user_id``, so access checks can compare the
+        owner without exposing it to any response.
+        """
+        stmt = select(ApiCall.user_id).where(ApiCall.id == record_id)
+        return (await self.session.execute(self._scope_query(stmt, ApiCall))).scalar_one_or_none()
+
     async def get_latest_record_for_task(self, project_name: str, task_id: str) -> dict[str, Any] | None:
         """Most recent call detail recorded for one task in one project, including pending calls; ``None`` if absent.
 

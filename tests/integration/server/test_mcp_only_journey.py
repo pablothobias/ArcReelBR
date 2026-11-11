@@ -26,6 +26,7 @@ from mcp.types import BlobResourceContents
 
 from lib.config.resolver import ConfigResolver, ProviderModel
 from lib.custom_provider.declarative_backend import ProviderJobRejectedError
+from lib.db.repositories.usage_repo import UsageRepository
 from lib.generation.generation_queue import GenerationQueue
 from lib.project.project_manager import ProjectManager
 from lib.workflow.workflow_state import WorkflowActionType
@@ -529,6 +530,69 @@ async def test_provider_failure_diagnostics_are_sanitized_and_not_retried(journe
     assert_no_leaks(journey.seen, _forbidden(journey))
 
 
+HISTORICAL_GENERIC = "provider reported failure (status: failed)"
+HISTORICAL_MESSAGE = 'content[5].audio_url: invalid param: audio format ".x-wav" not allowed'
+
+
+async def test_historical_generic_failure_diagnostics_read_the_persisted_provider_verdict(journey: Journey) -> None:
+    """A failure settled before ``extract.error_code`` support: only the persisted response carries the real code."""
+    journey.image.fail_with = RuntimeError(HISTORICAL_GENERIC)
+    async with journey.session() as session:
+        await _bootstrap(journey, session)
+        structured(await journey.call(session, "generate_assets", PROJECT, type="character", names=[CHARACTER]))
+        settled = await journey.run_one("image")
+        # Worker side only: the backend's provider-response hook persisted the last body through the native ledger
+        # repository (the image fake has no such hook), exactly as the historical MiniMax H3 row stores it.
+        async with journey.sessions() as db:
+            usage = UsageRepository(db)
+            record = await usage.get_latest_record_for_task(PROJECT, settled["task_id"])
+            assert record is not None
+            await usage.update_last_provider_response(
+                record["id"],
+                {
+                    "task": {
+                        "id": "461931341250972",
+                        "model": "MiniMax-H3",
+                        "status": "failed",
+                        "error": {"code": "2013", "message": HISTORICAL_MESSAGE},
+                    },
+                    "debug": {"Authorization": f"Bearer {PROVIDER_SECRET}", "result": SIGNED_URL},
+                },
+            )
+            before = await usage.get_latest_record_for_task(PROJECT, settled["task_id"])
+        tasks_before = await journey.task_total()
+        diagnostics = structured(
+            await journey.call(
+                session,
+                "get_generation_diagnostics",
+                PROJECT,
+                task_id=settled["task_id"],
+                include_provider_response=True,
+            )
+        )["generation_diagnostics"]
+        async with journey.sessions() as db:
+            after = await UsageRepository(db).get_latest_record_for_task(PROJECT, settled["task_id"])
+
+    assert settled["status"] == "failed"
+    error = diagnostics["provider_error"]
+    assert (error["code"], error["code_known"], error["message"]) == ("2013", True, HISTORICAL_MESSAGE)
+    assert error["source"] == "last_provider_response"
+    assert error["source_path"] == "$.last_provider_response.body.task.error"
+    assert error["source_truncated"] is False
+    assert HISTORICAL_GENERIC in error["stored_message"]
+    # Internal codes stay separate from the provider's own code.
+    assert diagnostics["problem"]["code"] != "2013"
+    assert diagnostics["usage_record"]["error_code"] is None
+    assert diagnostics["recovery"]["action"] == "retry"
+    assert "authorization" in diagnostics["recovery"]["guidance"]
+    assert diagnostics["provider_calls"] == 0
+    # Read-only: no row changed, nothing enqueued, no further provider call.
+    assert after == before
+    assert await journey.task_total() == tasks_before == 1
+    assert len(journey.image.calls) == 1
+    assert_no_leaks(journey.seen, _forbidden(journey))
+
+
 # ---------------------------------------------------------------------------
 # Step 8: no escape hatches, gated global configuration, scope refusals, no leaks
 # ---------------------------------------------------------------------------
@@ -604,6 +668,7 @@ async def test_catalog_has_no_escape_hatches_and_scope_is_enforced(
     async with journey.host():
         async with journey.session(nested=True) as granted:
             granted_names = {tool.name for tool in (await granted.list_tools()).tools}
+            granted_call = await journey.call(granted, "list_global_endpoints", None)
         async with journey.session(OTHER_API_KEY, nested=True) as denied:
             denied_names = {tool.name for tool in (await denied.list_tools()).tools}
             denied_call = await journey.call(denied, "list_global_providers", None)
@@ -617,7 +682,10 @@ async def test_catalog_has_no_escape_hatches_and_scope_is_enforced(
     # Global endpoint/provider configuration is hidden from every key unless the operator grants it.
     assert not names & GLOBAL_CONFIG_TOOL_IDS
     assert not other_key_names & GLOBAL_CONFIG_TOOL_IDS
-    assert granted_names >= GLOBAL_CONFIG_TOOL_IDS
+    assert granted_names == names | GLOBAL_CONFIG_TOOL_IDS
+    assert not granted_call.isError
+    assert structured(granted_call)["endpoints"]
+    assert denied_names == names
     assert not denied_names & GLOBAL_CONFIG_TOOL_IDS
     assert denied_call.isError
     assert {label: problem(result)["code"] for label, result in refusals.items()} == {
