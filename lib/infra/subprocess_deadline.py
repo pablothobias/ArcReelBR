@@ -128,7 +128,7 @@ async def run_with_deadline(
             stdout = stderr = b""
     except TimeoutError:
         await _reap_to_completion(proc, grace, cleanup)
-        raise SubprocessDeadlineExceeded(f"{args[0]} 未在 {deadline_seconds}s 内退出") from None
+        raise SubprocessDeadlineExceeded(f"{args[0]} did not exit within {deadline_seconds}s") from None
     except asyncio.CancelledError:
         await _reap_to_completion(proc, grace, cleanup)
         raise

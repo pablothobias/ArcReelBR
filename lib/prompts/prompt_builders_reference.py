@@ -85,9 +85,9 @@ def build_reference_units_split_prompt(
     """
     normalized_durations = sorted({int(d) for d in supported_durations})
     if not normalized_durations:
-        raise ValueError("supported_durations 不能为空：必须提供模型支持的秒数集合")
+        raise ValueError("supported_durations must not be empty: provide the set of seconds the model supports")
     if default_duration is not None and int(default_duration) not in normalized_durations:
-        raise ValueError(f"default_duration={default_duration} 不在 supported_durations={normalized_durations} 内")
+        raise ValueError(f"default_duration={default_duration} is not in supported_durations={normalized_durations}")
     normalized_reference_durations = sorted({int(d) for d in reference_supported_durations or []})
     normalized_text_durations = sorted({int(d) for d in text_supported_durations or []})
     for name, tier in (
@@ -95,7 +95,7 @@ def build_reference_units_split_prompt(
         ("text_supported_durations", normalized_text_durations),
     ):
         if not set(tier) <= set(normalized_durations):
-            raise ValueError(f"{name}={tier} 不是 supported_durations={normalized_durations} 的子集")
+            raise ValueError(f"{name}={tier} is not a subset of supported_durations={normalized_durations}")
 
     # Include reference↔duration interaction only when declared and tier sets differ. Most models use
     # equivalent sets, so redundant rules waste attention. Always state both sets, not union plus image narrowing:

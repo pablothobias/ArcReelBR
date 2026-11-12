@@ -146,5 +146,5 @@ class OpenAIAudioBackend:
         if not content:
             # Lenient shims may return 200 with empty bodies: never write zero-byte files or count success. Synthesis already
             # occurred upstream; retry would bill again, so raise for task failure handling (regeneration is inexpensive).
-            raise RuntimeError("OpenAI 兼容语音合成返回空响应体")
+            raise RuntimeError("OpenAI-compatible speech synthesis returned an empty response body")
         return content

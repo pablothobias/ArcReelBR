@@ -128,34 +128,41 @@ async def restore_trash_record(
 
 def delete_project_file_summary(value: dict[str, Any]) -> str:
     record = value["record"]
-    return f"已移入项目回收站：{'、'.join(record['files'])}（删除记录 {record['id']}，保留 {project_trash.RETENTION.days} 天）"
+    return (
+        f"Moved to project trash: {', '.join(record['files'])} "
+        f"(deletion record {record['id']}, kept for {project_trash.RETENTION.days} days)"
+    )
 
 
 def _identity_notes(value: dict[str, Any]) -> list[str]:
     """Explain changed names or IDs after object restoration; omit this for degraded restorations that do not preserve original structure."""
     original, landed = value.get("original_object", {}), value["object"]
     notes = [
-        f"{label}已换：{original[key]} → {landed[key]}"
-        for key, label in (("name", "名称"), ("id", "编号"))
+        f"{label} changed: {original[key]} → {landed[key]}"
+        for key, label in (("name", "Name"), ("id", "ID"))
         if key in original and landed.get(key) != original[key]
     ]
     if landed.get("kind") == "episode":
-        notes.append("这一集排在播出顺序末尾")
+        notes.append("This episode is placed at the end of the broadcast order")
     return notes
 
 
 def restore_trash_record_summary(value: dict[str, Any]) -> str:
     lines = [
-        f"{item['original']} → {item['path']}" + ("（作为历史版本加回）" if item["as_history"] else "")
+        f"{item['original']} → {item['path']}" + (" (added back as a history version)" if item["as_history"] else "")
         for item in value["restored"]
     ]
     if not value.get("degraded"):
-        return "已恢复：\n" + "\n".join([*lines, *_identity_notes(value)])
-    kept = "、".join(value["download_only"])
+        return "Restored:\n" + "\n".join([*lines, *_identity_notes(value)])
+    kept = ", ".join(value["download_only"])
     return (
-        "无法按原结构恢复，只加回了其中的文件"
-        + ("：\n" + "\n".join(lines) if lines else "（没有可加回的文件）")
-        + (f"\n结构文件 {kept} 留在这条删除记录里，只能由创作者在回收站下载" if kept else "")
+        "Could not restore the original structure; only its files were added back"
+        + (":\n" + "\n".join(lines) if lines else " (no files to add back)")
+        + (
+            f"\nStructure files {kept} stay in this deletion record; only the creator can download them from the trash"
+            if kept
+            else ""
+        )
     )
 
 

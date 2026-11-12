@@ -67,7 +67,7 @@ class TestDualModeAuthViaBase:
         assert backend._headers()["Authorization"] == "Bearer static-key"
 
     def test_unknown_auth_mode_raises_from_base(self):
-        with pytest.raises(ValueError, match=r"未知 Kling auth_mode"):
+        with pytest.raises(ValueError, match=r"Unknown Kling auth_mode"):
             KlingImageBackend(auth_mode="oauth", api_key="k")
 
 

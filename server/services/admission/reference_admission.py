@@ -87,7 +87,7 @@ def reference_admission_problems(admission: ReferenceAdmission, *, unit_id: str)
         problems.append(
             GenerationProblem(
                 code=UNREGISTERED_REFERENCE_CODE,
-                detail=f"引用了未登记的资产名: {admission.unregistered_text()}",
+                detail=f"References unregistered asset names: {admission.unregistered_text()}",
                 action=GenerationAction.GENERATE_DEPENDENCY,
                 params={"unit_id": unit_id, "missing_text": admission.unregistered_text()},
             )
@@ -96,7 +96,7 @@ def reference_admission_problems(admission: ReferenceAdmission, *, unit_id: str)
         problems.append(
             GenerationProblem(
                 code=SHEET_MISSING_CODE,
-                detail=f"引用的资产没有资产图: {admission.without_sheet_text()}",
+                detail=f"Referenced assets have no asset image: {admission.without_sheet_text()}",
                 action=GenerationAction.GENERATE_DEPENDENCY,
                 params={"unit_id": unit_id, "missing_text": admission.without_sheet_text()},
             )

@@ -543,7 +543,7 @@ def test_rest_guard_refuses_writes_but_keeps_reads_open(tmp_path: Path, monkeypa
 def test_rest_guard_fails_loud_when_the_route_has_no_project_param() -> None:
     client = TestClient(_guarded_app(), raise_server_exceptions=True)
 
-    with pytest.raises(RuntimeError, match="没有项目路径参数"):
+    with pytest.raises(RuntimeError, match="without a project path parameter"):
         client.post("/no-project-param")
 
 

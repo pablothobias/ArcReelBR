@@ -24,7 +24,7 @@ Category 5, duplicate cases: in one file, bodies match after docstring removal a
 normalization, or one body equals a parameter-table row of a same-file `@parametrize` case. Require
 identical parameter names/defaults, nonparameterized decorators, and class context; same file only.
 
-`--check` gates all matches as `规则号 file:line 修复指引` (rule number, location, repair guidance); any match exits 1. Zero tolerance,
+`--check` gates all matches as `rule file:line guidance`; any match exits 1. Zero tolerance,
 no baseline or exemptions; fix false positives in this script.
 
 Default backend directories are `tests/` and workspace `packages/*/tests/`; repeat `--tests` to override.
@@ -198,9 +198,9 @@ IO_MODULE_HINTS = (
     "server.db",
 )
 
-MOTIVE_TIMING = "绕轮询/重试等待常量"
-MOTIVE_IO = "绕外部 I/O"
-MOTIVE_LOGIC = "绕被测逻辑本身"
+MOTIVE_TIMING = "bypass polling/retry wait constants"
+MOTIVE_IO = "bypass external I/O"
+MOTIVE_LOGIC = "bypass the logic under test itself"
 
 # Symbol-name regexes have limited accuracy. This manually reviewed table covers production targets they misclassify;
 # other targets use regex classification. Changing entries changes reported tier counts; include judgment evidence.
@@ -1343,9 +1343,9 @@ def scan_shared_facilities(root: Path, parsed: list[tuple[Path, ast.Module]]) ->
                     "CONFTEST-IMPORT",
                     rel,
                     lineno,
-                    f"import 了 {module}",
-                    "conftest 只放 fixture 与收集期钩子，且 conftest 之间不互相 import；"
-                    "被 import 的 helper 移到 tests/fakes.py、tests/factories.py 或专题共享模块",
+                    f"imports {module}",
+                    "conftest holds only fixtures and collection-time hooks, and conftests do not import each other; "
+                    "move imported helpers to tests/fakes.py, tests/factories.py, or a topic-specific shared module",
                 )
             )
         if path.name == "conftest.py":
@@ -1367,8 +1367,8 @@ def scan_shared_facilities(root: Path, parsed: list[tuple[Path, ast.Module]]) ->
                             "FIXTURE-OVERRIDE",
                             rel,
                             line,
-                            f"fixture `{name}` 与 {owner} 同名",
-                            "复用 conftest 的 fixture；语义确实不同的改用不同名字",
+                            f"fixture `{name}` has the same name as one in {owner}",
+                            "reuse the conftest fixture; if the meaning really differs, use a different name",
                         )
                     )
                     break
@@ -1385,8 +1385,8 @@ def scan_shared_facilities(root: Path, parsed: list[tuple[Path, ast.Module]]) ->
                             "CONFTEST-SHADOW",
                             rel,
                             line,
-                            f"fixture `{name}` 与祖先 {owner} 同名",
-                            "局部 conftest 不得与祖先 conftest 的 fixture 同名",
+                            f"fixture `{name}` has the same name as one in ancestor {owner}",
+                            "a local conftest must not reuse an ancestor conftest's fixture name",
                         )
                     )
                     break
@@ -1406,8 +1406,8 @@ def scan_shared_facilities(root: Path, parsed: list[tuple[Path, ast.Module]]) ->
                     "FIXTURE-DUP",
                     rel,
                     line,
-                    f"fixture `{name}` 在 {len(files)} 个测试文件重复定义",
-                    "同一实体上提到 conftest；恰好重名的不同实体改用区分性名字",
+                    f"fixture `{name}` is defined again in {len(files)} test files",
+                    "move the shared entity up into conftest; give distinct entities that happen to share a name distinguishing names",
                 )
             )
 
@@ -1419,10 +1419,10 @@ PATCH_SPREAD_KINDS = {"patch", "patch.object", "monkeypatch.setattr"}
 #: Per-file filesystem-boundary replacements: injected failures/probes differ per case; shared substitutes would only forward.
 #: Values explain exemptions; before adding entries, verify no shared helper or seam can be extracted.
 PATCH_SPREAD_ALLOWED: Mapping[str, str] = {
-    "pathlib.Path.mkdir": "建目录失败注入（磁盘满、权限）与并发屏障，各用例的触发路径与失败形状不同",
-    "pathlib.Path.open": "读次数计数、锁文件打开闸门、分块读取探针，各用例观察的行为不同",
-    "pathlib.Path.read_bytes": "读次数计数、线程卸载阻塞闸门、权限失败与交错暂停，各用例观察的行为不同",
-    "pathlib.Path.unlink": "删除失败注入（设备忙、文件占用、权限）与持锁探针，各用例的失败条件不同",
+    "pathlib.Path.mkdir": "directory-creation failure injection (disk full, permissions) and concurrency barriers; trigger paths and failure shapes differ per case",
+    "pathlib.Path.open": "read counting, lock-file open gates, chunked-read probes; each case observes different behavior",
+    "pathlib.Path.read_bytes": "read counting, thread-offload blocking gates, permission failures and interleaved pauses; each case observes different behavior",
+    "pathlib.Path.unlink": "deletion failure injection (device busy, file in use, permissions) and lock-holding probes; failure conditions differ per case",
 }
 
 
@@ -1448,8 +1448,8 @@ def scan_patch_spread(patches: Sequence[PatchSite]) -> list[StructureFinding]:
                 "PATCH-SPREAD",
                 rel,
                 line,
-                f"patch 目标 `{target}` 出现在 {len(lines)} 个测试文件",
-                "收编为 tests/fakes.py 或专题共享模块中的共享 helper / fixture，各文件改用它",
+                f"patch target `{target}` appears in {len(lines)} test files",
+                "consolidate into a shared helper / fixture in tests/fakes.py or a topic-specific shared module, and use it from each file",
             )
             for rel, line in sorted(lines.items())
         )
@@ -1536,8 +1536,8 @@ def scan_shared_symbol_usage(root: Path, parsed: Sequence[tuple[Path, ast.Module
                         "SHARED-SYMBOL-USAGE",
                         rel,
                         node.lineno,
-                        f"公开符号 `{name}` 只被 {count} 个测试文件使用",
-                        "只有一个文件用的移回该文件；模块内部自用的改下划线名；无人使用的删除",
+                        f"public symbol `{name}` is used by only {count} test files",
+                        "move symbols used by one file back into it; prefix module-internal ones with an underscore; delete unused ones",
                     )
                 )
     return findings
@@ -1580,8 +1580,8 @@ def scan_file_shape(root: Path, paths: list[Path]) -> list[StructureFinding]:
                     "NAME-SPLIT",
                     rel,
                     1,
-                    f"文件名带分裂后缀 `_{match.group(1)}`",
-                    "按行为域取语义化主题后缀重命名，或并回主文件",
+                    f"file name has a split suffix `_{match.group(1)}`",
+                    "rename with a meaningful topic suffix for the behavior area, or merge back into the main file",
                 )
             )
         lines = len(path.read_text(encoding="utf-8").splitlines())
@@ -1591,8 +1591,8 @@ def scan_file_shape(root: Path, paths: list[Path]) -> list[StructureFinding]:
                     "SIZE-LIMIT",
                     rel,
                     lines,
-                    f"{lines} 行，超出单文件 {FILE_LINE_LIMIT} 行熔断",
-                    "按被测对象或行为域拆分为多个文件",
+                    f"{lines} lines, over the {FILE_LINE_LIMIT}-line per-file limit",
+                    "split into several files by subject under test or behavior area",
                 )
             )
     return findings
@@ -1610,8 +1610,8 @@ def scan_frontend_layout(root: Path, paths: list[Path]) -> list[StructureFinding
             "FE-TESTS-DIR",
             path.relative_to(root).as_posix(),
             1,
-            f"测试文件位于 `{FRONTEND_TESTS_DIR}/` 目录",
-            "迁出为与源文件同级并放",
+            f"test file is in the `{FRONTEND_TESTS_DIR}/` directory",
+            "move it next to its source file",
         )
         for path in sorted(paths)
         if FRONTEND_TESTS_DIR in path.parts
@@ -1894,9 +1894,9 @@ def scan_module_duplicates(rel: str, tree: ast.Module, scope: CollectionScope) -
                 "DUP-BODY",
                 rel,
                 case.line,
-                f"`{case.qual}` 的函数体去掉 docstring 后与同文件 `{earlier.qual}` 等同",
-                "按无意义测试判据三步处置：行为已被另一条实质覆盖则删除，"
-                "用例名声称的契约点值得保护则补上该契约点特有的断言与输入",
+                f"`{case.qual}` has the same function body as `{earlier.qual}` in the same file once docstrings are removed",
+                "handle it with the three-step meaningless-test criteria: delete it if another test already covers the behavior, "
+                "or, if the contract point named by the test is worth protecting, add assertions and inputs specific to that contract point",
             )
         )
 
@@ -1918,9 +1918,9 @@ def scan_module_duplicates(rel: str, tree: ast.Module, scope: CollectionScope) -
                     "DUP-BODY",
                     rel,
                     case.line,
-                    f"`{case.qual}` 的函数体等同于同文件 `{owner.qual}` 参数表中的一行"
-                    f"（{render_row(expanded.argnames, values)}）",
-                    "删除本用例——它的输入已被该参数表完全包含",
+                    f"`{case.qual}` has the same function body as a row in the parameter table of `{owner.qual}` in the same file"
+                    f" ({render_row(expanded.argnames, values)})",
+                    "delete this test: that parameter table already fully contains its input",
                 )
             )
     return findings
@@ -1989,7 +1989,7 @@ def run(root: Path, tests_dir: Path | Sequence[Path], top: int, frontend_src: Pa
     motive_counter = Counter(p.motive for p in flagged)
     motive_private = Counter(p.motive for p in private)
     motive_integ = Counter(p.motive for p in integ_self)
-    module_counter = Counter(p.module or "<未解析>" for p in private)
+    module_counter = Counter(p.module or "<unresolved>" for p in private)
     kind_counter = Counter(p.kind for p in flagged)
     origin_counter = Counter(p.symbol_origin for p in private)
 
@@ -2084,7 +2084,7 @@ def gate_violations(result: dict[str, object]) -> list[Violation]:
             "DOUBLE-ONLY",
             str(case["path"]),
             int(str(case["line"])),
-            f"`{case['func']}` 的断言全部落在替身调用记录上，改断言真实产出或删除",
+            f"`{case['func']}` asserts only on test-double call records; assert real output instead, or delete it",
         )
         for case in rows("double_only_cases")
     )
@@ -2093,7 +2093,7 @@ def gate_violations(result: dict[str, object]) -> list[Violation]:
             "NO-ASSERTION",
             str(case["path"]),
             int(str(case["line"])),
-            f"`{case['func']}` 零断言，补上要保护的行为断言或删除",
+            f"`{case['func']}` has no assertions; add assertions for the behavior to protect, or delete it",
         )
         for case in rows("no_assertion_cases")
     )
@@ -2102,7 +2102,7 @@ def gate_violations(result: dict[str, object]) -> list[Violation]:
             "PRIVATE-PATCH",
             str(site["path"]),
             int(str(site["line"])),
-            f"patch 生产代码私有符号 `{site['target']}`，改走显式参数注入的 seam",
+            f"patches the production private symbol `{site['target']}`; use an explicit parameter-injection seam instead",
         )
         for site in rows("private_patch_sites")
     )
@@ -2111,7 +2111,7 @@ def gate_violations(result: dict[str, object]) -> list[Violation]:
             "INTEG-SELF-PATCH",
             str(site["path"]),
             int(str(site["line"])),
-            f"integration 用例 patch 被测 module 的公共入口 `{site['target']}`，改走真实协作",
+            f"integration test patches the public entry point `{site['target']}` of the module under test; use real collaboration instead",
         )
         for site in rows("integration_self_patch_sites")
     )
@@ -2120,7 +2120,7 @@ def gate_violations(result: dict[str, object]) -> list[Violation]:
             str(finding["rule"]),
             str(finding["path"]),
             int(str(finding["line"])),
-            f"{finding['detail']}；{finding['guidance']}",
+            f"{finding['detail']}; {finding['guidance']}",
         )
         for finding in rows("shared_facility_findings") + rows("file_shape_findings") + rows("duplicate_body_findings")
     )
@@ -2133,7 +2133,7 @@ def gate_violations(result: dict[str, object]) -> list[Violation]:
                 "PARSE-FAIL",
                 str(failure["path"]),
                 int(str(failure["line"])),
-                f"{failure['detail']}；测试文件无法解析，审计无法覆盖，先修复语法",
+                f"{failure['detail']}; the test file cannot be parsed, so the audit cannot cover it; fix the syntax first",
             )
         )
 
@@ -2150,25 +2150,25 @@ def _print_ranking(title: str, rows: object) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description="审计 tests/ 中「测 mock 本身」与「patch 私有符号/被测公共入口」的用例",
+        description='Audit tests/ for cases that "test the mock itself" or "patch private symbols / the public entry point under test"',
     )
-    parser.add_argument("--root", default=".", help="仓库根目录（默认当前目录）")
+    parser.add_argument("--root", default=".", help="Repository root (default: current directory)")
     parser.add_argument(
         "--tests",
         action="append",
-        help=f"测试目录，相对 root，可重复指定（默认 {' '.join(DEFAULT_TESTS_DIRS)}，其中不存在的子包目录跳过）",
+        help=f"Test directory relative to root; repeatable (default: {' '.join(DEFAULT_TESTS_DIRS)}; missing subpackage directories are skipped)",
     )
-    parser.add_argument("--top", type=int, default=30, help="Top N 榜单长度（默认 30）")
-    parser.add_argument("--json", dest="json_out", help="把完整明细写入该 JSON 文件")
+    parser.add_argument("--top", type=int, default=30, help="Length of the Top N rankings (default: 30)")
+    parser.add_argument("--json", dest="json_out", help="Write the full details to this JSON file")
     parser.add_argument(
         "--frontend",
         default="frontend/src",
-        help="前端源码目录，相对 root（默认 frontend/src）；目录不存在时跳过前端段",
+        help="Frontend source directory relative to root (default: frontend/src); the frontend section is skipped if it does not exist",
     )
     parser.add_argument(
         "--check",
         action="store_true",
-        help="闸门模式：按 `规则号 file:line 修复指引` 列出全部违规，非零命中时退出码 1",
+        help="Gate mode: list every violation as `rule file:line guidance`; exit code 1 when there are any",
     )
     args = parser.parse_args(argv)
 
@@ -2180,7 +2180,7 @@ def main(argv: list[str] | None = None) -> int:
         tests_dirs = [root / primary, *(root / name for name in packages if (root / name).is_dir())]
     for tests_dir in tests_dirs:
         if not tests_dir.is_dir():
-            print(f"测试目录不存在：{tests_dir}", file=sys.stderr)
+            print(f"Test directory does not exist: {tests_dir}", file=sys.stderr)
             return 2
 
     result = run(root, tests_dirs, args.top, root / args.frontend)
@@ -2192,62 +2192,65 @@ def main(argv: list[str] | None = None) -> int:
         for v in violations:
             print(f"{v.rule} {v.path}:{v.line} {v.guidance}")
         if violations:
-            print(f"\n闸门未通过：{len(violations)} 处违规", file=sys.stderr)
+            print(f"\nGate failed: {len(violations)} violations", file=sys.stderr)
             return 1
-        print("闸门通过：0 处违规")
+        print("Gate passed: 0 violations")
         return 0
 
-    print("== 总量 ==")
+    print("== Totals ==")
     for key, value in totals.items():
         print(f"{key:38s} {value}")
 
-    print("\n== 类 1：仅断言替身的用例（按文件 Top） ==")
+    print("\n== Class 1: cases asserting only on test doubles (Top by file) ==")
     by_file = result["double_only_by_file"]
     assert isinstance(by_file, list)
     for row in by_file:
         print(f"{row['double_only']:4d}/{row['test_funcs']:<4d} {row['path']}")
 
-    _print_ranking("\n== 类 1：被断言的替身主体 Top ==", result["double_only_subjects_top"])
-    _print_ranking("\n== 类 2：patch 私有符号 Top ==", result["private_targets_top"])
+    _print_ranking("\n== Class 1: Top asserted test-double subjects ==", result["double_only_subjects_top"])
+    _print_ranking("\n== Class 2: Top patched private symbols ==", result["private_targets_top"])
     _print_ranking(
-        "\n== 类 2：integration 用例 patch 被测 module 公共入口 Top ==", result["integration_self_targets_top"]
+        "\n== Class 2: Top public entry points of the module under test patched by integration tests ==",
+        result["integration_self_targets_top"],
     )
 
-    print("\n== 类 2：动机分档 ==")
+    print("\n== Class 2: motives ==")
     motives = result["motive_counts"]
     assert isinstance(motives, dict)
     for motive, count in sorted(motives.items(), key=lambda kv: -kv[1]):
         print(f"{count:4d}  {motive}")
 
-    _print_ranking("\n== 类 2：私有符号最集中的生产模块 ==", result["private_modules_top"])
+    _print_ranking(
+        "\n== Class 2: production modules with the most patched private symbols ==", result["private_modules_top"]
+    )
 
-    print("\n== 类 3：共享设施结构 ==")
+    print("\n== Class 3: shared facility structure ==")
     structure = result["shared_facility_findings"]
     assert isinstance(structure, list)
     for row in structure:
         print(f"{row['rule']:17s} {row['path']}:{row['line']}  {row['detail']}  → {row['guidance']}")
     if not structure:
-        print("无命中")
+        print("No findings")
 
-    print("\n== 类 4：文件形态（后端 + 前端） ==")
+    print("\n== Class 4: file shape (backend + frontend) ==")
     shape = result["file_shape_findings"]
     assert isinstance(shape, list)
     for row in shape:
         print(f"{row['rule']:13s} {row['path']}:{row['line']}  {row['detail']}  → {row['guidance']}")
     if not shape:
-        print("无命中")
+        print("No findings")
 
-    print("\n== 类 5：重复用例 ==")
+    print("\n== Class 5: duplicate cases ==")
     duplicates = result["duplicate_body_findings"]
     assert isinstance(duplicates, list)
     for row in duplicates:
         print(f"{row['rule']:13s} {row['path']}:{row['line']}  {row['detail']}  → {row['guidance']}")
     if not duplicates:
-        print("无命中")
+        print("No findings")
 
     if args.json_out:
         Path(args.json_out).write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
-        print(f"\n明细已写入 {args.json_out}")
+        print(f"\nDetails written to {args.json_out}")
     return 0
 
 

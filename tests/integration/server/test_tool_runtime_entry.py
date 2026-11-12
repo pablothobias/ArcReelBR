@@ -514,7 +514,9 @@ async def test_retry_migration_settles_write_before_propagating_cancellation(tmp
 def test_create_project_request_rejects_mode_specific_fields_before_writing(tmp_path: Path) -> None:
     services = _services(tmp_path)
 
-    with pytest.raises(ValidationError, match=r"target_duration 与 brief 仅广告/短片项目可用"):
+    with pytest.raises(
+        ValidationError, match=r"target_duration and brief are available only for ad/short-film projects"
+    ):
         CreateProjectToolRequest(name="demo", content_mode="narration", target_duration=30)
 
     assert services.projects.list_projects() == []

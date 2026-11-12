@@ -317,8 +317,8 @@ async def test_edit_images_build_specs_warnings(fake_ctx: ToolHarness) -> None:
     # Entries without addressable IDs have no reportable units, only summary warnings.
     assert isinstance(out.value, dict)
     summary = out.value["summary"]
-    assert "缺少 id 的条目" in summary
-    assert "重复出现" in summary
+    assert "skipped edits entries that have no id" in summary
+    assert "appears more than once in edits" in summary
 
     result = read_generation_result(out)
     assert result.succeeded == ["张三"]

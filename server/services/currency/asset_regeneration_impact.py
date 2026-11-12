@@ -6,7 +6,7 @@ that are **currently current** and include this image in generation input; do no
 - Storyboards: the name appears in reference fields (``characters_in_*`` / ``scenes`` / ``props`` / ``products_in_shot``).
   A derivative reference ``本体/衍生`` uses its own asset image, not the base image.
 - Videos: only reference-to-video directly references asset images. Storyboard-to-video uses storyboard images, so asset regeneration
-  does not directly make those videos stale. Reference-video units use body ``@[名称]`` and reference fields.
+  does not directly make those videos stale. Reference-video units use body ``@[name]`` and reference fields.
 - Derivative asset images: the base image is the sole input for generated derivatives; regenerating it makes all current generated derivatives stale.
   Uploaded or library-imported derivatives are finished images whose basis depends only on image bytes; base regeneration does not make them stale, so exclude them."""
 

@@ -351,7 +351,9 @@ class ScriptReviewService:
             # File exists but envelope is malformed (invalid JSON / nonobject top level / nonobject content). `read_quarantine`
             # returns None as no draft under its own reading contract (confirm existence checks still block),
             # but presentation must not accept this blindly or panels look clean while the draft still blocks confirmation.
-            view["violations"] = [_unreadable_violation("草稿文件已损坏或格式不符，无法解析")]
+            view["violations"] = [
+                _unreadable_violation("The draft file is corrupted or malformed and cannot be parsed")
+            ]
             return view
         view["revision"] = draft_revision(draft)
         view["editable_by"] = draft_owner(draft)
@@ -386,7 +388,11 @@ class ScriptReviewService:
             # Damaged drafts, e.g. missing meta.source: report recalculation failure itself as an episode-level violation. Exception text contains
             # draft.path; log only, never return to callers, because user-facing messages must not contain internal paths.
             logger.warning("草稿重算失败 project=%s episode=%s：%s", project_name, episode, exc)
-            view["violations"] = [_unreadable_violation("草稿的产出上下文缺失或损坏，无法重新校验")]
+            view["violations"] = [
+                _unreadable_violation(
+                    "The draft's production context is missing or corrupted, so it cannot be revalidated"
+                )
+            ]
             return view
         view["violations"] = violation_entries(revalidation.violations)
         view["soft_violations"] = soft_violation_entries(list(revalidation.soft_violations))
@@ -597,7 +603,7 @@ class ScriptReviewService:
         # generation's rules: promotion uses the production-time validators; here only check pending-draft presence.
         quarantine = script_review.script_plan_quarantine_path(project_path, project, episode)
         if quarantine is not None and quarantine.exists():
-            raise ScriptReviewError("quarantined", f"script_plan 草稿待处置: {quarantine}")
+            raise ScriptReviewError("quarantined", f"script_plan draft awaiting disposition: {quarantine}")
         # Migrate existing draft durations before validation: Agent/direct calls may confirm without get_state. One per-path
         # lock covers the whole read-modify-write (including the reference_video branch's write below), preventing intervening
         # save_content or migration writes; _read_script_plan_migrated requires the caller to hold the lock.

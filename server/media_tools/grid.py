@@ -92,7 +92,10 @@ logger = logging.getLogger(__name__)
 _OPERATION = "generate_grid"
 _SPLIT_OPERATION = "split_grids"
 
-_SPLIT_CONSENT_HINT = "请用户在宫格面板审阅联合图；用户明确同意切分后，再以这些 grid_id 调用 split_grids 切分落格"
+_SPLIT_CONSENT_HINT = (
+    "Ask the user to review the combined image in the grid panel; only after the user explicitly agrees to split, "
+    "call split_grids with these grid_ids to split them into storyboard cells"
+)
 
 
 def _gate_problem(exc: ApiError) -> ToolOutcome[Any]:
@@ -146,30 +149,30 @@ def _describe_layouts(layouts: Sequence[GridLayout]) -> str:
     parts = [f"{layout.grid_size} ({layout.rows}×{layout.cols})" for layout in layouts]
     if len(parts) == 1:
         return parts[0]
-    return f"{len(parts)} 张宫格: " + " + ".join(parts)
+    return f"{len(parts)} grid(s): " + " + ".join(parts)
 
 
 def _record_label(grid: GridGeneration) -> str:
     if grid.status in GRID_IN_FLIGHT_STATUSES:
-        return f"{grid.id} 生成中"
+        return f"{grid.id} generating"
     if grid.status == "failed":
-        return f"{grid.id} 生成失败"
-    return f"{grid.id} {'已切分' if grid.split_at else '联合图已就绪、未切分'}"
+        return f"{grid.id} generation failed"
+    return f"{grid.id} {'split' if grid.split_at else 'combined image ready, not split'}"
 
 
 _ACTION_LABELS = {
-    GridChunkAction.GENERATE: "本次将生成",
-    GridChunkAction.IN_FLIGHT: "正在生成，本次沿用、不重复提交",
-    GridChunkAction.UNSPLIT: "等待切分落格，本次不重生成",
-    GridChunkAction.SKIPPED: "本次无需生成",
-    GridChunkAction.BLOCKED: "受阻",
+    GridChunkAction.GENERATE: "will generate in this run",
+    GridChunkAction.IN_FLIGHT: "generating; reused in this run, not resubmitted",
+    GridChunkAction.UNSPLIT: "awaiting split; not regenerated in this run",
+    GridChunkAction.SKIPPED: "no generation needed in this run",
+    GridChunkAction.BLOCKED: "blocked",
 }
 
 
 def _chunk_line(chunk: GridChunkPlan) -> str:
-    record = f"；记录 {_record_label(chunk.grid)}" if chunk.grid is not None else ""
+    record = f"; record {_record_label(chunk.grid)}" if chunk.grid is not None else ""
     ids = chunk.scene_ids
-    return f"    · {chunk.layout.grid_size} {ids[0]}..{ids[-1]}：{_ACTION_LABELS[chunk.action]}{record}"
+    return f"    · {chunk.layout.grid_size} {ids[0]}..{ids[-1]}: {_ACTION_LABELS[chunk.action]}{record}"
 
 
 def _render_plan(plan: GridSubmissionPlan) -> str:
@@ -177,17 +180,17 @@ def _render_plan(plan: GridSubmissionPlan) -> str:
     by_group: dict[int, list[GridChunkPlan]] = {}
     for chunk in plan.chunks:
         by_group.setdefault(chunk.group_index, []).append(chunk)
-    lines = [f"共 {len(by_group)} 个分组："]
+    lines = [f"{len(by_group)} group(s):"]
     for position, chunks in enumerate(by_group.values(), start=1):
         ids = [scene_id for chunk in chunks for scene_id in chunk.scene_ids]
         layouts = [chunk.layout for chunk in chunks]
-        lines.append(f"  组 {position}: {ids[0]}..{ids[-1]} ({len(ids)} 分镜) → {_describe_layouts(layouts)}")
+        lines.append(f"  group {position}: {ids[0]}..{ids[-1]} ({len(ids)} storyboards) → {_describe_layouts(layouts)}")
         lines.extend(_chunk_line(chunk) for chunk in chunks)
     if plan.refused:
-        lines.append("按当前状态提交会整批受阻、不建任何任务：")
-        lines.extend(f"  - {b.scene_id}：{b.problem.code} {b.problem.detail}" for b in plan.blocked)
+        lines.append("Submitting in the current state would block the whole batch and create no tasks:")
+        lines.extend(f"  - {b.scene_id}: {b.problem.code} {b.problem.detail}" for b in plan.blocked)
     if plan.unsplit:
-        lines.append(_SPLIT_CONSENT_HINT + "：" + "、".join(c.grid.id for c in plan.unsplit if c.grid is not None))
+        lines.append(_SPLIT_CONSENT_HINT + ": " + ", ".join(c.grid.id for c in plan.unsplit if c.grid is not None))
     return "\n".join(lines)
 
 
@@ -330,7 +333,9 @@ def _commit_submission(
         status, _blocker = observe_artifact_status(resolver=resolver, key=key, artifact_path=path)
         for scene_id in chunk.report_ids:
             builder.skip_unit(scene_id, artifact_key=key, artifact_path=path, artifact_status=status)
-        log.append(f"宫格 {grid.id}（{'、'.join(chunk.report_ids)}）联合图已就绪、未切分，本次不重生成")
+        log.append(
+            f"Grid {grid.id} ({', '.join(chunk.report_ids)}) combined image ready, not split; not regenerated in this run"
+        )
 
     if plan.refused:
         for blocked in (*plan.blocked, *plan.withheld):
@@ -345,10 +350,14 @@ def _commit_submission(
             if chunk.action is not GridChunkAction.IN_FLIGHT or chunk.grid is None:
                 continue
             _report_in_flight_in_refused_batch(builder, chunk.grid, chunk.report_ids, episode, resolver)
-            log.append(f"宫格 {chunk.grid.id}（{'、'.join(chunk.report_ids)}）已在生成中，不受本次受阻影响")
-        log.append("本次请求整批受阻，未创建任何宫格任务；修复全部缺口后重试即可一次性提交。")
+            log.append(
+                f"Grid {chunk.grid.id} ({', '.join(chunk.report_ids)}) is already generating and unaffected by this block"
+            )
+        log.append(
+            "The whole request was blocked and no grid tasks were created; fix every gap and retry to submit them all at once."
+        )
         if unsplit_ids:
-            log.append(_SPLIT_CONSENT_HINT + "：" + "、".join(unsplit_ids))
+            log.append(_SPLIT_CONSENT_HINT + ": " + ", ".join(unsplit_ids))
         return generation_result_outcome(builder.build(), log, grid_ids_awaiting_split=unsplit_ids)
 
     submissions = commit_grid_submission(plan, project_path)
@@ -469,11 +478,11 @@ def _collect_results(
                 warnings=grid_warnings,
             )
         ready.append(grid_id)
-        reused_note = "沿用已在生成中的任务（未重复提交），" if grid_id in reused_grid_ids else ""
-        log.append(f"宫格 {grid_id}（{'、'.join(report_ids)}）{reused_note}联合图已就绪、未切分")
+        reused_note = "reused the task already generating (not resubmitted), " if grid_id in reused_grid_ids else ""
+        log.append(f"Grid {grid_id} ({', '.join(report_ids)}) {reused_note}combined image ready, not split")
     awaiting_split = [*ready, *unsplit_ids]
     if awaiting_split:
-        log.append(_SPLIT_CONSENT_HINT + "：" + "、".join(awaiting_split))
+        log.append(_SPLIT_CONSENT_HINT + ": " + ", ".join(awaiting_split))
     return generation_result_outcome(
         builder.build(),
         log,
@@ -525,7 +534,8 @@ def _report_in_flight_in_refused_batch(
     status, _blocker = observe_artifact_status(resolver=resolver, key=key, artifact_path=path)
     problem = GenerationProblem(
         code=GenerationProblemCode.ACTIVE_TASK_CONFLICT,
-        detail=f"宫格 {grid.id} 已在生成中，本次整批受阻未提交它，它照常跑完；完成后请用户审阅联合图",
+        detail=f"Grid {grid.id} is already generating; this blocked batch did not submit it and it will finish "
+        "normally; once done, ask the user to review the combined image",
         action=GenerationAction.WAIT_FOR_TASK,
         params={"grid_ids": [grid.id]},
     )
@@ -611,14 +621,18 @@ async def split_grids(
             for grid_id in grid_ids
         ]
         lines = [
-            f"- {r['grid_id']}：已切分落格 {len(r['updated_scene_ids'])} 格"
-            + (f"，剧本中已不存在而跳过 {'、'.join(r['missing_scene_ids'])}" if r["missing_scene_ids"] else "")
+            f"- {r['grid_id']}: split into {len(r['updated_scene_ids'])} storyboard cells"
+            + (
+                f", skipped {', '.join(r['missing_scene_ids'])} (no longer in the script)"
+                if r["missing_scene_ids"]
+                else ""
+            )
             if r["status"] == "split"
-            else f"- {r['grid_id']}：未切分（{r['detail']}）"
+            else f"- {r['grid_id']}: not split ({r['detail']})"
             for r in results
         ]
         if all(r["status"] != "split" for r in results):
-            return tool_problem("\n".join(["没有宫格被切分落格：", *lines]), params={"results": results})
+            return tool_problem("\n".join(["No grid was split:", *lines]), params={"results": results})
         return ToolOutcome(value={"results": results, "summary": "\n".join(lines)})
     except Exception as exc:
         return tool_error(_SPLIT_OPERATION, exc)
@@ -643,14 +657,18 @@ async def _split_one(
                 grid = None
             else:
                 logger.exception("宫格记录读取失败: grid_id=%s", grid_id)
-                return {"grid_id": grid_id, "status": "failed", "detail": "宫格记录无法读取，分镜图未改动"}
+                return {
+                    "grid_id": grid_id,
+                    "status": "failed",
+                    "detail": "grid record cannot be read; storyboard images unchanged",
+                }
         if grid is None:
-            return {"grid_id": grid_id, "status": "not_found", "detail": "宫格不存在"}
+            return {"grid_id": grid_id, "status": "not_found", "detail": "grid not found"}
         if await grid_is_in_flight(grid, queue=queue, project_name=project_name, user_id=user_id):
             return {
                 "grid_id": grid_id,
                 "status": "in_progress",
-                "detail": "联合图仍在生成，等它完成并经用户审阅后再切分",
+                "detail": "combined image is still generating; split it after it finishes and the user reviews it",
             }
         if reviewed is not None and reviewed.version is not None:
             current_version = await asyncio.to_thread(
@@ -684,14 +702,18 @@ async def _split_one(
                 "current_sha256": exc.actual_sha256,
             }
         except GridImageNotReadyError:
-            return {"grid_id": grid_id, "status": "not_ready", "detail": "尚无可用的联合图，先生成或在面板上传"}
+            return {
+                "grid_id": grid_id,
+                "status": "not_ready",
+                "detail": "no combined image available yet; generate one or upload it in the panel",
+            }
         except Exception:
             # One failure must not hide other split results: roll back each failed grid atomically and report per grid.
             logger.exception("宫格切分落格失败: grid_id=%s", grid_id)
             return {
                 "grid_id": grid_id,
                 "status": "failed",
-                "detail": "切分落格失败，分镜图未改动；可在宫格面板重试切分",
+                "detail": "split failed; storyboard images unchanged; retry the split in the grid panel",
             }
     return {
         "grid_id": grid_id,

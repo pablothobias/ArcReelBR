@@ -278,8 +278,8 @@ def batch_admission_withheld_problem(holding_unit_ids: Sequence[str]) -> Generat
     return GenerationProblem(
         code=GenerationProblemCode.BATCH_ADMISSION_WITHHELD,
         detail=(
-            "本次批量请求未创建任何任务：同批的 "
-            f"{'、'.join(holding_unit_ids)} 未通过准入。修复后重试即可连同本 unit 一起提交。"
+            "This batch request created no tasks: "
+            f"{', '.join(holding_unit_ids)} in the same batch did not pass admission. Fix them and retry to submit this unit along with them."
         ),
         action=GenerationAction.RETRY,
         params={"blocked_unit_ids": list(holding_unit_ids)},

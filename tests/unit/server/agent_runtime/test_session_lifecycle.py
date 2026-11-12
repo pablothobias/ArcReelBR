@@ -326,7 +326,7 @@ class TestEnsureCapacity:
         try:
             with (
                 patch.object(mgr, "_get_max_concurrent", new_callable=AsyncMock, return_value=3),
-                pytest.raises(SessionCapacityError, match="正在进行的会话"),
+                pytest.raises(SessionCapacityError, match="sessions are in progress"),
             ):
                 await mgr._ensure_capacity()
         finally:
@@ -344,7 +344,7 @@ class TestEnsureCapacity:
         try:
             with (
                 patch.object(mgr, "_get_max_concurrent", new_callable=AsyncMock, return_value=3),
-                pytest.raises(SessionCapacityError, match="3个"),
+                pytest.raises(SessionCapacityError, match="3 sessions"),
             ):
                 await mgr._ensure_capacity()
         finally:

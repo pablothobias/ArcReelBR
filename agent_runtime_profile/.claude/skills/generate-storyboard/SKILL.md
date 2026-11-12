@@ -45,7 +45,7 @@ When the user asks about particular storyboard images, inspect them directly wit
 ## Review checkpoint: editing versus regeneration
 
 - **Local changes only** (such as malformed hands, background clutter, or lighting deviations), with satisfactory composition/character consistency →
-  Use `mcp__arcreel__edit_images({"resource_type": "storyboard", "script_file": "episode_1.json", "edits": [{"id": "E1S05", "instruction": "去掉背景里多余的路人"}]})`
+  Use `mcp__arcreel__edit_images({"resource_type": "storyboard", "script_file": "episode_1.json", "edits": [{"id": "E1S05", "instruction": "Remove the extra passers-by from the background"}]})`
   Refine the existing image without changing `image_prompt`; multiple storyboards can be submitted in a batch
 - **Replace composition or character/reference-image relationships**, or change `image_prompt` itself → use
   `patch_episode_script` to change `image_prompt`, immediately followed by `generate_storyboards` to regenerate
@@ -64,25 +64,25 @@ MCP tools supply these reference images automatically; manual specification is u
 The model receives references as an ordered image array; the prompt identifies them as “图N” (N is array position, with products first,
 then character/scene/prop asset images, and the previous storyboard last):
 - The generator inserts a `Reference_Images` type declaration between `Style` and `Scene`, for example
-  `图1、图2为角色参考图；图3为场景参考图；图4为上一分镜图，只参考构图与色调。`; for a product storyboard:
-  `图1为商品参考图，画面中的商品须与之完全一致；……`
-- In `image_prompt.scene`, identify assets with `@[登记名]` (derivatives use `@[角色/衍生]`); the generator replaces mentions with the corresponding “图N” above;
+  `图1, 图2: character reference images; 图3: scene reference images; 图4: previous storyboard image, use only composition and color.`; for a product storyboard:
+  `图1: product reference images; the product in the frame must match exactly; …`
+- In `image_prompt.scene`, identify assets with `@[name]`, using registered names (derivatives use `@[character/derivative]`); the generator replaces mentions with the corresponding “图N” above;
   also put the name in the entry's reference fields (`characters_in_*` / `scenes` / `props` / `products_in_shot`); only these fields determine references, and `@[]` adds no extra images
-- Unregistered `@[名称]` mentions or names absent from reference fields are sent unchanged; `warnings` from `generate_episode_script` / `patch_episode_script` list such references. Register them or add reference fields as instructed, then regenerate
+- Unregistered `@[name]` mentions or names absent from reference fields are sent unchanged; `warnings` from `generate_episode_script` / `patch_episode_script` list such references. Register them or add reference fields as instructed, then regenerate
 
 ## Prompt template
 
 The generator renders the final prompt using project style, reference list, and entry `image_prompt` (inspect exact text with `get_prompt_preview`):
 
 ```
-Style: [项目 style]
-Reference_Images: 图1、图2为角色参考图；图3为场景参考图；图4为上一分镜图，只参考构图与色调。
-Scene: [image_prompt.scene，其中 @[登记名] 已换成对应的图N]
+Style: [project style]
+Reference_Images: 图1, 图2: character reference images; 图3: scene reference images; 图4: previous storyboard image, use only composition and color.
+Scene: [image_prompt.scene, with each @[name] replaced by its 图N]
 Composition:
   shot_type: [image_prompt.composition.shot_type]
   lighting: [image_prompt.composition.lighting]
   ambiance: [image_prompt.composition.ambiance]
-Avoid: 水印、多余文字、Logo
+Avoid: watermarks, extra text, logos
 ```
 
 > Aspect ratio is set through API parameters, not written into the prompt.

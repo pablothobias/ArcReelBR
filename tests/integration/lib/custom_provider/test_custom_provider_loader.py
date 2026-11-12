@@ -65,7 +65,7 @@ class TestLoadCustomBackend:
         assert result.model == "active-m"
 
     async def test_provider_not_found_fails_loud(self, db_session):
-        with pytest.raises(ValueError, match="不存在"):
+        with pytest.raises(ValueError, match="does not exist"):
             await load_custom_backend(
                 session=db_session, provider_id=make_provider_id(999), model_id="x", media_type="image"
             )
@@ -76,7 +76,7 @@ class TestLoadCustomBackend:
             db_session,
             models=[{"model_id": "dall-e-3", "endpoint": "openai-images", "is_enabled": True}],
         )
-        with pytest.raises(ValueError, match="没有默认"):
+        with pytest.raises(ValueError, match="has no default"):
             await load_custom_backend(session=db_session, provider_id=pid, model_id=None, media_type="video")
 
 
@@ -114,7 +114,7 @@ class TestBucketAwareDefaultFallback:
                 {"model_id": "t2i-m", "endpoint": "openai-images-generations", "is_enabled": True, "is_default": True}
             ],
         )
-        with pytest.raises(ValueError, match="没有默认 i2i image 模型"):
+        with pytest.raises(ValueError, match="has no default i2i image model"):
             await load_custom_backend(
                 session=db_session, provider_id=pid, model_id=None, media_type="image", generation_type="i2i"
             )
@@ -128,7 +128,7 @@ class TestBucketAwareDefaultFallback:
                 {"model_id": "m-b", "endpoint": "gemini-image", "is_enabled": True, "is_default": True},
             ],
         )
-        with pytest.raises(ValueError, match="有多个默认 t2i image 模型：m-a, m-b"):
+        with pytest.raises(ValueError, match="has multiple default t2i image models: m-a, m-b"):
             await load_custom_backend(
                 session=db_session, provider_id=pid, model_id=None, media_type="image", generation_type="t2i"
             )

@@ -1387,7 +1387,7 @@ class ConfigResolver:
             return selected
         if submitted_job:
             raise ValueError(
-                "续跑已提交的视频任务须在 payload 里锁定提交时的执行身份（video_provider_<generation_type>）"
+                "Resuming a submitted video task requires the payload to pin the execution identity used at submission (video_provider_<generation_type>)"
             )
         if generation_type is None:
             provider_id, model_id = await self._resolve_layered_backend(
@@ -1969,5 +1969,5 @@ class ConfigResolver:
             return make_provider_id(candidates[0].provider_id), candidates[0].model_id
 
         raise NoAvailableProviderError(
-            f"未找到可用的 {media_type} 供应商。请在「全局设置 → 供应商」页面配置至少一个供应商。"
+            f"No available {media_type} provider found. Configure at least one provider in Settings → Providers."
         )

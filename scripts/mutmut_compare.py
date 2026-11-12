@@ -90,27 +90,27 @@ def load_meta(root: Path) -> MetaSnapshot:
         codes = data.get("exit_code_by_key")
         hashes = data.get("hash_by_function_name")
         if not isinstance(codes, dict) or not isinstance(hashes, dict):
-            raise ValueError(f"{meta} 缺少 exit_code_by_key 或 hash_by_function_name")
+            raise ValueError(f"{meta} is missing exit_code_by_key or hash_by_function_name")
         modules: set[str] = set()
         for key, code in codes.items():
             if not isinstance(key, str) or not (code is None or isinstance(code, int)):
-                raise ValueError(f"{meta} 的 exit_code_by_key 含非法项：{key!r}: {code!r}")
+                raise ValueError(f"{meta} exit_code_by_key has an invalid item: {key!r}: {code!r}")
             if key in exit_codes:
-                raise ValueError(f"mutant {key} 在 {root} 下出现多次")
+                raise ValueError(f"mutant {key} appears more than once under {root}")
             exit_codes[key] = code
             modules.add(key.partition("__mutmut_")[0].rpartition(".")[0])
         if len(modules) > 1:
-            raise ValueError(f"{meta} 混有多个模块的 mutant：{sorted(modules)}")
+            raise ValueError(f"{meta} mixes mutants from several modules: {sorted(modules)}")
         module = modules.pop() if modules else ""
         unhashed = sorted({key.partition("__mutmut_")[0].rpartition(".")[2] for key in codes} - set(hashes))
         if unhashed:
-            raise ValueError(f"{meta} 的 hash_by_function_name 缺少 mutant 对应的函数：{unhashed}")
+            raise ValueError(f"{meta} hash_by_function_name is missing the functions of these mutants: {unhashed}")
         for func, digest in hashes.items():
             if not isinstance(func, str) or not isinstance(digest, str):
-                raise ValueError(f"{meta} 的 hash_by_function_name 含非法项：{func!r}: {digest!r}")
+                raise ValueError(f"{meta} hash_by_function_name has an invalid item: {func!r}: {digest!r}")
             function_hashes[f"{module}.{func}" if module else func] = digest
     if not exit_codes:
-        raise ValueError(f"{root} 下没有任何 *.meta 或其 exit_code_by_key 为空")
+        raise ValueError(f"No *.meta under {root}, or their exit_code_by_key is empty")
     return MetaSnapshot(exit_codes=exit_codes, function_hashes=function_hashes)
 
 
@@ -138,7 +138,7 @@ def compare(
     invalid: list[str] = []
 
     if not reworked_set:
-        invalid.append("改造名单为空：没有任何 mutant 可验收，检查名单文件是否生成正确")
+        invalid.append("Reworked list is empty: no mutant to verify; check that the list file was generated correctly")
     changed_functions = sorted(
         func
         for func, digest in (baseline_hashes or {}).items()
@@ -146,39 +146,44 @@ def compare(
     )
     if changed_functions:
         invalid.append(
-            f"基线与本轮有 {len(changed_functions)} 个函数源码哈希不同：mutant 名可能没变但语义已变，先重建基线"
+            f"{len(changed_functions)} function source hashes differ between baseline and this round: mutant names may be unchanged while their meaning changed; rebuild the baseline first"
         )
-        invalid.extend(f"  源码已变 {func}" for func in changed_functions[:10])
+        invalid.extend(f"  source changed {func}" for func in changed_functions[:10])
     if baseline_hashes is not None or current_hashes is not None:
         hash_only_baseline = sorted(set(baseline_hashes or {}) - set(current_hashes or {}))
         hash_only_current = sorted(set(current_hashes or {}) - set(baseline_hashes or {}))
         if hash_only_baseline or hash_only_current:
             invalid.append(
-                f"基线与本轮的函数哈希集合不一致（基线独有 {len(hash_only_baseline)}，"
-                f"本轮独有 {len(hash_only_current)}）：源码变了或 .meta 不完整，先重建基线"
+                f"Function hash sets differ between baseline and this round (baseline only {len(hash_only_baseline)}, "
+                f"this round only {len(hash_only_current)}): the source changed or .meta is incomplete; rebuild the baseline first"
             )
-            invalid.extend(f"  基线独有哈希 {func}" for func in hash_only_baseline[:10])
-            invalid.extend(f"  本轮独有哈希 {func}" for func in hash_only_current[:10])
+            invalid.extend(f"  baseline-only hash {func}" for func in hash_only_baseline[:10])
+            invalid.extend(f"  this-round-only hash {func}" for func in hash_only_current[:10])
     missing = sorted(set(baseline) - set(current))
     extra = sorted(set(current) - set(baseline))
     if missing or extra:
         invalid.append(
-            f"基线与本轮的 mutant 名集合不一致（基线独有 {len(missing)}，本轮独有 {len(extra)}）：源码变了，先重建基线"
+            f"Mutant name sets differ between baseline and this round (baseline only {len(missing)}, this round only {len(extra)}): the source changed; rebuild the baseline first"
         )
-        invalid.extend(f"  基线独有 {name}" for name in missing[:10])
-        invalid.extend(f"  本轮独有 {name}" for name in extra[:10])
-    invalid.extend(f"改造名单里的 mutant 不在基线中：{name}" for name in sorted(reworked_set - set(baseline)))
+        invalid.extend(f"  baseline only {name}" for name in missing[:10])
+        invalid.extend(f"  this round only {name}" for name in extra[:10])
     invalid.extend(
-        f"改造名单里的 mutant 在基线已是 killed，无从证明改造有效：{name}"
+        f"Reworked-list mutant is not in the baseline: {name}" for name in sorted(reworked_set - set(baseline))
+    )
+    invalid.extend(
+        f"Reworked-list mutant is already killed in the baseline, so the rework cannot be shown to work: {name}"
         for name in sorted(reworked_set & set(baseline))
         if baseline[name] == KILLED
     )
     invalid.extend(
-        f"同一 mutant 既在改造名单又在等价变异体名单：{name}" for name in sorted(equivalent_set & reworked_set)
+        f"Mutant is in both the reworked list and the equivalent-mutant list: {name}"
+        for name in sorted(equivalent_set & reworked_set)
     )
-    invalid.extend(f"等价变异体名单里的 mutant 不在基线中：{name}" for name in sorted(equivalent_set - set(baseline)))
     invalid.extend(
-        f"等价变异体名单里的 mutant 在基线已是 killed：等价变异体不可能被杀，基线本身可疑，先查假杀死链：{name}"
+        f"Equivalent-list mutant is not in the baseline: {name}" for name in sorted(equivalent_set - set(baseline))
+    )
+    invalid.extend(
+        f"Equivalent-list mutant is already killed in the baseline: equivalent mutants cannot be killed, so the baseline itself is suspect; check for a false-kill chain first: {name}"
         for name in sorted(equivalent_set & set(baseline))
         if baseline[name] == KILLED
     )
@@ -221,48 +226,58 @@ def _code(value: int | None) -> int:
 def render(report: ComparisonReport) -> str:
     lines: list[str] = []
     if report.invalid:
-        lines.append("比对无效：")
+        lines.append("Comparison invalid:")
         lines.extend(report.invalid)
         return "\n".join(lines)
 
-    lines.append("| 层 | 数量 | 结果 |")
+    lines.append("| Layer | Count | Result |")
     lines.append("| --- | ---: | --- |")
     reworked_total = len(report.reworked_killed) + len(report.reworked_survived) + len(report.reworked_recheck)
     lines.append(
-        f"| 本次改造针对的 mutant | {reworked_total} | killed {len(report.reworked_killed)}，"
-        f"存活 {len(report.reworked_survived)}，待复核 {len(report.reworked_recheck)} |"
+        f"| Mutants targeted by this rework | {reworked_total} | killed {len(report.reworked_killed)}, "
+        f"survived {len(report.reworked_survived)}, pending recheck {len(report.reworked_recheck)} |"
     )
     lines.append(
-        f"| 基线 killed 的 mutant | {report.baseline_killed_total} | 回退 {len(report.regressed)}，"
-        f"待复核 {len(report.baseline_killed_recheck)} |"
+        f"| Mutants killed in the baseline | {report.baseline_killed_total} | regressed {len(report.regressed)}, "
+        f"pending recheck {len(report.baseline_killed_recheck)} |"
     )
     lines.append(
-        f"| 基线存活且未改造的 mutant | {report.untouched_total} | 顺手杀死 {len(report.untouched_killed)}，"
-        f"其中等价变异体 {len(report.equivalent_killed)}，等价变异体待复核 {len(report.equivalent_recheck)} |"
+        f"| Mutants surviving in the baseline and not reworked | {report.untouched_total} | incidentally killed {len(report.untouched_killed)}, "
+        f"of which equivalent mutants {len(report.equivalent_killed)}, equivalent mutants pending recheck {len(report.equivalent_recheck)} |"
     )
 
-    _section(lines, "改造后仍存活（改造未生效）", report.reworked_survived)
-    _section(lines, "改造后待复核（新进程只跑关联用例，1 failed 即 killed）", _with_codes(report.reworked_recheck))
-    _section(lines, "回退（基线 killed、本轮存活）", report.regressed)
+    _section(lines, "Still surviving after rework (rework ineffective)", report.reworked_survived)
     _section(
         lines,
-        "基线 killed 变待复核（新进程复核，1 failed 即护栏成立；只有全部通过才是回退）",
+        "Pending recheck after rework (a new process runs only the related tests; 1 failed means killed)",
+        _with_codes(report.reworked_recheck),
+    )
+    _section(lines, "Regressed (killed in the baseline, surviving this round)", report.regressed)
+    _section(
+        lines,
+        "Baseline killed now pending recheck (recheck in a new process; 1 failed means the guard holds; only all passing is a regression)",
         _with_codes(report.baseline_killed_recheck),
     )
-    _section(lines, "顺手杀死（只登记）", report.untouched_killed)
-    _section(lines, "等价变异体被杀死——整轮作废，先查假杀死链", report.equivalent_killed)
+    _section(lines, "Incidentally killed (recorded only)", report.untouched_killed)
     _section(
         lines,
-        "等价变异体待复核（新进程复核，1 failed 即被杀死、整轮作废）",
+        "Equivalent mutants killed: the whole round is void; check for a false-kill chain first",
+        report.equivalent_killed,
+    )
+    _section(
+        lines,
+        "Equivalent mutants pending recheck (recheck in a new process; 1 failed means killed and the whole round is void)",
         _with_codes(report.equivalent_recheck),
     )
     lines.append("")
     if report.passed:
-        lines.append("验收通过")
+        lines.append("Verification passed")
     elif report.reworked_survived or report.regressed or report.equivalent_killed:
-        lines.append("验收未通过")
+        lines.append("Verification failed")
     else:
-        lines.append("验收未完成：有待复核项，新进程复核后按结果改基线或改本轮 .meta 再比对")
+        lines.append(
+            "Verification incomplete: items are pending recheck; recheck them in a new process, update the baseline or this round's .meta from the result, then compare again"
+        )
     return "\n".join(lines)
 
 
@@ -280,10 +295,23 @@ def _section(lines: list[str], title: str, items: list[str]) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--baseline", type=Path, required=True, help="改造前那轮的 *.meta 所在目录")
-    parser.add_argument("--current", type=Path, required=True, help="改造后复跑的 *.meta 所在目录，通常是 mutants/")
-    parser.add_argument("--reworked", type=Path, required=True, help="本次改造针对的 mutant 名单，一行一个")
-    parser.add_argument("--equivalent", type=Path, help="判为等价变异体的 mutant 名单，一行一个；被杀死即整轮作废")
+    parser.add_argument(
+        "--baseline", type=Path, required=True, help="Directory holding the *.meta files of the round before the rework"
+    )
+    parser.add_argument(
+        "--current",
+        type=Path,
+        required=True,
+        help="Directory holding the *.meta files of the rerun after the rework, usually mutants/",
+    )
+    parser.add_argument(
+        "--reworked", type=Path, required=True, help="List of mutants targeted by this rework, one per line"
+    )
+    parser.add_argument(
+        "--equivalent",
+        type=Path,
+        help="List of mutants judged equivalent, one per line; if any is killed the whole round is void",
+    )
     args = parser.parse_args(argv)
 
     try:
@@ -292,7 +320,7 @@ def main(argv: list[str] | None = None) -> int:
         reworked = read_names(args.reworked)
         equivalent = read_names(args.equivalent) if args.equivalent else []
     except (OSError, ValueError, json.JSONDecodeError) as exc:
-        print(f"读取输入失败：{exc}", file=sys.stderr)
+        print(f"Failed to read input: {exc}", file=sys.stderr)
         return EXIT_INVALID
 
     report = compare(

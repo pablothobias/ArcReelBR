@@ -564,7 +564,7 @@ class TestSessionManager:
         # Non-AskUserQuestion tools should be denied (whitelist fallback)
         result = await allow_cb("Read", {"x": 1}, None)
         assert isinstance(result, _FakeDeny)
-        assert "未授权" in result.message
+        assert "Unauthorized" in result.message
         # AskUserQuestion still handled
         result2 = await allow_cb("AskUserQuestion", {"questions": []}, None)
         assert result2.updated_input == {"questions": []}
@@ -601,7 +601,7 @@ class TestSessionManager:
         from tests.fakes import build_managed_with_actor
 
         assert await session_manager.get_pending_questions_snapshot("missing") == []
-        with pytest.raises(ValueError, match=r"会话未运行或无待回答问题"):
+        with pytest.raises(ValueError, match=r"The session is not running or has no pending question"):
             await session_manager.answer_user_question("missing", "q", {"a": "b"})
 
         meta = await meta_store.create("demo", "sdk-buffer-snap")
@@ -1060,7 +1060,7 @@ class TestJsonValidationHook:
         )
         assert result["hookSpecificOutput"]["permissionDecision"] == "deny"
         assert (
-            "无效 JSON" in result["hookSpecificOutput"]["permissionDecisionReason"]
+            "invalid JSON" in result["hookSpecificOutput"]["permissionDecisionReason"]
             or "JSON" in result["hookSpecificOutput"]["permissionDecisionReason"]
         )
 
@@ -1196,7 +1196,7 @@ class TestJsonValidationHook:
             },
         )
         assert result["hookSpecificOutput"]["permissionDecision"] == "deny"
-        assert "弯引号" in result["hookSpecificOutput"]["permissionDecisionReason"]
+        assert "curly quotes" in result["hookSpecificOutput"]["permissionDecisionReason"]
 
     async def test_edit_curly_quotes_old_only_is_allowed(self, tmp_path):
         """If only old_string has curly quotes but new_string is clean,
@@ -1232,7 +1232,7 @@ class TestJsonValidationHook:
             },
         )
         assert result["hookSpecificOutput"]["permissionDecision"] == "deny"
-        assert "弯引号" in result["hookSpecificOutput"]["permissionDecisionReason"]
+        assert "curly quotes" in result["hookSpecificOutput"]["permissionDecisionReason"]
 
 
 class TestJsonPostValidationHook:

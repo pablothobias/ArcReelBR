@@ -176,7 +176,7 @@ class TextGenerationRequest:
 @dataclass(frozen=True, slots=True)
 class TextGenerationResult:
     message: str
-    #: Locale-neutral ``{"key", "params"}`` notices (e.g. visual ``@[名称]`` without reference-image binding),
+    #: Locale-neutral ``{"key", "params"}`` notices (e.g. visual ``@[name]`` without reference-image binding),
     #: matching task ``result.warnings`` shape for read-side localization.
     warnings: list[dict[str, Any]] = dataclass_field(default_factory=list)
     #: New assets/derivatives registered by whole ad/short-film generation (``{"type", "name"}``), returned for Web listing.
@@ -851,7 +851,7 @@ def _rewritten_mention_warnings(
     result_path: Path,
     rewritten: Sequence[str],
 ) -> list[dict[str, Any]]:
-    """Unbound-reference-image ``@[名称]`` mentions in rewritten visual descriptions; unreadable scripts must not block receipts."""
+    """Unbound-reference-image ``@[name]`` mentions in rewritten visual descriptions; unreadable scripts must not block receipts."""
     if not rewritten:
         return []
     try:
@@ -1130,7 +1130,7 @@ class ReferenceSplitCaps(NamedTuple):
 
     ``reference_durations`` / ``text_durations`` are effective tiers with/without usable reference images;
     ``durations`` is their union for schema enums/prompt options, since either set can be valid. Membership
-    is known only after body `@[名称]` mentions hydrate currently available images. All three equal means
+    is known only after body `@[name]` mentions hydrate currently available images. All three equal means
     no effective reference-image↔duration coupling at current resolution, as for most models.
 
     ``voice`` is the voice-input tier derived from the same r2v request-fact evaluation for tolerated voice
@@ -1239,7 +1239,7 @@ def _reference_unit_id(episode: int, index: int, unit_ids: Sequence[str] | None 
 
 
 def _reference_unit_label(episode: int, index: int) -> str:
-    """Location prefix for violations/notices (``unit E{集}U{两位序号}``)."""
+    """Location prefix for violations/notices (``unit E{episode}U{two-digit index}``)."""
     return f"unit {_reference_unit_id(episode, index)}"
 
 
@@ -1265,7 +1265,7 @@ def collect_reference_flat_violations(
     in confirmation/execution) determine tiers. Without parseable body text, tiers cannot be determined;
     reporting both would only restate the same problem.
 
-    Body ``@[名称]`` must be registered or current additions. Validate against project views overlaid with
+    Body ``@[name]`` must be registered or current additions. Validate against project views overlaid with
     additions; separately collect their handling decisions as episode-level violations."""
     # Dialogue-volume speech rates share prompt-side sources: project override first, otherwise language defaults.
     speech_rate_override = project_speech_rate_override(project)
@@ -1314,7 +1314,7 @@ def build_reference_units_from_flat(
 
     LLMs author content; machines author structure. ``unit_id`` uses server-issued ``unit_ids`` matching
     flat output one-to-one; persist body text unchanged. Do not persist reference images: resolve by body
-    ``@[名称]`` first-occurrence order at execution. Callers must first pass ``collect_reference_flat_violations``;
+    ``@[name]`` first-occurrence order at execution. Callers must first pass ``collect_reference_flat_violations``;
     reparse bodies here too, ensuring validated text and persisted bodies come from the same parse."""
     units: list[dict] = []
     for index, flat in enumerate(flat_units, start=1):
@@ -1671,7 +1671,7 @@ def collect_narration_violations(
                 )
             )
 
-        # Like reference ``validate_unit_text`` registration checks for ``@[名称]``, trust only registered/currently added assets,
+        # Like reference ``validate_unit_text`` registration checks for ``@[name]``, trust only registered/currently added assets,
         # never model-invented/misspelled names persisted as truth for read-only prompt_authoring visual consumption.
         violations.extend(
             _unregistered_reference_violations(

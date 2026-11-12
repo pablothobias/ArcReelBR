@@ -209,7 +209,7 @@ export function ReferenceVideoCard({
     // Scan left for @. Legacy queries allow only `\w` + CJK + `/`;
     // wrapped `@[query` permits punctuation until whitespace/closing brackets.
     // `/` separates derivative names (`本体/衍生`); disallowing it closes candidates on typing `@阿岚/`,
-    // limiting derivative selection to wrapped names/full searches. Insert wrapped `@[本体/衍生]` regardless.
+    // limiting derivative selection to wrapped names/full searches. Insert wrapped `@[base/derivative]` regardless.
     let i = cursor - 1;
     while (i >= 0) {
       const ch = nextValue[i];

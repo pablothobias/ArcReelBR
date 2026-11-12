@@ -304,7 +304,7 @@ async def execute_reference_video_task(
 ) -> dict[str, Any]:
     """Generate one reference_video unit.
 
-    resource_id is unit_id (E{集}U{序号}); all content modes read self-contained ``video_units``."""
+    resource_id is unit_id (E{episode}U{index}); all content modes read self-contained ``video_units``."""
     # Queue rows own the frozen locator. Payload remains a compatibility fallback for direct/internal callers,
     # but production dispatch passes Task.script_file explicitly so mutable payload cannot redirect execution.
     payload_script_file = payload.get("script_file")
@@ -779,13 +779,13 @@ def apply_unit_video_assets(
     reads, compares, nor adds it."""
     units = script.get("video_units")
     if not isinstance(units, list):
-        raise ScriptEditError("video_units 必须是 list", key="script_edit_unit_lists_invalid")
+        raise ScriptEditError("video_units must be a list", key="script_edit_unit_lists_invalid")
     for u in units:
         if not isinstance(u, dict) or u.get("unit_id") != resource_id:
             continue
         ga = u.setdefault("generated_assets", {})
         if not isinstance(ga, dict):
-            raise ScriptEditError("generated_assets 必须是 dict", key="script_edit_generated_assets_invalid")
+            raise ScriptEditError("generated_assets must be a dict", key="script_edit_generated_assets_invalid")
         ga["video_clip"] = f"reference_videos/{resource_id}.mp4"
         ga["video_generated_at"] = generated_at or datetime.now(UTC).isoformat()
         if video_uri:

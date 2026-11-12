@@ -75,5 +75,7 @@ async def require_project_migration_ok(request: Request) -> None:
         return
     name = _project_name_param(request)
     if not name:
-        raise RuntimeError(f"require_project_migration_ok 挂在了没有项目路径参数的路由上：{request.url.path}")
+        raise RuntimeError(
+            f"require_project_migration_ok is attached to a route without a project path parameter: {request.url.path}"
+        )
     await asyncio.to_thread(assert_project_migration_ok, name)

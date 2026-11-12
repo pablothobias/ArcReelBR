@@ -27,7 +27,11 @@ def test_health_commit_is_null_when_run_from_source(app_client, monkeypatch):
     resp = app_client.get("/health")
 
     assert resp.status_code == 200
-    assert resp.json() == {"status": "ok", "message": "视频项目管理 WebUI 运行正常", "commit": None}
+    assert resp.json() == {
+        "status": "ok",
+        "message": "Video Project Management WebUI is running normally",
+        "commit": None,
+    }
 
 
 def test_health_commit_is_null_when_image_built_without_commit(app_client, monkeypatch):

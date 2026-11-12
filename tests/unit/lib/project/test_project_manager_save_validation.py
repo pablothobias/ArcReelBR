@@ -260,7 +260,7 @@ class TestAssetWritebackExemption:
         mark failure so operators see corruption rather than empty success."""
         pm = _pm(tmp_path)
         self._seed_corrupted_null_segments(pm, tmp_path)
-        with pytest.raises(ScriptEditError, match="必须是列表"):
+        with pytest.raises(ScriptEditError, match="must be a list"):
             pm.update_scene_asset("demo", "episode_1.json", "E1S01", "storyboard_image", "x.png")
 
     def test_batch_update_scene_assets_fails_loud_on_corrupted_list_key(self, tmp_path: Path):
@@ -268,7 +268,7 @@ class TestAssetWritebackExemption:
         all N written clips disappear while SSE still broadcasts all updated and the UI stays pending forever."""
         pm = _pm(tmp_path)
         self._seed_corrupted_null_segments(pm, tmp_path)
-        with pytest.raises(ScriptEditError, match="必须是列表"):
+        with pytest.raises(ScriptEditError, match="must be a list"):
             pm.batch_update_scene_assets("demo", "episode_1.json", [("E1S01", "video_clip", "videos/E1S01.mp4")])
 
     def test_writeback_preserves_old_metadata_on_corrupted_list_key(self, tmp_path: Path):

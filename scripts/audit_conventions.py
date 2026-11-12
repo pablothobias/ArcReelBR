@@ -13,11 +13,11 @@
 - PRIVATE-IMPORT: disallow `from <本仓模块> import _name`; symbols used by other modules need public names.
   Exclude `from m import 公开名 as _别名`, gettext `_`, dunders and private submodules.
 - HARD-DELETE: every file deletion in lib, server and subpackages (`unlink`, `rmdir`, `rmtree`, `os.remove`,
-  including deletion methods passed as callbacks) needs `# hard-delete: <类别> -- 理由` at the end of its
+  including deletion methods passed as callbacks) needs `# hard-delete: <category> -- reason` at the end of its
   statement or on the preceding line. Delete project data only through project trash (ADR 0107).
   There is no project-data category: route such deletions through trash, never waive them by annotation.
 
-`--check` lists every finding as `规则号 file:line 修复指引` and exits 1 for nonzero findings;
+`--check` lists every finding as `rule file:line guidance` and exits 1 for nonzero findings;
 `--fix` regenerates the index and CodeRabbit mapping, then checks the remaining rules.
 """
 
@@ -96,7 +96,7 @@ def load_standards(root: Path, out: list[Violation]) -> list[Standard]:
                     "STANDARDS-FRONTMATTER",
                     path,
                     1,
-                    "文件开头补 YAML frontmatter，`paths` 列出本规范适用的源码 glob（至少一项）",
+                    "add YAML frontmatter at the top of the file, with `paths` listing the source globs this standard applies to (at least one)",
                 )
             )
             continue
@@ -153,7 +153,11 @@ def check_generated_blocks(root: Path, standards: list[Standard], fix: bool, out
         text = (root / path).read_text(encoding="utf-8")
         expected = _replace_block(text, start, end, render(text))
         if expected is None:
-            out.append(Violation(rule, path, 1, f"缺少生成区标记 `{start}` / `{end}`，补回这两行"))
+            out.append(
+                Violation(
+                    rule, path, 1, f"generated-section markers `{start}` / `{end}` are missing; add both lines back"
+                )
+            )
         elif expected != text:
             if fix:
                 (root / path).write_text(expected, encoding="utf-8")
@@ -164,7 +168,7 @@ def check_generated_blocks(root: Path, standards: list[Standard], fix: bool, out
                         rule,
                         path,
                         line,
-                        "与 docs/standards/*.md 的 frontmatter 不一致，运行 `uv run python scripts/audit_conventions.py --fix`",
+                        "out of sync with the docs/standards/*.md frontmatter; run `uv run python scripts/audit_conventions.py --fix`",
                     )
                 )
 
@@ -220,7 +224,7 @@ def _ecosystem_groups(config: dict[str, object], ecosystem: str, directory: str)
 
 def check_dependabot_groups(root: Path, out: list[Violation]) -> None:
     config = yaml.safe_load((root / DEPENDABOT_CONFIG).read_text(encoding="utf-8"))
-    guidance = "只落进 `.github/dependabot.yml` 的兜底分组，把它加进语义对应的具名分组"
+    guidance = "falls only into the catch-all group in `.github/dependabot.yml`; add it to the named group that matches its purpose"
 
     pyproject_path = Path("pyproject.toml")
     pyproject = tomllib.loads((root / pyproject_path).read_text(encoding="utf-8"))
@@ -283,7 +287,7 @@ def check_tool_versions(root: Path, out: list[Violation]) -> None:
                     "TOOL-VERSION",
                     CI_WORKFLOW,
                     1,
-                    f"找不到 {tool} 的版本声明，更新本脚本的匹配规则或补回 pre-commit / workflow 中的声明",
+                    f"no version declaration found for {tool}; update this script's matching rules or restore the declaration in pre-commit / the workflow",
                 )
             )
             continue
@@ -294,7 +298,7 @@ def check_tool_versions(root: Path, out: list[Violation]) -> None:
                     "TOOL-VERSION",
                     CI_WORKFLOW,
                     line,
-                    f"{tool} 版本 {match.group(1)} 与 .pre-commit-config.yaml 的 {pre_commit_version} 不一致，两处同步升级",
+                    f"{tool} version {match.group(1)} differs from {pre_commit_version} in .pre-commit-config.yaml; upgrade both together",
                 )
             )
 
@@ -356,11 +360,11 @@ def _python_suppressions(rel: Path, source: str, out: list[Violation]) -> None:
         if last["tool"] is None:
             if re.match(r"\s*--\s*\S", rest):
                 continue
-            guidance = "`# noqa: <规则>` 后接 ` -- 理由`，写明这里为什么是工具误报"
+            guidance = "follow `# noqa: <rule>` with ` -- reason` explaining why this is a tool false positive"
         else:
             if re.match(r"\s*#\s*\S", rest):
                 continue
-            guidance = f"`# {last['tool']}: ignore[<规则>]` 后接 `  # 理由`，写明这里为什么是工具误报"
+            guidance = f"follow `# {last['tool']}: ignore[<rule>]` with `  # reason` explaining why this is a tool false positive"
         out.append(Violation("SUPPRESSION-REASON", rel, token.start[0], guidance))
 
 
@@ -401,15 +405,21 @@ def _inside_literal_or_comment(line: str, start: int, end: int, *, yaml: bool) -
 def _text_suppressions(rel: Path, source: str, out: list[Violation]) -> None:
     yaml = rel.suffix in YAML_SUFFIXES
     if yaml:
-        checks = [(_ZIZMOR_DIRECTIVE, r"\S", "`# zizmor: ignore[<规则>]` 后接理由，写明这里为什么是工具误报")]
+        checks = [
+            (
+                _ZIZMOR_DIRECTIVE,
+                r"\S",
+                "follow `# zizmor: ignore[<rule>]` with a reason explaining why this is a tool false positive",
+            )
+        ]
     else:
         checks = [
             (
                 _ESLINT_DIRECTIVE,
                 r"\s--\s*\S",
-                "`eslint-disable*` 指令的规则名后接 ` -- 理由`，写明这里为什么是工具误报",
+                "follow the rule names of `eslint-disable*` directives with ` -- reason` explaining why this is a tool false positive",
             ),
-            (_KNIP_PUBLIC, r"\S", "`@public` 后接理由，写明这个导出为什么要保留"),
+            (_KNIP_PUBLIC, r"\S", "follow `@public` with a reason explaining why this export must stay"),
         ]
     for n, line in enumerate(source.split("\n"), 1):
         for pattern, reason, guidance in checks:
@@ -455,8 +465,8 @@ def check_bundled_ffmpeg(root: Path, out: list[Violation]) -> None:
         for node in ast.walk(tree):
             if isinstance(node, ast.Constant) and node.value in _FFMPEG_NAMES:
                 guidance = (
-                    f"不按名字 {node.value!r} 查找可执行文件：ffmpeg 随包分发、不查 PATH（ADR 0095），"
-                    "调用 ffmpeg 用 lib.infra.ffmpeg 的 ffmpeg_executable()；ffprobe 不随包，媒体探测用 lib.infra.media_probe"
+                    f"do not look up the executable by name {node.value!r}: ffmpeg is bundled and PATH is not searched (ADR 0095); "
+                    "call ffmpeg through ffmpeg_executable() in lib.infra.ffmpeg; ffprobe is not bundled, so probe media with lib.infra.media_probe"
                 )
                 out.append(Violation("BUNDLED-FFMPEG", rel, node.lineno, guidance))
 
@@ -496,8 +506,8 @@ def check_private_imports(root: Path, out: list[Violation]) -> None:
                 # Private submodules (for example, `from server.routers import _validators`) are modules rather than symbols and are excluded
                 if _is_private_name(alias.name) and not is_local_module(f"{module}.{alias.name}"):
                     guidance = (
-                        f"`{alias.name}` 是 `{module}` 的私有名：把它在定义处改成公开名 `{alias.name.lstrip('_')}`，"
-                        "同步更新调用点与 tests 里的引用和 patch 目标"
+                        f"`{alias.name}` is a private name of `{module}`: rename it at its definition to the public name `{alias.name.lstrip('_')}`, "
+                        "and update call sites plus references and patch targets in tests"
                     )
                     out.append(Violation("PRIVATE-IMPORT", rel, node.lineno, guidance))
 
@@ -510,11 +520,11 @@ HARD_DELETE_EXEMPT: frozenset[Path] = frozenset(
     {Path("lib/project/project_trash.py"), Path("lib/project/deleted_projects.py")}
 )
 HARD_DELETE_CATEGORIES = {
-    "temp": "本流程自己创建的临时、暂存文件",
-    "rollback": "失败时撤销未完成的写入",
-    "derived": "可由账本或其他源数据重新生成的派生文件",
-    "infra": "锁、缓存、数据库、日志、迁移备份等基础设施文件",
-    "out-of-scope": "项目数据之外的文件（全局资产库、用户记忆、应用配置、供应商数据等）",
+    "temp": "temporary or staging files this flow created itself",
+    "rollback": "undoing unfinished writes on failure",
+    "derived": "derived files that can be regenerated from the ledger or other source data",
+    "infra": "infrastructure files such as locks, caches, databases, logs, and migration backups",
+    "out-of-scope": "files outside project data (global asset library, user memory, app configuration, provider data, etc.)",
 }
 _HARD_DELETE_TAG = re.compile(r"#\s*hard-delete:\s*(?P<category>[\w-]*)(?P<rest>.*)")
 _ANY_DELETE_ATTRS = frozenset({"unlink", "rmdir", "rmtree"})
@@ -599,7 +609,7 @@ def _hard_delete_tags(source: str) -> tuple[dict[int, re.Match[str]], set[int]]:
 
 
 def check_hard_deletes(root: Path, out: list[Violation]) -> None:
-    categories = "、".join(f"`{c}`" for c in HARD_DELETE_CATEGORIES)
+    categories = ", ".join(f"`{c}`" for c in HARD_DELETE_CATEGORIES)
     for path in sorted({p for pattern in HARD_DELETE_SCAN_GLOBS for p in root.glob(pattern)}):
         rel = path.relative_to(root)
         if rel in HARD_DELETE_EXEMPT:
@@ -617,22 +627,22 @@ def check_hard_deletes(root: Path, out: list[Violation]) -> None:
             tag = next((tags[n] for n in lines if n in tags), None)
             if tag is None:
                 guidance = (
-                    f"删除文件要标注类别：在所在语句行尾或上一行写 `# hard-delete: <类别> -- 理由`，类别取 {categories}；"
-                    "项目数据的删除应进项目回收站（docs/adr/0107）"
+                    f"file deletions need a category: write `# hard-delete: <category> -- reason` at the end of the statement or on the line above, with a category from {categories}; "
+                    "project data deletions should go to the project trash (docs/adr/0107)"
                 )
             elif tag["category"] == "pending-trash":
                 guidance = (
-                    "`pending-trash` 已退役：项目数据只能经项目回收站删除（docs/adr/0107），"
-                    "把这处删除改为移入回收站（lib/project/project_trash.py），不要用标注放行"
+                    "`pending-trash` is retired: project data may only be deleted through the project trash (docs/adr/0107); "
+                    "change this deletion to move into the trash (lib/project/project_trash.py) instead of allowing it with a tag"
                 )
             elif tag["category"] not in HARD_DELETE_CATEGORIES:
-                guidance = f"`hard-delete` 类别 `{tag['category']}` 不存在，取 {categories}"
+                guidance = f"`hard-delete` category `{tag['category']}` does not exist; use one of {categories}"
             elif not re.match(r"\s*--\s*\S", tag["rest"]):
-                guidance = "`# hard-delete: <类别>` 后接 ` -- 理由`，写明这次删除为什么属于该类别"
+                guidance = "follow `# hard-delete: <category>` with ` -- reason` explaining why this deletion belongs to that category"
             else:
                 continue
             out.append(Violation("HARD-DELETE", rel, line, guidance))
-        orphan = "这行没有删除调用，`hard-delete` 标注随删除调用一起移走或删掉"
+        orphan = "this line has no deletion call; move the `hard-delete` tag along with the deletion call, or remove it"
         out.extend(Violation("HARD-DELETE", rel, line, orphan) for line in sorted(tags.keys() - covered))
 
 
@@ -655,8 +665,12 @@ def audit(root: Path = ROOT, *, fix: bool = False) -> list[Violation]:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n", 1)[0])
     mode = parser.add_mutually_exclusive_group(required=True)
-    mode.add_argument("--check", action="store_true", help="列出全部违规，有违规时退出码 1")
-    mode.add_argument("--fix", action="store_true", help="重新生成规范索引与 CodeRabbit 映射，再检查其余规则")
+    mode.add_argument("--check", action="store_true", help="List every violation; exit code 1 if there are any")
+    mode.add_argument(
+        "--fix",
+        action="store_true",
+        help="Regenerate the standards index and CodeRabbit mapping, then check the remaining rules",
+    )
     args = parser.parse_args(argv)
     violations = audit(ROOT, fix=args.fix)
     for violation in violations:

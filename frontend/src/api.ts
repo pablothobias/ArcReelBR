@@ -1063,7 +1063,7 @@ class API {
 
   /**
    * Derivatives are character-local subidentities such as costume changes, transformations and disguises, named uniquely within the character and referenced as
-   * `@[角色/衍生]`. These four methods only register them. See the three methods below for asset-image reads, generation and uploads; versioning
+   * `@[character/derivative]`. These four methods only register them. See the three methods below for asset-image reads, generation and uploads; versioning
    * and image editing reuse generic endpoints with resource types `character_derivatives` / `character_derivative`.
    */
   static async addCharacterDerivative(

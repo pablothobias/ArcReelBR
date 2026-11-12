@@ -127,7 +127,7 @@ def _load_schema_version(project_dir: Path) -> int:
     try:
         data = json.loads(pj.read_text(encoding="utf-8"))
         if not isinstance(data, dict):
-            raise ValueError("project.json 必须包含对象")
+            raise ValueError("project.json must contain an object")
         return parse_project_schema_version(data)
     except Exception as exc:
         logger.warning("project.json 损坏或 schema_version 不可解析，跳过：%s（%s）", project_dir, exc)

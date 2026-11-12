@@ -139,12 +139,12 @@ async def test_plan_episodes_reports_each_planned_episode_for_boundary_review(fa
     )
 
     for fragment in (
-        "《古玉藏诀》（第 1 个，id=1）",
+        '"古玉藏诀" (position 1, id=1)',
         "剑诀来历成谜",
         "812",
-        "《城门遇袭》（第 2 个，id=2）",
-        "首句：第一章 山村少年。",
-        "尾句：城门口他撞见了被追杀的少女。",
+        '"城门遇袭" (position 2, id=2)',
+        "First sentence: 第一章 山村少年。",
+        "Last sentence: 城门口他撞见了被追杀的少女。",
     ):
         assert fragment in value.message
     assert [episode["title"] for episode in value.episodes] == ["古玉藏诀", "城门遇袭"]
@@ -213,7 +213,7 @@ async def test_plan_episodes_reports_an_exhausted_source(fake_ctx: ToolHarness) 
     value = _plan_value(await run_declared_tool(PLAN_EPISODES, fake_ctx, {}, planner_cls=_fake_planner_cls(result)))
 
     assert value.source_exhausted is True
-    assert "全部规划" in value.message
+    assert "fully planned" in value.message
 
 
 async def test_plan_episodes_attaches_global_volume_review_when_the_source_is_exhausted(
@@ -227,15 +227,15 @@ async def test_plan_episodes_attaches_global_volume_review_when_the_source_is_ex
     value = _plan_value(await run_declared_tool(PLAN_EPISODES, fake_ctx, {}, planner_cls=_fake_planner_cls(result)))
 
     for fragment in (
-        "累计总集数：30",
-        "《第30回》（第 30 个，id=30）（约 57）",
-        "《第12回》（第 12 个，id=12）（约 640）",
-        "中位数：约 812",
-        "目标体量设置：约 800",
-        "有偏差须向用户明确说明",
+        "Total episodes: 30",
+        '"第30回" (position 30, id=30) (about 57)',
+        '"第12回" (position 12, id=12) (about 640)',
+        "Median episode volume across the ledger: about 812",
+        "Per-episode target volume: about 800",
+        "tell the user explicitly about any deviation",
     ):
         assert fragment in value.message
-    assert "折算" not in value.message
+    assert "converted from" not in value.message
     assert value.ledger_stats is not None
     assert value.ledger_stats["target_units"] == 800
     assert value.ledger_stats["target_units_source"] == "units"
@@ -250,7 +250,10 @@ async def test_plan_episodes_marks_a_target_volume_derived_from_duration(fake_ct
 
     value = _plan_value(await run_declared_tool(PLAN_EPISODES, fake_ctx, {}, planner_cls=_fake_planner_cls(result)))
 
-    assert "目标体量设置：约 450（按单集目标时长 90 秒折算）" in value.message
+    assert (
+        "Per-episode target volume: about 450 (converted from the 90-second per-episode target duration)"
+        in value.message
+    )
     assert value.ledger_stats is not None
     assert value.ledger_stats["target_units"] == 450
     assert value.ledger_stats["target_units_source"] == "duration"
@@ -268,9 +271,9 @@ async def test_plan_episodes_normal_batch_reports_only_the_running_total(fake_ct
 
     value = _plan_value(await run_declared_tool(PLAN_EPISODES, fake_ctx, {}, planner_cls=_fake_planner_cls(result)))
 
-    assert "累计已规划 5 集。" in value.message
-    assert "累计总集数" not in value.message
-    assert "体量最小的几集" not in value.message
+    assert "Episodes planned so far: 5." in value.message
+    assert "Total episodes" not in value.message
+    assert "Smallest episodes" not in value.message
 
 
 async def test_remote_plan_episodes_returns_the_generation_batch_handle(tmp_path: Path, db_factory) -> None:
@@ -340,7 +343,7 @@ async def test_reset_episode_planning_full_reset_points_back_to_planning(fake_ct
     assert captured["args"][1:] == (None, False)
     assert value.confirmation_required is False
     assert value.removed_episodes == [1, 2]
-    assert "2 个切出集退回未规划" in value.message
+    assert "2 cut episodes returned to unplanned" in value.message
     assert "source/_episode_2.txt.bak" in value.message
     assert "plan_episodes" in value.message
 
@@ -374,7 +377,7 @@ async def test_reset_episode_planning_forwards_the_confirmation(fake_ctx: ToolHa
 
     assert captured["args"][1:] == (None, True)
     assert value.retired_episodes == [1]
-    assert "产物与产物登记都保留" in value.message
+    assert "artifacts and their registrations are kept" in value.message
 
 
 async def test_reset_episode_planning_partial_reset_reports_the_new_starting_point(fake_ctx: ToolHarness) -> None:
@@ -387,7 +390,11 @@ async def test_reset_episode_planning_partial_reset_reports_the_new_starting_poi
         await run_declared_tool(RESET_EPISODE_PLANNING, fake_ctx, {"episode_id": 2}, resetter=_fake_reset(result))
     )
 
-    for fragment in ("部分重置", "从 《下山》（第 2 个，id=2） 起的 2 个切出集退回未规划", "不复用被清除的集 ID"):
+    for fragment in (
+        "Partially reset",
+        '2 cut episodes from "下山" (position 2, id=2) onward returned to unplanned',
+        "cleared IDs are not reused",
+    ):
         assert fragment in value.message
     assert "切出集已全部移出账本" not in value.message
 

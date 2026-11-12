@@ -104,7 +104,7 @@ async def test_restore_summary_tells_the_agent_that_the_asset_came_back_under_a_
     assert outcome.problem is None, outcome.problem
     assert outcome.value["original_object"]["name"] == "阿岚"
     assert outcome.value["object"]["name"] == "阿岚 (1)"
-    assert "名称已换：阿岚 → 阿岚 (1)" in restore_trash_record_summary(outcome.value)
+    assert "Name changed: 阿岚 → 阿岚 (1)" in restore_trash_record_summary(outcome.value)
 
 
 def test_restore_summary_names_a_new_entry_id_and_stays_quiet_when_nothing_changed() -> None:
@@ -115,5 +115,5 @@ def test_restore_summary_names_a_new_entry_id_and_stays_quiet_when_nothing_chang
     }
     unchanged = {"object": {"kind": "file"}, "original_object": {"kind": "file"}, "restored": []}
 
-    assert "编号已换：E1S03 → E1S04" in restore_trash_record_summary(renumbered)
-    assert restore_trash_record_summary(unchanged).strip() == "已恢复："
+    assert "ID changed: E1S03 → E1S04" in restore_trash_record_summary(renumbered)
+    assert restore_trash_record_summary(unchanged).strip() == "Restored:"

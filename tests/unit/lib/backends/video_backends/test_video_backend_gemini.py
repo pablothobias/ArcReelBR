@@ -300,7 +300,7 @@ class TestGeminiVideoBackendGenerate:
             output_path=output,
         )
 
-        with pytest.raises(RuntimeError, match="API 返回空结果"):
+        with pytest.raises(RuntimeError, match="the API returned an empty result"):
             await gemini_backend.generate(request)
 
     async def test_generate_error_in_operation(self, gemini_backend, tmp_path):
@@ -320,7 +320,7 @@ class TestGeminiVideoBackendGenerate:
         )
 
         # Include operation.error content in the message, distinguishing it from the empty-result branch.
-        with pytest.raises(RuntimeError, match="视频生成失败: Something went wrong"):
+        with pytest.raises(RuntimeError, match="Video generation failed: Something went wrong"):
             await gemini_backend.generate(request)
 
     async def test_rate_limiter_called(self, gemini_backend, mock_rate_limiter, tmp_path):
@@ -666,7 +666,7 @@ class TestDownloadVideo:
 
         mock_ref = MagicMock(spec=[])  # no attributes
 
-        with pytest.raises(RuntimeError, match="无法获取视频数据"):
+        with pytest.raises(RuntimeError, match="the video data could not be retrieved"):
             gemini_backend._download_video(mock_ref, output, deadline=_far_deadline())
 
 
@@ -781,7 +781,7 @@ class TestGeminiResumeVideo:
         gemini_backend._client.aio.operations.get = AsyncMock(return_value=failed_op)
 
         request = VideoGenerationRequest(prompt="x", output_path=tmp_path / "out.mp4")
-        with pytest.raises(RuntimeError, match="视频生成失败") as ei:
+        with pytest.raises(RuntimeError, match="Video generation failed") as ei:
             await gemini_backend.resume_video("op-xyz", request)
 
         assert not isinstance(ei.value, ResumeExpiredError)

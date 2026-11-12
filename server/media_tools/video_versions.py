@@ -64,7 +64,7 @@ def _api_problem(exc: ApiError, *, unit_id: str, versions: VersionManager, resou
             if isinstance(record, dict) and isinstance(record.get("version"), int)
         ]
         params = {"available_versions": available}
-        detail = f"{detail}；该视频单元现有版本：{', '.join(map(str, available)) or '无'}"
+        detail = f"{detail}; available versions of this video unit: {', '.join(map(str, available)) or 'none'}"
     return tool_problem(detail, code=exc.key, params=params)
 
 
@@ -85,7 +85,7 @@ async def select_video_version(
 
         exists, resource_type, versions = await asyncio.to_thread(locate_unit)
         if not exists:
-            return tool_problem(f"视频单元「{unit_id}」不存在", code="video_unit_not_found")
+            return tool_problem(f'Video unit "{unit_id}" not found', code="video_unit_not_found")
 
         try:
             restored = await restore_typed_media_resource(
@@ -113,7 +113,7 @@ async def select_video_version(
 
 
 def select_video_version_summary(value: dict[str, Any]) -> str:
-    return f"✅ 视频单元 {value['unit_id']} 的 current 视频版本已切换为 v{value['current_version']}（{value['file_path']}）"
+    return f"✅ Current video version of video unit {value['unit_id']} switched to v{value['current_version']} ({value['file_path']})"
 
 
 __all__ = [

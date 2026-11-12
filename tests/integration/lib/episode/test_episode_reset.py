@@ -269,7 +269,7 @@ def test_file_failure_aborts_and_leaves_ledger_intact(tmp_path: Path, monkeypatc
 
     monkeypatch.setattr(Path, "unlink", _boom)
 
-    with pytest.raises(EpisodeResetError, match="派生集文件删除失败"):
+    with pytest.raises(EpisodeResetError, match="Failed to delete a derived episode file"):
         reset_episode_planning(project_dir)
 
     assert _load_project(project_dir) == before
@@ -408,7 +408,7 @@ def test_reset_rejects_symlinked_source_dir(tmp_path: Path) -> None:
     source_dir.symlink_to(outside, target_is_directory=True)
     before = _load_project(project_dir)
 
-    with pytest.raises(EpisodeResetError, match="符号链接"):
+    with pytest.raises(EpisodeResetError, match="symbolic link"):
         reset_episode_planning(project_dir)
 
     assert (outside / "episode_1.txt").exists()
@@ -664,7 +664,7 @@ def test_reset_rejects_non_positive_episode_id(tmp_path: Path) -> None:
     project_dir = _write_project(tmp_path)
     before = _load_project(project_dir)
 
-    with pytest.raises(EpisodeResetError, match="正整数"):
+    with pytest.raises(EpisodeResetError, match="positive integer"):
         reset_episode_planning(project_dir, episode_id=0)
 
     assert _load_project(project_dir) == before
@@ -754,7 +754,7 @@ def test_partial_reset_rejects_when_episode_id_not_in_ledger(tmp_path: Path) -> 
     )
     before = _load_project(project_dir)
 
-    with pytest.raises(EpisodeResetError, match="不在账本中"):
+    with pytest.raises(EpisodeResetError, match="is not in the ledger"):
         reset_episode_planning(project_dir, episode_id=5)
 
     assert _load_project(project_dir) == before
@@ -809,7 +809,7 @@ def test_partial_reset_rejects_when_retain_boundary_has_no_source_range(tmp_path
     )
     before = _load_project(project_dir)
 
-    with pytest.raises(EpisodeResetError, match="没有带可信原文范围记录"):
+    with pytest.raises(EpisodeResetError, match="without a trusted source range record"):
         reset_episode_planning(project_dir, episode_id=2)
 
     assert _load_project(project_dir) == before
@@ -826,7 +826,7 @@ def test_partial_reset_rejects_structurally_incomplete_boundary_same_as_missing(
     )
     before = _load_project(project_dir)
 
-    with pytest.raises(EpisodeResetError, match="没有带可信原文范围记录"):
+    with pytest.raises(EpisodeResetError, match="without a trusted source range record"):
         reset_episode_planning(project_dir, episode_id=2)
 
     assert _load_project(project_dir) == before
@@ -844,7 +844,7 @@ def test_partial_reset_rejects_on_fingerprint_mismatch(tmp_path: Path) -> None:
     )
     before = _load_project(project_dir)
 
-    with pytest.raises(EpisodeResetError, match="已被修改或移除"):
+    with pytest.raises(EpisodeResetError, match="were modified or removed"):
         reset_episode_planning(project_dir, episode_id=2)
 
     assert _load_project(project_dir) == before
@@ -861,7 +861,7 @@ def test_partial_reset_rejects_when_retained_range_out_of_bounds(tmp_path: Path)
     )
     before = _load_project(project_dir)
 
-    with pytest.raises(EpisodeResetError, match="原文范围无效"):
+    with pytest.raises(EpisodeResetError, match="has an invalid source range"):
         reset_episode_planning(project_dir, episode_id=2)
 
     assert _load_project(project_dir) == before
@@ -880,7 +880,7 @@ def test_partial_reset_rejects_overlapping_retained_ranges(tmp_path: Path) -> No
     )
     before = _load_project(project_dir)
 
-    with pytest.raises(EpisodeResetError, match="重叠或倒退"):
+    with pytest.raises(EpisodeResetError, match="overlaps or precedes"):
         reset_episode_planning(project_dir, episode_id=3)
 
     assert _load_project(project_dir) == before
@@ -925,7 +925,7 @@ def test_partial_reset_rejects_backward_source_file_switch(tmp_path: Path) -> No
     (project_dir / "project.json").write_text(json.dumps(project, ensure_ascii=False), encoding="utf-8")
     before = _load_project(project_dir)
 
-    with pytest.raises(EpisodeResetError, match="重叠或倒退"):
+    with pytest.raises(EpisodeResetError, match="overlaps or precedes"):
         reset_episode_planning(project_dir, episode_id=3)
 
     assert _load_project(project_dir) == before
@@ -1040,7 +1040,7 @@ def test_reset_from_an_episode_that_was_not_cut_is_refused(tmp_path: Path, origi
     )
     before = _load_project(project_dir)
 
-    with pytest.raises(EpisodeResetError, match="不是切自整本源文的集"):
+    with pytest.raises(EpisodeResetError, match="was not cut from the whole source"):
         reset_episode_planning(project_dir, episode_id=2)
 
     assert _load_project(project_dir) == before
@@ -1058,7 +1058,7 @@ def test_partial_reset_rejects_zero_length_retained_range(tmp_path: Path) -> Non
     )
     before = _load_project(project_dir)
 
-    with pytest.raises(EpisodeResetError, match="原文范围无效"):
+    with pytest.raises(EpisodeResetError, match="has an invalid source range"):
         reset_episode_planning(project_dir, episode_id=2)
 
     assert _load_project(project_dir) == before
@@ -1117,7 +1117,7 @@ def test_partial_reset_rejects_non_positive_episode_numbers_in_ledger(tmp_path: 
     )
     before = _load_project(project_dir)
 
-    with pytest.raises(EpisodeResetError, match="非法集 ID"):
+    with pytest.raises(EpisodeResetError, match="invalid episode ID"):
         reset_episode_planning(project_dir, episode_id=2)
 
     assert _load_project(project_dir) == before
@@ -1134,7 +1134,7 @@ def test_partial_reset_rejects_duplicate_episode_numbers(tmp_path: Path) -> None
     )
     before = _load_project(project_dir)
 
-    with pytest.raises(EpisodeResetError, match="重复集 ID"):
+    with pytest.raises(EpisodeResetError, match="duplicate episode ID"):
         reset_episode_planning(project_dir, episode_id=2)
 
     assert _load_project(project_dir) == before
@@ -1144,7 +1144,7 @@ def test_partial_reset_rejects_non_list_episodes(tmp_path: Path) -> None:
     project_dir = _write_project(tmp_path, extra={"episodes": 1})
     before = _load_project(project_dir)
 
-    with pytest.raises(EpisodeResetError, match="形状异常"):
+    with pytest.raises(EpisodeResetError, match="invalid shape"):
         reset_episode_planning(project_dir, episode_id=2)
 
     assert _load_project(project_dir) == before

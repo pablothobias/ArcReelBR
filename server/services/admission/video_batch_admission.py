@@ -176,7 +176,7 @@ def screen_script_entries(
             refused_ticket(
                 "video_units",
                 code=GenerationProblemCode.UNIT_REQUEST_INVALID,
-                detail=f"video_units 必须是数组，当前为 {type(entries).__name__}",
+                detail=f"video_units must be an array, got {type(entries).__name__}",
                 action=GenerationAction.FIX_INPUT,
             )
         ]
@@ -198,15 +198,15 @@ def screen_script_entries(
         detail: str | None = None
         unit_id = ""
         if not isinstance(entry, dict):
-            detail = f"该条目不是对象，当前为 {type(entry).__name__}"
+            detail = f"This entry is not an object, got {type(entry).__name__}"
         else:
             raw_id = entry.get("unit_id")
             if raw_id is not None and not isinstance(raw_id, str):
-                detail = f"该 unit 的 ID 不是字符串，当前为 {type(raw_id).__name__}"
+                detail = f"This unit's ID is not a string, got {type(raw_id).__name__}"
             else:
                 unit_id = (raw_id or "").strip()
                 if not unit_id:
-                    detail = "该 unit 没有可用的 unit_id"
+                    detail = "This unit has no usable unit_id"
         if detail is not None:
             if named is None:
                 tickets.append(
@@ -227,7 +227,7 @@ def screen_script_entries(
                 refused_ticket(
                     diagnostic_unit_id(f"{unit_id}#{index}", taken),
                     code=GenerationProblemCode.UNIT_REQUEST_INVALID,
-                    detail=f"unit {unit_id} 在剧本中重复出现",
+                    detail=f"unit {unit_id} appears more than once in the script",
                     action=GenerationAction.FIX_INPUT,
                 )
             )
@@ -288,15 +288,15 @@ def screen_storyboard_items(
         detail: str | None = None
         item_id = ""
         if not isinstance(item, dict):
-            detail = "该条目不是对象"
+            detail = "This entry is not an object"
         else:
             raw_id = storyboard_item_id(item, id_field)
             if raw_id is not None and not isinstance(raw_id, str):
-                detail = "该条目的 ID 不是字符串"
+                detail = "This entry's ID is not a string"
             else:
                 item_id = (raw_id or "").strip()
                 if not item_id:
-                    detail = "该条目没有可用的 ID"
+                    detail = "This entry has no usable ID"
         if detail is not None:
             if named is None:
                 tickets.append(
@@ -331,7 +331,7 @@ def screen_storyboard_items(
                 refused_ticket(
                     diagnostic_unit_id(f"{item_id}#{index}", taken),
                     code=GenerationProblemCode.UNIT_REQUEST_INVALID,
-                    detail=f"ID {item_id} 在剧本中重复出现",
+                    detail=f"ID {item_id} appears more than once in the script",
                     action=GenerationAction.FIX_INPUT,
                 )
             )
@@ -361,7 +361,7 @@ def screen_storyboard_items(
             refused_ticket(
                 name,
                 code=GenerationProblemCode.UNIT_REQUEST_INVALID,
-                detail=f"ID {name} 在剧本中指向多个条目",
+                detail=f"ID {name} points to multiple entries in the script",
                 action=GenerationAction.FIX_INPUT,
             )
         )
@@ -405,7 +405,7 @@ def reference_unit_task_spec(unit: object, script_file: str) -> TaskSpec:
     # Normalize with .get: bad data lacking unit_id (Agent can directly write script JSON) is rejected by from_request
     # as empty resource_id instead of raising KeyError here and interrupting the batch.
     if not isinstance(unit, dict):
-        raise ValueError("unit 必须是对象")
+        raise ValueError("unit must be an object")
     unit_id = str(unit.get("unit_id") or "")
     if unit.get("needs_replan") is True:
         require_script_unit_admitted("video_units", unit)
@@ -414,9 +414,9 @@ def reference_unit_task_spec(unit: object, script_file: str) -> TaskSpec:
         # Centralize container checks at enqueue validation: dirty dict/numeric values (import / direct Agent script writes)
         # would otherwise raise TypeError in downstream prompt assembly, turning the batch into 500 instead of letting this unit
         # enter admission conclusions with its own problem code.
-        raise ValueError(f"text 必须是字符串，当前为 {type(text).__name__}")
+        raise ValueError(f"text must be a string, got {type(text).__name__}")
     if not text.strip():
-        raise ValueError("正文为空")
+        raise ValueError("body is empty")
     spec = TaskSpec.from_request(
         task_type="reference_video",
         media_type="video",
@@ -499,7 +499,7 @@ def _speech_problem(exc: SpeechAdmissionError) -> GenerationProblem:
 def active_task_problem(task: Mapping[str, Any]) -> GenerationProblem:
     return GenerationProblem(
         code=GenerationProblemCode.ACTIVE_TASK_CONFLICT,
-        detail=f"该 unit 已有在途任务（状态：{task.get('status')}），等待其结束后再提交本次批量请求",
+        detail=f"This unit already has an in-flight task (status: {task.get('status')}); wait for it to finish before submitting this batch request",
         action=GenerationAction.WAIT_FOR_TASK,
         params={"task_id": str(task.get("id") or task.get("task_id") or ""), "status": str(task.get("status") or "")},
     )
@@ -611,7 +611,7 @@ async def admit_reference_video_batch(
                 refused_ticket(
                     f"video_units[{index}]",
                     code=GenerationProblemCode.UNIT_REQUEST_INVALID,
-                    detail="该 unit 没有可用的 unit_id",
+                    detail="This unit has no usable unit_id",
                     action=GenerationAction.FIX_INPUT,
                 )
             )
@@ -621,7 +621,7 @@ async def admit_reference_video_batch(
                 refused_ticket(
                     f"{unit_id}#{index}",
                     code=GenerationProblemCode.UNIT_REQUEST_INVALID,
-                    detail=f"unit_id {unit_id} 在剧本中重复出现",
+                    detail=f"unit_id {unit_id} appears more than once in the script",
                     action=GenerationAction.FIX_INPUT,
                 )
             )
@@ -639,7 +639,7 @@ async def admit_reference_video_batch(
                 problems.append(
                     GenerationProblem(
                         code=GenerationProblemCode.UNIT_REQUEST_INVALID,
-                        detail=f"入队校验未通过：{exc}",
+                        detail=f"Enqueue validation failed: {exc}",
                         action=GenerationAction.FIX_INPUT,
                     )
                 )
@@ -672,7 +672,7 @@ async def admit_reference_video_batch(
                 refused_ticket(
                     unit_id,
                     code=GenerationProblemCode.UNIT_REQUEST_INVALID,
-                    detail=f"请求投影失败：{exc}",
+                    detail=f"Request projection failed: {exc}",
                     action=GenerationAction.FIX_INPUT,
                 )
             )
@@ -782,7 +782,7 @@ def speech_admission_ticket(unit_id: str, exc: SpeechAdmissionError) -> UnitAdmi
     return refused_ticket(
         unit_id or exc.admission.unit_id,
         code=problem.code.value,
-        detail=f"发声准入未通过：{json.dumps(exc.admission.to_dict(), ensure_ascii=False)}",
+        detail=f"Speech admission failed: {json.dumps(exc.admission.to_dict(), ensure_ascii=False)}",
         action=(GenerationAction.REPLAN_UNIT if problem.action.value == "replan_unit" else GenerationAction.FIX_INPUT),
         params={"speech_admission": exc.admission.to_dict()},
     )
@@ -794,13 +794,13 @@ def storyboard_video_prompt(
     prompt = item.get("video_prompt")
     if not prompt:
         item_id = item.get("segment_id") or item.get("scene_id")
-        raise ValueError(f"分镜缺少 video_prompt 字段: {item_id}")
+        raise ValueError(f"Storyboard is missing the video_prompt field: {item_id}")
     if isinstance(prompt, dict) and not is_structured_video_prompt(prompt):
         item_id = item.get("segment_id") or item.get("scene_id")
-        raise ValueError(f"分镜 video_prompt 为对象但格式不符合结构化规范: {item_id}")
+        raise ValueError(f"Storyboard video_prompt is an object but does not match the structured format: {item_id}")
     if not isinstance(prompt, (dict, str)):
         item_id = item.get("segment_id") or item.get("scene_id")
-        raise TypeError(f"分镜 video_prompt 类型无效（期望 str 或 dict）: {item_id}")
+        raise TypeError(f"Storyboard video_prompt has an invalid type (expected str or dict): {item_id}")
     # Share render_storyboard_video_prompt with execution: enqueue snapshots and outgoing text have the same structure;
     # this exit centrally appends negative-constraint suffixes (idempotent on already-suffixed strings at execution).
     return render_storyboard_video_prompt(prompt, item, content_mode=content_mode, voice_characters=voice_characters)
@@ -880,7 +880,7 @@ def build_storyboard_video_specs(
     and needs_replan therefore hold the entire batch before task creation at every entry point, and plan
     admission previews agree with actual submission."""
 
-    item_type = "分镜"
+    item_type = "Storyboard"
     skip_set = set(skip_ids or [])
 
     specs: list[TaskSpec] = []
@@ -912,12 +912,12 @@ def build_storyboard_video_specs(
             )
         except (OSError, ValueError) as exc:
             # An unusable storyboard image is the most common case; give the next operation instead of only reporting a path.
-            advice = "，请先运行 generate_storyboards" if isinstance(exc, StoryboardImageUnavailable) else ""
+            advice = "; run generate_storyboards first" if isinstance(exc, StoryboardImageUnavailable) else ""
             refused.append(
                 refused_ticket(
                     str(item_id),
                     code=GenerationProblemCode.UNIT_INPUT_UNUSABLE,
-                    detail=f"{item_type} {item_id} 的视频输入不可用: {exc}{advice}",
+                    detail=f"{item_type} {item_id} video input is unusable: {exc}{advice}",
                     action=GenerationAction.GENERATE_DEPENDENCY,
                 )
             )
@@ -930,7 +930,7 @@ def build_storyboard_video_specs(
                 refused_ticket(
                     str(item_id),
                     code=GenerationProblemCode.UNIT_REQUEST_INVALID,
-                    detail=f"{item_type} {item_id} 的 video_prompt 无效: {exc}",
+                    detail=f"{item_type} {item_id} has an invalid video_prompt: {exc}",
                     action=GenerationAction.FIX_INPUT,
                 )
             )
@@ -961,7 +961,7 @@ def build_storyboard_video_specs(
                 refused_ticket(
                     str(item_id),
                     code=GenerationProblemCode.UNIT_REQUEST_INVALID,
-                    detail=f"{item_type} {item_id} 无法构造入队请求: {exc}",
+                    detail=f"{item_type} {item_id} cannot build an enqueue request: {exc}",
                     action=GenerationAction.FIX_INPUT,
                 )
             )
@@ -1014,7 +1014,7 @@ async def admit_storyboard_video_request(
     for spec in specs:
         item = items_by_id.get(spec.resource_id)
         if item is None:
-            raise ValueError(f"找不到待生成条目: {spec.resource_id}")
+            raise ValueError(f"Pending entry not found: {spec.resource_id}")
         targets.append((spec.resource_id, item))
     request_facts = (
         (video_request_facts or await storyboard_video_request_facts(project, config_resolver)) if specs else None

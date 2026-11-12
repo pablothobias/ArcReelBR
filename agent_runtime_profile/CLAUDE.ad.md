@@ -39,7 +39,7 @@ These rules apply to all operations throughout the project:
 > by a fixed +7 seconds per call, unsuitable for joining different shots. Join different shots on an edit timeline.
 
 ### Audio rules
-- **Automatic BGM prohibition**: generation automatically appends a prohibition equivalent to `Avoid: BGM、文字字幕、水印` to video prompts; do not append it manually or describe BGM / scores in video_prompt
+- **Automatic BGM prohibition**: generation automatically appends a prohibition equivalent to `Avoid: BGM, text subtitles, watermarks, logos` to video prompts; do not append it manually or describe BGM / scores in video_prompt
 
 ### Video-prompt wording
 
@@ -65,7 +65,7 @@ The Agent session’s cwd is bound to the current project root. **All paths in t
 - **Read / Edit / Write / Glob / Grep**: use **absolute paths** for `file_path`
 - **Bash calls to skill scripts**: use paths **relative to project-root cwd**, for example:
   - ✅ `scripts/episode_1.json`、`storyboards/E1S01.png`
-  - ❌ `projects/{项目名}/scripts/episode_1.json` (double prefix; substitution/concatenation errors can land at the projects root)
+  - ❌ `projects/{project name}/scripts/episode_1.json` (double prefix; substitution/concatenation errors can land at the projects root)
 - **Never** use the `projects/{...}/` prefix in tool arguments. It is only for documenting project layout and **must not be passed directly to any tool**
 - Skill scripts validate cwd and reject execution when it is outside the current project directory
 - **Relative forms in `.claude/agents/*.md` / `SKILL.md`**: relative paths in subagent instructions (such as “read `project.json`” or “read `source/episode_{N}.txt`”) describe **locations within the project**, not directly usable `file_path` arguments. Still join them to session cwd and pass absolute paths to Read/Edit/Write/Glob/Grep
@@ -93,14 +93,14 @@ For ads/shorts, **generation mode** (`generation_mode`) is expressed solely by t
 | generation_mode | UI name | Main data structure | Visual-reference source |
 |---|---|---|---|
 | `storyboard` | Storyboard video | `shots[]` + storyboard images | One storyboard image per shot as first frame |
-| `reference_video` | Reference video | Self-contained `video_units[]` | Asset sheets derived from body `@[名称]` mentions (originals if no sheet) |
+| `reference_video` | Reference video | Self-contained `video_units[]` | Asset sheets derived from body `@[name]` mentions (originals if no sheet) |
 
 Grid assembly (`grid_storyboard`) is **unavailable** for ads/shorts: per-panel grid resolution conflicts with high product fidelity.
 
 ### Self-contained reference-video units
 
 - Script generation directly produces `video_units[]` in one stage, without a script_plan intermediate requiring content confirmation. Each unit corresponds to one generation call and `reference_videos/{unit_id}.mp4`
-- Unit bodies are free text using unified reference syntax: `@[角色]{台词}` for character speech, `{台词}` for unassigned narration, anywhere inline; mention products/characters/scenes/props through `@[名称]`. At execution the system derives references in first-mention order; same-name collisions resolve by product → character → scene → prop
+- Unit bodies are free text using unified reference syntax: `@[character]{dialogue}` for character speech, `{dialogue}` for unassigned narration, anywhere inline; mention products/characters/scenes/props through `@[name]`. At execution the system derives references in first-mention order; same-name collisions resolve by product → character → scene → prop
 - A unit may carry only character speech, unassigned narration, or no speech. Split into adjacent units during planning when ownership must change. Existing problematic units marked `needs_replan` must be replanned first; generation rejects queueing them
 - Reference sets follow first-mention order, with the same rule for all asset types: use a sheet if present, otherwise all original images. Do not sort by type or add originals when a sheet exists
 - **Duration constraints**: each unit’s `duration_seconds` is a positive integer planned duration satisfying script-model structure; the sum should approach `target_duration`. Generation precheck handles provider tiers; do not quantize during script planning
@@ -129,7 +129,7 @@ The workflow supports **flexible entry**: follow `next_action` when the user say
 ### Product fidelity (soft gate)
 
 - **Arrange product-sheet review before storyboards**: when a `product_sheet` exists, ask the user to confirm fidelity on the product asset page before storyboards (before first video generation in reference video, where sheets enter references directly and confirmation before costs is especially important). Regenerate mismatches, then continue only after confirmation. This is a workflow convention, not a system state machine; originals-only projects may start directly
-- Product shots (nonempty script `products_in_shot`) **automatically inject product references** during storyboard-image generation (sheet + originals if a sheet exists, otherwise originals directly). The prompt `Reference_Images` declaration identifies those positions as product references and requires exact fidelity; no need to repeat appearance details in image_prompt. Body `@[商品名]` becomes the corresponding “图N”. Storyboard-video generation does not add product references again; the storyboard carries fidelity. Reference video skips storyboards and derives references at execution in mention order, without putting products first (see Self-contained reference-video units). Atmospheric shots have no product images; project style carries their look
+- Product shots (nonempty script `products_in_shot`) **automatically inject product references** during storyboard-image generation (sheet + originals if a sheet exists, otherwise originals directly). The prompt `Reference_Images` declaration identifies those positions as product references and requires exact fidelity; no need to repeat appearance details in image_prompt. Body `@[product]` becomes the corresponding “图N”. Storyboard-video generation does not add product references again; the storyboard carries fidelity. Reference video skips storyboards and derives references at execution in mention order, without putting products first (see Self-contained reference-video units). Atmospheric shots have no product images; project style carries their look
 - After storyboard generation, guide user review of product fidelity and regenerate unsatisfactory storyboard images before paying for video generation
 
 ### General shorts (no products)
@@ -156,10 +156,10 @@ Some image/video providers **have suspended reference uploads containing real hu
 
 ## Project directory structure
 
-> The directory tree below is illustrative only; session cwd is already the project root. Use cwd-relative paths for **Bash calls to skill scripts** (such as `source/`, `scripts/`); **Read / Edit / Write / Glob / Grep** still require **absolute** `file_path` under the Path rules above. No tool may use a `projects/{项目名}/` prefix.
+> The directory tree below is illustrative only; session cwd is already the project root. Use cwd-relative paths for **Bash calls to skill scripts** (such as `source/`, `scripts/`); **Read / Edit / Write / Glob / Grep** still require **absolute** `file_path` under the Path rules above. No tool may use a `projects/{project name}/` prefix.
 
 ```text
-projects/{项目名}/      # ← session cwd is here; paths below are relative to it
+projects/{project name}/      # ← session cwd is here; paths below are relative to it
 ├── project.json       # Project metadata (products, characters, scenes, props, style, target_duration, brief)
 ├── scripts/           # Script (JSON), always episode_1.json
 ├── products/          # Product sheets; products/refs/ holds user-uploaded product originals

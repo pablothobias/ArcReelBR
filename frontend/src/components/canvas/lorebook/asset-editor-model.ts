@@ -1,10 +1,10 @@
 import { API, type AssetCreateResult } from "@/api";
-import type { AssetSheetType, Character, Product } from "@/types";
+import type { AssetSheetType, Character, Product, Scene } from "@/types";
 import type { GalleryAssetSource } from "./gallery-model";
 
 /**
  * Unsaved detail-editor fields. Four asset types share shape, using subsets by type:
- * characters use voice style, products brand/selling points. Rename/upload/alias changes execute immediately outside this model.
+ * characters use voice style, scenes occupancy, products brand/selling points. Rename/upload/alias changes execute immediately outside this model.
  */
 export interface AssetFields {
   description: string;
@@ -12,6 +12,8 @@ export interface AssetFields {
   brand: string;
   /** Selling points, one per line. */
   sellingPoints: string;
+  /** Scene sheet shows the people its description asks for (scene occupancy "occupied"). */
+  occupied: boolean;
 }
 
 /** Asset creation additionally has a name. */
@@ -19,7 +21,13 @@ export interface NewAssetFields extends AssetFields {
   name: string;
 }
 
-export const EMPTY_ASSET_FIELDS: AssetFields = { description: "", voiceStyle: "", brand: "", sellingPoints: "" };
+export const EMPTY_ASSET_FIELDS: AssetFields = {
+  description: "",
+  voiceStyle: "",
+  brand: "",
+  sellingPoints: "",
+  occupied: false,
+};
 
 export function assetFieldsOf(type: AssetSheetType, asset: GalleryAssetSource): AssetFields {
   return {
@@ -27,6 +35,7 @@ export function assetFieldsOf(type: AssetSheetType, asset: GalleryAssetSource): 
     voiceStyle: type === "character" ? ((asset as Character).voice_style ?? "") : "",
     brand: type === "product" ? ((asset as Product).brand ?? "") : "",
     sellingPoints: type === "product" ? ((asset as Product).selling_points ?? []).join("\n") : "",
+    occupied: type === "scene" && (asset as Scene).occupancy === "occupied",
   };
 }
 
@@ -44,6 +53,7 @@ export function assetFieldsEqual(a: AssetFields, b: AssetFields): boolean {
     a.description === b.description &&
     a.voiceStyle === b.voiceStyle &&
     a.brand === b.brand &&
+    a.occupied === b.occupied &&
     parseSellingPoints(a.sellingPoints).join("\n") === parseSellingPoints(b.sellingPoints).join("\n")
   );
 }
@@ -53,6 +63,7 @@ export function assetFieldsPatch(type: AssetSheetType, value: AssetFields, saved
   const patch: Record<string, unknown> = {};
   if (value.description !== saved.description) patch.description = value.description;
   if (type === "character" && value.voiceStyle !== saved.voiceStyle) patch.voice_style = value.voiceStyle;
+  if (type === "scene" && value.occupied !== saved.occupied) patch.occupancy = value.occupied ? "occupied" : "empty";
   if (type === "product") {
     if (value.brand !== saved.brand) patch.brand = value.brand;
     const points = parseSellingPoints(value.sellingPoints);

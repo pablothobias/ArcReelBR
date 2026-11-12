@@ -88,8 +88,8 @@ def model_fact_value_matches(key: str, value: object) -> bool:
 _TYPE_NAMES: Mapping[str, str] = {
     "max_output_tokens": "int > 0",
     "max_reference_images": "int >= 0",
-    "durations": "list[int > 0]（非空）",
-    "resolutions": "list[str]（非空）",
+    "durations": "list[int > 0] (non-empty)",
+    "resolutions": "list[str] (non-empty)",
     "duration_constraints": "{by_resolution: {str: list[int > 0]}, with_reference_images: list[int > 0]}",
 }
 

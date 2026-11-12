@@ -214,7 +214,7 @@ def _task_failure(task: Any, request: VideoGenerationRequest) -> str | None:
     rejection = _input_image_rejection(request, getattr(error, "code", None), getattr(error, "message", None))
     if rejection is not None:
         raise rejection
-    return f"Ark 视频生成失败(status={task.status}): {error or 'Unknown error'}"
+    return f"Ark video generation failed (status={task.status}): {error or 'Unknown error'}"
 
 
 class ArkVideoBackend(ProviderJobIdPersistenceMixin):
@@ -241,7 +241,7 @@ class ArkVideoBackend(ProviderJobIdPersistenceMixin):
         # Actual request host uses create_ark_client normalization; persist with job_id on submission.
         self._base_url = ark_base_url(base_url)
         if not model:
-            raise ValueError("ArkVideoBackend 需要指定模型")
+            raise ValueError("ArkVideoBackend requires a model")
         self._model = model
         self._inference_credential = inference_credential
 

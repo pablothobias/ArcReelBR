@@ -168,13 +168,13 @@ def _tool_call_absent(exc: BaseException | None) -> bool:
 def _failure_reason(exc: BaseException) -> str:
     """Reduce a tier failure to a readable reason carried by StructuredOutputExhaustedError."""
     if not isinstance(exc, InstructorRetryException):
-        return f"降级链失败（{type(exc).__name__}: {exc}）"
+        return f"fallback chain failed ({type(exc).__name__}: {exc})"
     api_failure = _api_call_failure(exc)
     if api_failure is not None:
-        return f"降级链各档传递 schema 的方式均被上游拒收（{api_failure}）"
+        return f"upstream rejected every fallback tier's way of passing the schema ({api_failure})"
     last = exc.failed_attempts[-1].exception if exc.failed_attempts else None
-    detail = type(last).__name__ if last is not None else "未知原因"
-    return f"降级链各档重试耗尽后模型输出仍不合规（{exc.n_attempts} 次尝试，最后一次 {detail}）"
+    detail = type(last).__name__ if last is not None else "unknown reason"
+    return f"model output still invalid after retries in every fallback tier ({exc.n_attempts} attempts, last {detail})"
 
 
 def _billed_usage(exc: BaseException, *, provider: str, model: str) -> TextGenerationResult:

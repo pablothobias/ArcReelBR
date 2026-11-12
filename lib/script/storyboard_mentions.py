@@ -1,7 +1,7 @@
-"""Check ``@[登记名]`` bindings in storyboard visual descriptions.
+"""Check ``@[registered name]`` bindings in storyboard visual descriptions.
 
 Reference fields (``characters_in_*`` / ``scenes`` / ``props`` / ``products_in_shot``) determine storyboard images;
-``image_prompt.scene`` ``@[名称]`` mentions identify, never derive, references. Replacement with “图N” requires both
+``image_prompt.scene`` ``@[name]`` mentions identify, never derive, references. Replacement with “图N” requires both
 asset registration and presence in this entry's reference fields. If either is missing, render the bare name and collect
 locale-neutral ``{"key", "params"}`` warnings here for script-writing tool receipts.
 """
@@ -16,7 +16,7 @@ from lib.references.reference_catalog import build_reference_catalog
 from lib.script.reference_video.text_parser import extract_mentions
 from lib.script.storyboard_sequence import get_storyboard_items
 
-#: Visual ``@[名称]`` absent from registration or this shot's reference fields is sent as a bare name.
+#: Visual ``@[name]`` absent from registration or this shot's reference fields is sent as a bare name.
 WARN_STORYBOARD_MENTION_UNBOUND = "storyboard_warn_mention_unbound"
 
 _REFERENCE_LIST_FIELDS: tuple[str, ...] = tuple(

@@ -224,7 +224,7 @@ async def test_windows_bash_whitelist_matches_main_behavior(tmp_path: Path, comm
     result = await callback("Bash", {"command": command}, None)
     assert type(result).__name__ == expected
     if expected == "PermissionResultDeny":
-        assert "Bash 白名单" in result.message
+        assert "Bash allowlist" in result.message
         # Denial wording must include every allowlist prefix (single source of truth).
         for prefix in AgentAccessPolicy.WINDOWS_BASH_PREFIX_WHITELIST:
             assert prefix in result.message
@@ -279,7 +279,7 @@ async def test_windows_bash_whitelist_blocks_metachar_chains(tmp_path: Path, com
     callback = await sm._build_can_use_tool_callback("test_sid", [None])
     result = await callback("Bash", {"command": command}, None)
     assert type(result).__name__ == "PermissionResultDeny"
-    assert "Bash 白名单" in result.message
+    assert "Bash allowlist" in result.message
 
 
 @pytest.mark.asyncio

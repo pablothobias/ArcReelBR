@@ -39,7 +39,7 @@ def parse_integrated_loudness(stderr: str) -> float:
     """Read integrated loudness (LUFS) from ``ebur128`` summaries; ffmpeg reports silence as −70 or ``-inf``, both treated as at/below −70."""
     matches = _INTEGRATED_RE.findall(stderr)
     if not matches:
-        raise LoudnessMeasurementError("ffmpeg 输出里没有积分响度汇总")
+        raise LoudnessMeasurementError("ffmpeg output has no integrated loudness summary")
     value = matches[-1]
     return float("-inf") if value == "-inf" else float(value)
 
@@ -56,10 +56,10 @@ async def measure_integrated_loudness(
             spawn=spawn,
         )
     except SubprocessDeadlineExceeded:
-        raise LoudnessMeasurementError("响度测量超时") from None
+        raise LoudnessMeasurementError("Loudness measurement timed out") from None
     stderr = result.stderr.decode(errors="replace")
     if result.returncode != 0:
-        raise LoudnessMeasurementError(f"ffmpeg 退出码 {result.returncode}：{stderr.strip()[-500:]}")
+        raise LoudnessMeasurementError(f"ffmpeg exit code {result.returncode}: {stderr.strip()[-500:]}")
     return parse_integrated_loudness(stderr)
 
 

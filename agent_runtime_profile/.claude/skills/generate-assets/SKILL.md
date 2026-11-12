@@ -18,7 +18,7 @@ Project settings select the image provider, without locking a specific backend.
   (layout / defect-prevention wording / negatives) is assembled server-side by `lib/prompts/prompt_builders.py`,
   sharing one source of truth between WebUI and skills.
 - Pending means Artifact Manifest state `missing`, including registered but unreadable files; reuse `stale` artifacts, not counting them as pending.
-- Derivatives (`本体/衍生`) share a batch with their base; if the base is pending, submit derivatives only after base success. Base failure yields `generation_dependency_failed`, without derivative submission.
+- Derivatives (`base/derivative`) share a batch with their base; if the base is pending, submit derivatives only after base success. Base failure yields `generation_dependency_failed`, without derivative submission.
 
 ---
 
@@ -96,14 +96,14 @@ Enqueue through MCP:
 | Generate episode-referenced pending, including products/derivatives | `mcp__arcreel__generate_assets({"episode_id": 3})` |
 | Generate all pending (one pass per four types) | `mcp__arcreel__generate_assets({})` |
 | Generate one type’s pending | `mcp__arcreel__generate_assets({"type": "character"})` |
-| Generate selected assets | `mcp__arcreel__generate_assets({"type": "prop", "names": ["玉佩", "密信"]})` |
-| Generate one asset | `mcp__arcreel__generate_assets({"type": "scene", "names": ["村口老槐树"]})` |
-| Generate one product | `mcp__arcreel__generate_assets({"type": "product", "names": ["保温杯"]})` |
-| Generate derivative | `mcp__arcreel__generate_assets({"type": "character", "names": ["张三/战损"]})` |
+| Generate selected assets | `mcp__arcreel__generate_assets({"type": "prop", "names": ["Jade Pendant", "Secret Letter"]})` |
+| Generate one asset | `mcp__arcreel__generate_assets({"type": "scene", "names": ["Old Locust Tree at the Village Gate"]})` |
+| Generate one product | `mcp__arcreel__generate_assets({"type": "product", "names": ["Thermos Cup"]})` |
+| Generate derivative | `mcp__arcreel__generate_assets({"type": "character", "names": ["Zhang San/Battle-worn"]})` |
 
 Do not combine `episode_id` with `type` / `names`; the server computes episode references using the same list as the Web episode layer.
 
-Results return `requested / succeeded / failed / blocked / skipped` per ID, such as `character/张三` (derivative `character/张三/战损`);
+Results return `requested / succeeded / failed / blocked / skipped` per ID, such as `character/Zhang San` (derivative `character/Zhang San/Battle-worn`);
 stale but reusable old images are `skipped`, never automatically regenerated;
 follow each `problem.code` / `problem.action`, without parsing prose.
 See `.claude/references/generation-results.md` for structure.
@@ -130,7 +130,7 @@ For user questions about particular sheets, inspect directly with `mcp__arcreel_
 Choose by user intent; the wrong path replaces satisfactory content or loses unexpected changes:
 
 - **Local edits only** (hair color, clutter, lighting), with satisfactory composition/design →
-  `mcp__arcreel__edit_images({"resource_type": "character", "edits": [{"id": "张三", "instruction": "把头发改成红色"}]})`
+  `mcp__arcreel__edit_images({"resource_type": "character", "edits": [{"id": "Zhang San", "instruction": "Change the hair to red"}]})`
   refines the base and supports same-type asset batches
 - **New composition/design**, or intended description changes affecting later
   regeneration → use `generate_assets` to redraw from updated description

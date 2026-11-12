@@ -113,7 +113,7 @@ def _parse_framecrc(output: str) -> dict[int, _StreamAccumulator]:
             continue
         fields = line.split(",")
         if len(fields) < 6:
-            raise ValueError(f"framecrc 行字段不足：{line!r}")
+            raise ValueError(f"framecrc line has too few fields: {line!r}")
         index, pts, duration = int(fields[0]), int(fields[2]), int(fields[3])
         if pts == _AV_NOPTS_VALUE or _parse_packet_flags(fields) & _AV_PKT_FLAG_DISCARD:
             continue
@@ -187,15 +187,15 @@ async def probe_media(
             spawn=spawn,
         )
     except SubprocessDeadlineExceeded:
-        raise MediaProbeError(f"媒体探测超时：{path.name}") from None
+        raise MediaProbeError(f"Media probe timed out: {path.name}") from None
     if result.returncode != 0:
-        raise MediaProbeError(f"媒体文件无法解析：{path.name}")
+        raise MediaProbeError(f"Media file could not be parsed: {path.name}")
     input_format = _INPUT_FORMAT_RE.search(result.stderr.decode(errors="replace"))
     container_formats = frozenset(input_format.group(1).split(",")) if input_format else frozenset()
     try:
         accumulators = _parse_framecrc(result.stdout.decode(errors="replace"))
     except (ValueError, ZeroDivisionError) as exc:
-        raise MediaProbeError(f"无法解析 ffmpeg 输出：{path.name}") from exc
+        raise MediaProbeError(f"Could not parse ffmpeg output: {path.name}") from exc
     return _build_probe(container_formats, accumulators)
 
 
@@ -214,7 +214,7 @@ def _parse_frame_times(output: str) -> tuple[float, ...]:
             continue
         fields = line.split(",")
         if len(fields) < 6:
-            raise ValueError(f"framecrc 行字段不足：{line!r}")
+            raise ValueError(f"framecrc line has too few fields: {line!r}")
         pts = int(fields[2])
         if pts == _AV_NOPTS_VALUE or _parse_packet_flags(fields) & _AV_PKT_FLAG_DISCARD:
             continue
@@ -263,13 +263,13 @@ async def probe_video_frame_times(
             args, deadline_seconds=deadline_seconds, grace=grace, capture_stdout=True, spawn=spawn
         )
     except SubprocessDeadlineExceeded:
-        raise MediaProbeError(f"媒体探测超时：{path.name}") from None
+        raise MediaProbeError(f"Media probe timed out: {path.name}") from None
     if result.returncode != 0:
-        raise MediaProbeError(f"媒体文件无法解析：{path.name}")
+        raise MediaProbeError(f"Media file could not be parsed: {path.name}")
     try:
         times = _parse_frame_times(result.stdout.decode(errors="replace"))
     except (ValueError, ZeroDivisionError) as exc:
-        raise MediaProbeError(f"无法解析 ffmpeg 输出：{path.name}") from exc
+        raise MediaProbeError(f"Could not parse ffmpeg output: {path.name}") from exc
     if not times:
-        raise MediaProbeError(f"没有视频帧：{path.name}")
+        raise MediaProbeError(f"No video frames: {path.name}")
     return times

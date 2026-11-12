@@ -1,4 +1,4 @@
-"""Binding checks for storyboard visual-description ``@[登记名]`` mentions."""
+"""Binding checks for storyboard visual-description ``@[registered name]`` mentions."""
 
 from __future__ import annotations
 

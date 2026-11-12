@@ -70,7 +70,7 @@ async def select_custom_model(
     db_id = parse_provider_id(provider_id)
     provider = await CustomProviderRepository(session).get_provider(db_id)
     if provider is None:
-        raise ValueError(f"自定义供应商 {provider_id} 不存在")
+        raise ValueError(f"Custom provider {provider_id} does not exist")
 
     if model_id:
         model = await requested_model(

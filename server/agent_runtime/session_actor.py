@@ -126,7 +126,7 @@ class SessionActor:
 
     async def start(self) -> None:
         """Start the actor task and return only after successful connect or fail-fast."""
-        assert self._task is None, "SessionActor.start() 不可重入调用"
+        assert self._task is None, "SessionActor.start() must not be called re-entrantly"
         self._task = asyncio.create_task(self._run(), name="session-actor")
         started_task = asyncio.create_task(self._started.wait())
         try:

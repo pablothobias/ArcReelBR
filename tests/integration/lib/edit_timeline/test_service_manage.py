@@ -184,7 +184,7 @@ async def test_restore_appends_a_revision_with_the_target_content(service: EditT
     assert (result.revision, result.base_revision) == (4, 3)
     assert result.deleted_clip_ids == ()
     assert {clip.id for clip in result.clips} == {"c1", "c2", "c3"}
-    assert "修订 1" in result.message
+    assert "revision 1" in result.message
     restored = await service.read("demo", timeline_id)
     assert restored.revision == 4
     assert restored.clips == original.clips

@@ -314,7 +314,7 @@ async def test_split_reference_video_units_happy_derives_structure(
     # Fixtures used E1S01; never reuse IDs, so units start at 2.
     assert unit["unit_id"] == "E1U2"
     assert unit["text"] == text
-    # References never persist; reads derive them from body @[名称].
+    # References never persist; reads derive them from body @[name].
     assert "references" not in unit
     assert derived_reference_names(fake_ctx, unit["text"]) == ["张三", "村口"]
     assert unit["source_text"] == _RV_NOVEL
@@ -355,7 +355,7 @@ async def test_split_reference_video_units_rejects_unregistered_asset(
     rv_source(fake_ctx)
     out = await run_rv_split(fake_ctx, monkeypatch, [rv_unit("@[不存在的人] 出场")])
     assert out.problem is not None
-    assert "未登记" in said(out)
+    assert "references unregistered asset names" in said(out)
     assert not rv_script_plan_path(fake_ctx).exists()
 
 
@@ -366,7 +366,7 @@ async def test_split_reference_video_units_rejects_unregistered_speaker(
     rv_source(fake_ctx)
     out = await run_rv_split(fake_ctx, monkeypatch, [rv_unit("门开了\n@[无名氏]：{我来了。}")])
     assert out.problem is not None
-    assert "说话人未登记" in said(out)
+    assert "dialogue speakers not registered as character assets" in said(out)
     assert not rv_script_plan_path(fake_ctx).exists()
 
 
@@ -378,7 +378,7 @@ async def test_split_reference_video_units_rejects_over_max_refs(
     set_video_request_facts(_reference_facts("r2v", max_reference_images=2))
     out = await run_rv_split(fake_ctx, monkeypatch, [rv_unit("@[张三] 与 @[李四] 在 @[村口]")])
     assert out.problem is not None
-    assert "参考图数" in said(out)
+    assert "reference images, exceeding the model limit" in said(out)
     assert not rv_script_plan_path(fake_ctx).exists()
 
 
@@ -481,7 +481,7 @@ async def test_split_reference_video_units_rejects_non_verbatim_source_text(
     units = [rv_unit("@[张三] 起身", source_text="张三在城里等人")]
     out = await run_rv_split(fake_ctx, monkeypatch, units)
     assert out.problem is not None
-    assert "不是小说原文的逐字片段" in said(out)
+    assert "is not a verbatim excerpt of the novel source text" in said(out)
     assert not rv_script_plan_path(fake_ctx).exists()
 
 
@@ -504,7 +504,7 @@ async def test_split_reference_video_units_rejects_dialogue_overload(
     units = [rv_unit(f"@[张三] 起身\n@[张三]：{{{long_line}}}", duration=4)]
     out = await run_rv_split(fake_ctx, monkeypatch, units)
     assert out.problem is not None
-    assert "超过该 unit" in said(out)
+    assert "exceeding the unit's" in said(out)
     assert not rv_script_plan_path(fake_ctx).exists()
 
 
@@ -515,7 +515,7 @@ async def test_split_reference_video_units_rejects_braces_in_description(
     rv_source(fake_ctx)
     out = await run_rv_split(fake_ctx, monkeypatch, [rv_unit("@[张三] 推门，音量 {}，转身离开")])
     assert out.problem is not None
-    assert "花括号" in said(out)
+    assert "uses braces in visual description" in said(out)
     assert not rv_script_plan_path(fake_ctx).exists()
 
 
@@ -612,7 +612,7 @@ async def test_split_reference_video_units_reports_soft_violations_alongside_the
 
     assert out.problem is not None
     text = said(out)
-    assert "未登记" in text
+    assert "references unregistered asset names" in text
     assert "Fallback notices" in text
     assert "references no scene" in text
     assert "unit E1U02：" in text

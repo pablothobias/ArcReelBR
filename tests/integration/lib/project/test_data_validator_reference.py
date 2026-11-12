@@ -88,7 +88,7 @@ def test_validator_accepts_nfc_reference_for_nfd_registered_character(tmp_path: 
 
 
 def test_validator_accepts_unregistered_mention(tmp_path: Path):
-    """Unregistered `@[名称]` is not structural corruption; references derive at execution and unresolved mentions only warn while rendering."""
+    """Unregistered `@[name]` is not structural corruption; references derive at execution and unresolved mentions only warn while rendering."""
 
     _write(tmp_path, "project.json", _reference_project(with_assets=False))
     _write(tmp_path, "scripts/episode_1.json", _valid_reference_script())

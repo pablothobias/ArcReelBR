@@ -70,7 +70,7 @@ _KNOWN_SUFFIXES = ("/compatible-mode/v1", "/api/v1")
 
 def resolve_dashscope_api_key(api_key: str | None = None) -> str:
     if api_key is None or not api_key.strip():
-        raise ValueError("请到系统配置页填写 DashScope API Key")
+        raise ValueError("Enter the DashScope API Key in Settings")
     return api_key.strip()
 
 
@@ -151,10 +151,10 @@ def dashscope_failure_reason(payload: dict) -> str | None:
     if status in _FAILURE_STATES:
         code = output.get("code") or "unknown"
         message = output.get("message") or ""
-        return f"DashScope 任务失败 status={status} code={code}: {message}".strip()
+        return f"DashScope task failed status={status} code={code}: {message}".strip()
     # Submission top-level errors such as InvalidApiKey lack output.task_status.
     if status is None and payload.get("code"):
-        return f"DashScope 提交失败 code={payload.get('code')}: {payload.get('message', '')}".strip()
+        return f"DashScope submission failed code={payload.get('code')}: {payload.get('message', '')}".strip()
     return None
 
 
@@ -163,7 +163,7 @@ def extract_task_id(submit_payload: dict) -> str:
     task_id = _as_dict(submit_payload.get("output")).get("task_id")
     if not task_id:
         reason = dashscope_failure_reason(submit_payload)
-        raise RuntimeError(reason or f"DashScope 提交响应缺少 task_id: {submit_payload}")
+        raise RuntimeError(reason or f"DashScope submission response is missing task_id: {submit_payload}")
     return task_id
 
 
@@ -171,7 +171,7 @@ def extract_video_url(payload: dict) -> str:
     """Extract output.video_url from SUCCEEDED polling responses."""
     url = _as_dict(payload.get("output")).get("video_url")
     if not url:
-        raise RuntimeError(f"DashScope 任务完成但缺少 video_url: {payload}")
+        raise RuntimeError(f"DashScope task completed but video_url is missing: {payload}")
     return url
 
 
@@ -205,7 +205,7 @@ def extract_image_url(payload: dict) -> str:
     choices = _as_dict(payload.get("output")).get("choices")
     if not isinstance(choices, list) or not choices:
         reason = dashscope_failure_reason(payload)
-        raise RuntimeError(reason or f"DashScope 图像响应缺少 choices: {payload}")
+        raise RuntimeError(reason or f"DashScope image response is missing choices: {payload}")
     # Normalize malformed choices[0]/message nondicts to empty, preventing .get AttributeError.
     content = _as_dict(_as_dict(choices[0]).get("message")).get("content")
     # Require lists explicitly: truthy nonlist content, such as int/bool/dict, bypasses `or []`,
@@ -214,7 +214,7 @@ def extract_image_url(payload: dict) -> str:
         for item in content:
             if isinstance(item, dict) and (url := item.get("image")):
                 return url
-    raise RuntimeError(f"DashScope 图像响应 content 无 image 字段: {payload}")
+    raise RuntimeError(f"DashScope image response content has no image field: {payload}")
 
 
 # Synchronous audio-response helpers.
@@ -225,7 +225,7 @@ def extract_audio_url(payload: dict) -> str:
     url = _as_dict(_as_dict(payload.get("output")).get("audio")).get("url")
     if not url:
         reason = dashscope_failure_reason(payload)
-        raise RuntimeError(reason or f"DashScope 语音合成响应缺少 audio.url: {payload}")
+        raise RuntimeError(reason or f"DashScope speech synthesis response is missing audio.url: {payload}")
     return url
 
 

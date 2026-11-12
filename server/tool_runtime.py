@@ -448,7 +448,7 @@ async def get_generation_batch(
     except GenerationBatchNotFound as exc:
         return ToolOutcome(problem=ToolProblem("generation_batch_not_found", str(exc)))
     except Exception as exc:
-        return ToolOutcome(problem=ToolProblem("internal_error", f"get_generation_batch 失败: {exc}"))
+        return ToolOutcome(problem=ToolProblem("internal_error", f"get_generation_batch failed: {exc}"))
     return ToolOutcome(value=result)
 
 
@@ -467,7 +467,7 @@ async def cancel_generation_batch(
     except GenerationBatchNotFound as exc:
         return ToolOutcome(problem=ToolProblem("generation_batch_not_found", str(exc)))
     except Exception as exc:
-        return ToolOutcome(problem=ToolProblem("internal_error", f"cancel_generation_batch 失败: {exc}"))
+        return ToolOutcome(problem=ToolProblem("internal_error", f"cancel_generation_batch failed: {exc}"))
     return ToolOutcome(value=result)
 
 
@@ -559,7 +559,7 @@ class PatchEpisodeScriptRequest(BaseModel):
     @classmethod
     def _validate_script(cls, value: str) -> str:
         if "/" in value or "\\" in value or value in (".", ".."):
-            raise ValueError(f"script 必须是纯文件名，禁止路径分隔符: {value!r}")
+            raise ValueError(f"script must be a bare filename without path separators: {value!r}")
         return value
 
 
@@ -1201,11 +1201,11 @@ _SCRIPT_PLAN_BUSINESS_FILENAMES = frozenset(
 
 def _business_path_parts(value: str) -> tuple[str, ...]:
     if not is_str(value) or not value or "\\" in value or "\x00" in value:
-        raise ValueError("path 必须是项目内业务文件的 POSIX 相对路径")
+        raise ValueError("path must be a POSIX relative path to a business file in the project")
     pure = PurePosixPath(value)
     parts = pure.parts
     if pure.is_absolute() or ".." in parts or any(part.startswith(".") for part in parts):
-        raise ValueError("path 不在业务文件白名单内")
+        raise ValueError("path is not in the business-file allowlist")
     allowed = (
         parts == ("project.json",)
         or (len(parts) == 2 and parts[0] == "source" and pure.suffix.lower() in {".txt", ".md"})
@@ -1218,7 +1218,7 @@ def _business_path_parts(value: str) -> tuple[str, ...]:
         )
     )
     if not allowed:
-        raise ValueError("path 不在业务文件白名单内")
+        raise ValueError("path is not in the business-file allowlist")
     return parts
 
 
@@ -1245,9 +1245,9 @@ def _read_business_file(project_dir: Path, relative: str) -> tuple[bytes, Path]:
             opened = os.fstat(handle.fileno())
             current = os.lstat(resolved)
             if not stat.S_ISREG(opened.st_mode) or not stat.S_ISREG(current.st_mode):
-                raise ValueError("path 必须指向普通文件")
+                raise ValueError("path must point to a regular file")
             if (opened.st_dev, opened.st_ino) != (current.st_dev, current.st_ino):
-                raise ValueError("path 在安全校验后发生变化")
+                raise ValueError("path changed after the safety check")
             raw = handle.read(BUSINESS_FILE_MAX_BYTES + 1)
     else:
         directory_flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW  # noqa: TID251 -- Executed only in the POSIX branch supporting dir_fd, where the constants necessarily exist
@@ -1260,7 +1260,7 @@ def _read_business_file(project_dir: Path, relative: str) -> tuple[bytes, Path]:
             file_fd = os.open(parts[-1], os.O_RDONLY | os.O_NONBLOCK | os.O_NOFOLLOW, dir_fd=directory_fd)  # noqa: TID251 -- Executed only in the POSIX branch supporting dir_fd, where the constants necessarily exist
             try:
                 if not stat.S_ISREG(os.fstat(file_fd).st_mode):
-                    raise ValueError("path 必须指向普通文件")
+                    raise ValueError("path must point to a regular file")
                 with os.fdopen(file_fd, "rb", closefd=False) as handle:
                     raw = handle.read(BUSINESS_FILE_MAX_BYTES + 1)
             finally:
@@ -1268,11 +1268,11 @@ def _read_business_file(project_dir: Path, relative: str) -> tuple[bytes, Path]:
         except FileNotFoundError:
             raise
         except OSError as exc:
-            raise ValueError("path 必须指向无 symlink 的普通文件") from exc
+            raise ValueError("path must point to a regular file without symlinks") from exc
         finally:
             os.close(directory_fd)
     if len(raw) > BUSINESS_FILE_MAX_BYTES:
-        raise _BusinessFileTooLargeError(f"文件超过 {BUSINESS_FILE_MAX_BYTES} 字节读取上限")
+        raise _BusinessFileTooLargeError(f"File exceeds the {BUSINESS_FILE_MAX_BYTES}-byte read limit")
     return raw, path
 
 
@@ -1320,14 +1320,14 @@ def _business_file_entries(
 
 def _file_problem(name: str, exc: BaseException) -> ToolProblem:
     if isinstance(exc, FileNotFoundError):
-        return ToolProblem("file_not_found", f"{name} 文件不存在")
+        return ToolProblem("file_not_found", f"{name}: file does not exist")
     if isinstance(exc, (json.JSONDecodeError, UnicodeError)):
-        return ToolProblem("invalid_content", f"{name} 文件不是有效的 UTF-8 JSON/文本")
+        return ToolProblem("invalid_content", f"{name}: file is not valid UTF-8 JSON/text")
     if isinstance(exc, _BusinessFileTooLargeError):
         return ToolProblem("file_too_large", str(exc))
     if isinstance(exc, (TypeError, ValueError)):
         return ToolProblem("unsafe_path", str(exc))
-    return ToolProblem("internal_error", f"{name} 失败: {exc}")
+    return ToolProblem("internal_error", f"{name} failed: {exc}")
 
 
 def _get_project_content_sync(project_name: str, projects: ProjectManager) -> ProjectContent:
@@ -1344,9 +1344,11 @@ async def get_project_content(
     try:
         content = await asyncio.to_thread(_get_project_content_sync, scope.project_name, services.projects)
     except FileNotFoundError as exc:
-        return ToolOutcome(problem=ToolProblem("project_not_found", f"项目未找到或缺 project.json: {exc}"))
+        return ToolOutcome(
+            problem=ToolProblem("project_not_found", f"Project not found or missing project.json: {exc}")
+        )
     except Exception as exc:
-        return ToolOutcome(problem=ToolProblem("internal_error", f"get_project_content 失败: {exc}"))
+        return ToolOutcome(problem=ToolProblem("internal_error", f"get_project_content failed: {exc}"))
     return ToolOutcome(value=content)
 
 
@@ -1359,7 +1361,7 @@ async def get_episode_script(
     """Read one episode script and issue a revision; migration-failed projects receive the complete migration problem without a revision."""
     filename = request.value.script
     if not filename or "/" in filename or "\\" in filename or filename in {".", ".."}:
-        return ToolOutcome(problem=ToolProblem("invalid_request", "script 必须是纯文件名"))
+        return ToolOutcome(problem=ToolProblem("invalid_request", "script must be a bare filename"))
     try:
         failure = await asyncio.to_thread(project_migration_failure, scope.project_name, services.projects)
         if failure is not None:
@@ -1370,7 +1372,7 @@ async def get_episode_script(
     except (TypeError, ValueError) as exc:
         return ToolOutcome(problem=ToolProblem("invalid_request", str(exc)))
     except Exception as exc:
-        return ToolOutcome(problem=ToolProblem("internal_error", f"get_episode_script 失败: {exc}"))
+        return ToolOutcome(problem=ToolProblem("internal_error", f"get_episode_script failed: {exc}"))
     return ToolOutcome(
         value=EpisodeScriptContent(revision=script_revision(script), script_filename=filename, script=script)
     )
@@ -1409,7 +1411,7 @@ async def get_prompt_preview(
     value = request.value
     filename = value.script
     if "/" in filename or "\\" in filename or filename in {".", ".."}:
-        return ToolOutcome(problem=ToolProblem("invalid_request", "script 必须是纯文件名"))
+        return ToolOutcome(problem=ToolProblem("invalid_request", "script must be a bare filename"))
     try:
         if problem := await migration_gate(scope, services):
             return ToolOutcome(problem=problem)
@@ -1431,7 +1433,7 @@ async def get_prompt_preview(
             )
             preview = replace(preview, captured_submission=captured)
     except ScriptItemNotFound:
-        return ToolOutcome(problem=ToolProblem("item_not_found", f"剧本中不存在分镜 {value.item_id}"))
+        return ToolOutcome(problem=ToolProblem("item_not_found", f"The script has no unit {value.item_id}"))
     except CapturedSubmissionError as exc:
         return ToolOutcome(problem=ToolProblem(exc.code, str(exc), params={"task_id": value.task_id}))
     except FileNotFoundError as exc:
@@ -1439,7 +1441,7 @@ async def get_prompt_preview(
     except (TypeError, ValueError) as exc:
         return ToolOutcome(problem=ToolProblem("invalid_request", str(exc)))
     except Exception as exc:
-        return ToolOutcome(problem=ToolProblem("internal_error", f"get_prompt_preview 失败: {exc}"))
+        return ToolOutcome(problem=ToolProblem("internal_error", f"get_prompt_preview failed: {exc}"))
     return ToolOutcome(value=preview)
 
 
@@ -1469,10 +1471,10 @@ async def get_source_text(
     try:
         project_dir = await asyncio.to_thread(services.projects.get_project_path, scope.project_name)
         if not path.startswith("source/"):
-            raise ValueError("path 必须指向 source/ 下的文本文件")
+            raise ValueError("path must point to a text file under source/")
         content, revision, etag, _size = await asyncio.to_thread(_decode_business_file, project_dir, path)
         if not isinstance(content, str):
-            raise ValueError("source 文件必须是文本")
+            raise ValueError("The source file must be text")
         return ToolOutcome(value=SourceTextContent(revision=revision, etag=etag, path=path, text=content))
     except Exception as exc:
         return ToolOutcome(problem=_file_problem("get_source_text", exc))
@@ -1511,7 +1513,11 @@ async def get_script_plan_content(
     try:
         result = await asyncio.to_thread(_get_script_plan_content_sync, scope.project_name, episode, services.projects)
         if result is None:
-            return ToolOutcome(problem=ToolProblem("script_plan_not_applicable", "当前项目没有 script_plan 中间态"))
+            return ToolOutcome(
+                problem=ToolProblem(
+                    "script_plan_not_applicable", "The current project has no script_plan intermediate stage"
+                )
+            )
         return ToolOutcome(value=result)
     except Exception as exc:
         return ToolOutcome(problem=_file_problem("get_script_plan_content", exc))
@@ -1734,9 +1740,9 @@ async def _execute_draft_repair(
     violations = draft.get("violations") if isinstance(draft, dict) else None
     count = 0 if adopted else len(violations) if isinstance(violations, list) else 0
     message = (
-        f"✅ AI 修复后违约已清零，集（id={request.episode_id}）{request.doc_type} 草稿已采用为正式内容"
+        f"✅ AI repair cleared all violations; Episode (id={request.episode_id}) {request.doc_type} draft was adopted as formal content"
         if adopted
-        else f"AI 修复已写回集（id={request.episode_id}）{request.doc_type} 草稿，仍有 {count} 条违约待处理"
+        else f"AI repair was written back to the Episode (id={request.episode_id}) {request.doc_type} draft; {count} violations remain"
     )
     return ToolOutcome(
         value=DraftRepairResult(
@@ -1808,11 +1814,11 @@ class CreateProjectToolRequest(BaseModel):
     def validate_mode_fields(self) -> CreateProjectToolRequest:
         if self.content_mode == "ad":
             if self.default_duration is not None:
-                raise ValueError("广告/短片项目不持有 default_duration")
+                raise ValueError("Ad/short-film projects do not have default_duration")
             if self.grid_storyboard:
-                raise ValueError("广告/短片项目不支持宫格分镜")
+                raise ValueError("Ad/short-film projects do not support grid storyboards")
         elif self.target_duration is not None or self.brief is not None:
-            raise ValueError("target_duration 与 brief 仅广告/短片项目可用")
+            raise ValueError("target_duration and brief are available only for ad/short-film projects")
         return self
 
 
@@ -1870,14 +1876,14 @@ async def list_projects(
     try:
         return ToolOutcome(value=await asyncio.to_thread(_list))
     except Exception as exc:
-        return ToolOutcome(problem=ToolProblem("internal_error", f"list_projects 失败: {exc}"))
+        return ToolOutcome(problem=ToolProblem("internal_error", f"list_projects failed: {exc}"))
 
 
 _NARRATION_CONFIG_PROBLEMS = {
-    "narration_tts_model_required": "use_tts 需要 TTS 模型：传 audio_backend（provider/model），或先让用户配置音频供应商",
-    "narration_tts_model_invalid": "audio_backend 不是可用的 TTS 模型，需为音频供应商下的 provider/model",
-    "narration_tts_voice_required": "use_tts 需要非空的 narration_voice",
-    "narration_tts_speed_invalid": "narration_speed 必须是正的有限数值或 null",
+    "narration_tts_model_required": "use_tts requires a TTS model: pass audio_backend (provider/model), or ask the user to configure an audio provider first",
+    "narration_tts_model_invalid": "audio_backend is not an available TTS model; it must be a provider/model under an audio provider",
+    "narration_tts_voice_required": "use_tts requires a non-empty narration_voice",
+    "narration_tts_speed_invalid": "narration_speed must be a positive finite number or null",
 }
 
 
@@ -1932,7 +1938,7 @@ async def create_project(
     except ValueError as exc:
         return ToolOutcome(problem=ToolProblem("invalid_request", str(exc)))
     except Exception as exc:
-        return ToolOutcome(problem=ToolProblem("internal_error", f"create_project 失败: {exc}"))
+        return ToolOutcome(problem=ToolProblem("internal_error", f"create_project failed: {exc}"))
 
 
 class SourceReplacement(BaseModel):
@@ -1972,9 +1978,9 @@ class EditSourceTextRequest(BaseModel):
     @model_validator(mode="after")
     def _one_target_one_change(self) -> EditSourceTextRequest:
         if (self.filename is None) == (self.episode_id is None):
-            raise ValueError("filename 与 episode_id 须且只能给一个")
+            raise ValueError("Provide exactly one of filename and episode_id")
         if (self.replacements is None) == (self.text is None):
-            raise ValueError("replacements 与 text 须且只能给一个")
+            raise ValueError("Provide exactly one of replacements and text")
         return self
 
 
@@ -1987,12 +1993,13 @@ class SourceChangeResult(BaseModel):
     revision: str | None = None
 
 
-def _zh(key: str, **kwargs: Any) -> str:
-    return i18n_message(key, "zh", **kwargs)
+def _agent_text(key: str, **kwargs: Any) -> str:
+    """Render an i18n message for Agent-facing tool replies, which are English (ADR 0122)."""
+    return i18n_message(key, "en", **kwargs)
 
 
 def _source_change_problem(exc: SourceFileChangeError) -> ToolProblem:
-    return ToolProblem(exc.code, f"❌ {_zh(f'source_file_change_{exc.code}')}")
+    return ToolProblem(exc.code, f"❌ {_agent_text(f'source_file_change_{exc.code}')}")
 
 
 async def _run_source_file_change(
@@ -2008,7 +2015,7 @@ async def _run_source_file_change(
             for episode in (*preview.impact.retired, *preview.impact.removed):
                 if await episode_has_active_tasks(services.queue, scope.project_name, episode):
                     return ToolProblem(
-                        "source_file_change_tasks_active", f"❌ {_zh('source_file_change_tasks_active')}"
+                        "source_file_change_tasks_active", f"❌ {_agent_text('source_file_change_tasks_active')}"
                     )
     return await _run_sync_transaction(command, False)
 
@@ -2017,14 +2024,14 @@ def _source_change_result(
     outcome: SourceFileChangeOutcome, project_before: Mapping[str, Any], rel: str
 ) -> SourceChangeResult:
     impact = outcome.impact.to_dict()
-    text = render_source_file_impact_text(impact, project_before, _zh)
+    text = render_source_file_impact_text(impact, project_before, _agent_text)
     if not outcome.applied:
         message = (
-            f"⚠️ 改动 {rel} 会波及以下集，尚未写入：\n{text}\n"
-            f'请把清单如实告知用户；用户确认后带 revision="{outcome.revision}" 原样重新调用。'
+            f"⚠️ Changing {rel} affects the following episodes; nothing was written yet:\n{text}\n"
+            f'Report this list to the user as is; after the user confirms, call again unchanged with revision="{outcome.revision}".'
         )
         return SourceChangeResult(message=message, confirmation_required=True, impact=impact, revision=outcome.revision)
-    message = f"✅ 已写入 {rel}。" + (f"\n分集账本已随之更新：\n{text}" if text else "")
+    message = f"✅ Wrote {rel}." + (f"\nThe episode ledger was updated accordingly:\n{text}" if text else "")
     return SourceChangeResult(message=message, confirmation_required=False, impact=impact, revision=outcome.revision)
 
 
@@ -2040,16 +2047,16 @@ async def upload_source(
 
     def _validate() -> None:
         if Path(value.filename).name != value.filename or "\\" in value.filename or value.filename.startswith("."):
-            raise ValueError("filename 必须是不含路径的非隐藏文件名")
+            raise ValueError("filename must be a non-hidden filename without a path")
         suffix = Path(value.filename).suffix.lower()
         if suffix not in {".txt", ".md"}:
             raise UnsupportedFormatError(ext=suffix)
         if not services.projects.project_exists(scope.project_name):
-            raise FileNotFoundError(f"项目 '{scope.project_name}' 缺少 project.json")
+            raise FileNotFoundError(f"Project '{scope.project_name}' is missing project.json")
         if value.role == "whole_source" and is_derived_episode_name(f"{Path(value.filename).stem}.txt"):
             raise ValueError(
-                f"文件名 {value.filename} 与集文件 episode_N.txt 同名，整本源文的文件须改名后上传；"
-                "逐集原文用 role=episode 上传"
+                f"Filename {value.filename} matches the episode file pattern episode_N.txt; rename whole-source files before uploading. "
+                "Upload per-episode source text with role=episode"
             )
 
     @contextlib.contextmanager
@@ -2167,7 +2174,7 @@ async def upload_source(
     except ConflictError as exc:
         return ToolOutcome(problem=ToolProblem("source_conflict", str(exc)))
     except Exception as exc:
-        return ToolOutcome(problem=ToolProblem("internal_error", f"upload_source 失败: {exc}"))
+        return ToolOutcome(problem=ToolProblem("internal_error", f"upload_source failed: {exc}"))
 
 
 def _apply_replacements(current: str, replacements: Sequence[SourceReplacement]) -> str:
@@ -2175,8 +2182,11 @@ def _apply_replacements(current: str, replacements: Sequence[SourceReplacement])
     for item in replacements:
         count = text.count(item.old_text)
         if count != 1:
-            where = "没有找到" if count == 0 else f"出现了 {count} 次"
-            raise ValueError(f"片段「{item.old_text}」在当前原文里{where}，须恰好出现一次；请带上更多上下文")
+            where = "was not found" if count == 0 else f"occurs {count} times"
+            raise ValueError(
+                f'Fragment "{item.old_text}" {where} in the current source text; it must occur exactly once. '
+                "Include more context"
+            )
         text = text.replace(item.old_text, item.new_text, 1)
     return text
 
@@ -2198,7 +2208,7 @@ async def edit_source_text(
         try:
             current = normalize_source_text(path.read_text(encoding="utf-8"))
         except (OSError, UnicodeDecodeError) as exc:
-            raise ValueError(f"读不到当前原文：{exc}") from exc
+            raise ValueError(f"Cannot read the current source text: {exc}") from exc
         return _apply_replacements(current, value.replacements or ())
 
     try:
@@ -2211,15 +2221,16 @@ async def edit_source_text(
             name = describe_episode_for_agent(project_before, episode)
             return ToolOutcome(
                 value=SourceChangeResult(
-                    message=f"✅ 已写入 {name} 的原文 {episode_source_relpath(episode)}。", confirmation_required=False
+                    message=f"✅ Wrote the source text of {name}: {episode_source_relpath(episode)}.",
+                    confirmation_required=False,
                 )
             )
         filename = value.filename or ""
         if Path(filename).name != filename or "\\" in filename:
-            raise ValueError("filename 必须是 source/ 下的纯文件名")
+            raise ValueError("filename must be a bare filename under source/")
         rel = f"source/{filename}"
         if rel not in whole_source_files(project_before):
-            raise SourceFileChangeError("source_file_not_found", f"整本源文里没有这个文件：{filename}")
+            raise SourceFileChangeError("source_file_not_found", f"The whole source has no such file: {filename}")
         text = await asyncio.to_thread(_new_text, project_dir / rel)
         changed = await _run_source_file_change(
             scope,
@@ -2237,7 +2248,7 @@ async def edit_source_text(
     except SourceFileChangeError as exc:
         return ToolOutcome(problem=_source_change_problem(exc))
     except EpisodeSourceError as exc:
-        return ToolOutcome(problem=ToolProblem(exc.code, f"❌ 修改集原文失败：{exc}"))
+        return ToolOutcome(problem=ToolProblem(exc.code, f"❌ Failed to edit the episode source text: {exc}"))
     except ValueError as exc:
         return ToolOutcome(problem=ToolProblem("invalid_request", str(exc)))
     except Exception as exc:
@@ -2261,7 +2272,7 @@ async def get_workflow_plan(
     except WorkflowRequestError as exc:
         return ToolOutcome(problem=ToolProblem("invalid_request", str(exc)))
     except Exception as exc:
-        return ToolOutcome(problem=ToolProblem("internal_error", f"get_workflow_plan 失败: {exc}"))
+        return ToolOutcome(problem=ToolProblem("internal_error", f"get_workflow_plan failed: {exc}"))
     return ToolOutcome(value=plan)
 
 
@@ -2289,13 +2300,15 @@ async def get_video_capabilities(
             project_name=scope.project_name,
         )
     except FileNotFoundError as exc:
-        return ToolOutcome(problem=ToolProblem("project_not_found", f"项目未找到或缺 project.json: {exc}"))
+        return ToolOutcome(
+            problem=ToolProblem("project_not_found", f"Project not found or missing project.json: {exc}")
+        )
     except VideoRequestFactsError as exc:
         failure = exc.failure
         return ToolOutcome(
             problem=ToolProblem(
                 failure.code,
-                f"无法解析视频模型能力: {failure.summary()}",
+                f"Cannot resolve video model capabilities: {failure.summary()}",
                 action=failure.action,
                 params=failure.parameters(),
             )
@@ -2303,9 +2316,11 @@ async def get_video_capabilities(
     except ModelNotInCatalogError as exc:
         return ToolOutcome(problem=model_not_in_catalog_problem(exc))
     except ValueError as exc:
-        return ToolOutcome(problem=ToolProblem("capabilities_unresolved", f"无法解析视频模型能力: {exc}"))
+        return ToolOutcome(
+            problem=ToolProblem("capabilities_unresolved", f"Cannot resolve video model capabilities: {exc}")
+        )
     except Exception as exc:
-        return ToolOutcome(problem=ToolProblem("internal_error", f"get_video_capabilities 失败: {exc}"))
+        return ToolOutcome(problem=ToolProblem("internal_error", f"get_video_capabilities failed: {exc}"))
     return ToolOutcome(value=payload)
 
 
@@ -2412,7 +2427,7 @@ def _project_patch_operations(
             items, id_field, _kind = resolve_items(preview)
             if not any(str(item.get(id_field)) == item_id for item in items):
                 raise ScriptEditError(
-                    f"未找到 id={item_id!r} 的分镜", operation_index=index, location=("id",), unit_id=item_id
+                    f"No unit with id={item_id!r}", operation_index=index, location=("id",), unit_id=item_id
                 )
             apply(
                 lambda item_id=item_id, move_after_id=move_after_id: move_segment(preview, item_id, move_after_id),
@@ -2437,7 +2452,7 @@ def _project_patch_operations(
         )
         if original_index is None:
             raise ScriptEditError(
-                f"未找到 id={item_id!r} 的分镜",
+                f"No unit with id={item_id!r}",
                 operation_index=index,
                 location=("id",),
                 unit_id=item_id,
@@ -2493,9 +2508,9 @@ def _patch_episode_script_sync(
     try:
         current = services.projects.load_script(scope.project_name, request.value.script)
     except FileNotFoundError:
-        return ToolOutcome(problem=ToolProblem("script_not_found", f"剧本不存在: {request.value.script}"))
+        return ToolOutcome(problem=ToolProblem("script_not_found", f"Script does not exist: {request.value.script}"))
     except Exception as exc:
-        return ToolOutcome(problem=ToolProblem("internal_error", f"patch_episode_script 失败: {exc}"))
+        return ToolOutcome(problem=ToolProblem("internal_error", f"patch_episode_script failed: {exc}"))
 
     if request.value.base_revision != script_revision(current):
         return ToolOutcome(
@@ -2607,7 +2622,9 @@ class PlanEpisodesRequest(BaseModel):
         if value is None:
             return None
         if len(value) > MAX_INSTRUCTIONS_LEN:
-            raise ValueError(f"instructions 过长（{len(value)} 字符，上限 {MAX_INSTRUCTIONS_LEN}），请精简后重试")
+            raise ValueError(
+                f"instructions too long ({len(value)} characters, limit {MAX_INSTRUCTIONS_LEN}); shorten and retry"
+            )
         return value.strip() or None
 
 
@@ -2656,7 +2673,7 @@ class PatchProjectRequest(BaseModel):
     entries: dict[str, Any] | None = Field(
         default=None,
         description=(
-            "(Asset upsert branch) A nonempty { name: { description, voice_style, ... } } map; insert missing names or merge changed fields into existing names. Character entries may include derivatives: { derivative_name: { description } } for alternative appearances. Merge by derivative name: update same-name descriptions, add new names and preserve unmentioned derivatives. Describe changes relative to the base character"
+            '(Asset upsert branch) A nonempty { name: { description, voice_style, ... } } map; insert missing names or merge changed fields into existing names. Character entries may include derivatives: { derivative_name: { description } } for alternative appearances. Merge by derivative name: update same-name descriptions, add new names and preserve unmentioned derivatives. Describe changes relative to the base character. Scene entries may include occupancy: "empty" (default) or "occupied"; set it only when the user explicitly asks for people in the scene sheet, never from description wording'
         ),
     )
     settings: dict[str, Any] | None = Field(
@@ -2676,20 +2693,22 @@ class PatchProjectRequest(BaseModel):
         has_upsert = self.table is not None or self.entries is not None
         branches = (has_upsert, self.settings is not None, self.overview is not None)
         if sum(branches) > 1:
-            raise ValueError("table/entries、settings、overview 三选一,不能同时给出多个")
+            raise ValueError("Provide only one of table/entries, settings, or overview")
         if not any(branches):
-            raise ValueError("必须提供 table+entries(资产 upsert)、settings(顶层字段)或 overview(项目概述)之一")
+            raise ValueError(
+                "Provide one of table+entries (asset upsert), settings (top-level fields), or overview (project overview)"
+            )
         if has_upsert:
             if self.table is None or self.entries is None:
-                raise ValueError("资产 upsert 分支必须同时提供 table 和 entries")
+                raise ValueError("The asset upsert branch requires both table and entries")
             if self.table not in ASSET_TABLES:
-                raise ValueError(f"table 必须是 {list(ASSET_TABLES)} 之一")
+                raise ValueError(f"table must be one of {list(ASSET_TABLES)}")
             if not self.entries:
-                raise ValueError("entries 必须是非空 { 名称: 字段对象 } 映射")
+                raise ValueError("entries must be a non-empty { name: field object } map")
         if self.settings is not None and not self.settings:
-            raise ValueError("settings 必须是非空 { 字段名: 值 } 映射")
+            raise ValueError("settings must be a non-empty { field name: value } map")
         if self.overview is not None and not self.overview:
-            raise ValueError("overview 必须是非空 { 字段名: 值 } 映射")
+            raise ValueError("overview must be a non-empty { field name: value } map")
         return self
 
 
@@ -2713,14 +2732,14 @@ class PatchEpisodeMetaRequest(BaseModel):
     @classmethod
     def _validate_script(cls, value: str) -> str:
         if not value or "/" in value or "\\" in value or value in (".", ".."):
-            raise ValueError(f"script 必须是纯文件名，禁止路径分隔符: {value!r}")
+            raise ValueError(f"script must be a bare filename without path separators: {value!r}")
         return value
 
     @field_validator("value")
     @classmethod
     def _validate_value(cls, value: str) -> str:
         if not value.strip():
-            raise ValueError("title 必须是非空字符串")
+            raise ValueError("title must be a non-empty string")
         return value.strip()
 
 
@@ -2745,7 +2764,7 @@ class RenameAssetRequest(BaseModel):
     @classmethod
     def _validate_table(cls, value: str) -> str:
         if value not in ASSET_TABLES:
-            raise ValueError(f"table 必须是 {list(ASSET_TABLES)} 之一")
+            raise ValueError(f"table must be one of {list(ASSET_TABLES)}")
         return value
 
 
@@ -2779,7 +2798,7 @@ class MergeAssetRequest(BaseModel):
     @classmethod
     def _validate_table(cls, value: str) -> str:
         if value not in MERGEABLE_ASSET_TABLES:
-            raise ValueError(f"table 必须是 {list(MERGEABLE_ASSET_TABLES)} 之一")
+            raise ValueError(f"table must be one of {list(MERGEABLE_ASSET_TABLES)}")
         return value
 
 
@@ -2829,7 +2848,7 @@ class CompleteScriptPlanRebuildResult(BaseModel):
 
 
 def _unexpected(name: str, exc: BaseException) -> ToolProblem:
-    return ToolProblem("internal_error", f"{name} 失败: {exc}")
+    return ToolProblem("internal_error", f"{name} failed: {exc}")
 
 
 def _migration_tool_problem(failure: MigrationFailureRecord) -> ToolProblem:
@@ -2862,51 +2881,59 @@ def _ledger_stats_payload(stats: LedgerStats | None) -> dict[str, Any] | None:
 
 
 def _render_ledger_stats(stats: LedgerStats, project: Mapping[str, Any]) -> list[str]:
-    lines = [f"累计总集数：{stats.total_episodes}"]
+    lines = [f"Total episodes: {stats.total_episodes}"]
     if stats.smallest:
-        smallest = "、".join(
-            f"{describe_episode_for_agent(project, num)}（约 {units}）" for num, units in stats.smallest
+        smallest = ", ".join(
+            f"{describe_episode_for_agent(project, num)} (about {units})" for num, units in stats.smallest
         )
-        lines.append(f"体量最小的几集：{smallest}")
+        lines.append(f"Smallest episodes: {smallest}")
     if stats.median_units is not None:
-        lines.append(f"全账本体量中位数：约 {stats.median_units}")
+        lines.append(f"Median episode volume across the ledger: about {stats.median_units}")
     if (volume := stats.target_volume) is not None:
         # Distinguish converted values from explicit settings: when the main Agent checks volume discrepancies, derived values add speech-rate estimation
         # and must not be treated as user-specified hard requirements.
-        derived = f"（按单集目标时长 {volume.seconds} 秒折算）" if volume.source == "duration" else ""
-        lines.append(f"每集目标体量设置：约 {volume.units}{derived}")
-    lines.append("若用户给过总集数、按章节对齐等结构性偏好，请对照以上分布核实，有偏差须向用户明确说明。")
+        derived = (
+            f" (converted from the {volume.seconds}-second per-episode target duration)"
+            if volume.source == "duration"
+            else ""
+        )
+        lines.append(f"Per-episode target volume: about {volume.units}{derived}")
+    lines.append(
+        "If the user gave structural preferences such as a total episode count or chapter alignment, check them against "
+        "the distribution above and tell the user explicitly about any deviation."
+    )
     return lines
 
 
 def _format_plan(result: PlanResult, project: Mapping[str, Any], *, gap: bool = False) -> str:
     # When planning an unsplit gap, ``source_exhausted`` means only that this range is planned; later parts of the whole source may remain unplanned.
-    done = "这段未切分的原文已全部规划完毕" if gap else "源文已全部规划完毕"
+    done = "This unsplit source range is fully planned" if gap else "The source text is fully planned"
     if not result.episodes and result.source_exhausted:
-        lines = [f"{done}，没有可规划的新内容。"]
+        lines = [f"{done}; there is no new content to plan."]
         if result.ledger_stats is not None:
             lines += _render_ledger_stats(result.ledger_stats, project)
         return "\n".join(lines)
-    lines = [f"✅ 已规划 {len(result.episodes)} 集："]
+    lines = [f"✅ Planned {len(result.episodes)} episodes:"]
     for episode in result.episodes:
-        status_note = "（stale，需重做下游产物）" if episode.ledger_status == "stale" else ""
+        status_note = " (stale; downstream artifacts must be redone)" if episode.ledger_status == "stale" else ""
         lines.append(
             f"- {describe_episode_for_agent(project, episode.episode)}{status_note}"
-            f"｜体量约 {episode.reading_units}｜钩子：{episode.hook}"
+            f" | volume about {episode.reading_units} | hook: {episode.hook}"
         )
-        lines.append(f"  首句：{episode.first_sentence}")
-        lines.append(f"  尾句：{episode.last_sentence}")
+        lines.append(f"  First sentence: {episode.first_sentence}")
+        lines.append(f"  Last sentence: {episode.last_sentence}")
     if result.source_exhausted:
-        lines.append(f"{done}。")
+        lines.append(f"{done}.")
     elif result.cursor:
-        lines.append(f"下一批规划起点：{result.cursor.get('source_file')} 偏移 {result.cursor.get('offset')}")
+        lines.append(f"Next batch starts at: {result.cursor.get('source_file')} offset {result.cursor.get('offset')}")
     if result.ledger_stats is not None:
         lines += _render_ledger_stats(result.ledger_stats, project)
     else:
-        lines.append(f"累计已规划 {result.total_planned} 集。")
+        lines.append(f"Episodes planned so far: {result.total_planned}.")
     lines.append(
-        "请把以上摘要（含每集首句与尾句原文）展示给用户做批级审阅；需要调整时先调用 reset_episode_planning 退回到"
-        "最早受影响的集，再带 instructions 重新调用本工具。"
+        "Show the summary above (including each episode's first and last source sentences) to the user for batch review; "
+        "to adjust, first call reset_episode_planning back to the earliest affected episode, then call this tool again "
+        "with instructions."
     )
     return "\n".join(lines)
 
@@ -3113,7 +3140,7 @@ class ReplanWindowResult(ToolMessage):
 
 
 def _replan_refused(exc: ReplanError) -> ToolProblem:
-    return ToolProblem("episode_replan_refused", f"❌ 重新规划未能执行：{exc}", params={"reason": exc.code})
+    return ToolProblem("episode_replan_refused", f"❌ Replanning could not run: {exc}", params={"reason": exc.code})
 
 
 async def _active_planning_windows(
@@ -3288,10 +3315,10 @@ async def _draft_replan_window(
         return ToolOutcome(problem=ToolProblem("episode_planning_failed", str(exc) or type(exc).__name__))
     finally:
         _STOPPED_PLANNING_WINDOWS.discard(str(chain.task["task_id"]))
-    done = "，已覆盖到整本源文结尾" if result.source_exhausted else ""
+    done = ", reaching the end of the whole source" if result.source_exhausted else ""
     return ToolOutcome(
         value=ReplanWindowResult(
-            message=f"新的分集方案追加了 {len(result.episodes)} 集，共 {result.total} 集{done}。",
+            message=f"The new episode plan added {len(result.episodes)} episodes, {result.total} in total{done}.",
             planned=len(result.episodes),
             total=result.total,
             complete=result.source_exhausted,
@@ -3448,32 +3475,43 @@ async def reset_episode_planning(
             )
         )
     except (EpisodeResetError, FileNotFoundError) as exc:
-        return ToolOutcome(problem=ToolProblem("episode_reset_failed", f"❌ 分集规划重置失败：{exc}"))
+        return ToolOutcome(problem=ToolProblem("episode_reset_failed", f"❌ Episode planning reset failed: {exc}"))
     except Exception as exc:
         return ToolOutcome(problem=_unexpected("reset_episode_planning", exc))
 
     def _episodes(ids: list[int]) -> str:
-        return "、".join(describe_episode_for_agent(project_before, episode_id) for episode_id in ids)
+        return ", ".join(describe_episode_for_agent(project_before, episode_id) for episode_id in ids)
 
     partial = value.episode_id is not None and value.episode_id != first_cut_episode_id(project_before)
     start = describe_episode_for_agent(project_before, value.episode_id) if value.episode_id is not None else ""
-    retired_note = "转为无原文的集并标 stale（原文已重新规划），移到播出顺序末尾，剧本、媒体等产物与产物登记都保留"
+    retired_note = (
+        "become episodes without source text, marked stale (their source text was replanned) and moved to the end "
+        "of the broadcast order; scripts, media and other artifacts and their registrations are kept"
+    )
     if isinstance(result, ResetConfirmationRequired):
         scope_note = (
-            f"从 {start} 起的切出集退回未规划，播出顺序中它之前的集保留不动"
+            f"cut episodes from {start} onward return to unplanned; episodes before it in broadcast order stay unchanged"
             if partial
-            else "全部切出集退回未规划，接续规划从整本源文开头读起"
+            else "all cut episodes return to unplanned, and continued planning reads from the start of the whole source"
         )
-        lines = [f"⚠️ 本次重置波及已有产物的集，尚未执行任何改动。确认后{scope_note}："]
+        lines = [
+            f"⚠️ This reset affects episodes that already have artifacts; nothing was changed yet. After confirmation, {scope_note}:"
+        ]
         if result.retired_episodes:
-            lines.append(f"- {_episodes(result.retired_episodes)}：{retired_note}")
+            lines.append(f"- {_episodes(result.retired_episodes)}: {retired_note}")
         if result.removed_episodes:
-            lines.append(f"- {_episodes(result.removed_episodes)}：还没有产物，移出账本")
+            lines.append(f"- {_episodes(result.removed_episodes)}: no artifacts yet; removed from the ledger")
         if result.deleted_files:
-            lines.append(f"- 删除可按原文范围重造的集文件：{'、'.join(result.deleted_files)}")
+            lines.append(
+                f"- Delete episode files that can be rebuilt from their source ranges: {', '.join(result.deleted_files)}"
+            )
         if result.archived_files:
-            lines.append(f"- 没有原文范围记录的集文件改名留底：{'、'.join(result.archived_files)}")
-        lines.append("请把以上清单如实告知用户；用户确认后带 confirm_consumed=true 重新调用。")
+            lines.append(
+                f"- Rename and keep episode files without recorded source ranges: {', '.join(result.archived_files)}"
+            )
+        lines.append(
+            "Report this list to the user as is; after the user confirms, call again with confirm_consumed=true."
+        )
         return ToolOutcome(
             value=ResetEpisodePlanningResult(
                 message="\n".join(lines),
@@ -3489,24 +3527,29 @@ async def reset_episode_planning(
     count = len(result.removed_episodes) + len(result.retired_episodes)
     if partial:
         lines = [
-            f"✅ 已部分重置分集规划：从 {start} 起的 {count} 个切出集退回未规划，"
-            "接续规划从保留段最后一个切出集的结尾读起。"
+            f"✅ Partially reset episode planning: {count} cut episodes from {start} onward returned to unplanned; "
+            "continued planning reads from the end of the last kept cut episode."
         ]
     else:
-        lines = [f"✅ 已全量重置分集规划：{count} 个切出集退回未规划，下次规划从整本源文开头读起。"]
+        lines = [
+            f"✅ Fully reset episode planning: {count} cut episodes returned to unplanned; the next planning run reads from the start of the whole source."
+        ]
     if result.retired_episodes:
-        lines.append(f"{_episodes(result.retired_episodes)} {retired_note}。")
+        lines.append(f"{_episodes(result.retired_episodes)}: {retired_note}.")
     if result.removed_episodes:
-        lines.append(f"{_episodes(result.removed_episodes)} 还没有产物，已移出账本。")
+        lines.append(f"{_episodes(result.removed_episodes)}: no artifacts yet; removed from the ledger.")
     if result.deleted_files:
-        lines.append(f"已删除可重造的派生集文件 {len(result.deleted_files)} 个。")
+        lines.append(f"Deleted {len(result.deleted_files)} rebuildable derived episode files.")
     if result.archived_files:
-        archived = "、".join(f"{src} → {dst}" for src, dst in result.archived_files)
-        lines.append(f"无原文范围记录的集文件已改名留底（内容保留）：{archived}")
+        archived = ", ".join(f"{src} → {dst}" for src, dst in result.archived_files)
+        lines.append(
+            f"Episode files without recorded source ranges were renamed and kept (content preserved): {archived}"
+        )
     lines.append(
-        "请调用 plan_episodes 继续规划；新规划的集分配新的集 ID，不复用被清除的集 ID。"
+        "Call plan_episodes to continue planning; newly planned episodes get new episode IDs and cleared IDs are not reused."
         if partial
-        else "自带原文与无原文的集保留不动，请调用 plan_episodes 从头重新规划；新规划的集分配新的集 ID，不复用被清除的集 ID。"
+        else "Episodes with their own source text and episodes without source text stay unchanged. Call plan_episodes to "
+        "replan from the start; newly planned episodes get new episode IDs and cleared IDs are not reused."
     )
     return ToolOutcome(
         value=ResetEpisodePlanningResult(
@@ -3533,16 +3576,16 @@ def _coerce_setting_value(key: str, value: Any) -> Any:
         if value is None:
             return None
         if isinstance(value, str):
-            value = _coerce_numeric_string(value, int, f"{key} 必须是正整数或 null,收到 {value!r}")
+            value = _coerce_numeric_string(value, int, f"{key} must be a positive integer or null, got {value!r}")
         if isinstance(value, bool) or not isinstance(value, int) or value < 1:
-            raise ValueError(f"{key} 必须是正整数或 null,收到 {value!r}")
+            raise ValueError(f"{key} must be a positive integer or null, got {value!r}")
         return value
     if key == EPISODE_TARGET_DURATION_FIELD:
         if value is None:
             return None
         message = (
-            f"{EPISODE_TARGET_DURATION_FIELD} 必须是 {MIN_EPISODE_TARGET_DURATION}-"
-            f"{MAX_EPISODE_TARGET_DURATION} 秒的整数或 null,收到 {value!r}"
+            f"{EPISODE_TARGET_DURATION_FIELD} must be an integer from {MIN_EPISODE_TARGET_DURATION} to "
+            f"{MAX_EPISODE_TARGET_DURATION} seconds or null, got {value!r}"
         )
         if isinstance(value, str):
             value = _coerce_numeric_string(value, int, message)
@@ -3553,32 +3596,34 @@ def _coerce_setting_value(key: str, value: Any) -> Any:
         return None if value is None else normalize_content_language(value)
     if key == "brief":
         if value is not None and not isinstance(value, str):
-            raise ValueError(f"brief 必须是字符串或 null,收到 {value!r}")
+            raise ValueError(f"brief must be a string or null, got {value!r}")
         return value
     if key == "character_voice_binding":
         if value is not None and (not isinstance(value, str) or value not in VALID_CHARACTER_VOICE_BINDINGS):
             raise ValueError(
-                f"character_voice_binding 必须是 {sorted(VALID_CHARACTER_VOICE_BINDINGS)} 之一或 null,收到 {value!r}"
+                f"character_voice_binding must be one of {sorted(VALID_CHARACTER_VOICE_BINDINGS)} or null, got {value!r}"
             )
         return value
     if key == "narration_voice":
         if value is not None and (not isinstance(value, str) or not value.strip()):
-            raise ValueError(f"narration_voice 必须是非空字符串或 null,收到 {value!r}")
+            raise ValueError(f"narration_voice must be a non-empty string or null, got {value!r}")
         return value
     if key == "narration_speed":
         if value is None:
             return None
         if isinstance(value, str):
-            value = _coerce_numeric_string(value, float, f"narration_speed 必须是正的有限数值或 null,收到 {value!r}")
+            value = _coerce_numeric_string(
+                value, float, f"narration_speed must be a positive finite number or null, got {value!r}"
+            )
         is_number = isinstance(value, (int, float)) and not isinstance(value, bool)
         try:
             is_valid = is_number and math.isfinite(value) and value > 0
         except OverflowError:
             is_valid = False
         if not is_valid:
-            raise ValueError(f"narration_speed 必须是正的有限数值或 null,收到 {value!r}")
+            raise ValueError(f"narration_speed must be a positive finite number or null, got {value!r}")
         return value
-    raise ValueError(f"settings 字段 {key!r} 缺类型校验")
+    raise ValueError(f"settings field {key!r} has no type validation")
 
 
 def _format_settings(changes: dict[str, tuple[str, Any]]) -> str:
@@ -3587,13 +3632,13 @@ def _format_settings(changes: dict[str, tuple[str, Any]]) -> str:
     unchanged = [key for key, (operation, _) in changes.items() if operation == "noop"]
     parts = []
     if set_items:
-        parts.append("已更新 " + ", ".join(f"{key}={value}" for key, value in set_items))
+        parts.append("updated " + ", ".join(f"{key}={value}" for key, value in set_items))
     if cleared:
-        parts.append("已清除 " + ", ".join(cleared))
+        parts.append("cleared " + ", ".join(cleared))
     if unchanged:
-        parts.append("无变更 " + ", ".join(unchanged))
+        parts.append("unchanged " + ", ".join(unchanged))
     icon = "ℹ️" if not set_items and not cleared else "✅"
-    return f"{icon} settings: {'; '.join(parts) if parts else '无变更'}"
+    return f"{icon} settings: {'; '.join(parts) if parts else 'no changes'}"
 
 
 def _format_overview(changes: dict[str, str]) -> str:
@@ -3601,10 +3646,10 @@ def _format_overview(changes: dict[str, str]) -> str:
     unchanged = [key for key, operation in changes.items() if operation == "noop"]
     parts = []
     if updated:
-        parts.append("已更新 " + ", ".join(updated))
+        parts.append("updated " + ", ".join(updated))
     if unchanged:
-        parts.append("无变更 " + ", ".join(unchanged))
-    return f"{'ℹ️' if not updated else '✅'} overview: {'; '.join(parts) if parts else '无变更'}"
+        parts.append("unchanged " + ", ".join(unchanged))
+    return f"{'ℹ️' if not updated else '✅'} overview: {'; '.join(parts) if parts else 'no changes'}"
 
 
 def _format_upsert(table: str, result: dict[str, Any]) -> str:
@@ -3615,24 +3660,24 @@ def _format_upsert(table: str, result: dict[str, Any]) -> str:
     dropped_legacy = result.get("dropped_legacy") or {}
     parts = []
     if added:
-        parts.append(f"新增 {len(added)} 个: {', '.join(added)}")
+        parts.append(f"added {len(added)}: {', '.join(added)}")
     if merged:
-        parts.append(f"合并改字段 {len(merged)} 个: {', '.join(merged)}")
+        parts.append(f"merged field changes into {len(merged)}: {', '.join(merged)}")
     if noop:
-        parts.append(f"无可写字段已跳过 {len(noop)} 个: {', '.join(noop)}")
+        parts.append(f"skipped {len(noop)} with no writable fields: {', '.join(noop)}")
     lines = [
-        f"{'ℹ️' if not added and not merged else '✅'} {table}: {'; '.join(parts) if parts else '无变更（所有条目均无可写字段）'}"
+        f"{'ℹ️' if not added and not merged else '✅'} {table}: {'; '.join(parts) if parts else 'no changes (no entry has writable fields)'}"
     ]
     if dropped_fields:
         detail = "; ".join(f"{name}: {', '.join(fields)}" for name, fields in sorted(dropped_fields.items()))
         lines += [
-            f"⚠️  以下字段不在 Agent 可编辑范围,已忽略 → {detail}",
-            "   说明: reference_image 由用户上传/系统管理;",
-            "   character_sheet / scene_sheet / prop_sheet 由资产生成流水线回写,不可手动设置。",
+            f"⚠️  These fields are outside the Agent's editable scope and were ignored → {detail}",
+            "   Note: reference_image is uploaded by the user or managed by the system;",
+            "   character_sheet / scene_sheet / prop_sheet are written back by the asset generation pipeline and cannot be set manually.",
         ]
     if dropped_legacy:
         detail = "; ".join(f"{name}: {', '.join(fields)}" for name, fields in sorted(dropped_legacy.items()))
-        lines.append(f"ℹ️  以下历史字段已废弃,本次未持久化 → {detail}")
+        lines.append(f"ℹ️  These legacy fields are deprecated and were not persisted → {detail}")
     return "\n".join(lines)
 
 
@@ -3647,9 +3692,9 @@ def _patch_project_sync(
             overview_patch = value.overview
             for key, field_value in overview_patch.items():
                 if key not in PROJECT_OVERVIEW_FIELDS:
-                    raise ValueError(f"overview 字段 {key!r} 不在白名单 {list(PROJECT_OVERVIEW_FIELDS)} 内")
+                    raise ValueError(f"overview field {key!r} is not in the allowlist {list(PROJECT_OVERVIEW_FIELDS)}")
                 if not isinstance(field_value, str):
-                    raise ValueError(f"overview 字段 {key!r} 的值必须是字符串,收到 {field_value!r}")
+                    raise ValueError(f"overview field {key!r} must be a string, got {field_value!r}")
             changes: dict[str, str] = {}
 
             def mutate_overview(project_data: dict[str, Any]) -> None:
@@ -3669,16 +3714,16 @@ def _patch_project_sync(
             coerced = {}
             for key, field_value in value.settings.items():
                 if key not in PROJECT_SETTINGS:
-                    raise ValueError(f"settings 字段 {key!r} 不在白名单 {list(PROJECT_SETTINGS)} 内")
+                    raise ValueError(f"settings field {key!r} is not in the allowlist {list(PROJECT_SETTINGS)}")
                 coerced[key] = _coerce_setting_value(key, field_value)
             diagnostics: dict[str, tuple[str, Any]] = {}
 
             def mutate_settings(project_data: dict[str, Any]) -> None:
                 if "brief" in coerced and project_data.get("content_mode") != "ad":
-                    raise ValueError("brief 仅广告/短片项目（content_mode=ad）可用")
+                    raise ValueError("brief is available only for ad/short-film projects (content_mode=ad)")
                 if EPISODE_TARGET_DURATION_FIELD in coerced and project_data.get("content_mode") == "ad":
                     raise ValueError(
-                        f"{EPISODE_TARGET_DURATION_FIELD} 不适用广告/短片项目（整集体量按 target_duration 预算规划）"
+                        f"{EPISODE_TARGET_DURATION_FIELD} does not apply to ad/short-film projects (the whole volume is planned from the target_duration budget)"
                     )
                 for key, field_value in coerced.items():
                     current = project_data.get(key)
@@ -3694,7 +3739,7 @@ def _patch_project_sync(
                     validate_project_narration_config(project_data)
                 except NarrationConfigError as exc:
                     raise ValueError(
-                        f"项目的旁白交付方式是 TTS 配音，TTS 快照必须完整，本次修改被拒绝（{exc.code}）"
+                        f"The project delivers voiceover through TTS, so the TTS snapshot must be complete; this change was rejected ({exc.code})"
                     ) from exc
 
             services.projects.update_project(scope.project_name, mutate_settings)
@@ -3735,7 +3780,7 @@ def _patch_episode_meta_sync(
         return ToolOutcome(problem=_unexpected("patch_episode_meta", exc))
     return ToolOutcome(
         value=PatchEpisodeMetaResult(
-            message=f"✅ 已更新分集{value.field}为「{value.value}」",
+            message=f'✅ Updated episode {value.field} to "{value.value}"',
             script=value.script,
             field=value.field,
             value=value.value,
@@ -3754,39 +3799,44 @@ async def patch_episode_meta(
 
 def _merge_episode_line(project: Mapping[str, Any], impact: AssetMergeEpisodeImpact) -> str:
     counts = (
-        ("脚本规划", impact.script_plan),
-        ("正式脚本", impact.script),
-        ("草稿", impact.draft),
-        ("提示词正文", impact.prompt_text),
-        ("说话人", impact.speaker),
+        ("script plan", impact.script_plan),
+        ("formal script", impact.script),
+        ("draft", impact.draft),
+        ("prompt body", impact.prompt_text),
+        ("speaker", impact.speaker),
     )
-    references = "、".join(f"{label} {count} 处" for label, count in counts if count) or "无引用改写"
+    references = ", ".join(f"{label} {count}" for label, count in counts if count) or "no references rewritten"
     return (
-        f"- {describe_episode_for_agent(project, impact.episode)}：{references}；"
-        f"过期分镜图 {impact.storyboards} 张、视频 {impact.videos} 段"
+        f"- {describe_episode_for_agent(project, impact.episode)}: {references}; "
+        f"stale storyboard images {impact.storyboards}, videos {impact.videos}"
     )
 
 
 def _merge_asset_message(project: Mapping[str, Any], report: AssetMergeReport) -> str:
-    how = f"并为 {report.target!r} 的衍生" if report.as_derivative else f"并入 {report.target!r}"
+    how = f"as a derivative of {report.target!r}" if report.as_derivative else f"into {report.target!r}"
     head = (
-        f"预览：把 {report.table} 资产 {report.source!r} {how}，将改写 {report.references} 处引用。"
+        f"Preview: merging {report.table} asset {report.source!r} {how} will rewrite {report.references} references."
         if report.dry_run
-        else f"已把 {report.table} 资产 {report.source!r} {how}，改写 {report.references} 处引用。"
+        else f"Merged {report.table} asset {report.source!r} {how}; rewrote {report.references} references."
     )
     lines = [head, *(_merge_episode_line(project, impact) for impact in report.episodes)]
     if report.aliases_added:
-        lines.append("追加为保留方别名：" + "、".join(report.aliases_added))
+        lines.append("Added as aliases of the kept asset: " + ", ".join(report.aliases_added))
     if report.derivative_created is not None:
-        lines.append(f"新建衍生 {report.derivative_created!r}，资产图待生成")
+        lines.append(f"Created derivative {report.derivative_created!r}; its asset sheet is pending generation")
     if report.derivatives_moved:
-        lines.append("迁到保留方名下的衍生：" + "、".join(report.derivatives_moved))
+        lines.append("Derivatives moved under the kept asset: " + ", ".join(report.derivatives_moved))
     if report.derivatives_folded:
-        lines.append("与保留方已有衍生同名、并入已有衍生：" + "、".join(report.derivatives_folded))
+        lines.append(
+            "Derivatives with the same name as an existing kept derivative, merged into it: "
+            + ", ".join(report.derivatives_folded)
+        )
     lines.append(
-        "被并方的描述、资产图及版本历史、声音设置、原图与参考音频不并入保留方，将移入项目回收站。"
+        "The merged asset's description, asset sheets and version history, voice settings, original images and reference "
+        "audio are not merged into the kept asset; they will move to the project trash."
         if report.dry_run
-        else "被并方的描述、资产图及版本历史、声音设置、原图与参考音频已移入项目回收站。"
+        else "The merged asset's description, asset sheets and version history, voice settings, original images and reference "
+        "audio were moved to the project trash."
     )
     return "\n".join(lines)
 
@@ -3813,7 +3863,7 @@ async def merge_asset(
     try:
         report, project = await _run_sync_transaction(_merge)
     except AssetMergeNotFoundError as exc:
-        return ToolOutcome(problem=ToolProblem("invalid_request", f"{value.table} 中不存在名为 {exc.name!r} 的资产"))
+        return ToolOutcome(problem=ToolProblem("invalid_request", f"{value.table} has no asset named {exc.name!r}"))
     except AssetMergeRejectedError as exc:
         return ToolOutcome(problem=ToolProblem("invalid_request", str(exc)))
     except Exception as exc:
@@ -3866,8 +3916,8 @@ async def rename_asset(
     except Exception as exc:
         return ToolOutcome(problem=_unexpected("rename_asset", exc))
     message = (
-        f"已把 {value.table} 资产 {report.old_name!r} 重命名为 {report.new_name!r}:"
-        f"更新 {report.episodes} 集共 {report.references} 处引用,迁移 {report.files} 个关联文件。"
+        f"Renamed {value.table} asset {report.old_name!r} to {report.new_name!r}: "
+        f"updated {report.references} references in {report.episodes} episodes and moved {report.files} related files."
     )
     return ToolOutcome(
         value=RenameAssetResult(
@@ -3914,7 +3964,8 @@ async def retry_project_migration(
         )
     return ToolOutcome(
         value=RetryProjectMigrationResult(
-            message="✅ 数据升级已完成，项目解除阻断。当前制作计划：\n" + plan.model_dump_json(),
+            message="✅ Data upgrade completed; the project is unblocked. Current production plan:\n"
+            + plan.model_dump_json(),
             workflow_plan=plan,
         )
     )

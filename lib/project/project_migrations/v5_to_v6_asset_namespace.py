@@ -74,12 +74,12 @@ def _assert_migration_write_target(project_dir: Path, target: Path) -> None:
     try:
         relative = target.relative_to(project_dir)
     except ValueError as exc:
-        raise ValueError(f"迁移写入路径越出项目目录: {target}") from exc
+        raise ValueError(f"Migration write path escapes the project directory: {target}") from exc
     current = project_dir
     for part in relative.parts:
         current /= part
         if current.is_symlink():
-            raise ValueError(f"迁移写入路径不得为符号链接: {current.relative_to(project_dir)}")
+            raise ValueError(f"Migration write path must not be a symbolic link: {current.relative_to(project_dir)}")
 
 
 def _assert_migration_write_roots(project_dir: Path) -> None:
@@ -117,7 +117,7 @@ def _plan_occurrences(
     for spec in _ordered_specs():
         bucket = project.get(spec.bucket_key, {})
         if not isinstance(bucket, dict):
-            raise ValueError(f"project[{spec.bucket_key!r}] 必须是对象，无法迁移资产名称空间")
+            raise ValueError(f"project[{spec.bucket_key!r}] must be an object; the asset namespace cannot be migrated")
         for raw_name, entry in bucket.items():
             clean = validate_asset_name(raw_name)
             occurrences.append(
@@ -377,7 +377,7 @@ def _declared_media_owners(
                 continue
             previous_exact = exact_owners.get(relative)
             if previous_exact is not None and previous_exact is not item:
-                raise ValueError(f"资产迁移媒体路径被多个条目引用: {relative}")
+                raise ValueError(f"Asset migration media path is referenced by multiple entries: {relative}")
             exact_owners[relative] = item
 
             key = _media_path_key(relative)
@@ -426,7 +426,7 @@ def _retained_history_keys(project_dir: Path, project: dict[str, Any]) -> dict[s
         return {}
     payload = load_json(versions_file)
     if not isinstance(payload, dict):
-        raise ValueError("versions/versions.json 必须是对象")
+        raise ValueError("versions/versions.json must be an object")
     retained: dict[str, set[str]] = {}
     for spec in _ordered_specs():
         current_bucket = project.get(spec.bucket_key)
@@ -446,19 +446,19 @@ def _retained_history_keys(project_dir: Path, project: dict[str, Any]) -> dict[s
 def _confined_version_path(project_dir: Path, spec: AssetSpec, relative: PurePosixPath) -> Path:
     """Resolve a version entry only inside its declared project version bucket."""
     if relative.is_absolute():
-        raise ValueError(f"版本快照路径不得为绝对路径: {relative}")
+        raise ValueError(f"Version snapshot path must not be absolute: {relative}")
     expected_root = project_dir / "versions" / spec.bucket_key
     candidate = project_dir.joinpath(*relative.parts)
     try:
         candidate.relative_to(expected_root)
     except ValueError as exc:
-        raise ValueError(f"版本快照路径必须位于 versions/{spec.bucket_key}: {relative}") from exc
+        raise ValueError(f"Version snapshot path must be under versions/{spec.bucket_key}: {relative}") from exc
 
     project_root = project_dir.resolve()
     resolved_root = expected_root.resolve(strict=False)
     resolved_candidate = candidate.resolve(strict=False)
     if not resolved_root.is_relative_to(project_root) or not resolved_candidate.is_relative_to(resolved_root):
-        raise ValueError(f"版本快照路径越出项目目录: {relative}")
+        raise ValueError(f"Version snapshot path escapes the project directory: {relative}")
     _assert_migration_write_target(project_dir, candidate)
     return candidate
 
@@ -470,7 +470,7 @@ def _rewrite_versions(project_dir: Path, occurrences: list[_AssetOccurrence]) ->
     _assert_migration_write_target(project_dir, versions_file)
     payload = load_json(versions_file)
     if not isinstance(payload, dict):
-        raise ValueError("versions/versions.json 必须是对象")
+        raise ValueError("versions/versions.json must be an object")
     moves: list[tuple[Path, Path]] = []
     typed = _typed_owner_map(occurrences)
     for spec in _ordered_specs():
@@ -526,9 +526,9 @@ def _execute_moves(moves: list[tuple[Path, Path]]) -> None:
             except OSError:
                 logger.debug("无法确认迁移目标与源文件是否相同，继续按独立路径检查冲突", exc_info=True)
         if destination in destinations:
-            raise ValueError(f"资产迁移目标重复: {destination}")
+            raise ValueError(f"Duplicate asset migration destination: {destination}")
         if destination.exists() and destination not in sources:
-            raise ValueError(f"资产迁移目标已被占用: {destination}")
+            raise ValueError(f"Asset migration destination is already occupied: {destination}")
         destinations.add(destination)
         temporary = source.with_name(f".{source.name}.v6-{uuid.uuid4().hex}.tmp")
         os.replace(source, temporary)

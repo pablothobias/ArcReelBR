@@ -43,13 +43,15 @@ class ProviderMeta:
         for lane, limit in self.default_concurrency.items():
             if lane not in _VALID_LANES:
                 raise ValueError(
-                    f"{self.display_name} default_concurrency 含未知 lane {lane!r}，合法值：{sorted(_VALID_LANES)}"
+                    f"{self.display_name} default_concurrency has unknown lane {lane!r}; valid values: {sorted(_VALID_LANES)}"
                 )
             # Handwritten Python registry data lacks runtime annotation enforcement; exact types catch mistakes.
             # bool subclasses int, so isinstance(True,int) would admit concurrency 1; strings
             # "1"/float 3.0 likewise violate declarations. type() is int rejects all at import.
             if type(limit) is not int or limit < 1:
-                raise ValueError(f"{self.display_name} default_concurrency[{lane!r}] 必须是 >=1 的整数，得到 {limit!r}")
+                raise ValueError(
+                    f"{self.display_name} default_concurrency[{lane!r}] must be an integer >= 1, got {limit!r}"
+                )
         if self.credential_groups:
             allowed = set(self.required_keys) & set(self.secret_keys)
             covered: set[str] = set()
@@ -57,17 +59,17 @@ class ProviderMeta:
                 # Empty groups pass unknown=set() and frontend group.every(...) trivially,
                 # falsely satisfied; reject author mistakes at import.
                 if not group:
-                    raise ValueError(f"{self.display_name} credential_groups 含空分组")
+                    raise ValueError(f"{self.display_name} credential_groups contains an empty group")
                 unknown = set(group) - allowed
                 if unknown:
                     raise ValueError(
-                        f"{self.display_name} credential_groups 含未登记为 required∩secret 的 key {sorted(unknown)}"
+                        f"{self.display_name} credential_groups has keys not registered as required∩secret: {sorted(unknown)}"
                     )
                 covered |= set(group)
             # Keys uncovered by groups escape both old all-required and group rules,
             # making omitted declarations falsely optional in frontend.
             if covered != allowed:
-                raise ValueError(f"{self.display_name} credential_groups 未覆盖 {sorted(allowed - covered)}")
+                raise ValueError(f"{self.display_name} credential_groups does not cover {sorted(allowed - covered)}")
 
     def fully_covered_credential_groups(self, values: Mapping[str, str | None]) -> list[list[str]]:
         """Credential groups fully covered by nonempty ``values``.

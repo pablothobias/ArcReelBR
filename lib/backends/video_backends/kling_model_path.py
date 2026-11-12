@@ -102,7 +102,9 @@ def decode_job_id(job_id: str) -> str:
     """Restore new-API task ids from persisted job_id; reject ids not written by this channel instead of querying them."""
     task_id = job_id.removeprefix(_JOB_ID_PREFIX)
     if task_id == job_id or not task_id:
-        raise ValueError(f"可灵新版 API 认不出这个任务 ID，它不是由本调用端点提交的: {job_id}")
+        raise ValueError(
+            f"The new Kling API does not recognize this task ID; it was not submitted by this endpoint: {job_id}"
+        )
     return task_id
 
 
@@ -126,7 +128,9 @@ class KlingModelPathVideoBackend(EntryBoundCapabilities, KlingBackendBase, Provi
     ) -> None:
         if auth_mode != "bearer":
             # Official authentication: Access Key / Secret Key apply only to old-standard APIs; new APIs accept API Key only.
-            raise ValueError("可灵新版 API 只支持 API Key 鉴权，请到系统配置页填写可灵 Kling 的 API Key")
+            raise ValueError(
+                "The new Kling API supports API Key authentication only; enter the Kling API Key in Settings"
+            )
         super().__init__(
             auth_mode=auth_mode,
             access_key=access_key,

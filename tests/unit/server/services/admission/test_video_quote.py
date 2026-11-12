@@ -128,4 +128,4 @@ def test_confirmation_text_tells_the_agent_which_units_in_a_tier_are_unpriced() 
 
     text = "\n".join(_confirmation_lines(admission))
 
-    assert "8s tier × 2：E1U1、E1U2; total 0.8 USD (priced units only); 1 units are unpriced, with unknown cost" in text
+    assert "8s tier × 2: E1U1, E1U2; total 0.8 USD (priced units only); 1 units are unpriced, with unknown cost" in text

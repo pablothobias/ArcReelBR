@@ -57,7 +57,7 @@ async def save_image_from_response_item(item, output_path: Path) -> None:
     if url:
         await download_image_to_path(url, output_path)
         return
-    raise ValueError("图片生成响应既无 b64_json 也无 url")
+    raise ValueError("Image generation response has neither b64_json nor url")
 
 
 class ImageCapability(StrEnum):

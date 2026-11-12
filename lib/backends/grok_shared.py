@@ -84,7 +84,7 @@ def grpc_rejection(exc: BaseException) -> tuple[int, str | None] | None:
 
 def resolve_grok_api_key(api_key: str | None = None) -> str:
     if api_key is None or not api_key.strip():
-        raise ValueError("请到系统配置页填写 xAI API Key")
+        raise ValueError("Enter the xAI API Key in Settings")
     return api_key.strip()
 
 

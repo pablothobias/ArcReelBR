@@ -76,7 +76,7 @@ _QUARANTINE_FILENAMES: dict[str, str] = {
 
 #: All draft filenames for consumers locating drafts without kinds, such as cascading asset-rename rewrite lists.
 #: Derive from the table rather than maintaining another list: new origins need one row. Omitted registration
-#: silently excludes drafts from rewrite lists; their reference arrays and ``@[名称]`` bodies then miss rewrites,
+#: silently excludes drafts from rewrite lists; their reference arrays and ``@[name]`` bodies then miss rewrites,
 #: blocking promotion with unregistered-reference errors.
 QUARANTINE_FILENAMES: frozenset[str] = frozenset(_QUARANTINE_FILENAMES.values())
 

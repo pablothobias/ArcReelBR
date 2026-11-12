@@ -113,15 +113,15 @@ class TestConstructionAndCapabilities:
         assert b.model == "kling-v2-5-turbo"
 
     def test_jwt_missing_credentials_raises(self):
-        with pytest.raises(ValueError, match=r"请到系统配置页填写可灵 Kling 的 Access Key 与 Secret Key"):
+        with pytest.raises(ValueError, match=r"Enter the Kling Access Key and Secret Key in Settings"):
             KlingVideoBackend(auth_mode="jwt", access_key="ak", secret_key=None)
 
     def test_bearer_missing_api_key_raises(self):
-        with pytest.raises(ValueError, match=r"请填写可灵 Kling 的 API Key"):
+        with pytest.raises(ValueError, match=r"Enter the Kling API Key"):
             KlingVideoBackend(auth_mode="bearer", api_key=None)
 
     def test_unknown_auth_mode_raises(self):
-        with pytest.raises(ValueError, match=r"未知 Kling auth_mode"):
+        with pytest.raises(ValueError, match=r"Unknown Kling auth_mode"):
             KlingVideoBackend(auth_mode="oauth", api_key="k")
 
     def test_video_capabilities_first_and_last_frame(self):

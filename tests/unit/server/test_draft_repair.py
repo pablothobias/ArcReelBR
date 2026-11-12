@@ -37,10 +37,14 @@ def test_whole_draft_mode_keeps_only_the_draft_fields() -> None:
 @pytest.mark.parametrize(
     ("scope", "reply", "match"),
     [
-        (RepairScope("segments", (1,)), {"segments": []}, "条目数"),
-        (RepairScope("segments", (1,)), {"segments": ["not an object"]}, "条目不是 JSON 对象"),
-        (RepairScope("segments", None), {"segments": []}, "缺少非空的 segments 数组"),
-        (RepairScope("segments", None), ["not an object"], "模型回复不是 JSON 对象"),
+        (RepairScope("segments", (1,)), {"segments": []}, "number of segments entries"),
+        (
+            RepairScope("segments", (1,)),
+            {"segments": ["not an object"]},
+            "entry in the model reply is not a JSON object",
+        ),
+        (RepairScope("segments", None), {"segments": []}, "lacks a non-empty segments array"),
+        (RepairScope("segments", None), ["not an object"], "The model reply is not a JSON object"),
     ],
     ids=["item_count_mismatch", "item_not_object", "empty_whole_draft", "reply_not_object"],
 )

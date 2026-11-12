@@ -429,7 +429,7 @@ class TestProjectArchiveReferenceVideo:
         assert not any(item["code"] == "placeholder_character_added" for item in result.diagnostics["auto_fixed"])
 
     def test_import_warns_without_blocking_on_unresolved_mention(self, tmp_path):
-        # Body @[名称] mentions derive references at execution; unregistered mentions only omit these references,
+        # Body @[name] mentions derive references at execution; unregistered mentions only omit these references,
         # allowing imports with nonblocking warnings.
         pm = ProjectManager(tmp_path / "projects")
         unit = _build_unit(

@@ -154,7 +154,7 @@ class TestPollWithRetry:
         poll_fn = AsyncMock(return_value="pending")
         clock = _FakeClock([0.0, 0.0, 100.0])
 
-        with pytest.raises(TimeoutError, match="超时"):
+        with pytest.raises(TimeoutError, match="timed out"):
             await poll_with_retry(
                 poll_fn=poll_fn,
                 is_done=lambda r: False,
@@ -335,7 +335,7 @@ class TestPollWithRetry:
         poll_fn = AsyncMock(side_effect=[ConnectionError("a"), ConnectionError("b"), ConnectionError("c")])
         clock = _FakeClock([0.0, 0.0, 55.0, 60.0])
 
-        with pytest.raises(TimeoutError, match="超时"):
+        with pytest.raises(TimeoutError, match="timed out"):
             await poll_with_retry(
                 poll_fn=poll_fn,
                 is_done=lambda r: r == "done",
@@ -651,7 +651,7 @@ class TestSubmitPost:
             await submit_post(_post, provider="newapi")
         msg = str(excinfo.value)
         assert "[create_ambiguous]" in msg
-        assert "手动重试" in msg
+        assert "retry manually" in msg
         assert isinstance(excinfo.value.__cause__, httpx.ReadTimeout)
 
     async def test_http_status_error_propagates_for_status_gate(self):

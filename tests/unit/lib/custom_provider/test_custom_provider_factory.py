@@ -452,7 +452,7 @@ class TestErrors:
     def test_v2_empty_base_url_raises(self):
         """v2-video-generations requires base_url (no default host); empty values fail loudly."""
         provider = _make_provider(base_url="")
-        with pytest.raises(ValueError, match="需要 base_url"):
+        with pytest.raises(ValueError, match="require base_url"):
             create_custom_backend(provider=provider, model_id="some-model", endpoint="v2-video-generations")
 
 

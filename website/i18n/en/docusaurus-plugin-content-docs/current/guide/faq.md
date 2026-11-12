@@ -279,7 +279,9 @@ Reference-to-video mode has no separate end-frame setting.
 
 ### Why do people appear in a scene asset image? {#people-in-scene-images}
 
-The prompt for a scene asset image asks the image model not to include people, but the model may not follow the constraint perfectly. Regenerate the scene image or use instruction-based image editing to remove the people.
+By default, the prompt for a scene asset image asks the image model not to include people, even when the description mentions them. The model may not follow the constraint perfectly. Regenerate the scene image or use instruction-based image editing to remove the people.
+
+If the scene itself needs people, such as a classroom full of onlookers, turn on "People in asset sheet" in the scene details and regenerate. The asset image then shows the described people without prominent faces and not as story characters. Changing this setting makes the current scene image outdated. People in the asset image may carry into storyboard images and videos through the reference, so leave the setting off when the environment itself does not need people.
 
 A scene asset image is different from a story storyboard image: the scene asset image should focus on the environment, while the storyboard image includes people according to the story.
 

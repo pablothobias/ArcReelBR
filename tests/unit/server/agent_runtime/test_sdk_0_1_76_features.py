@@ -127,7 +127,7 @@ class TestCanUseToolDecisionReason:
         result = await callback("Bash", {"command": "rm -rf /"}, ctx)
         assert hasattr(result, "message"), f"expected PermissionResultDeny, got {type(result)}"
         assert "No matching allow rule" in result.message
-        assert "上游决策原因" in result.message
+        assert "Upstream decision reason" in result.message
 
     @pytest.mark.asyncio
     async def test_default_deny_without_decision_reason_does_not_raise(self, tmp_path):
@@ -142,5 +142,5 @@ class TestCanUseToolDecisionReason:
         ctx = SimpleNamespace()  # no decision_reason
         result = await callback("Bash", {"command": "echo hi"}, ctx)
         assert hasattr(result, "message")
-        assert "未授权的工具调用" in result.message
-        assert "上游决策原因" not in result.message
+        assert "Unauthorized tool call" in result.message
+        assert "Upstream decision reason" not in result.message

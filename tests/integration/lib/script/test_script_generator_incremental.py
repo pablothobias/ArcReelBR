@@ -517,7 +517,7 @@ class TestPromptAuthoring:
         project_dir, _plan_path = await _converted_and_authored(tmp_path, variant)
         before = (project_dir / "scripts" / "episode_1.json").read_bytes()
 
-        with pytest.raises(PromptAuthoringTargetError, match="不在集（id=1）正式脚本内"):
+        with pytest.raises(PromptAuthoringTargetError, match=r"not in the formal script of episode \(id=1\)"):
             await variant.generator(project_dir, []).generate(1, entry_ids=["E9U99"])
 
         assert (project_dir / "scripts" / "episode_1.json").read_bytes() == before
@@ -555,7 +555,7 @@ class TestPromptAuthoring:
     async def test_missing_formal_script_is_refused(self, tmp_path: Path, variant: _Variant) -> None:
         project_dir, _plan_path = variant.build(tmp_path)
 
-        with pytest.raises(PromptAuthoringTargetError, match="尚无正式脚本"):
+        with pytest.raises(PromptAuthoringTargetError, match="has no formal script yet"):
             await variant.generator(project_dir, []).generate(1)
 
         assert not (project_dir / "scripts" / "episode_1.json").exists()
@@ -753,7 +753,7 @@ class TestDryRunPrompt:
 
         prompt = await variant.generator(project_dir, []).build_prompt(1)
 
-        assert "没有要编写的条目" in prompt
+        assert "No entries to author" in prompt
 
     async def test_entry_ids_cover_those_entries(self, tmp_path: Path, variant: _Variant) -> None:
         first, second = variant.entry_ids

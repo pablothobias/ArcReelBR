@@ -110,7 +110,7 @@ async def probe_audio_duration_seconds(content: bytes, suffix: str) -> float | N
             logger.info("随包 ffmpeg 不可用，跳过音频时长探测", exc_info=True)
             return None
         except MediaProbeError:
-            raise ValueError("音频文件无法解析") from None
+            raise ValueError("Audio file cannot be parsed") from None
     finally:
         for path in created:
             await run_noninterruptible_sync(
@@ -118,12 +118,12 @@ async def probe_audio_duration_seconds(content: bytes, suffix: str) -> float | N
             )  # hard-delete: temp -- temporary file used for duration probing
 
     if probe.first_stream("audio") is None:
-        raise ValueError("音频文件无法解析")
+        raise ValueError("Audio file cannot be parsed")
     expected_tokens = _CONTAINER_FORMAT_TOKENS.get(suffix.lower())
     if expected_tokens is not None and not probe.container_formats & expected_tokens:
-        raise ValueError("音频文件无法解析")
+        raise ValueError("Audio file cannot be parsed")
     if probe.duration_seconds is None:
-        raise ValueError("音频文件无法解析")
+        raise ValueError("Audio file cannot be parsed")
     return probe.duration_seconds
 
 

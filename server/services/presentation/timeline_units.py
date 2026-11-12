@@ -38,7 +38,9 @@ def load_episode_items(
         None,
     )
     if not isinstance(script_file, str) or not script_file:
-        raise EditTimelineError("episode_not_found", f"集（id={episode}）不存在或尚无脚本", episode=episode)
+        raise EditTimelineError(
+            "episode_not_found", f"episode (id={episode}) does not exist or has no script yet", episode=episode
+        )
     script = projects.load_script_readonly(project_name, script_file)
     raw_items, id_field, kind = resolve_items(script)
     items = {

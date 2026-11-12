@@ -83,17 +83,17 @@ class TestProbeAudioDuration:
         assert duration == pytest.approx(3.0, abs=1e-6)
 
     async def test_invalid_bytes_raise_value_error(self):
-        with pytest.raises(ValueError, match=r"音频文件无法解析"):
+        with pytest.raises(ValueError, match=r"Audio file cannot be parsed"):
             await audio_utils_module.probe_audio_duration_seconds(b"not audio at all", ".wav")
 
     async def test_video_only_file_renamed_to_wav_is_rejected(self):
         """Audio-free video renamed to .wav passes container/duration checks but must reject because no audio stream is available."""
-        with pytest.raises(ValueError, match=r"音频文件无法解析"):
+        with pytest.raises(ValueError, match=r"Audio file cannot be parsed"):
             await audio_utils_module.probe_audio_duration_seconds(_video_only_mp4_bytes(), ".wav")
 
     async def test_m4a_renamed_to_wav_is_rejected(self):
         """m4a has audio and probeable duration but is not a wav container; renamed uploads must reject instead of being accepted as wav."""
-        with pytest.raises(ValueError, match=r"音频文件无法解析"):
+        with pytest.raises(ValueError, match=r"Audio file cannot be parsed"):
             await audio_utils_module.probe_audio_duration_seconds(_m4a_bytes(), ".wav")
 
     async def test_cancel_during_temp_write_still_removes_temp_file(self, tmp_path, monkeypatch):

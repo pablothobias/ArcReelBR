@@ -113,7 +113,7 @@ class _ResetPlan:
     archives: list[Path]
 
 
-_FULL_RESET_HINT = "请改用不带 episode_id 的全量重置"
+_FULL_RESET_HINT = "use a full reset without episode_id instead"
 
 
 def _has_recreatable_source_range(entry: Mapping[str, Any]) -> bool:
@@ -211,7 +211,9 @@ def _assert_source_directory_safe(project_dir: Path) -> None:
 
     source_dir = project_dir / "source"
     if source_dir.is_symlink() or source_dir.is_junction():
-        raise EpisodeResetError("source/ 不能是符号链接或目录联接，拒绝处置派生集文件")
+        raise EpisodeResetError(
+            "source/ cannot be a symbolic link or directory junction; refusing to handle derived episode files"
+        )
 
 
 def _apply_files(
@@ -239,14 +241,18 @@ def _apply_files(
                 missing_ok=True
             )  # hard-delete: derived -- derived episode sources removed by resets, regenerable from episode ledgers
         except OSError as exc:
-            raise EpisodeResetError(f"派生集文件删除失败，重置已中止：{path.name}: {exc}") from exc
+            raise EpisodeResetError(
+                f"Failed to delete a derived episode file; reset aborted: {path.name}: {exc}"
+            ) from exc
         deleted.append(_rel(project_dir, path))
     for path in plan.archives:
         target = archive_targets[path] if archive_targets is not None else archive_episode_file_path(path)
         try:
             path.rename(target)
         except OSError as exc:
-            raise EpisodeResetError(f"集文件留底改名失败，重置已中止：{path.name}: {exc}") from exc
+            raise EpisodeResetError(
+                f"Failed to rename an episode file to its kept copy; reset aborted: {path.name}: {exc}"
+            ) from exc
         archived.append((_rel(project_dir, path), _rel(project_dir, target)))
     # Remainder files are not sources and record no planning progress (starts derive from ledgers); retaining them leaves
     # stale remainder text unrelated to ledgers under source/. Clean them along with reset.
@@ -255,7 +261,9 @@ def _apply_files(
         try:
             remaining.unlink()  # hard-delete: derived -- derived unsplit-source files, regenerable from episode ledgers
         except OSError as exc:
-            raise EpisodeResetError(f"余文文件清理失败，重置已中止：{remaining.name}: {exc}") from exc
+            raise EpisodeResetError(
+                f"Failed to clean up the remaining-text file; reset aborted: {remaining.name}: {exc}"
+            ) from exc
     return deleted, archived
 
 
@@ -294,36 +302,44 @@ def _resolve_partial_reset(project_dir: Path, project: Mapping[str, Any], *, epi
     """
     raw_episodes = project.get("episodes")
     if not isinstance(raw_episodes, list):
-        raise EpisodeResetError(f"账本 episodes 字段形状异常，无法安全推算部分重置边界，{_FULL_RESET_HINT}")
+        raise EpisodeResetError(
+            f"The ledger episodes field has an invalid shape, so the partial reset boundary cannot be derived safely; {_FULL_RESET_HINT}"
+        )
 
     ordered: list[tuple[int, Mapping[str, Any]]] = []
     seen: set[int] = set()
     for entry in raw_episodes:
         if not isinstance(entry, Mapping):
-            raise EpisodeResetError(f"账本存在非法条目（非对象），无法安全推算部分重置边界，{_FULL_RESET_HINT}")
+            raise EpisodeResetError(
+                f"The ledger has an invalid entry (not an object), so the partial reset boundary cannot be derived safely; {_FULL_RESET_HINT}"
+            )
         num = parse_episode_num(entry.get("episode"))
         if num is None:
-            raise EpisodeResetError(f"账本存在无法解析集 ID 的条目，无法安全推算部分重置边界，{_FULL_RESET_HINT}")
+            raise EpisodeResetError(
+                f"The ledger has an entry whose episode ID cannot be parsed, so the partial reset boundary cannot be derived safely; {_FULL_RESET_HINT}"
+            )
         if num < 1:
             raise EpisodeResetError(
-                f"账本存在非法集 ID {num}（须为正整数），无法安全推算部分重置边界，{_FULL_RESET_HINT}"
+                f"The ledger has invalid episode ID {num} (must be a positive integer), so the partial reset boundary cannot be derived safely; {_FULL_RESET_HINT}"
             )
         if num in seen:
-            raise EpisodeResetError(f"账本存在重复集 ID {num}，无法安全推算部分重置边界，{_FULL_RESET_HINT}")
+            raise EpisodeResetError(
+                f"The ledger has duplicate episode ID {num}, so the partial reset boundary cannot be derived safely; {_FULL_RESET_HINT}"
+            )
         seen.add(num)
         ordered.append((num, entry))
 
     boundary = next((index for index, (num, _entry) in enumerate(ordered) if num == episode_id), None)
     if boundary is None:
-        raise EpisodeResetError(f"集 ID {episode_id} 不在账本中，无法从此处部分重置")
+        raise EpisodeResetError(f"Episode ID {episode_id} is not in the ledger; a partial reset cannot start there")
     retained = ordered[:boundary]
 
     current_sources = discover_sources(project_dir, project)
     mismatched = mismatched_source_fingerprints(project.get(SOURCE_FINGERPRINTS_KEY), current_sources)
     if mismatched:
         raise EpisodeResetError(
-            f"源文件已被修改或移除：{'、'.join(mismatched)}；账本坐标绑定的是修改前的原文内容，"
-            f"无法安全部分重置，{_FULL_RESET_HINT}"
+            f"Source files were modified or removed: {', '.join(mismatched)}; ledger coordinates are bound to the "
+            f"source text before the change, so a partial reset is not safe; {_FULL_RESET_HINT}"
         )
 
     text_by_rel = {doc.rel_path: doc.text for doc in current_sources}
@@ -335,8 +351,8 @@ def _resolve_partial_reset(project_dir: Path, project: Mapping[str, Any], *, epi
         span = parse_source_range(entry)
         if span is None:
             raise EpisodeResetError(
-                f"保留段里的集 ID {num} 是没有带可信原文范围记录（source_range）的切出集，部分重置后仍无法接续"
-                f"分集规划，{_FULL_RESET_HINT}"
+                f"Episode ID {num} in the retained range is a cut episode without a trusted source range record "
+                f"(source_range), so episode planning still cannot continue after a partial reset; {_FULL_RESET_HINT}"
             )
         first, last = source_order.get(span.source_file), source_order.get(span.end_file)
         start_text, end_text = text_by_rel.get(span.source_file), text_by_rel.get(span.end_file)
@@ -352,13 +368,13 @@ def _resolve_partial_reset(project_dir: Path, project: Mapping[str, Any], *, epi
         ):
             length = len(start_text) if start_text is not None else 0
             raise EpisodeResetError(
-                f"集 ID {num} 的原文范围无效（源文件 {span.source_file} 当前长度 {length}，"
-                f"记录范围 [{span.start}, {span.end})），无法安全部分重置，{_FULL_RESET_HINT}"
+                f"Episode ID {num} has an invalid source range (source file {span.source_file} current length {length}, "
+                f"recorded range [{span.start}, {span.end})), so a partial reset is not safe; {_FULL_RESET_HINT}"
             )
         if prev is not None and (first, span.start) < prev:
             raise EpisodeResetError(
-                f"集 ID {num} 的原文范围与播出顺序中前一个切出集重叠或倒退，账本可能已损坏，"
-                f"无法安全部分重置，{_FULL_RESET_HINT}"
+                f"Episode ID {num} has a source range that overlaps or precedes the previous cut episode in broadcast "
+                f"order; the ledger may be corrupted, so a partial reset is not safe; {_FULL_RESET_HINT}"
             )
         prev = (last, span.end)
 
@@ -400,7 +416,7 @@ def reset_episode_planning(
         EpisodeResetConflictError: Consumed episodes outside confirmation inventories appeared during reset.
     """
     if episode_id is not None and episode_id < 1:
-        raise EpisodeResetError(f"episode_id 必须是正整数，收到 {episode_id}")
+        raise EpisodeResetError(f"episode_id must be a positive integer; received {episode_id}")
 
     project_dir = Path(project_path)
     pm = ProjectManager.for_project_dir(project_dir)
@@ -414,7 +430,9 @@ def reset_episode_planning(
         and (target := episode_entry(project, episode_id)) is not None
         and not is_cut_episode(target)
     ):
-        raise EpisodeResetError(f"集（id={episode_id}）不是切自整本源文的集；分集规划重置只能从切出集起算")
+        raise EpisodeResetError(
+            f"Episode (id={episode_id}) was not cut from the whole source; an episode planning reset can only start from a cut episode"
+        )
     partial_from = None if episode_id is None or episode_id == first_cut_episode_id(project) else episode_id
 
     def _boundary(p: Mapping[str, Any]) -> _PartialReset | None:
@@ -451,7 +469,9 @@ def reset_episode_planning(
         retained = _retained(p, locked_boundary)
         current = _scan(project_dir, p, retained=retained)
         if any(num not in plan.consumed for num in current.consumed):
-            raise EpisodeResetConflictError("重置期间出现新的已消费集，需重新确认后再执行")
+            raise EpisodeResetConflictError(
+                "A newly consumed episode appeared during the reset; confirm again before running it"
+            )
         raw_episodes = p.get("episodes")
         consumed = set(current.consumed)
         kept: list[Any] = []
@@ -481,7 +501,7 @@ def reset_episode_planning(
 
     def _commit_side_effects(_project_file: Path) -> None:
         if commit_plan is None:  # pragma: no cover - update_project calls mutate before on_commit
-            raise EpisodeResetError("重置未执行：文件处置计划未生成")
+            raise EpisodeResetError("Reset not run: the file disposition plan was not generated")
         _assert_source_directory_safe(project_dir)
         archive_targets = {path: archive_episode_file_path(path) for path in commit_plan.archives}
         remaining = project_dir / "source" / "_remaining.txt"
@@ -515,7 +535,7 @@ def reset_episode_planning(
 
     pm.update_project(project_name, _commit, on_commit=_commit_side_effects)
     if not committed:  # pragma: no cover - update_project necessarily calls mutate_fn
-        raise EpisodeResetError("重置未执行：账本更新回调未被调用")
+        raise EpisodeResetError("Reset not run: the ledger update callback was not called")
     result = committed[0]
     logger.info(
         "分集规划已%s重置：项目 %s，移出 %d 集，转为无原文 %d 集，删除派生文件 %d 个，留底 %d 个",

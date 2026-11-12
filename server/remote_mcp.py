@@ -91,7 +91,7 @@ def build_remote_mcp_server(
     retrieval-resume surface for ``retry_artifact_download``; without it that tool refuses with a stable problem."""
     if services is not None:
         if projects is not None and projects.data_root.resolve() != services.projects.data_root.resolve():
-            raise ValueError("projects 与 services.projects 必须属于同一项目根")
+            raise ValueError("projects and services.projects must belong to the same project root")
         projects = services.projects
         if artifact_download_worker is not None:
             services = replace(services, artifact_download_worker=artifact_download_worker)

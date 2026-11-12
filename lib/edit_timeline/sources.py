@@ -83,7 +83,9 @@ def _episode_script_file(project: Mapping[str, Any], episode: int) -> str:
             if isinstance(script_file, str) and script_file:
                 return ProjectManager.normalize_script_filename(script_file)
             break
-    raise EditTimelineError("episode_not_found", f"集（id={episode}）不存在或尚无脚本", episode=episode)
+    raise EditTimelineError(
+        "episode_not_found", f"Episode (id={episode}) does not exist or has no script yet", episode=episode
+    )
 
 
 def load_episode_script_units(projects: ProjectManager, project_name: str, episode: int) -> EpisodeScriptUnits:
@@ -94,9 +96,13 @@ def load_episode_script_units(projects: ProjectManager, project_name: str, episo
         script = projects.load_script_readonly(project_name, script_file)
         items, id_field, kind = resolve_items(script)
     except FileNotFoundError as exc:
-        raise EditTimelineError("episode_not_found", f"集（id={episode}）的脚本不存在", episode=episode) from exc
+        raise EditTimelineError(
+            "episode_not_found", f"The script for episode (id={episode}) does not exist", episode=episode
+        ) from exc
     except ScriptEditError as exc:
-        raise EditTimelineError("script_invalid", f"集（id={episode}）的脚本无法解析：{exc}", episode=episode) from exc
+        raise EditTimelineError(
+            "script_invalid", f"The script for episode (id={episode}) cannot be parsed: {exc}", episode=episode
+        ) from exc
     units: list[ScriptUnit] = []
     for item in items:
         if not isinstance(item, dict):

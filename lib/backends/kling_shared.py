@@ -112,7 +112,7 @@ def resolve_kling_jwt_credentials(access_key: str | None, secret_key: str | None
     ak = (access_key or "").strip()
     sk = (secret_key or "").strip()
     if not ak or not sk:
-        raise ValueError("请到系统配置页填写可灵 Kling 的 Access Key 与 Secret Key")
+        raise ValueError("Enter the Kling Access Key and Secret Key in Settings")
     return ak, sk
 
 
@@ -124,7 +124,7 @@ def resolve_kling_api_key(api_key: str | None) -> str:
     """
     key = (api_key or "").strip()
     if not key:
-        raise ValueError("请填写可灵 Kling 的 API Key")
+        raise ValueError("Enter the Kling API Key")
     return key
 
 
@@ -201,7 +201,7 @@ def extract_kling_task_id(submit_payload: dict) -> str:
     task_id = _as_dict(submit_payload.get("data")).get("task_id")
     if not task_id:
         reason = kling_response_error(submit_payload)
-        raise RuntimeError(reason or f"Kling 提交响应缺少 task_id: {submit_payload}")
+        raise RuntimeError(reason or f"Kling submission response is missing task_id: {submit_payload}")
     return str(task_id)
 
 
@@ -226,7 +226,7 @@ def kling_task_failure_reason(payload: dict) -> str | None:
         return err
     if kling_task_status(payload) == KLING_STATUS_FAILED:
         data = _as_dict(payload.get("data"))
-        return (f"Kling 任务失败 task_id={data.get('task_id')}: {_as_str(data.get('task_status_msg'))}").strip()
+        return (f"Kling task failed task_id={data.get('task_id')}: {_as_str(data.get('task_status_msg'))}").strip()
     return None
 
 
@@ -248,7 +248,7 @@ def extract_kling_video_url(payload: dict) -> str:
     for url in _extract_task_result_urls(payload, "videos"):
         return url
     reason = kling_response_error(payload)
-    raise RuntimeError(reason or f"Kling 视频任务完成但缺少视频 URL: {payload}")
+    raise RuntimeError(reason or f"Kling video task completed but the video URL is missing: {payload}")
 
 
 def extract_kling_image_urls(payload: dict) -> list[str]:
@@ -261,7 +261,7 @@ def extract_kling_image_urls(payload: dict) -> list[str]:
     if urls:
         return urls
     reason = kling_response_error(payload)
-    raise RuntimeError(reason or f"Kling 图像任务完成但缺少图片 URL: {payload}")
+    raise RuntimeError(reason or f"Kling image task completed but the image URL is missing: {payload}")
 
 
 # New API response parsing, with model names in paths.
@@ -289,7 +289,7 @@ def kling_model_path_task_id(submit_payload: dict) -> str:
     task_id = _as_dict(submit_payload.get("data")).get("id")
     if not task_id:
         reason = kling_response_error(submit_payload)
-        raise RuntimeError(reason or f"Kling 提交响应缺少任务 id: {submit_payload}")
+        raise RuntimeError(reason or f"Kling submission response is missing the task id: {submit_payload}")
     return str(task_id)
 
 
@@ -320,7 +320,7 @@ def kling_model_path_failure_reason(payload: dict) -> str | None:
         return err
     task = kling_model_path_task(payload)
     if task.get("status") == KLING_STATUS_FAILED:
-        return f"Kling 任务失败 task_id={_as_str(task.get('id'))}: {_as_str(task.get('message'))}".strip()
+        return f"Kling task failed task_id={_as_str(task.get('id'))}: {_as_str(task.get('message'))}".strip()
     return None
 
 
@@ -334,7 +334,7 @@ def extract_kling_model_path_video_url(payload: dict) -> str:
             if output.get("type") == "video" and isinstance(url, str) and url:
                 return url
     reason = kling_response_error(payload)
-    raise RuntimeError(reason or f"Kling 视频任务完成但缺少视频 URL: {payload}")
+    raise RuntimeError(reason or f"Kling video task completed but the video URL is missing: {payload}")
 
 
 def kling_model_path_output_duration(payload: dict) -> int | None:

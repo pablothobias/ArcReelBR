@@ -159,19 +159,19 @@ class CatalogReader:
     def obj(self, value: object, path: str) -> dict[str, object]:
         if isinstance(value, dict):
             return cast(dict[str, object], value)
-        self.reject(path, "not_object", "应为 JSON 对象")
+        self.reject(path, "not_object", "should be a JSON object")
         return {}
 
     def known_fields(self, raw: Mapping[str, object], path: str, allowed: frozenset[str]) -> None:
         for key in raw:
             if key not in allowed:
-                self.flag(_at(path, key), "unknown_field", "不认识的字段")
+                self.flag(_at(path, key), "unknown_field", "unknown field")
 
     def text(self, raw: Mapping[str, object], key: str, path: str) -> str:
         value = raw.get(key)
         if isinstance(value, str) and value:
             return value
-        self.reject(_at(path, key), "invalid_text", "应为非空字符串")
+        self.reject(_at(path, key), "invalid_text", "should be a non-empty string")
         return ""
 
     def optional_text(self, raw: Mapping[str, object], key: str, path: str) -> str | None:
@@ -183,7 +183,7 @@ class CatalogReader:
             return False
         if isinstance(value, bool):
             return value
-        self.reject(_at(path, key), "invalid_bool", "应为布尔值")
+        self.reject(_at(path, key), "invalid_bool", "should be a boolean")
         return False
 
     def optional_date(self, raw: Mapping[str, object], key: str, path: str) -> date | None:
@@ -196,7 +196,7 @@ class CatalogReader:
                 return date.fromisoformat(value)
             except ValueError:
                 pass
-        self.reject(_at(path, key), "invalid_date", "应为 YYYY-MM-DD 格式的日期")
+        self.reject(_at(path, key), "invalid_date", "should be a date in YYYY-MM-DD format")
         return None
 
     def positive_int(self, raw: Mapping[str, object], key: str, path: str) -> int | None:
@@ -205,7 +205,7 @@ class CatalogReader:
             return None
         if type(value) is int and value > 0:
             return value
-        self.reject(_at(path, key), "invalid_positive_int", "应为正整数")
+        self.reject(_at(path, key), "invalid_positive_int", "should be a positive integer")
         return None
 
     def optional_flag(self, raw: Mapping[str, object], key: str, path: str) -> bool | None:
@@ -217,7 +217,7 @@ class CatalogReader:
             return None
         if type(value) is int and value >= 0:
             return value
-        self.reject(_at(path, key), "invalid_nonnegative_int", "应为非负整数")
+        self.reject(_at(path, key), "invalid_nonnegative_int", "should be a non-negative integer")
         return None
 
     def nonnegative_seconds(self, raw: Mapping[str, object], key: str, path: str) -> float | None:
@@ -228,17 +228,17 @@ class CatalogReader:
         seconds = _as_float(value)
         if seconds is not None and math.isfinite(seconds) and seconds >= 0:
             return seconds
-        self.reject(_at(path, key), "invalid_nonnegative_number", "应为非负的有限数")
+        self.reject(_at(path, key), "invalid_nonnegative_number", "should be a non-negative finite number")
         return None
 
     def number(self, value: object, path: str) -> float:
         """Finite nonnegative number. Non-numbers are rejected; negative or non-finite values are reported only during builds."""
         result = _as_float(value)
         if result is None:
-            self.reject(path, "invalid_number", "应为数字")
+            self.reject(path, "invalid_number", "should be a number")
             return 0.0
         if not math.isfinite(result) or result < 0:
-            self.flag(path, "negative_number", "应为非负的有限数")
+            self.flag(path, "negative_number", "should be a non-negative finite number")
         return result
 
     def items(self, value: object, path: str) -> list[object]:
@@ -246,7 +246,7 @@ class CatalogReader:
             return []
         if isinstance(value, list):
             return cast(list[object], value)
-        self.reject(path, "not_array", "应为数组")
+        self.reject(path, "not_array", "should be an array")
         return []
 
     def texts(self, value: object, path: str) -> tuple[str, ...]:
@@ -254,10 +254,10 @@ class CatalogReader:
         for index, item in enumerate(self.items(value, path)):
             if isinstance(item, str) and item:
                 if item in result:
-                    self.flag(f"{path}[{index}]", "duplicate_value", "重复的取值")
+                    self.flag(f"{path}[{index}]", "duplicate_value", "duplicate value")
                 result.append(item)
             else:
-                self.reject(f"{path}[{index}]", "invalid_text", "应为非空字符串")
+                self.reject(f"{path}[{index}]", "invalid_text", "should be a non-empty string")
         return tuple(result)
 
     def durations(self, value: object, path: str) -> tuple[int, ...]:
@@ -265,10 +265,12 @@ class CatalogReader:
         for index, item in enumerate(self.items(value, path)):
             if type(item) is int and item > 0:
                 if item in result:
-                    self.flag(f"{path}[{index}]", "duplicate_value", "重复的取值")
+                    self.flag(f"{path}[{index}]", "duplicate_value", "duplicate value")
                 result.append(item)
             else:
-                self.reject(f"{path}[{index}]", "invalid_positive_int", "应为正整数秒")
+                self.reject(
+                    f"{path}[{index}]", "invalid_positive_int", "should be a positive integer number of seconds"
+                )
         return tuple(result)
 
     # ---- Catalog data ----
@@ -283,7 +285,7 @@ class CatalogReader:
             if (entry := self.entry(item, f"entries[{index}]")) is not None
         ]
         if "entries" not in data:
-            self.reject("entries", "missing_field", "缺少条目列表")
+            self.reject("entries", "missing_field", "missing entries list")
         providers_raw = self.obj(data.get("builtin_providers", {}), "builtin_providers")
         providers = {
             provider_id: self.listing(listing, f"builtin_providers.{provider_id}")
@@ -304,7 +306,7 @@ class CatalogReader:
                 self.reject(
                     _at(path, "dataset_version"),
                     "invalid_dataset_version",
-                    f"应为 UTC 时间戳，格式 {DATASET_VERSION_FORMAT}",
+                    f"should be a UTC timestamp in the format {DATASET_VERSION_FORMAT}",
                 )
         return value
 
@@ -313,7 +315,7 @@ class CatalogReader:
         self.known_fields(data, path, _ENTRY_FIELDS)
         maker = self.text(data, "maker", path)
         if "/" in maker:
-            self.reject(_at(path, "maker"), "invalid_maker", "模型厂商不能含 /")
+            self.reject(_at(path, "maker"), "invalid_maker", "maker must not contain /")
         name = self.text(data, "name", path)
         media_type = self.text(data, "media_type", path)
         display_name = self.text(data, "display_name", path)
@@ -325,7 +327,7 @@ class CatalogReader:
         successor = self.optional_text(data, "successor", path)
         if media_type not in MEDIA_TYPES:
             if media_type:
-                self.flag(_at(path, "media_type"), "unknown_media_type", "不认识的媒体类型")
+                self.flag(_at(path, "media_type"), "unknown_media_type", "unknown media type")
             return None
         known_media_type = cast(MediaType, media_type)
         facts = self.facts(data.get("facts"), known_media_type, _at(path, "facts"))
@@ -373,7 +375,9 @@ class CatalogReader:
             case "video":
                 durations = self.durations(data.get("durations"), _at(path, "durations"))
                 if not durations:
-                    self.flag(_at(path, "durations"), "missing_durations", "视频条目必须给出可选时长")
+                    self.flag(
+                        _at(path, "durations"), "missing_durations", "video entries must list the available durations"
+                    )
                 resolutions = self.texts(data.get("resolutions"), _at(path, "resolutions"))
                 constraints = self.duration_constraints(
                     data.get("duration_constraints"), durations, resolutions, _at(path, "duration_constraints")
@@ -384,7 +388,7 @@ class CatalogReader:
                     self.flag(
                         _at(path, "max_reference_audio_count"),
                         "reference_audio_without_count",
-                        "接受参考音频时参考音频数量上限不能为 0",
+                        "the reference audio count limit cannot be 0 when reference audio is accepted",
                     )
                 return VideoFacts(
                     durations=durations,
@@ -408,11 +412,11 @@ class CatalogReader:
         result: dict[str, int] = {}
         for quality, base in data.items():
             if not is_valid_dimension_value("quality", quality):
-                self.reject(path, "invalid_text", "质量档应为非空字符串")
+                self.reject(path, "invalid_text", "quality tier should be a non-empty string")
             elif type(base) is int and base > 0:
                 result[quality] = base
             else:
-                self.reject(_at(path, quality), "invalid_positive_int", "应为正整数")
+                self.reject(_at(path, quality), "invalid_positive_int", "should be a positive integer")
         return result
 
     def duration_constraints(
@@ -425,7 +429,9 @@ class CatalogReader:
         for resolution, allowed in resolution_map.items():
             item_path = _at(path, f"by_resolution.{resolution}")
             if resolution not in resolutions:
-                self.flag(item_path, "constraint_outside_facts", "约束引用了条目没有的分辨率")
+                self.flag(
+                    item_path, "constraint_outside_facts", "constraint references a resolution the entry does not have"
+                )
             values = self.durations(allowed, item_path)
             self.check_constraint_durations(values, durations, item_path)
             by_resolution[resolution] = values
@@ -435,7 +441,7 @@ class CatalogReader:
 
     def check_constraint_durations(self, values: tuple[int, ...], durations: tuple[int, ...], path: str) -> None:
         if any(value not in durations for value in values):
-            self.flag(path, "constraint_outside_facts", "约束中的时长不在可选时长内")
+            self.flag(path, "constraint_outside_facts", "constraint duration is not among the available durations")
 
     # ---- Price tables ----
 
@@ -444,15 +450,19 @@ class CatalogReader:
         self.known_fields(data, path, _PRICE_FIELDS)
         currency = self.text(data, "currency", path)
         if currency and currency not in CURRENCIES:
-            self.flag(_at(path, "currency"), "unknown_currency", "不认识的币种")
+            self.flag(_at(path, "currency"), "unknown_currency", "unknown currency")
         meters: list[Meter] = []
         for index, item in enumerate(self.items(data.get("meters"), _at(path, "meters"))):
             meter = self.meter(item, media_type, _at(path, f"meters[{index}]"))
             if meter.meter in (existing.meter for existing in meters):
-                self.flag(_at(path, f"meters[{index}].meter"), "duplicate_meter", "同一计量项只能出现一次")
+                self.flag(_at(path, f"meters[{index}].meter"), "duplicate_meter", "each meter may appear only once")
             meters.append(meter)
         if not meters:
-            self.flag(_at(path, "meters"), "empty_price_table", "价目表至少要有一个计量项；没有价格时省略 price")
+            self.flag(
+                _at(path, "meters"),
+                "empty_price_table",
+                "a price table needs at least one meter; omit price when there is no price",
+            )
         self.check_context_tiers(meters, path)
         return PriceTable(currency=currency, meters=tuple(meters))
 
@@ -467,11 +477,11 @@ class CatalogReader:
                 continue
             meter_path = _at(path, f"meters[{index}]")
             if 0 not in tiers:
-                self.flag(meter_path, "context_tier_not_from_zero", "上下文档的首档要写 0")
+                self.flag(meter_path, "context_tier_not_from_zero", "the first context tier must start at 0")
             if grid is None:
                 grid = tiers
             elif tiers != grid:
-                self.flag(meter_path, "context_tier_mismatch", "各计量项的上下文档分界要相同")
+                self.flag(meter_path, "context_tier_mismatch", "all meters must use the same context tier boundaries")
 
     def meter(self, raw: object, media_type: MediaType, path: str) -> Meter:
         data = self.obj(raw, path)
@@ -480,21 +490,25 @@ class CatalogReader:
         spec = METERS.get(key)
         if spec is None:
             if key:
-                self.flag(_at(path, "meter"), "unknown_meter", "不认识的计量项")
+                self.flag(_at(path, "meter"), "unknown_meter", "unknown meter")
         elif media_type not in spec.media_types:
-            self.flag(_at(path, "meter"), "meter_not_for_media_type", "这个计量项不适用于条目的媒体类型")
+            self.flag(
+                _at(path, "meter"), "meter_not_for_media_type", "this meter does not apply to the entry's media type"
+            )
         dims = self.texts(data.get("dims"), _at(path, "dims"))
         for index, dim in enumerate(dims):
             if dim not in DIMENSIONS:
-                self.flag(_at(path, f"dims[{index}]"), "unknown_dimension", "不认识的选择维度")
+                self.flag(_at(path, f"dims[{index}]"), "unknown_dimension", "unknown selection dimension")
         rows: list[PriceRow] = []
         for index, item in enumerate(self.items(data.get("rows"), _at(path, "rows"))):
             row = self.row(item, dims, _at(path, f"rows[{index}]"))
             if any(_overlaps(row.when, earlier.when) for earlier in rows):
-                self.flag(_at(path, f"rows[{index}]"), "overlapping_rows", "与前面的行可能命中同一请求")
+                self.flag(
+                    _at(path, f"rows[{index}]"), "overlapping_rows", "may match the same request as an earlier row"
+                )
             rows.append(row)
         if not rows:
-            self.flag(_at(path, "rows"), "empty_rows", "计量项至少要有一行单价")
+            self.flag(_at(path, "rows"), "empty_rows", "a meter needs at least one unit price row")
         defaults = {} if data.get("defaults") is None else self.obj(data["defaults"], _at(path, "defaults"))
         self.check_dimension_values(defaults, dims, _at(path, "defaults"))
         free_allowance = None
@@ -502,7 +516,11 @@ class CatalogReader:
             free_allowance = self.number(data["free_allowance"], _at(path, "free_allowance"))
         cjk_double = self.flag_value(data, "cjk_double", path)
         if cjk_double and key != CJK_DOUBLE_METER:
-            self.flag(_at(path, "cjk_double"), "cjk_double_not_characters", "汉字计 2 只用于字符数计量项")
+            self.flag(
+                _at(path, "cjk_double"),
+                "cjk_double_not_characters",
+                "counting Chinese characters as 2 applies only to character-count meters",
+            )
         return Meter(
             meter=key,
             dims=dims,
@@ -542,15 +560,15 @@ class CatalogReader:
                     self.flag(
                         _at(selection_path, "resolution"),
                         "resolution_case_mismatch",
-                        f"分辨率与条目声明的「{declared}」只差大小写",
+                        f'resolution differs from the entry\'s declared "{declared}" only in case',
                     )
 
     def check_dimension_values(self, values: Mapping[str, object], dims: tuple[str, ...], path: str) -> None:
         for dim, value in values.items():
             if dim not in dims:
-                self.flag(_at(path, dim), "dimension_not_declared", "选择维度没有列在 dims 中")
+                self.flag(_at(path, dim), "dimension_not_declared", "selection dimension is not listed in dims")
             elif dim in DIMENSIONS and not is_valid_dimension_value(dim, value):
-                self.flag(_at(path, dim), "invalid_dimension_value", "选择维度的取值不合法")
+                self.flag(_at(path, dim), "invalid_dimension_value", "invalid selection dimension value")
 
     # ---- Built-in provider listings ----
 
@@ -578,7 +596,7 @@ class CatalogReader:
             multiplier = self.number(data["multiplier"], _at(path, "multiplier"))
         min_app_version = self.optional_text(data, "min_app_version", path)
         if min_app_version and not is_app_version(min_app_version):
-            self.flag(_at(path, "min_app_version"), "invalid_app_version", "应为形如 0.34.0 的应用版本")
+            self.flag(_at(path, "min_app_version"), "invalid_app_version", "should be an app version like 0.34.0")
         return BuiltinProviderModel(
             api_model_name=api_model_name,
             entry=entry,
@@ -597,7 +615,7 @@ class CatalogReader:
         for index, entry in enumerate(entries):
             path = f"entries[{index}]"
             if entry.key in seen:
-                self.flag(path, "duplicate_entry", f"条目 {entry.key.ref}（{entry.media_type}）重复")
+                self.flag(path, "duplicate_entry", f"entry {entry.key.ref} ({entry.media_type}) is duplicated")
                 continue
             seen.add(entry.key)
             names = [(_at(path, "name"), entry.name)]
@@ -606,7 +624,7 @@ class CatalogReader:
                 slot = (entry.media_type, normalize_model_name(name))
                 owner = owners.setdefault(slot, entry.key)
                 if owner != entry.key:
-                    self.flag(name_path, "name_conflict", f"「{name}」与条目 {owner.ref} 的名字冲突")
+                    self.flag(name_path, "name_conflict", f'"{name}" conflicts with the name of entry {owner.ref}')
 
     def check_successors(self, entries: tuple[CatalogEntry, ...]) -> None:
         """Successors reference existing entries with the same media type as the original. Check only the direct successor, not successor chains."""
@@ -615,9 +633,11 @@ class CatalogReader:
                 continue
             path = f"entries[{index}].successor"
             if matching_entries(entries, entry.successor, None):
-                self.flag(path, "successor_media_type_mismatch", "后继模型的媒体类型与原条目不同")
+                self.flag(
+                    path, "successor_media_type_mismatch", "successor model media type differs from the original entry"
+                )
             else:
-                self.flag(path, "unknown_successor", "后继模型指向的条目不存在")
+                self.flag(path, "unknown_successor", "successor model points to an entry that does not exist")
 
     def check_listings(self, data: CatalogData) -> None:
         for provider_id, listing in data.builtin_providers.items():
@@ -633,51 +653,69 @@ class CatalogReader:
                 self.check_endpoint(provider_id, model, entry, model_path)
                 slot = (model.api_model_name, entry.media_type)
                 if slot in listed:
-                    self.flag(model_path, "duplicate_provider_model", "同一供应商下 API 模型名与媒体类型重复")
+                    self.flag(
+                        model_path,
+                        "duplicate_provider_model",
+                        "duplicate API model name and media type under the same provider",
+                    )
                 listed.setdefault(slot, entry)
             for media_type, api_model_name in listing.defaults.items():
                 default_path = _at(path, f"defaults.{media_type}")
                 if media_type not in MEDIA_TYPES:
-                    self.flag(default_path, "unknown_media_type", "不认识的媒体类型")
+                    self.flag(default_path, "unknown_media_type", "unknown media type")
                     continue
                 default_entry = listed.get((api_model_name, media_type))
                 if default_entry is None:
                     if api_model_name in unresolved:
                         continue  # Reference issues were already reported on the listing entry
-                    self.flag(default_path, "unknown_default_model", "默认模型不在这个供应商这一媒体类型的清单中")
+                    self.flag(
+                        default_path,
+                        "unknown_default_model",
+                        "default model is not in this provider's list for this media type",
+                    )
                 elif default_entry.discontinued:
-                    self.flag(default_path, "default_model_discontinued", "默认模型已下线")
+                    self.flag(default_path, "default_model_discontinued", "default model has been discontinued")
                 elif default_entry.shutdown_date is not None:
-                    self.flag(default_path, "default_model_retiring", "默认模型带关停日期")
+                    self.flag(default_path, "default_model_retiring", "default model has a shutdown date")
 
     def check_endpoint(self, provider_id: str, model: BuiltinProviderModel, entry: CatalogEntry, path: str) -> None:
         """The declared endpoint exists in the endpoint list, matches the referenced entry's media type, and is an eligible endpoint for this provider and media type."""
         path = _at(path, "endpoint")
         if model.endpoint is None:
-            self.flag(path, "missing_endpoint", "发布的供应商模型必须声明调用端点")
+            self.flag(path, "missing_endpoint", "published provider models must declare an endpoint")
             return
         declared = BUILTIN_ENDPOINTS.get(model.endpoint)
         if declared is None:
-            self.flag(path, "unknown_endpoint", "端点清单里没有这个调用端点")
+            self.flag(path, "unknown_endpoint", "this endpoint is not in the endpoint list")
         elif declared.media_type != entry.media_type:
             self.flag(
-                path, "endpoint_media_type_mismatch", f"这是 {declared.media_type} 端点，条目是 {entry.media_type}"
+                path,
+                "endpoint_media_type_mismatch",
+                f"this is a {declared.media_type} endpoint, but the entry is {entry.media_type}",
             )
         else:
             options = provider_endpoint_options(provider_id, entry.media_type)
             if options is None or model.endpoint not in options.endpoints:
-                self.flag(path, "endpoint_not_selectable", "这个调用端点不在该供应商这一媒体类型的可选端点里")
+                self.flag(
+                    path,
+                    "endpoint_not_selectable",
+                    "this endpoint is not among the provider's selectable endpoints for this media type",
+                )
 
     def listed_entry(self, data: CatalogData, model: BuiltinProviderModel, path: str) -> CatalogEntry | None:
         if model.media_type is not None and model.media_type not in MEDIA_TYPES:
-            self.flag(_at(path, "media_type"), "unknown_media_type", "不认识的媒体类型")
+            self.flag(_at(path, "media_type"), "unknown_media_type", "unknown media type")
             return None
         matches = matching_entries(data.entries, model.entry, model.media_type)
         if not matches:
-            self.flag(_at(path, "entry"), "unknown_entry", "引用的条目不存在")
+            self.flag(_at(path, "entry"), "unknown_entry", "referenced entry does not exist")
             return None
         if len(matches) > 1:
-            self.flag(_at(path, "entry"), "ambiguous_entry", "引用两栖模型时须用 media_type 指明条目")
+            self.flag(
+                _at(path, "entry"),
+                "ambiguous_entry",
+                "references to multi-media-type models must specify the entry with media_type",
+            )
             return None
         return matches[0]
 
@@ -729,7 +767,7 @@ def parse_entry(raw: object) -> CatalogEntry:
     reader = CatalogReader()
     entry = reader.entry(raw, "")
     if entry is None and not reader.fatal:
-        reader.reject("media_type", "unknown_media_type", "不认识的媒体类型")
+        reader.reject("media_type", "unknown_media_type", "unknown media type")
     if reader.fatal or entry is None:
         raise CatalogFormatError(reader.fatal)
     return entry

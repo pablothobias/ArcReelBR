@@ -889,9 +889,9 @@ class TestCancelRespectsScope:
         hidden = await self._enqueue(TaskRepository(db_session), "hidden")
         scoped = ResourceScopedTaskRepository(db_session)
 
-        with pytest.raises(ValueError, match="任务 'no-such-task' 不存在"):
+        with pytest.raises(ValueError, match="Task 'no-such-task' does not exist"):
             await getattr(scoped, method)("no-such-task")
-        with pytest.raises(ValueError, match=f"任务 '{hidden}' 不存在"):
+        with pytest.raises(ValueError, match=f"Task '{hidden}' does not exist"):
             await getattr(scoped, method)(hidden)
 
         assert (await TaskRepository(db_session).get(hidden))["status"] == "queued"

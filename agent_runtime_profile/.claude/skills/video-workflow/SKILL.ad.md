@@ -46,7 +46,7 @@ Pass `target.episode`, `next_action.args`, and `requested_ids` when calling tool
 6. **Sheet review (soft gate)**: if a product has `product_sheet`, ask the user to confirm fidelity to the real product before first storyboard or reference-to-video generation; continue directly when only originals exist.
 7. **Planning and generation**:
 
-   - `repair_video_units`: read body and revision with `mcp__arcreel__get_episode_script({"script": target.script_filename})`, addressing only units in `requested_ids`; then use one `mcp__arcreel__patch_episode_script({"script": target.script_filename, "base_revision": revision, "operations": [{"op": "update", "id": unit_id, "fields": {"text": "...", "duration_seconds": ...}}]})` to write complete plans for all these units (one ordered update per unit). Let the tool recompute `needs_replan`; do not edit flags directly. Keep one speech owner per unit and use `@[名称]` for products/characters/scenes/props. Immediately regenerate repaired units using `generate_videos`, `selected` scope, and `force: true`, then refresh state.
+   - `repair_video_units`: read body and revision with `mcp__arcreel__get_episode_script({"script": target.script_filename})`, addressing only units in `requested_ids`; then use one `mcp__arcreel__patch_episode_script({"script": target.script_filename, "base_revision": revision, "operations": [{"op": "update", "id": unit_id, "fields": {"text": "...", "duration_seconds": ...}}]})` to write complete plans for all these units (one ordered update per unit). Let the tool recompute `needs_replan`; do not edit flags directly. Keep one speech owner per unit and use `@[name]` for products/characters/scenes/props. Immediately regenerate repaired units using `generate_videos`, `selected` scope, and `force: true`, then refresh state.
    - `next_action.type == "generate_storyboards"` → call
      `mcp__arcreel__generate_storyboards({"script": target.script_filename, "segment_ids": requested_ids})`
    - `next_action.type == "generate_grid"` → call
@@ -65,12 +65,12 @@ Pass `target.episode`, `next_action.args`, and `requested_ids` when calling tool
      status, queue task, provider checkpoint, and artifact freshness as four separate axes: “task succeeded” does not mean “current artifact valid”.
      Stale artifacts remain usable; the user decides whether to redo them. Never automatically delete or regenerate paid artifacts
    - For product-promotion storyboard-to-video, review product-storyboard fidelity before incurring video costs; general short films have no product storyboards and no such checkpoint.
-   - Reference-to-video generates self-contained units and skips storyboards; references resolve at execution time from body `@[名称]` mentions in first-mention order, using the same rules for products, characters, scenes, and props. Regenerate by explicit `unit_id` when the user is dissatisfied.
+   - Reference-to-video generates self-contained units and skips storyboards; references resolve at execution time from body `@[name]` mentions in first-mention order, using the same rules for products, characters, scenes, and props. Regenerate by explicit `unit_id` when the user is dissatisfied.
 
 8. **Editing**: for TTS projects (nonempty `plan.status.artifacts.audio.missing_ids`), first follow `generate-narration-audio`
    and call `mcp__arcreel__generate_narration_audio({"script": target.script_filename})` to fill missing narration, omitting
    `segment_ids`; choosing TTS already authorizes this. This step completes as soon as an editing timeline exists; the workflow will not return here later to fill audio.
-   Then call `mcp__arcreel__create_timeline({"from": "script", "episode": target.episode, "name": "完整版"})`
+   Then call `mcp__arcreel__create_timeline({"from": "script", "episode": target.episode, "name": "Full cut"})`
    to mechanically create a timeline from the script; the step completes once at least one timeline exists. Then use `edit-video`
    to edit it, rendering a final cut or exporting a Jianying draft only when requested. Server presentation results determine speech ownership and subtitle timing:
    **do not estimate subtitle timelines yourself or decide for the user whether TTS is necessary**. Stale artifacts remain usable; output neither clears nor

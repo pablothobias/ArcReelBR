@@ -31,19 +31,20 @@ def test_builtin_directory_has_valid_slots_variants_and_template_syntax():
         rendered = templates.render(
             asset.id,
             asset_type=asset_type,
-            name="测试资产",
-            description="外观描述",
-            style="水彩",
-            style_description="柔和笔触",
+            name="Test Asset",
+            description="Silver-haired figure in a long coat",
+            style="Watercolor",
+            style_description="Soft brushstrokes",
+            occupied=False,
         )
-        assert "外观描述" in rendered
+        assert "Silver-haired figure in a long coat" in rendered
         assert "Avoid:" in rendered
         if asset_type in {"character_derivative", "product"}:
             assert "Style:" not in rendered
             assert "Visual style:" not in rendered
         else:
-            assert rendered.count("Style: 水彩") == 1
-            assert rendered.count("Visual style: 柔和笔触") == 1
+            assert rendered.count("Style: Watercolor") == 1
+            assert rendered.count("Visual style: Soft brushstrokes") == 1
 
 
 def test_builtin_applies_to_values_are_real_project_values():
@@ -123,6 +124,6 @@ def test_shared_partial_scan_includes_files_unreachable_from_templates(tmp_path:
     parent = tmp_path / "shared" / "orphan_parent.md"
     parent.parent.mkdir()
     parent.write_text('{{ partial("shared/orphan_child") }}', encoding="utf-8")
-    (parent.parent / "orphan_child.md").write_text("孤立措辞", encoding="utf-8")
+    (parent.parent / "orphan_child.md").write_text("Orphan wording", encoding="utf-8")
 
     assert _single_parent_shared_partials(tmp_path, []) == ["shared/orphan_child"]

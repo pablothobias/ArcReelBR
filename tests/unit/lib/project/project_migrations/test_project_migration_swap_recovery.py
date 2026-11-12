@@ -136,7 +136,7 @@ def test_migration_fails_readably_when_disk_headroom_is_insufficient(tmp_project
 
     message = str(excinfo.value)
     assert "demo" in message
-    assert "磁盘空间不足" in message
+    assert "Not enough disk space" in message
     assert (project_dir / "project.json").read_bytes() == original
     assert sorted(entry.name for entry in project_dir.iterdir()) == before
     assert not list(tmp_projects.glob(".demo.v6-*"))

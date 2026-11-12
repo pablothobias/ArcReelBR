@@ -717,7 +717,7 @@ async def test_generate_reference_video_legacy_unresolvable_episode_fails_before
     out = await run_generate_videos(fake_ctx, _EPISODE_1, script="draft.json", batch_waiter=enqueue)
 
     assert out.problem is not None
-    assert "无法确定集号" in out.problem.detail
+    assert "Cannot determine the episode number" in out.problem.detail
     enqueue.assert_not_awaited()
 
 
@@ -1256,7 +1256,7 @@ async def test_generate_videos_scene_scope_generated_assets_non_dict_readable_re
     out = await run_generate_videos(fake_ctx, _scene("E1S01"), force=True)
 
     assert _is_error(out)
-    assert "请先运行 generate_storyboards" in _text(out)
+    assert "run generate_storyboards first" in _text(out)
 
 
 def _admitted_video_yaml(item: dict, **kwargs) -> dict:

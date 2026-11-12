@@ -77,16 +77,16 @@ def safe_join(
     try:
         candidate_real = os.path.realpath(os.path.join(base_real, *parts))
     except (OSError, ValueError) as exc:
-        raise PathTraversalError(f"路径解析失败：{parts!r}") from exc
+        raise PathTraversalError(f"Path resolution failed: {parts!r}") from exc
 
     # Handle candidate_real == base_real separately: at the filesystem or drive root,
     # base_prefix == base_real and an equal candidate also passes the startswith branch below.
     # Combining allow_base into that branch would bypass allow_base=False at the root.
     if candidate_real == base_real:
         if not allow_base:
-            raise PathTraversalError(f"路径越界：{candidate_real!r} 不在 {base_real!r} 内")
+            raise PathTraversalError(f"Path out of bounds: {candidate_real!r} is not inside {base_real!r}")
     elif not candidate_real.startswith(base_prefix):
-        raise PathTraversalError(f"路径越界：{candidate_real!r} 不在 {base_real!r} 内")
+        raise PathTraversalError(f"Path out of bounds: {candidate_real!r} is not inside {base_real!r}")
 
     # is_file/exists check candidate_real directly (the string carrying the barrier), rather than
     # wrapping it in Path first: Path() would also interrupt the recognition described above.

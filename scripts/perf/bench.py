@@ -468,7 +468,7 @@ def summarize(idle: dict[str, Any], peak: dict[str, Any]) -> str:
         return "-" if x is None or x != x else f"{x:.2f}s"
 
     lines = [
-        "| 接口 | 重启后首开 | 空闲 p95 | 高峰 p95 | 高峰/空闲 | 同时在算最大份数 | 高峰请求数（放弃/未完成） |",
+        "| Endpoint | First open after restart | Idle p95 | Peak p95 | Peak/idle | Max concurrent computations | Peak requests (abandoned/unfinished) |",
         "|---|---|---|---|---|---|---|",
     ]
     for name in ENDPOINTS:
@@ -486,25 +486,25 @@ def summarize(idle: dict[str, Any], peak: dict[str, Any]) -> str:
         )
     lines.append("")
     drain = f"{peak['drain_s']:.1f}s" + (
-        f"（达到上限，仍有 {peak['leftover']} 未完成）" if peak["drain_capped"] else ""
+        f" (hit the cap, {peak['leftover']} still unfinished)" if peak["drain_capped"] else ""
     )
-    lines.append(f"- 停止写入后的排空时间：{drain}")
+    lines.append(f"- Drain time after writes stopped: {drain}")
     for name, p in peak["probes"].items():
-        lines.append(f"- 轻量请求 {name} 高峰 p95：{p['p95'] * 1000:.0f}ms（max {p['max'] * 1000:.0f}ms）")
+        lines.append(f"- Light request {name} peak p95: {p['p95'] * 1000:.0f}ms (max {p['max'] * 1000:.0f}ms)")
     if "project" in idle:
         lines.append(
-            f"- 热态打开项目详情读取媒体内容（次数与字节）：{idle['project']['warm_media']}；"
-            f"重启后首开：{idle['project']['first_open_media']}"
+            f"- Media content reads when opening project details warm (count and bytes): {idle['project']['warm_media']}; "
+            f"first open after restart: {idle['project']['first_open_media']}"
         )
     migration = h.data_root() / "migration.json"
     if migration.exists():
         m = json.loads(migration.read_text())
         lines.append(
-            f"- 启动迁移（v17→v18，构建时测）：{m['startup_migration_s']:.1f}s；"
-            f"迁移后带内容指纹的视频条目 {m['with_facts']}/{m['videos']}"
+            f"- Startup migration (v17→v18, measured at build time): {m['startup_migration_s']:.1f}s; "
+            f"video entries with content fingerprints after migration {m['with_facts']}/{m['videos']}"
         )
     lines.append(
-        f"- 高峰期清单锁非阻塞加锁失败（重试）次数：{peak['manifest_lock_nb_failures']}；线程池队列最大长度：{peak['thread_queue_max']}"
+        f"- Peak manifest-lock non-blocking acquire failures (retries): {peak['manifest_lock_nb_failures']}; max thread-pool queue length: {peak['thread_queue_max']}"
     )
     return "\n".join(lines)
 
@@ -542,7 +542,7 @@ def _sample_hz(value: str) -> float:
     # Negative or inf intervals become nonpositive, spinning the sampler and stealing measured-process CPU.
     hz = float(value)
     if hz != 0 and not (math.isfinite(hz) and hz > 0):
-        raise argparse.ArgumentTypeError("采样频率须为 0 或有限正数")
+        raise argparse.ArgumentTypeError("Sampling rate must be 0 or a finite positive number")
     return hz
 
 
@@ -558,21 +558,29 @@ def main() -> None:
     common.add_argument("--sheet-kb", type=int, default=512)
     common.add_argument("--video-ratio", type=float, default=0.9)
     common.add_argument("--rebuild", action="store_true")
-    common.add_argument("--ep", type=int, default=45, help="单元列表等按集请求使用的集号")
+    common.add_argument(
+        "--ep", type=int, default=45, help="Episode number used by per-episode requests such as the unit list"
+    )
     common.add_argument("--only", nargs="+", choices=ENDPOINTS)
-    common.add_argument("--tag", default="default", help="输出文件名后缀")
+    common.add_argument("--tag", default="default", help="Output file name suffix")
     idle_opts = argparse.ArgumentParser(add_help=False)
     idle_opts.add_argument("--reps", type=int, default=5)
     peak_opts = argparse.ArgumentParser(add_help=False)
     peak_opts.add_argument("--duration", type=float, default=240)
-    peak_opts.add_argument("--interval", type=float, nargs=2, default=[2.0, 5.0], help="两次视频完成的间隔范围（秒）")
-    peak_opts.add_argument("--drain", type=float, default=300, help="排空等待上限（秒）")
+    peak_opts.add_argument(
+        "--interval",
+        type=float,
+        nargs=2,
+        default=[2.0, 5.0],
+        help="Interval range between two video completions (seconds)",
+    )
+    peak_opts.add_argument("--drain", type=float, default=300, help="Drain wait limit (seconds)")
     peak_opts.add_argument("--clients", type=int, default=1)
     peak_opts.add_argument(
         "--sample-hz",
         type=_sample_hz,
         default=0,
-        help="高峰期栈采样频率，0 为关闭；折叠栈写入 out/peak-<tag>.stacks.txt",
+        help="Peak stack sampling rate, 0 to disable; folded stacks are written to out/peak-<tag>.stacks.txt",
     )
     sub.add_parser("build", parents=[common])
     sub.add_parser("idle", parents=[common, idle_opts])

@@ -103,7 +103,7 @@ def test_render_report_contains_header_and_rows():
     results = [_ok(Provider.ARK, 9, 10, note="fast mode"), _fail(Provider.SORA, "422 Unprocessable")]
     md = render_report(results, generated_at=datetime(2026, 4, 20, 12, 0))
 
-    assert "# Reference-to-Video SDK 验证报告" in md
+    assert "# Reference-to-Video SDK verification report" in md
     assert "2026-04-20" in md
     # Table header
     assert "| Provider | Model | Refs | Duration | Multi-shot | Result | Elapsed | Bytes | Note |" in md
@@ -116,7 +116,7 @@ def test_render_report_contains_header_and_rows():
 
 def test_render_report_empty_results_still_emits_header():
     md = render_report([], generated_at=datetime(2026, 4, 20, 12, 0))
-    assert "# Reference-to-Video SDK 验证报告" in md
+    assert "# Reference-to-Video SDK verification report" in md
     assert "_no results_" in md
 
 

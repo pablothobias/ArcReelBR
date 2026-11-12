@@ -226,7 +226,7 @@ function unitCapability(unit: DisplayUnit, tiers: ScriptReviewState["duration_ti
  * Units referencing no registered scenes leave places to models; indoor/outdoor neighboring units may invent
  * inconsistent locations. Mirror backend `lib/script/reference_video/script_preview.py::unit_lacks_scene_reference`.
  *
- * Like tier narrowing, evaluate current bodies immediately, not server snapshots: in-place edits adding `@[场景]` must
+ * Like tier narrowing, evaluate current bodies immediately, not server snapshots: in-place edits adding `@[scene]` must
  * remove notices immediately, rather than leaving notices mismatched until saving/server response.
  */
 function unitLacksSceneReference(scriptText: string, lookup: MentionLookup, projectHasScene: boolean): boolean {

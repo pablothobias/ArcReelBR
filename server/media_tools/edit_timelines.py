@@ -65,14 +65,14 @@ class CreateTimelineRequest(BaseModel):
     def _arguments_match_source(self) -> CreateTimelineRequest:
         if self.source == "script":
             if self.episode is None:
-                raise ValueError("from=script 时必须给出 episode")
+                raise ValueError("episode is required when from=script")
             if self.timeline is not None or self.revision is not None:
-                raise ValueError("timeline、revision 只用于 from=timeline")
+                raise ValueError("timeline and revision are only used with from=timeline")
         else:
             if self.timeline is None:
-                raise ValueError("from=timeline 时必须给出 timeline")
+                raise ValueError("timeline is required when from=timeline")
             if self.episode is not None:
-                raise ValueError("from=timeline 时集取自源时间线，省略 episode")
+                raise ValueError("with from=timeline the episode comes from the source timeline; omit episode")
         return self
 
 
@@ -282,14 +282,14 @@ async def restore_revision(
 
 
 _SEVERITY_LABELS = {
-    IssueSeverity.BLOCKING: "阻断",
-    IssueSeverity.WARNING: "警告",
-    IssueSeverity.INFO: "提示",
+    IssueSeverity.BLOCKING: "blocking",
+    IssueSeverity.WARNING: "warning",
+    IssueSeverity.INFO: "info",
 }
 
 
 def _issue_counts(issues: tuple[TimelineIssue, ...]) -> str:
-    return "、".join(
+    return ", ".join(
         f"{label} {sum(1 for issue in issues if issue.severity is severity)}"
         for severity, label in _SEVERITY_LABELS.items()
     )
@@ -298,45 +298,45 @@ def _issue_counts(issues: tuple[TimelineIssue, ...]) -> str:
 def timeline_readout_summary(readout: EditTimelineReadout) -> str:
     timeline = readout.timeline
     return (
-        f"剪辑时间线「{timeline.name}」（{timeline.id}）属于集（id={timeline.episode}），修订 {readout.revision}："
-        f"{len(readout.clips)} 个剪辑片段、{len(readout.bgm)} 个 BGM 片段，总时长 {readout.duration} 秒；"
-        f"issues：{_issue_counts(readout.issues)}"
+        f'Timeline "{timeline.name}" ({timeline.id}) belongs to episode (id={timeline.episode}), '
+        f"revision {readout.revision}: {len(readout.clips)} clips, {len(readout.bgm)} BGM clips, "
+        f"total duration {readout.duration}s; issues: {_issue_counts(readout.issues)}"
     )
 
 
 def timeline_write_summary(result: EditTimelineWriteResult) -> str:
-    changed = "、".join([*(clip.id for clip in result.clips), *(item.id for item in result.bgm)]) or "无"
-    deleted = f"；删除 {'、'.join(result.deleted_clip_ids)}" if result.deleted_clip_ids else ""
+    changed = ", ".join([*(clip.id for clip in result.clips), *(item.id for item in result.bgm)]) or "none"
+    deleted = f"; deleted {', '.join(result.deleted_clip_ids)}" if result.deleted_clip_ids else ""
     return (
-        f"{result.message}\n受影响片段 {changed}{deleted}；总时长 {result.duration} 秒；"
-        f"issues：{_issue_counts(result.issues)}"
+        f"{result.message}\nAffected clips: {changed}{deleted}; total duration {result.duration}s; "
+        f"issues: {_issue_counts(result.issues)}"
     )
 
 
 def timeline_list_summary(timelines: tuple[TimelineSummary, ...]) -> str:
     if not timelines:
-        return "还没有剪辑时间线；用 create_timeline 按脚本新建一条"
+        return "No timelines yet; use create_timeline to create one from a script"
     return "\n".join(
-        f"- {item.id} 集（id={item.episode}）「{item.name}」修订 {item.revision}，{item.clip_count} 个剪辑片段，"
-        f"最近修改 {item.updated_at}"
+        f'- {item.id} episode (id={item.episode}) "{item.name}" revision {item.revision}, {item.clip_count} clips, '
+        f"last modified {item.updated_at}"
         for item in timelines
     )
 
 
 def timeline_renamed_summary(summary: TimelineSummary) -> str:
-    return f"剪辑时间线 {summary.id}（集 id={summary.episode}）已改名为「{summary.name}」，剪辑内容与修订不变"
+    return f'Timeline {summary.id} (episode id={summary.episode}) renamed to "{summary.name}"; clips and revision unchanged'
 
 
 def revision_history_summary(history: RevisionHistory) -> str:
     timeline = history.timeline
     lines = [
-        f"剪辑时间线「{timeline.name}」（{timeline.id}，集 id={timeline.episode}）共 {len(history.revisions)} 个修订，"
-        f"最新修订 {history.latest_revision}"
+        f'Timeline "{timeline.name}" ({timeline.id}, episode id={timeline.episode}) has '
+        f"{len(history.revisions)} revisions, latest revision {history.latest_revision}"
     ]
     for revision in history.revisions:
-        restored = f"（回滚到修订 {revision.restored_from}）" if revision.restored_from is not None else ""
+        restored = f" (rolled back to revision {revision.restored_from})" if revision.restored_from is not None else ""
         lines.append(
-            f"- 修订 {revision.number}{restored} {revision.created_at} {revision.author.kind}：{revision.summary}"
+            f"- revision {revision.number}{restored} {revision.created_at} {revision.author.kind}: {revision.summary}"
         )
     return "\n".join(lines)
 

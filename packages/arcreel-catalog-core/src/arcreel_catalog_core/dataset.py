@@ -34,7 +34,7 @@ def _read_manifest(reader: CatalogReader, raw: object) -> CatalogManifest:
     dataset_version = reader.dataset_version(data, MANIFEST_FILENAME)
     sha256 = reader.text(data, "sha256", MANIFEST_FILENAME)
     if sha256 and not _SHA256.fullmatch(sha256):
-        reader.reject(f"{MANIFEST_FILENAME}.sha256", "invalid_sha256", "应为 64 位小写十六进制")
+        reader.reject(f"{MANIFEST_FILENAME}.sha256", "invalid_sha256", "should be 64 lowercase hexadecimal characters")
     return CatalogManifest(dataset_version=dataset_version, sha256=sha256)
 
 
@@ -51,7 +51,7 @@ def _decode(reader: CatalogReader, content: bytes, filename: str) -> object:
     try:
         return json.loads(content)
     except (UnicodeDecodeError, json.JSONDecodeError) as exc:
-        reader.reject(filename, "invalid_json", f"不是合法的 JSON：{exc}")
+        reader.reject(filename, "invalid_json", f"not valid JSON: {exc}")
         return None
 
 
@@ -62,11 +62,13 @@ def _read_files(reader: CatalogReader, manifest_content: bytes, catalog_content:
         return None
     manifest = _read_manifest(reader, manifest_raw)
     if manifest.sha256 and hashlib.sha256(catalog_content).hexdigest() != manifest.sha256:
-        reader.reject(f"{MANIFEST_FILENAME}.sha256", "sha256_mismatch", "与数据文件的 SHA-256 不一致")
+        reader.reject(f"{MANIFEST_FILENAME}.sha256", "sha256_mismatch", "does not match the SHA-256 of the data file")
     data = reader.catalog(catalog_raw)
     if manifest.dataset_version and manifest.dataset_version != data.dataset_version:
         reader.reject(
-            f"{MANIFEST_FILENAME}.dataset_version", "dataset_version_mismatch", "与数据文件的数据集版本不一致"
+            f"{MANIFEST_FILENAME}.dataset_version",
+            "dataset_version_mismatch",
+            "does not match the dataset version of the data file",
         )
     return data
 

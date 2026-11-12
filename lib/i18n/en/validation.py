@@ -77,6 +77,7 @@ MESSAGES = {
     "val_asset_field_must_be_string": "{asset_type} '{name}'.{field} must be a string, got {actual}",
     "val_asset_field_bad_timestamp": "{asset_type} '{name}'.{field} is not a valid ISO8601 timestamp: {value}",
     "val_asset_field_must_be_string_list": "{asset_type} '{name}'.{field} must be a list of strings, got {actual}",
+    "val_asset_field_invalid_choice": "{asset_type} '{name}'.{field} must be one of {allowed}, got {actual}",
     "val_asset_field_item_must_be_string": "{asset_type} '{name}'.{field}[{index}] must be a string, got {actual}",
     "val_asset_name_duplicate": (
         "Duplicate project asset name: {duplicate_type} '{duplicate_name}' conflicts with "

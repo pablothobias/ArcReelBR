@@ -51,7 +51,7 @@ _IMAGE_MIME_TYPES: dict[str, str] = {
 
 def resolve_vidu_api_key(api_key: str | None = None) -> str:
     if api_key is None or not api_key.strip():
-        raise ValueError("请到系统配置页填写 Vidu API Key")
+        raise ValueError("Enter the Vidu API Key in Settings")
     return api_key.strip()
 
 
@@ -104,9 +104,9 @@ def assert_vidu_body_size(body: dict) -> None:
     encoded = json.dumps(body, ensure_ascii=False).encode("utf-8")
     if len(encoded) > VIDU_MAX_BODY_BYTES:
         raise ValueError(
-            f"Vidu 请求体大小 {len(encoded) / 1024 / 1024:.1f}MB 超过上限 "
-            f"{VIDU_MAX_BODY_BYTES / 1024 / 1024:.0f}MB（base64 编码自带 ~33% 膨胀，"
-            f"请减少参考图数量或压缩图片后重试）。"
+            f"Vidu request body size {len(encoded) / 1024 / 1024:.1f}MB exceeds the "
+            f"{VIDU_MAX_BODY_BYTES / 1024 / 1024:.0f}MB limit (base64 encoding adds ~33%; "
+            f"use fewer reference images or compress them, then retry)."
         )
 
 
@@ -129,7 +129,7 @@ def is_vidu_done(payload: dict) -> bool:
 def vidu_failure_reason(payload: dict) -> str | None:
     if payload.get("state") == _FAILED_STATE:
         err = payload.get("err_code") or "unknown"
-        return f"Vidu 任务失败: err_code={err}"
+        return f"Vidu task failed: err_code={err}"
     return None
 
 
@@ -137,10 +137,10 @@ def extract_vidu_url(payload: dict) -> str:
     """Extract generated URLs from success responses."""
     creations = payload.get("creations") or []
     if not creations:
-        raise RuntimeError(f"Vidu 任务无 creations: task_id={payload.get('id')}")
+        raise RuntimeError(f"Vidu task has no creations: task_id={payload.get('id')}")
     url = creations[0].get("url")
     if not url:
-        raise RuntimeError(f"Vidu creations[0].url 为空: task_id={payload.get('id')}")
+        raise RuntimeError(f"Vidu creations[0].url is empty: task_id={payload.get('id')}")
     return url
 
 
@@ -166,5 +166,5 @@ def test_vidu_connection(config: dict[str, str]) -> None:
     if resp.status_code == 404:
         return
     if resp.status_code in (401, 403):
-        raise RuntimeError(f"HTTP {resp.status_code}: 凭证无效")
-    raise RuntimeError(f"HTTP {resp.status_code}: 连接测试无法判定（{resp.text[:200]}）")
+        raise RuntimeError(f"HTTP {resp.status_code}: invalid credentials")
+    raise RuntimeError(f"HTTP {resp.status_code}: connection test inconclusive ({resp.text[:200]})")

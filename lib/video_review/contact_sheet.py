@@ -96,12 +96,14 @@ async def _extract_frames(video_path: Path, indices: list[int]) -> list[Image.Im
     try:
         result = await run_with_deadline(args, deadline_seconds=_EXTRACT_DEADLINE_SECONDS, capture_stdout=True)
     except SubprocessDeadlineExceeded:
-        raise ContactSheetError(f"抽帧超时：{video_path.name}") from None
+        raise ContactSheetError(f"Frame extraction timed out: {video_path.name}") from None
     if result.returncode != 0:
-        raise ContactSheetError(f"抽帧失败：{video_path.name}")
+        raise ContactSheetError(f"Frame extraction failed: {video_path.name}")
     chunks = [chunk + _PNG_END for chunk in result.stdout.split(_PNG_END) if chunk]
     if len(chunks) != len(indices):
-        raise ContactSheetError(f"抽帧数量不符：{video_path.name} 期望 {len(indices)} 帧，得到 {len(chunks)} 帧")
+        raise ContactSheetError(
+            f"Frame count mismatch: {video_path.name} expected {len(indices)} frames, got {len(chunks)}"
+        )
     # Per-frame PNG decoding is CPU-only work; move it to worker threads rather than occupying the event loop.
     return await asyncio.to_thread(_decode_frames, chunks)
 
@@ -129,7 +131,7 @@ def _layout(count: int, aspect: float, label_height: int) -> tuple[int, int, int
         if best is None or tile_width * tile_height > best[1] * best[2]:
             best = (cols, tile_width, tile_height)
     if best is None:
-        raise ContactSheetError("画面比例过于极端，无法排版联系表")
+        raise ContactSheetError("Aspect ratio is too extreme to lay out a contact sheet")
     return best
 
 

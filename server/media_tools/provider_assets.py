@@ -211,13 +211,13 @@ async def release_provider_asset_link(
 
 def upload_summary(link: link_ops.LinkResponse) -> str:
     return (
-        f"已创建入库任务（关联 {link.id}），后台会完成上传与审核查询，本次调用不等待结果。"
-        "稍后用 get_provider_asset_links 查询状态，状态为可用后再重新生成"
+        f"Created an import task (link {link.id}); upload and review checks finish in the background and this call "
+        "does not wait. Check the status later with get_provider_asset_links and regenerate once it is available"
     )
 
 
 def select_summary(value: dict[str, Any]) -> str:
-    return f"已把素材库图片保存为第 {value['content_version'].version} 版，关联 {value['link'].id} 可用"
+    return f"Saved the provider library image as version {value['content_version'].version}; link {value['link'].id} is available"
 
 
 __all__ = [

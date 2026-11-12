@@ -221,7 +221,7 @@ class TestPollAndCollect:
 
         with capture_http() as router:
             router.post(AISTUDIO_INTERACTIONS).respond(200, json=empty)
-            with pytest.raises(RuntimeError, match="未返回视频数据"):
+            with pytest.raises(RuntimeError, match="returned no video data"):
                 await _aistudio().generate(request)
 
         assert not request.output_path.exists()

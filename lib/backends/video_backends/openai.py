@@ -153,7 +153,7 @@ class OpenAIVideoBackend(EntryBoundCapabilities, ProviderJobIdPersistenceMixin):
     ):
         self._client = create_openai_client(api_key=api_key, base_url=base_url, transport_layer=transport_layer)
         if not model:
-            raise ValueError("OpenAIVideoBackend 需要指定模型")
+            raise ValueError("OpenAIVideoBackend requires a model")
         self._model = model
 
     @property
@@ -340,7 +340,7 @@ class OpenAIVideoBackend(EntryBoundCapabilities, ProviderJobIdPersistenceMixin):
             poll_fn=lambda: client.videos.retrieve(video_id),
             is_done=lambda v: _video_status(v) in TERMINAL_PROVIDER_STATUSES,
             is_failed=lambda v: (
-                f"Sora 视频生成失败: {_video_error_message(v)}"
+                f"Sora video generation failed: {_video_error_message(v)}"
                 if _video_status(v) is ProviderJobStatus.FAILED
                 else None
             ),

@@ -101,7 +101,7 @@ class GeminiVideoBackend(EntryBoundCapabilities, ProviderJobIdPersistenceMixin):
 
             credentials_file = Path(credentials_path) if credentials_path else resolve_vertex_credentials_path()
             if credentials_file is None:
-                raise ValueError("未找到 Vertex AI 凭证文件")
+                raise ValueError("Vertex AI credentials file not found")
 
             with open(credentials_file, encoding="utf-8") as f:
                 creds_data = json_module.load(f)
@@ -200,7 +200,9 @@ class GeminiVideoBackend(EntryBoundCapabilities, ProviderJobIdPersistenceMixin):
             # Fail fast: missing operation.name means successful submission without persistable provider_job_id.
             # After interruption, orphan handlers would [restart_lost] into resubmission, exactly the duplicate-billing
             # case to prevent. Raise so worker finally marks failed instead of silently continuing polling.
-            raise RuntimeError("Gemini 提交成功但未返回 operation.name，无法持久化 provider_job_id")
+            raise RuntimeError(
+                "Gemini submission succeeded but returned no operation.name; cannot persist provider_job_id"
+            )
         # Persist actual request hosts too: resume replays them, otherwise changed base_url would query old operations on new hosts.
         await self._persist_provider_job_id(request, op_name, provider=PROVIDER_GEMINI, endpoint=self._request_base_url)
         done_operation = await self._poll_until_done(operation, request)
@@ -352,8 +354,8 @@ class GeminiVideoBackend(EntryBoundCapabilities, ProviderJobIdPersistenceMixin):
                 metadata,
             )
             if error_detail:
-                raise RuntimeError(f"视频生成失败: {error_detail}")
-            raise RuntimeError("视频生成失败: API 返回空结果")
+                raise RuntimeError(f"Video generation failed: {error_detail}")
+            raise RuntimeError("Video generation failed: the API returned an empty result")
 
         # Extract/download videos.
         generated_video = operation.response.generated_videos[0]
@@ -439,7 +441,7 @@ class GeminiVideoBackend(EntryBoundCapabilities, ProviderJobIdPersistenceMixin):
                 uri = video_ref.uri
                 write_atomically(output_path, lambda target: _fetch_uri(uri, target, deadline))
             else:
-                raise RuntimeError("视频生成成功但无法获取视频数据")
+                raise RuntimeError("Video generation succeeded but the video data could not be retrieved")
         else:
             # AI Studio files.download with destination writes chunks directly without loading entire videos into memory.
             def write(target: Path) -> None:
@@ -472,7 +474,7 @@ class _DeadlineWriter(io.RawIOBase):
 
     def write(self, b: Buffer, /) -> int:
         if time.monotonic() >= self._deadline:
-            raise TimeoutError("Gemini 成片下载超出取件预算")
+            raise TimeoutError("Gemini video download exceeded the retrieval budget")
         written = self._handle.write(b)
         self.written += written
         return written
@@ -482,7 +484,7 @@ def _io_timeout(deadline: float) -> float:
     """Per-network-operation timeout: bounded by I/O maximum and deadline; raise ``TimeoutError`` immediately after expiry."""
     remaining = deadline - time.monotonic()
     if remaining <= 0:
-        raise TimeoutError("Gemini 成片下载超出取件预算")
+        raise TimeoutError("Gemini video download exceeded the retrieval budget")
     return min(_DOWNLOAD_IO_TIMEOUT_SECONDS, remaining)
 
 

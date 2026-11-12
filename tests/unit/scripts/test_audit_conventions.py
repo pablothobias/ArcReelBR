@@ -467,8 +467,8 @@ def test_pending_trash_category_is_rejected_with_trash_guidance(repo: Path) -> N
     violations = [v for v in audit(repo) if v.rule == "HARD-DELETE"]
 
     assert [(v.path.as_posix(), v.line) for v in violations] == [("lib/cleanup.py", 2)]
-    assert "回收站" in violations[0].guidance
-    assert "已退役" in violations[0].guidance
+    assert "project trash" in violations[0].guidance
+    assert "is retired" in violations[0].guidance
 
 
 def test_hard_delete_tag_without_delete_call_is_reported(repo: Path) -> None:

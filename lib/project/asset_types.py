@@ -40,20 +40,27 @@ class AssetSpec:
     as ``本体名/衍生名``. Generic by asset type, currently character-only (``docs/adr/0072``);
     other types omit the field.
 
-    ``label_zh`` serves logger/Agent strings, both exempt under i18n rules; user-visible types use
-    ``lib/i18n`` ``asset_type_*`` instead."""
+    ``choice_fields`` declares closed-vocabulary string fields as ``(field, allowed values)`` pairs. The first
+    value is the default and an absent field means that default, so existing entries need no backfill;
+    validators reject other values. Like string extras they are PATCH-writable, and they are Agent-writable
+    only when also listed in ``agent_editable_extra_fields``.
+
+    ``label_zh`` serves logger strings and ``label_en`` Agent-facing error text, both exempt under i18n
+    rules; user-visible types use ``lib/i18n`` ``asset_type_*`` instead."""
 
     asset_type: str
     bucket_key: str
     sheet_field: str
     subdir: str
     label_zh: str
+    label_en: str
     namespace_priority: int
     reference_list_fields: tuple[str, ...]
     original_image_fields: tuple[str, ...] = ()
     extra_string_fields: tuple[str, ...] = ()
     extra_list_fields: tuple[str, ...] = ()
     agent_editable_extra_fields: tuple[str, ...] = ()
+    choice_fields: tuple[tuple[str, tuple[str, ...]], ...] = ()
     in_global_library: bool = True
     supports_derivatives: bool = False
 
@@ -71,6 +78,14 @@ class AssetSpec:
         return frozenset(fields)
 
 
+#: Scene-sheet occupancy (``docs/adr/0127``): whether the scene sheet is drawn as an empty environment
+#: (the default) or with the people its description asks for. Set explicitly by the author; never inferred
+#: from description wording.
+SCENE_OCCUPANCY_FIELD = "occupancy"
+SCENE_OCCUPANCY_EMPTY = "empty"
+SCENE_OCCUPANCY_OCCUPIED = "occupied"
+SCENE_OCCUPANCY_VALUES: tuple[str, ...] = (SCENE_OCCUPANCY_EMPTY, SCENE_OCCUPANCY_OCCUPIED)
+
 #: Character/scene/prop aliases: source alternative names, old names, merged names, used only by AI
 #: planning/script generation to recognize identities, never programmatic matching or references (``docs/adr/0092``).
 ALIASES_FIELD = "aliases"
@@ -82,6 +97,7 @@ ASSET_SPECS: dict[str, AssetSpec] = {
         sheet_field="character_sheet",
         subdir="characters",
         label_zh="角色",
+        label_en="character",
         namespace_priority=0,
         reference_list_fields=("characters_in_segment", "characters_in_scene", "characters_in_shot"),
         original_image_fields=("reference_image",),
@@ -104,11 +120,13 @@ ASSET_SPECS: dict[str, AssetSpec] = {
         sheet_field="scene_sheet",
         subdir="scenes",
         label_zh="场景",
+        label_en="scene",
         namespace_priority=1,
         reference_list_fields=("scenes",),
         extra_string_fields=(),
         extra_list_fields=(ALIASES_FIELD,),
-        agent_editable_extra_fields=(ALIASES_FIELD,),
+        agent_editable_extra_fields=(ALIASES_FIELD, SCENE_OCCUPANCY_FIELD),
+        choice_fields=((SCENE_OCCUPANCY_FIELD, SCENE_OCCUPANCY_VALUES),),
     ),
     "prop": AssetSpec(
         asset_type="prop",
@@ -116,6 +134,7 @@ ASSET_SPECS: dict[str, AssetSpec] = {
         sheet_field="prop_sheet",
         subdir="props",
         label_zh="道具",
+        label_en="prop",
         namespace_priority=2,
         reference_list_fields=("props",),
         extra_string_fields=(),
@@ -128,6 +147,7 @@ ASSET_SPECS: dict[str, AssetSpec] = {
         sheet_field="product_sheet",
         subdir="products",
         label_zh="商品",
+        label_en="product",
         namespace_priority=3,
         reference_list_fields=("products_in_shot",),
         original_image_fields=("reference_images",),
@@ -178,13 +198,13 @@ class ProjectAssetNameConflictError(ValueError):
         self.existing = existing
         self.requested_asset_type = requested_asset_type
         requested = (
-            f"新增/改名后的{ASSET_SPECS[requested_asset_type].label_zh}"
+            f"new or renamed {ASSET_SPECS[requested_asset_type].label_en}"
             if requested_asset_type in ASSET_SPECS
-            else "待写入资产"
+            else "asset to write"
         )
         super().__init__(
-            f"{requested}名称 {name!r} 与项目内已有{ASSET_SPECS[existing.asset_type].label_zh} "
-            f"{existing.name!r} 冲突（按 strip + Unicode NFC、不区分大小写判定）"
+            f"The {requested} name {name!r} conflicts with existing {ASSET_SPECS[existing.asset_type].label_en} "
+            f"{existing.name!r} in the project (compared after strip + Unicode NFC, case-insensitively)"
         )
 
 
@@ -256,9 +276,27 @@ def build_asset_entry(asset_type: str, description: str, source: Mapping[str, An
             entry[field] = []
         else:
             entry[field] = value  # Pass invalid types through for prewrite structural failure.
+    for field, _values in spec.choice_fields:
+        # Absent means the default value: copy only explicit choices, passing invalid values through.
+        if data.get(field) is not None:
+            entry[field] = data[field]
     if spec.supports_derivatives:
         entry[DERIVATIVES_FIELD] = {}
     return entry
+
+
+def is_valid_choice(value: object, allowed: tuple[str, ...]) -> bool:
+    """Single acceptance rule for choice fields: absent (``None``/``""``) means the default, otherwise a declared value."""
+    return value is None or value == "" or value in allowed
+
+
+def asset_choice(asset: Mapping[str, Any], spec: AssetSpec, field: str) -> str:
+    """Stored value of a declared choice field, or its default when absent/empty; ``ValueError`` on invalid values."""
+    values = dict(spec.choice_fields)[field]
+    value = asset.get(field)
+    if not is_valid_choice(value, values):
+        raise ValueError(f"{spec.asset_type} {field} must be one of {list(values)}, got {value!r}")
+    return value or values[0]
 
 
 def record_asset_aliases(entry: dict[str, Any], aliases: Iterable[str], *, asset_name: str) -> None:
@@ -431,25 +469,26 @@ def validate_asset_name(name: object) -> str:
     (CON / COM1, etc., by first dotted segment; ``CON.backup`` is reserved too). Apply constraints on
     all platforms at creation, ensuring portable projects.
 
-    Reject ``]`` too: ``@[名称]`` terminates at first ``]``
+    Reject ``]`` too: ``@[name]`` terminates at first ``]``
     (:func:`lib.script.reference_video.text_parser._iter_mentions`), truncating names containing ``]``.
     Allow ``[``: ``[甲`` in ``@[[甲]`` still parses completely as ``[甲``."""
     if not isinstance(name, str):
-        raise ValueError(f"资产名称必须是字符串，当前为 {type(name).__name__}")
+        raise ValueError(f"Asset name must be a string; got {type(name).__name__}")
     cleaned = normalize_asset_name(name.strip())
     if not cleaned:
-        raise ValueError("资产名称不能为空或仅含空白字符")
+        raise ValueError("Asset name cannot be empty or whitespace only")
     if (
         ".." in cleaned
         or any(c in cleaned for c in ILLEGAL_ASSET_NAME_CHARS)
         or any(ord(c) < 32 or ord(c) == 127 for c in cleaned)
     ):
         raise ValueError(
-            f"资产名称 {cleaned!r} 含非法字符：不允许路径分隔符（/ \\）、"
-            f'Windows 保留字符（: * ? " < > |）、引用定界符（]）、控制字符或 ..'
+            f"Asset name {cleaned!r} contains illegal characters: path separators (/ \\), "
+            f'Windows reserved characters (: * ? " < > |), the reference delimiter (]), control characters, '
+            "and .. are not allowed"
         )
     if cleaned.endswith("."):
-        raise ValueError(f"资产名称 {cleaned!r} 不能以点结尾（Windows 文件名约束）")
+        raise ValueError(f"Asset name {cleaned!r} cannot end with a dot (Windows file name constraint)")
     if cleaned.split(".", 1)[0].upper() in WINDOWS_RESERVED_BASENAMES:
-        raise ValueError(f"资产名称 {cleaned!r} 是 Windows 保留设备名（CON/PRN/AUX/NUL/COM1-9/LPT1-9）")
+        raise ValueError(f"Asset name {cleaned!r} is a Windows reserved device name (CON/PRN/AUX/NUL/COM1-9/LPT1-9)")
     return cleaned

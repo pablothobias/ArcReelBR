@@ -13,7 +13,7 @@ class _FakePM(FakeProjectAssetMutationMixin):
         self.projects = {
             "demo": {
                 "scenes": {
-                    "祠堂": {"description": "old", "scene_sheet": ""},
+                    "Shrine": {"description": "old", "scene_sheet": ""},
                 }
             }
         }
@@ -56,19 +56,19 @@ class TestScenesRouter:
         with _client(monkeypatch, fake_pm) as client:
             add_resp = client.post(
                 "/api/v1/projects/demo/scenes",
-                json={"name": "雪山", "description": "冷峻"},
+                json={"name": "Glacier", "description": "Stark"},
             )
             assert add_resp.status_code == 200
-            assert add_resp.json()["scene"]["description"] == "冷峻"
+            assert add_resp.json()["scene"]["description"] == "Stark"
 
             patch_resp = client.patch(
-                "/api/v1/projects/demo/scenes/祠堂",
-                json={"description": "new", "scene_sheet": "scenes/祠堂.png"},
+                "/api/v1/projects/demo/scenes/Shrine",
+                json={"description": "new", "scene_sheet": "scenes/Shrine.png"},
             )
             assert patch_resp.status_code == 200
-            assert patch_resp.json()["scene"]["scene_sheet"].endswith("祠堂.png")
+            assert patch_resp.json()["scene"]["scene_sheet"].endswith("Shrine.png")
 
-            delete_resp = client.delete("/api/v1/projects/demo/scenes/雪山")
+            delete_resp = client.delete("/api/v1/projects/demo/scenes/Glacier")
             assert delete_resp.status_code == 200
 
     def test_error_mapping(self, monkeypatch):
@@ -77,18 +77,18 @@ class TestScenesRouter:
             # Duplicate name → 409
             dup_resp = client.post(
                 "/api/v1/projects/demo/scenes",
-                json={"name": "祠堂", "description": ""},
+                json={"name": "Shrine", "description": ""},
             )
             assert dup_resp.status_code == 409
 
             # Missing scene → 404
             missing_resp = client.patch(
-                "/api/v1/projects/demo/scenes/不存在",
+                "/api/v1/projects/demo/scenes/Missing",
                 json={"description": "x"},
             )
             assert missing_resp.status_code == 404
 
-            missing_del = client.delete("/api/v1/projects/demo/scenes/不存在")
+            missing_del = client.delete("/api/v1/projects/demo/scenes/Missing")
             assert missing_del.status_code == 404
 
 
@@ -117,8 +117,45 @@ class TestScenesRouterDoesNotCollideWithProjects:
 
         with TestClient(app) as client:
             resp = client.patch(
-                "/api/v1/projects/demo/scenes/祠堂",
-                json={"description": "傍晚至清晨室外海景"},
+                "/api/v1/projects/demo/scenes/Shrine",
+                json={"description": "Outdoor seascape from dusk to dawn"},
             )
             assert resp.status_code == 200, resp.json()
-            assert resp.json()["scene"]["description"] == "傍晚至清晨室外海景"
+            assert resp.json()["scene"]["description"] == "Outdoor seascape from dusk to dawn"
+
+
+class TestSceneOccupancy:
+    def test_create_and_patch_store_an_explicit_occupancy(self, monkeypatch):
+        fake_pm = _FakePM()
+        with _client(monkeypatch, fake_pm) as client:
+            created = client.post(
+                "/api/v1/projects/demo/scenes", json={"name": "Classroom", "description": "d", "occupancy": "occupied"}
+            )
+            plain = client.post("/api/v1/projects/demo/scenes", json={"name": "Snowy peak", "description": "d"})
+            patched = client.patch("/api/v1/projects/demo/scenes/Shrine", json={"occupancy": "occupied"})
+            reverted = client.patch("/api/v1/projects/demo/scenes/Shrine", json={"occupancy": "empty"})
+
+        assert created.json()["scene"]["occupancy"] == "occupied"
+        assert "occupancy" not in plain.json()["scene"]
+        assert patched.json()["scene"]["occupancy"] == "occupied"
+        assert reverted.json()["scene"]["occupancy"] == "empty"
+
+    def test_unknown_occupancy_is_rejected_without_writing(self, monkeypatch):
+        fake_pm = _FakePM()
+        with _client(monkeypatch, fake_pm) as client:
+            created = client.post(
+                "/api/v1/projects/demo/scenes", json={"name": "Classroom", "description": "d", "occupancy": "crowded"}
+            )
+            patched = client.patch("/api/v1/projects/demo/scenes/Shrine", json={"occupancy": "crowded"})
+
+        assert created.status_code == 422
+        assert patched.status_code == 422
+        assert "Classroom" not in fake_pm.projects["demo"]["scenes"]
+        assert "occupancy" not in fake_pm.projects["demo"]["scenes"]["Shrine"]
+
+    def test_blank_occupancy_is_accepted_as_the_default_like_the_validator(self, monkeypatch):
+        fake_pm = _FakePM()
+        with _client(monkeypatch, fake_pm) as client:
+            patched = client.patch("/api/v1/projects/demo/scenes/Shrine", json={"occupancy": ""})
+
+        assert patched.status_code == 200

@@ -144,7 +144,9 @@ class ArkImageBackend:
         data = getattr(response, "data", None) or []
         if not data:
             # Empty data usually means moderation filtering or gateway anomalies; expose clear errors for diagnosis.
-            raise RuntimeError(f"Ark 图片生成响应 data 为空 (model={self._model})，可能触发内容安全过滤或上游服务异常")
+            raise RuntimeError(
+                f"Ark image generation response data is empty (model={self._model}); a content safety filter or an upstream service error may be the cause"
+            )
         await save_image_from_response_item(data[0], request.output_path)
 
         return ImageGenerationResult(

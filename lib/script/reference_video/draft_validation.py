@@ -89,14 +89,14 @@ def validate_source_text_anchor(label: str, source_text: str, novel_text: str) -
     anchor = _normalize_for_anchor(source_text)
     if not anchor:
         raise DraftViolation(
-            f"{label} 的 source_text 为空：每个 unit 必须摘录其所依据的原文片段作为追溯锚",
+            f"{label} has an empty source_text: every unit must quote the source text passage it is based on as a traceability anchor",
             code="source_text_empty",
             label=label,
         )
     if not is_verbatim_source_anchor(source_text, novel_text):
         raise DraftViolation(
-            f"{label} 的 source_text 不是小说原文的逐字片段（存在改写、翻译或杜撰）："
-            f"{source_text.strip()[:40]!r}；请原样复制原文，不要转述",
+            f"{label} source_text is not a verbatim excerpt of the novel source text (it was rewritten, translated or invented): "
+            f"{source_text.strip()[:40]!r}; copy the source text exactly instead of paraphrasing it",
             code="source_text_not_verbatim",
             label=label,
         )
@@ -120,8 +120,8 @@ def _assert_line_syntax(label: str, text: str, character_references: Container[s
     for idx, line in enumerate(text.splitlines()):
         if any(ch in line for ch in _FULLWIDTH_BRACES):
             raise DraftViolation(
-                f"{label} 使用了全角花括号：{line.strip()[:40]!r}；"
-                "台词与画外音的花括号必须是半角 `{}`，全角形不会被识别为台词",
+                f"{label} uses fullwidth braces: {line.strip()[:40]!r}; "
+                "dialogue and voiceover braces must be ASCII `{}`; fullwidth braces are not recognized as dialogue",
                 code="fullwidth_braces",
                 label=label,
                 line=idx,
@@ -129,9 +129,9 @@ def _assert_line_syntax(label: str, text: str, character_references: Container[s
         malformed = find_malformed_mention(line)
         if malformed is not None:
             raise DraftViolation(
-                f"{label} 有写坏的资产引用：{malformed!r}；"
-                "引用须写成 `@[资产名]`，方括号要成对闭合、名称非空，否则既不进 references，"
-                "又会原样进入视频请求",
+                f"{label} has a malformed asset reference: {malformed!r}; "
+                "write references as `@[asset name]` with paired square brackets and a nonempty name; "
+                "otherwise the reference is left out of references and sent verbatim in the video request",
                 code="malformed_mention",
                 label=label,
                 line=idx,
@@ -139,13 +139,13 @@ def _assert_line_syntax(label: str, text: str, character_references: Container[s
         parts = split_speech_line(line)
         leads_with_speech = bool(parts) and isinstance(parts[0], SpeechMark) and bool(parts[0].speaker)
         # Only registered characters plus a colon imply malformed dialogue. Scene/prop subheadings
-        # (``@[酒馆]：木门被风吹开``) are valid visual descriptions; rejecting every such shape would
+        # (``@[Tavern]: the wooden door blows open``) are valid visual descriptions; rejecting every such shape would
         # reject normal script_plan output.
         if not leads_with_speech and (leading_mention_before_colon(line) or "") in character_references:
             raise DraftViolation(
-                f"{label} 的台词写法不合法：{line.strip()[:40]!r}；"
-                "台词须写成 `@[角色]{台词}`——说话人非空、台词由半角花括号成对包裹，"
-                "否则这段会被当成画面描述、台词整句丢失",
+                f"{label} has an invalid dialogue line: {line.strip()[:40]!r}; "
+                "write dialogue as `@[character]{dialogue}` with a nonempty speaker and the dialogue wrapped in "
+                "a pair of ASCII braces; otherwise the line is treated as visual description and the dialogue is lost",
                 code="dialogue_line_syntax",
                 label=label,
                 line=idx,
@@ -156,11 +156,13 @@ def _assert_line_syntax(label: str, text: str, character_references: Container[s
             continue
         excerpt = line.strip()[:40]
         if rest.count("{") != rest.count("}"):
-            raise DraftViolation(f"{label} 有未闭合的花括号：{excerpt!r}", code="unclosed_brace", label=label, line=idx)
+            raise DraftViolation(
+                f"{label} has an unclosed brace: {excerpt!r}", code="unclosed_brace", label=label, line=idx
+            )
         raise DraftViolation(
-            f"{label} 在画面描述里使用了花括号：{excerpt!r}；"
-            "花括号是发声保留语法，台词写作 `@[角色]{台词}`、画外音写作 `{画外音}`，"
-            "说话人须非空、花括号不得嵌套",
+            f"{label} uses braces in visual description: {excerpt!r}; "
+            "braces are reserved for speech: write dialogue as `@[character]{dialogue}` and voiceover as "
+            "`{voiceover}`; the speaker must be nonempty and braces must not nest",
             code="braces_in_description",
             label=label,
             line=idx,
@@ -179,7 +181,7 @@ def dialogue_speakers(text: str) -> list[str]:
     at the parser entry (``_normalize_source`` in ``lib.script.reference_video.text_parser``).
     They match normalized asset-table keys, so use them directly without additional normalization.
 
-    A speaker written as ``@[角色/衍生]`` yields the base name: voice belongs to identity, and derivatives
+    A speaker written as ``@[character/derivative]`` yields the base name: voice belongs to identity, and derivatives
     share the base's reference audio and voice characteristics (see ``docs/adr/0072``).
     See ``speech_speaker_references`` for the appearance actually written.
     """
@@ -194,7 +196,7 @@ def dialogue_speakers(text: str) -> list[str]:
 
 
 def normative_lines(text: str) -> list[tuple[str, str, str]]:
-    """Return all speech marks in appearance order: ``(kind, speaker, 台词)``, with ``kind`` dialogue / voiceover.
+    """Return all speech marks in appearance order: ``(kind, speaker, dialogue)``, with ``kind`` dialogue / voiceover.
 
     prompt_authoring's structure-preserving diff compares these: visual descriptions may expand freely,
     but speech marks must remain verbatim.
@@ -226,7 +228,7 @@ def validate_unit_text(
     """Validate one unit's body and mechanically derive reference-image references.
 
     Cover four blocking violations: empty bodies or speech-only bodies; reference-syntax misuse
-    (braces, malformed references, unbraced dialogue); unregistered ``@[名称]`` references, including
+    (braces, malformed references, unbraced dialogue); unregistered ``@[name]`` references, including
     speech-mark speakers and their written derivatives; and reference counts over model limits.
     Only the body is persisted. Derived results serve this validation/capability check and are not written back.
 
@@ -234,7 +236,7 @@ def validate_unit_text(
     may be unregistered extras. Execution binds no voice to those lines and sends them verbatim.
     """
     if not text.strip():
-        raise DraftViolation(f"{label} 的正文为空", code="empty_text", label=label)
+        raise DraftViolation(f"{label} has an empty body", code="empty_text", label=label)
 
     # Always get registered names from the reference catalog, already in comparison coordinates.
     # The parser normalizes body names at entry; both sides must match for accurate checks.
@@ -244,7 +246,7 @@ def validate_unit_text(
     # Dialogue/voiceover-only bodies have no generatable visuals; nonempty bodies pass the empty check.
     if not _has_description_line(text):
         raise DraftViolation(
-            f"{label} 没有画面描述；只有台词与画外音的单元没有可生成的画面",
+            f"{label} has no visual description; a unit with only dialogue and voiceover has nothing to generate visually",
             code="blank_description",
             label=label,
         )
@@ -254,7 +256,8 @@ def validate_unit_text(
     refs, missing = derive_references_from_text(text, project)
     if missing:
         raise DraftViolation(
-            f"{label} 引用了未登记的资产名: {missing}；资产名必须逐字取自 project.json 三张表",
+            f"{label} references unregistered asset names: {missing}; "
+            "asset names must be copied verbatim from the three tables in project.json",
             code="unregistered_asset",
             label=label,
         )
@@ -266,7 +269,8 @@ def validate_unit_text(
     bad_speakers = sorted({s for s in dialogue_speakers(text) if s not in registered_speakers and s not in tolerated})
     if bad_speakers:
         raise DraftViolation(
-            f"{label} 的台词说话人未登记为角色资产: {bad_speakers}；说话人决定该句台词绑哪段参考音频，必须是登记角色",
+            f"{label} has dialogue speakers not registered as character assets: {bad_speakers}; "
+            "the speaker determines which reference audio the dialogue line binds to, so it must be a registered character",
             code="unregistered_speaker",
             label=label,
         )
@@ -280,15 +284,16 @@ def validate_unit_text(
     )
     if bad_forms:
         raise DraftViolation(
-            f"{label} 的台词说话人写了该角色没有的衍生: {bad_forms}；"
-            "衍生须先登记在该角色下，或改写成本体名 `@[角色]{台词}`",
+            f"{label} has dialogue speakers using derivatives the character does not have: {bad_forms}; "
+            "register the derivative under that character first, or use the base character name as `@[character]{dialogue}`",
             code="unregistered_speaker_derivative",
             label=label,
         )
 
     if max_refs is not None and len(refs) > max_refs:
         raise DraftViolation(
-            f"{label} 的参考图数 {len(refs)} 超过模型上限 {max_refs}；请把次要角色融入背景描述（不用 `@` 引用）",
+            f"{label} uses {len(refs)} reference images, exceeding the model limit of {max_refs}; "
+            "fold minor characters into the background description (without `@` references)",
             code="refs_over_limit",
             label=label,
         )
@@ -306,8 +311,8 @@ def _speech_problem_violation(problem: SpeechProblem) -> DraftViolation:
     )
     line = problem.locations[0].line if len(problem.locations) == 1 else None
     return DraftViolation(
-        f"unit {problem.unit_id} 发声准入未通过（{problem.reason.value}，定位：{locations}）；"
-        f"下一步：{problem.action.value}",
+        f"unit {problem.unit_id} failed speech admission ({problem.reason.value}, location: {locations}); "
+        f"next step: {problem.action.value}",
         code=problem.code.value,
         label=f"unit {problem.unit_id}",
         line=line,
@@ -348,9 +353,9 @@ def validate_dialogue_load(
     budget = duration_seconds * (1 + SPEECH_OVERFLOW_TOLERANCE)
     if spoken > budget:
         raise DraftViolation(
-            f"{label} 的台词念完约需 {spoken:.1f} 秒，超过该 unit 的 {duration_seconds} 秒"
-            f"（宽容 {SPEECH_OVERFLOW_TOLERANCE:.0%} 后上限 {budget:.1f} 秒）；"
-            "请改取更长的时长档、把该 unit 拆开，或精简台词",
+            f"{label} dialogue takes about {spoken:.1f} seconds to speak, exceeding the unit's {duration_seconds} seconds"
+            f" (limit {budget:.1f} seconds with {SPEECH_OVERFLOW_TOLERANCE:.0%} tolerance); "
+            "choose a longer duration tier, split the unit, or trim the dialogue",
             code="dialogue_overload",
             label=label,
         )
@@ -370,16 +375,17 @@ def assert_dialogue_preserved(label: str, script_plan_text: str, prompt_authorin
         return
     if len(before) != len(after):
         raise DraftViolation(
-            f"{label} 的台词条数被改动（script_plan 有 {len(before)} 条，prompt_authoring 产出 {len(after)} 条）；"
-            "prompt_authoring 只做提示词编写，台词须逐字保留",
+            f"{label} dialogue line count changed (script_plan has {len(before)}, prompt_authoring produced {len(after)}); "
+            "prompt_authoring only writes prompts; dialogue lines must be preserved verbatim",
             code="dialogue_line_count_changed",
             label=label,
         )
     for index, (old, new) in enumerate(zip(before, after, strict=True), start=1):
         if old != new:
             raise DraftViolation(
-                f"{label} 第 {index} 条台词被改写（原：{old[1] or '画外音'}「{old[2]}」，"
-                f"现：{new[1] or '画外音'}「{new[2]}」）；prompt_authoring 只做提示词编写，台词须逐字保留",
+                f'{label} dialogue line {index} was rewritten (was: {old[1] or "voiceover"} "{old[2]}", '
+                f'now: {new[1] or "voiceover"} "{new[2]}"); '
+                "prompt_authoring only writes prompts; dialogue lines must be preserved verbatim",
                 code="dialogue_rewritten",
                 label=label,
             )

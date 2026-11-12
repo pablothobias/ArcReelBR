@@ -97,7 +97,7 @@ async def test_no_audio_fails_without_writing(backend, tmp_path):
     empty = httpx.Response(200, json={"candidates": [{"content": {"role": "model", "parts": [{"text": "no"}]}}]})
     with capture_http() as router:
         route = router.post(_URL).mock(return_value=empty)
-        with pytest.raises(RuntimeError, match="未返回音频"):
+        with pytest.raises(RuntimeError, match="returned no audio"):
             await backend.synthesize(_request(tmp_path))
     assert route.call_count == 1
     assert not (tmp_path / "out.wav").exists()

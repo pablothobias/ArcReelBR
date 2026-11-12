@@ -139,17 +139,17 @@ def episode_file_label(project: Mapping[str, Any], episode_id: int, translate: C
 
 
 def describe_episode_for_agent(project: Mapping[str, Any], episode_id: int) -> str:
-    """Agent output labels: ``《标题》（第 N 个，id=X）``.
+    """Agent output labels: ``"Title" (position N, id=X)``.
 
     Omit title brackets without titles, IDs only outside ledgers.
     """
 
     position = episode_position(project, episode_id)
     if position is None:
-        return f"集（id={episode_id}）"
+        return f"Episode (id={episode_id})"
     title = episode_title(project, episode_id)
-    locator = f"（第 {position} 个，id={episode_id}）"
-    return f"《{title}》{locator}" if title else f"未命名集{locator}"
+    locator = f" (position {position}, id={episode_id})"
+    return f'"{title}"{locator}' if title else f"Untitled episode{locator}"
 
 
 def item_id_within_episode(item_id: str) -> str:

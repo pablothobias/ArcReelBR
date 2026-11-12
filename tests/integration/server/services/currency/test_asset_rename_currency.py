@@ -60,7 +60,7 @@ def _write_script(project_dir: Path, script: dict) -> None:
 def test_a_storyboard_that_mentions_the_renamed_character_stays_current(
     current_cast_artifacts: ProjectManager,
 ) -> None:
-    """Body ``@[名称]`` becomes “图N” for models, so rewriting asset names does not change model inputs."""
+    """Body ``@[name]`` becomes “图N” for models, so rewriting asset names does not change model inputs."""
 
     pm = current_cast_artifacts
     project_dir = pm.get_project_path(PROJECT)

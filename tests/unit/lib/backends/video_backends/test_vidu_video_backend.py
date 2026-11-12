@@ -458,7 +458,7 @@ class TestCreateTaskAmbiguity:
         backend = _profile("viduq3-turbo")(api_key="k", model="viduq3-turbo")
         with (
             bounded_poll_clock(),
-            pytest.raises(AmbiguousSubmitError, match="手动重试"),
+            pytest.raises(AmbiguousSubmitError, match="retry manually"),
         ):
             await backend._create_task(client, "/text2video", {"model": "viduq3-turbo", "prompt": "x", "duration": 8})
         # Ambiguous: the request may have arrived; do not retry.

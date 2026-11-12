@@ -45,6 +45,7 @@ from lib.project.asset_types import (
     ASSET_SPECS,
     DERIVATIVES_FIELD,
     asset_name_comparison_key,
+    is_valid_choice,
     project_asset_name_conflicts,
 )
 from lib.project.project_manager import VALID_GENERATION_MODES as _VALID_GENERATION_MODES
@@ -729,6 +730,19 @@ class DataValidator:
                         )
                     )
             self._validate_asset_list_fields(data, extra_list_fields, kind, name, errors)
+            for field_name, allowed in spec.choice_fields if spec else ():
+                val = data.get(field_name)
+                if not is_valid_choice(val, allowed):
+                    errors.append(
+                        _m(
+                            "val_asset_field_invalid_choice",
+                            asset_type=kind,
+                            name=name,
+                            field=field_name,
+                            allowed=", ".join(allowed),
+                            actual=repr(val),
+                        )
+                    )
 
     def _unregistered_refs(self, refs: list[Any], registered: Container[str]) -> list[Any]:
         """Select unregistered references using ``lib.project.asset_types`` NFC coordinates.
@@ -1341,7 +1355,7 @@ class DataValidator:
             if not valid_duration:
                 errors.append(_m("val_unit_duration_range", prefix=prefix, low=low, high=high))
 
-            # Unregistered body `@[名称]` is not a validation error: references derive at execution; unresolved mentions produce
+            # Unregistered body `@[name]` is not a validation error: references derive at execution; unresolved mentions produce
             # nonblocking render/preview warnings (ADR 0064), never promoted to structural errors here.
 
             if project_dir is not None:
@@ -1458,7 +1472,7 @@ class DataValidator:
                 speech_rate_override=scene_speech_rate,
             )
         else:  # pragma: no cover - resolve_declared_kind returns four skeletons; unhandled fifth kinds raise
-            raise ValueError(f"未处置的骨架种类: {kind!r}")
+            raise ValueError(f"Unhandled skeleton kind: {kind!r}")
 
     def validate_episode(self, project_name: str, episode_file: str) -> ValidationResult:
         """Validate episode JSON."""
@@ -1678,9 +1692,9 @@ if __name__ == "__main__":
     import sys
 
     if len(sys.argv) < 2:
-        print("用法: python data_validator.py <project_name> [episode_file]")
-        print("  验证 project.json: python data_validator.py my_project")
-        print("  验证 episode JSON: python data_validator.py my_project episode_1.json")
+        print("Usage: python data_validator.py <project_name> [episode_file]")
+        print("  Validate project.json: python data_validator.py my_project")
+        print("  Validate episode JSON: python data_validator.py my_project episode_1.json")
         sys.exit(1)
 
     project_name = sys.argv[1]
@@ -1688,10 +1702,10 @@ if __name__ == "__main__":
     if len(sys.argv) >= 3:
         episode_file = sys.argv[2]
         result = validate_episode(project_name, episode_file)
-        print(f"验证 {project_name}/scripts/{episode_file}:")
+        print(f"Validating {project_name}/scripts/{episode_file}:")
     else:
         result = validate_project(project_name)
-        print(f"验证 {project_name}/project.json:")
+        print(f"Validating {project_name}/project.json:")
 
     print(result)
     sys.exit(0 if result.valid else 1)

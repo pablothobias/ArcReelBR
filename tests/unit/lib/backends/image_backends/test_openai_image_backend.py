@@ -209,7 +209,7 @@ class TestOpenAIImageBackend:
                 image_size="1K",
             )
 
-            with pytest.raises(RuntimeError, match="data 为空"):
+            with pytest.raises(RuntimeError, match="data is empty"):
                 await backend.generate(request)
 
     async def test_text_to_image_url_fallback(self, tmp_path: Path):

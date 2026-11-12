@@ -39,12 +39,12 @@ MAX_IMAGE_EDGE = 2000
 _JPEG_QUALITY = 85
 
 LABEL_ZH: dict[str, str] = {
-    "character": "角色资产图",
-    "scene": "场景资产图",
-    "prop": "道具资产图",
-    "product": "商品资产图",
-    "storyboard": "分镜图",
-    "character_derivative": "角色衍生资产图",
+    "character": "character asset image",
+    "scene": "scene asset image",
+    "prop": "prop asset image",
+    "product": "product asset image",
+    "storyboard": "storyboard image",
+    "character_derivative": "character derivative asset image",
 }
 
 type ImageStatus = Literal["ok", "image_missing", "image_unreadable"]
@@ -138,9 +138,9 @@ def _read_image(path: Path) -> tuple[bytes | None, str | None]:
     try:
         return compress_image_bytes(path.read_bytes(), max_long_edge=MAX_IMAGE_EDGE, quality=_JPEG_QUALITY), None
     except OSError as exc:
-        return None, f"读取失败：{exc}"
+        return None, f"read failed: {exc}"
     except ValueError:
-        return None, "图片无法解码"
+        return None, "image cannot be decoded"
 
 
 async def inspect_images(
@@ -153,7 +153,7 @@ async def inspect_images(
     ids = list(dict.fromkeys(request.value.ids))
     if len(ids) > MAX_IMAGES_PER_CALL:
         return tool_problem(
-            f"一次最多看 {MAX_IMAGES_PER_CALL} 张图，本次请求了 {len(ids)} 张，请分批调用",
+            f"At most {MAX_IMAGES_PER_CALL} images per call; this request asked for {len(ids)}, so split it into batches",
             code="image_limit_exceeded",
             params={"max_images_per_call": MAX_IMAGES_PER_CALL},
         )
@@ -162,7 +162,7 @@ async def inspect_images(
         resolved, missing = await asyncio.to_thread(_resolve_ids, services, scope.project_name, resource_type, ids)
         if missing:
             return tool_problem(
-                f"{label}的对象不存在：{', '.join(missing)}",
+                f"No {label} for: {', '.join(missing)}",
                 code="resource_not_found",
                 params={"resource_type": resource_type, "ids": missing},
             )
@@ -181,7 +181,8 @@ async def inspect_images(
                     version = current if current > 0 else None
                 elif version not in available:
                     return tool_problem(
-                        f"{label}「{item_id}」没有版本 v{version}；现有版本：{', '.join(map(str, available)) or '无'}",
+                        f'{label} "{item_id}" has no version v{version}; available versions: '
+                        f"{', '.join(map(str, available)) or 'none'}",
                         code="version_not_found",
                         params={"id": item_id, "available_versions": available},
                     )
@@ -273,8 +274,8 @@ def inspect_images_images(value: InspectImagesResult) -> list[ToolImage]:
 
 def inspect_images_summary(value: InspectImagesResult) -> str:
     unseen = [image.id for image in value.images if image.jpeg is None]
-    text = f"已取出 {len(value.images) - len(unseen)} 张{LABEL_ZH[value.resource_type]}，图片按 image 序号附在后面"
-    return f"{text}；没有可看的图：{', '.join(unseen)}" if unseen else text
+    text = f"Retrieved {len(value.images) - len(unseen)} {LABEL_ZH[value.resource_type]}(s); the images follow in image order"
+    return f"{text}; nothing to view for: {', '.join(unseen)}" if unseen else text
 
 
 __all__ = [

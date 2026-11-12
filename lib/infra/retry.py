@@ -147,7 +147,7 @@ def with_retry_async(
         @functools.wraps(func)
         async def wrapper(*args, **kwargs):
             if max_attempts <= 0:
-                raise RuntimeError(f"with_retry_async: max_attempts={max_attempts}，未执行任何尝试")
+                raise RuntimeError(f"with_retry_async: max_attempts={max_attempts}, no attempt was made")
             return await retry_async(
                 lambda: func(*args, **kwargs),
                 max_attempts=max_attempts,
@@ -191,7 +191,7 @@ async def retry_async[T](
             logger.warning("重试 %d/%d, %.1f 秒后...", attempt + 1, max_attempts - 1, wait_time)
             await active_clock.sleep(wait_time)
 
-    raise RuntimeError(f"retry_async: max_attempts={max_attempts}，未执行任何尝试")
+    raise RuntimeError(f"retry_async: max_attempts={max_attempts}, no attempt was made")
 
 
 def _compute_wait(

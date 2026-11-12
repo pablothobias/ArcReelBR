@@ -61,7 +61,7 @@ def migrate_v16_to_v17(project_dir: Path) -> None:
     with project_metadata_lock(project_dir):
         project = json.loads(project_file.read_bytes())
         if not isinstance(project, dict):
-            raise ValueError("project.json 必须是对象")
+            raise ValueError("project.json must be an object")
         if parse_project_schema_version(project) >= TARGET_SCHEMA_VERSION:
             return
         atomic_write_json(project_file, {**migrate_project_dict(project), "schema_version": TARGET_SCHEMA_VERSION})

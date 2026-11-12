@@ -65,7 +65,7 @@ _ANTHROPIC_ENV_MAP: dict[str, str] = {
 }
 # Environment-key consistency with ANTHROPIC_ENV_KEYS.
 assert set(_ANTHROPIC_ENV_MAP.values()) == set(ANTHROPIC_ENV_KEYS), (
-    "_ANTHROPIC_ENV_MAP 与 lib.config.env_keys.ANTHROPIC_ENV_KEYS 漂移"
+    "_ANTHROPIC_ENV_MAP has drifted from lib.config.env_keys.ANTHROPIC_ENV_KEYS"
 )
 
 

@@ -164,5 +164,5 @@ def test_reference_fixture_retains_literal_speech_and_rejects_translation():
     _assert_separated_policy(prompt)
     assert _SPEECH in prompt
     assert_dialogue_preserved("E1U01", body, body.replace("looks at the bill", "looks down at the bill"))
-    with pytest.raises(DraftViolation, match="台词被改写"):
+    with pytest.raises(DraftViolation, match="was rewritten"):
         assert_dialogue_preserved("E1U01", body, body.replace(_SPEECH, "I cannot believe it!"))

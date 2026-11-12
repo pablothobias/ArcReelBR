@@ -493,7 +493,7 @@ class ProjectArchiveService:
     ) -> dict[str, list[dict[str, Any]]]:
         self._validate_scope(scope)
         if not self.project_manager.project_exists(project_name):
-            raise FileNotFoundError(f"项目 '{project_name}' 不存在或未初始化")
+            raise FileNotFoundError(f"Project '{project_name}' does not exist or is not initialized")
 
         temp_dir, _, _, diagnostics = self._prepare_export_snapshot(project_name, scope=scope)
         temp_dir.cleanup()
@@ -507,7 +507,7 @@ class ProjectArchiveService:
     ) -> tuple[Path, str]:
         self._validate_scope(scope)
         if not self.project_manager.project_exists(project_name):
-            raise FileNotFoundError(f"项目 '{project_name}' 不存在或未初始化")
+            raise FileNotFoundError(f"Project '{project_name}' does not exist or is not initialized")
 
         fd, archive_path_str = tempfile.mkstemp(
             prefix=f"{project_name}-",
@@ -1470,7 +1470,7 @@ class ProjectArchiveService:
         # false values bypassing fail-loud checks and distorts nonreference error semantics.
         raw_content_mode = script_payload.get("content_mode") or project_payload.get("content_mode")
         if not isinstance(raw_content_mode, str):
-            raise ValueError(f"未知或缺失 content_mode: {raw_content_mode!r}")
+            raise ValueError(f"Unknown or missing content_mode: {raw_content_mode!r}")
         content_mode = raw_content_mode
         generation_mode = project_payload.get("generation_mode")
 
@@ -1720,7 +1720,7 @@ class ProjectArchiveService:
 
         Unit references are not persisted; body text is authoritative. Touch only structure/artifact fields:
         per-unit duration adoption, generated_assets completion, video_clip/video_thumbnail path normalization,
-        and history reconstruction. Body ``@[名称]`` self-healing uses :meth:`_repair_unit_mentions_tree`
+        and history reconstruction. Body ``@[name]`` self-healing uses :meth:`_repair_unit_mentions_tree`
         after schema migration converts legacy ``shots`` into readable body text. video_uri is a remote URL,
         not a local path (otherwise canonical local files with matching names would overwrite it)."""
         raw_units = script_payload.get("video_units")
@@ -1869,10 +1869,10 @@ class ProjectArchiveService:
         location_prefix: str,
         diagnostics: ArchiveDiagnostics,
     ) -> bool:
-        """Heal ``@[名称]`` in video_unit bodies: add missing-speaker placeholders; warn only for other unresolved mentions.
+        """Heal ``@[name]`` in video_unit bodies: add missing-speaker placeholders; warn only for other unresolved mentions.
 
         Body text alone is authoritative; references resolve at execution. Unresolved mentions mean only no
-        reference image here and do not block import. Speakers are the exception: ``@[角色]{台词}`` syntax
+        reference image here and do not block import. Speakers are the exception: ``@[character]{dialogue}`` syntax
         establishes a character; missing definitions lose dialogue voice bindings, so add placeholders like narration/drama.
 
         Names and registered keys may use NFC/NFD; always test membership through
@@ -2333,7 +2333,7 @@ class ProjectArchiveService:
     def _write_json_file(self, path: Path, payload: dict[str, Any]) -> None:
         real = self._resolve_json_path(path)
         if real is None:
-            raise ValueError(f"路径越界，拒绝写入: {path}")
+            raise ValueError(f"Path is out of bounds, refusing to write: {path}")
         real.parent.mkdir(parents=True, exist_ok=True)
         with open(real, "w", encoding="utf-8") as handle:
             json.dump(payload, handle, ensure_ascii=False, indent=2)
@@ -2341,7 +2341,7 @@ class ProjectArchiveService:
     @staticmethod
     def _validate_scope(scope: str) -> None:
         if scope not in {"full", "current"}:
-            raise ValueError(f"scope 仅支持 full 或 current，收到: {scope}")
+            raise ValueError(f"scope supports only full or current, got: {scope}")
 
     def _scan_archive_members(self, archive: zipfile.ZipFile) -> list[ArchiveMember]:
         members: list[ArchiveMember] = []
@@ -2595,7 +2595,7 @@ class ProjectArchiveService:
         Directory-replacement or record-commit failures roll back records and restore the old directory
         unchanged, also by rename, avoiding incomplete new-directory deletion stranding it among deleted projects."""
         if self._retire_project is None:
-            raise RuntimeError("覆盖导入需要收尾现有项目的记录")
+            raise RuntimeError("Overwrite import must finalize the existing project's records")
         deleted_dir: Path | None = None
 
         try:

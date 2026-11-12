@@ -601,11 +601,11 @@ class OptionsAssembler:
                             "hookEventName": "PreToolUse",
                             "permissionDecision": "deny",
                             "permissionDecisionReason": (
-                                "操作被阻止：new_string 包含弯引号"
-                                "（“ 或 ”），"
-                                "这会破坏 JSON 格式。"
-                                "请将所有弯引号替换为标准 ASCII "
-                                "双引号 (U+0022) 后重试。"
+                                "Operation blocked: new_string contains curly quotes "
+                                "(“ or ”), "
+                                "which would break the JSON format. "
+                                "Replace all curly quotes with standard ASCII "
+                                "double quotes (U+0022) and retry."
                             ),
                         },
                     }
@@ -674,10 +674,10 @@ class OptionsAssembler:
                         "hookEventName": "PreToolUse",
                         "permissionDecision": "deny",
                         "permissionDecisionReason": (
-                            f"操作被阻止：此次 {tool_name} 会导致 {file_path} "
-                            f"变成无效 JSON。错误：{exc}。"
-                            "请检查你的输入内容中是否包含未转义的双引号或其他"
-                            "JSON 语法问题，修正后重试。"
+                            f"Operation blocked: this {tool_name} would make {file_path} "
+                            f"invalid JSON. Error: {exc}. "
+                            "Check your input for unescaped double quotes or other "
+                            "JSON syntax problems, fix them and retry."
                         ),
                     },
                 }

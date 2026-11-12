@@ -262,7 +262,7 @@ async def test_promote_conflicts_when_official_changed_after_open(fake_ctx: Tool
 
     assert out.problem is not None
     report = said(out)
-    assert "并发冲突" in report
+    assert "concurrency conflict" in report
     assert "accept_formal_revision" in report
     assert "patch_draft" in report
     assert "base_revision" in report
@@ -307,7 +307,7 @@ async def test_promote_conflict_report_renders_missing_fingerprint_as_json_null(
     report = said(out)
     assert "null" in report
     assert "None" not in report
-    assert "显式传入 null" in report
+    assert "pass null explicitly" in report
 
     refreshed = draft_of(await open_for_edit(fake_ctx))
     assert refreshed["formal_revision"] is None
@@ -365,7 +365,7 @@ async def test_split_violation_quarantine_records_base_fingerprint(fake_ctx: Too
     out = await promote_reference_draft(fake_ctx)
 
     assert out.problem is not None
-    assert "并发冲突" in said(out)
+    assert "concurrency conflict" in said(out)
     assert "base_revision" in said(out)
     assert script_review.content_fingerprint(rv_script_plan_path(fake_ctx)) == formal_fingerprint
 
@@ -421,7 +421,7 @@ async def test_split_violation_keeps_pre_generation_formal_baseline(fake_ctx: To
 @pytest.mark.parametrize(
     ("mutate", "hint"),
     [
-        (lambda u: u.update(duration_seconds=7), "当前值：7"),
+        (lambda u: u.update(duration_seconds=7), "current value: 7"),
         (lambda u: u.pop("duration_seconds"), "duration_seconds"),
         (lambda u: u.update(source_text=""), "source_text"),
     ],
@@ -499,7 +499,7 @@ async def test_promote_draft_requires_source_provenance(fake_ctx: ToolHarness, m
     out = await promote_reference_draft(fake_ctx)
     assert out.problem is not None
     assert problem_of(out).code == "draft_invalid"
-    assert "meta.source 缺失" in said(out)
+    assert "is missing meta.source" in said(out)
     assert not rv_script_plan_path(fake_ctx).exists()
 
 
@@ -1122,7 +1122,7 @@ async def test_promote_drama_script_plan_reports_video_request_facts_problem(
     assert out.problem is not None
     problem = problem_of(out)
     assert (problem.code, problem.params) == ("video_capability_unavailable", {"capability": "i2v"})
-    assert "video_capability_unavailable（capability=i2v）" in said(out)
+    assert "video_capability_unavailable (capability=i2v)" in said(out)
     assert drama_quarantine_path(fake_ctx).exists()
 
 
@@ -1430,7 +1430,7 @@ async def test_promote_narration_script_plan_aborts_on_concurrent_write(fake_ctx
     out = await promote_nr(fake_ctx)
 
     assert out.problem is not None
-    assert "并发冲突" in said(out)
+    assert "concurrency conflict" in said(out)
     assert "content.segments" in said(out)
     assert nr_quarantine_path(fake_ctx).exists(), "冲突时草稿仍在场，合并后可重试"
     assert json.loads(nr_script_plan_path(fake_ctx).read_text(encoding="utf-8"))["segments"][0]["duration_seconds"] == 6

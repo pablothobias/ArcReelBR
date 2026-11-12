@@ -465,7 +465,7 @@ class OpenRouterImageBackend:
             await run_noninterruptible_sync(_decode_and_save)
             return
         # Retry retrieval failures only in downloads, never restart billed image-generation requests.
-        await with_artifact_retry(lambda: download_image_to_path(first["url"], output_path), label="OpenRouter 图像")
+        await with_artifact_retry(lambda: download_image_to_path(first["url"], output_path), label="OpenRouter image")
         await run_noninterruptible_sync(self._ensure_png, output_path, media_type)
 
     def _ensure_png(self, output_path: Path, media_type: str | None) -> None:

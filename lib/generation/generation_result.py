@@ -561,10 +561,10 @@ def normalize_requested_ids(raw: object, *, field: str) -> list[str] | None:
     if raw is None:
         return None
     if not isinstance(raw, list | tuple):
-        raise ValueError(f"{field} 必须是 ID 数组，收到: {raw!r}")
+        raise ValueError(f"{field} must be an array of IDs, got: {raw!r}")
     ids = list(dict.fromkeys(str(value) for value in raw))
     if not ids:
-        raise ValueError(f"{field} 不能为空数组：省略该参数表示只补缺失项")
+        raise ValueError(f"{field} must not be an empty array: omit the parameter to fill only missing items")
     return ids
 
 
@@ -582,7 +582,7 @@ def select_generation_targets(
     """
 
     if requested_ids is not None and not requested_ids:
-        raise ValueError("显式 ID 集合不能为空：省略该参数表示只补缺失项")
+        raise ValueError("An explicit ID set must not be empty: omit the parameter to fill only missing items")
 
     states = [
         GenerationTargetState(candidate=candidate, status=status, blocker=blocker)

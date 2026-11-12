@@ -189,19 +189,19 @@ def migrate_ad_reference_script(
     if "video_units" in payload and "shots" not in payload and "reference_units" not in payload:
         existing_units = payload.get("video_units")
         if not isinstance(existing_units, list):
-            raise ValueError("video_units 必须是数组")
+            raise ValueError("video_units must be an array")
         migrated = copy.deepcopy(payload)
         _mark_invalid_units(migrated["video_units"])
         return migrated, ()
 
     raw_shots = payload.get("shots")
     if not isinstance(raw_shots, list):
-        raise ValueError("广告/短片的参考生视频旧剧本缺少 shots 数组")
+        raise ValueError("The legacy ad/short reference-video script is missing the shots array")
     shots: list[dict[str, Any]] = []
     shot_by_id: dict[str, dict[str, Any]] = {}
     for index, raw_shot in enumerate(raw_shots):
         if not isinstance(raw_shot, dict):
-            raise ValueError(f"shots[{index}] 必须是对象")
+            raise ValueError(f"shots[{index}] must be an object")
         shot = copy.deepcopy(raw_shot)
         shots.append(shot)
         shot_id = shot.get("shot_id")
@@ -224,7 +224,7 @@ def migrate_ad_reference_script(
             )
     else:
         if not isinstance(raw_units, list):
-            raise ValueError("reference_units 必须是数组或 null")
+            raise ValueError("reference_units must be an array or null")
         covered_shots: set[int] = set()
         used_unit_ids: set[str] = set()
         membership_counts: dict[str, int] = {}
@@ -232,20 +232,20 @@ def migrate_ad_reference_script(
         duplicate_unit_indexes: list[int] = []
         for index, raw_unit in enumerate(raw_units):
             if not isinstance(raw_unit, dict):
-                raise ValueError(f"reference_units[{index}] 必须是对象")
+                raise ValueError(f"reference_units[{index}] must be an object")
             unit_id = raw_unit.get("unit_id")
             if not isinstance(unit_id, str) or not unit_id:
-                raise ValueError(f"reference_units[{index}].unit_id 必须是非空字符串")
+                raise ValueError(f"reference_units[{index}].unit_id must be a nonempty string")
             if unit_id in used_unit_ids:
                 duplicate_unit_indexes.append(len(prepared_units))
             used_unit_ids.add(unit_id)
             shot_ids = raw_unit.get("shot_ids")
             if not isinstance(shot_ids, list):
-                raise ValueError(f"reference_units[{index}].shot_ids 必须是数组")
+                raise ValueError(f"reference_units[{index}].shot_ids must be an array")
             normalized_shot_ids: list[str] = []
             for member_index, shot_id in enumerate(shot_ids):
                 if not isinstance(shot_id, str) or not shot_id:
-                    raise ValueError(f"reference_units[{index}].shot_ids[{member_index}] 必须是非空字符串")
+                    raise ValueError(f"reference_units[{index}].shot_ids[{member_index}] must be a nonempty string")
                 normalized_shot_ids.append(shot_id)
                 if shot_id in shot_by_id:
                     membership_counts[shot_id] = membership_counts.get(shot_id, 0) + 1
@@ -326,28 +326,28 @@ def migrate_ad_reference_script(
 def _script_paths(project_dir: Path, project: dict[str, Any]) -> list[tuple[Path, int]]:
     episodes = project.get("episodes")
     if not isinstance(episodes, list):
-        raise ValueError("project.episodes 必须是数组")
+        raise ValueError("project.episodes must be an array")
     result: list[tuple[Path, int]] = []
     seen: set[Path] = set()
     for index, entry in enumerate(episodes):
         if not isinstance(entry, dict):
-            raise ValueError(f"project.episodes[{index}] 必须是对象")
+            raise ValueError(f"project.episodes[{index}] must be an object")
         episode = entry.get("episode")
         script_file = entry.get("script_file")
         if not isinstance(episode, int) or isinstance(episode, bool) or episode <= 0:
-            raise ValueError(f"project.episodes[{index}].episode 必须是正整数")
+            raise ValueError(f"project.episodes[{index}].episode must be a positive integer")
         if not isinstance(script_file, str) or not script_file:
-            raise ValueError(f"project.episodes[{index}].script_file 必须是非空字符串")
+            raise ValueError(f"project.episodes[{index}].script_file must be a nonempty string")
         path = safe_join(project_dir, script_file)
         if path in seen:
-            raise ValueError(f"多个 episode 指向同一剧本文件: {script_file}")
+            raise ValueError(f"Multiple episodes point to the same script file: {script_file}")
         seen.add(path)
         if path.is_symlink():
-            raise ValueError(f"剧本文件不是普通文件: {script_file}")
+            raise ValueError(f"Script file is not a regular file: {script_file}")
         if not path.exists():
             continue
         if not path.is_file():
-            raise ValueError(f"剧本文件不是普通文件: {script_file}")
+            raise ValueError(f"Script file is not a regular file: {script_file}")
         result.append((path, episode))
     return result
 
@@ -363,7 +363,7 @@ def migrate_v6_to_v7(project_dir: Path, *, record: list[MigrationAdjustment] | N
         return
     project = load_json(project_file)
     if not isinstance(project, dict):
-        raise ValueError("project.json 必须是对象")
+        raise ValueError("project.json must be an object")
     if int(project.get("schema_version") or 0) >= 7:
         return
 
@@ -374,7 +374,7 @@ def migrate_v6_to_v7(project_dir: Path, *, record: list[MigrationAdjustment] | N
         for path, episode in _script_paths(project_dir, project):
             payload = load_json(path)
             if not isinstance(payload, dict):
-                raise ValueError(f"剧本必须是对象: {path.relative_to(project_dir)}")
+                raise ValueError(f"Script must be an object: {path.relative_to(project_dir)}")
             migrated, renumbered = migrate_ad_reference_script(payload, episode=episode)
             adjustments = [
                 MigrationAdjustment(

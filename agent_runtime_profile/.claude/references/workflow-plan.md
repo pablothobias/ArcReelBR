@@ -29,7 +29,7 @@ Admission belongs to AI operations, not pipeline positions: an operation is exec
 the recommended next action. Distinguish two request types:
 
 - **The user names an operation** (such as generating episode 2's script plan or authoring prompts): query the plan and inspect
-  `plan.status.operations[操作]`. Execute when `state == "admitted"`, even if `next_action` points elsewhere;
+  `plan.status.operations[<operation>]`. Execute when `state == "admitted"`, even if `next_action` points elsewhere;
   for `refused`, relay `reason` (what is missing and how to supply it) without executing; for `not_applicable`, explain that this project
   has no such operation. `operations` describes only listed operations; generation admission remains determined by each entry point
   (ADR 0073); relay that entry point's rejection reason.
@@ -95,7 +95,7 @@ The plan always serializes `requested_ids`: a nonempty array means explicit IDs;
 ID parameters, pass the former and **omit the parameter** for the latter; never forward `[]` unchanged (explicit empty arrays are invalid tool inputs).
 `plan.status.target` supplies `episode` (target episode ID), `script`, `script_filename`, and `source`. Tool
 `episode_id` always comes from `next_action.args.episode_id` or `target.episode`. The two script fields are not interchangeable:
-`script` is project-root-relative (`scripts/episode_{集 ID}.json`), used with Read for script content;
+`script` is project-root-relative (`scripts/episode_{episode ID}.json`), used with Read for script content;
 `script_filename` is the bare filename without `scripts/`, used by the `script` parameter of all `mcp__arcreel__*` tools.
 
 | `next_action.type` | Execution entry point |
@@ -108,7 +108,7 @@ ID parameters, pass the former and **omit the parameter** for the latter; never 
 | `resolve_draft` | Target episode has a draft (`args.draft_kind`): true `args.needs_repair` means a repair draft from a failed write; explain and rerun the corresponding operation. False means an Agent-editable draft; finish through its skill |
 | `prepare_script_plan` | Dispatch the subagent named by `next_action.args.preprocessor` |
 | `start_blank_script` | Only after the user chooses manual authoring: `mcp__arcreel__start_blank_script` with `next_action.args.episode_id` (same transaction as the Web “Start from blank”; unconfirmed planning moves to trash), then the user handwrites formal script entries on the timeline or asks for them through `mcp__arcreel__patch_episode_script` |
-| `provide_episode_source` | Guide the user to supply episode source (`source/episode_{集 ID}.txt`), enabling AI script planning |
+| `provide_episode_source` | Guide the user to supply episode source (`source/episode_{episode ID}.txt`), enabling AI script planning |
 | `confirm_script_plan` | `mcp__arcreel__confirm_script_review` |
 | `generate_script` | Dispatch `create-episode-script` (for ads call `mcp__arcreel__generate_episode_script` directly) |
 | `add_script_items` | Formal script empty: guide the user to add entries in Web, or insert through `mcp__arcreel__patch_episode_script` |

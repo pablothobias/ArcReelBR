@@ -461,7 +461,7 @@ class TestFailureAndTimeout:
             routes.poll.mock(return_value=_json({"task_id": "t-nourl", "status": "completed"}))
 
             backend = AgnesVideoBackend(api_key="k", model="agnes-video-v2.0", base_url=_BASE_URL)
-            with pytest.raises(RuntimeError, match="缺少成片 URL 与 video_id"):
+            with pytest.raises(RuntimeError, match="both the video URL and video_id are missing"):
                 await backend.generate(_request(tmp_path))
 
             assert routes.download.call_count == 0
@@ -635,7 +635,7 @@ class TestFailureAndTimeout:
             routes.query.mock(return_value=_json({"video_id": "vid-789", "status": "unexpected"}))
 
             backend = AgnesVideoBackend(api_key="k", model="agnes-video-v2.0", base_url=_BASE_URL)
-            with pytest.raises(RuntimeError, match="video_id 查询响应缺少成片 URL"):
+            with pytest.raises(RuntimeError, match="video_id query response is missing the video URL"):
                 await backend.generate(_request(tmp_path))
 
             assert routes.download.call_count == 0

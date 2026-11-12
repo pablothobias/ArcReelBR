@@ -37,7 +37,7 @@ function SpeechToken({ token }: { token: Extract<Token, { kind: "speech" }> }) {
   const { t } = useTranslation("dashboard");
   // Voiceover has no speaker: `speakerKind` is always unknown, sharing the unregistered-speaker color tier.
   const palette = assetColor(token.speakerKind);
-  // Preserve marker text verbatim, including `@[名称]` and colons; add only backgrounds and speaker labels so preview matches
+  // Preserve marker text verbatim, including `@[name]` and colons; add only backgrounds and speaker labels so preview matches
   // the author's line. Rewriting would make it hard to verify whether the fragment was recognized as dialogue.
   return (
     <span

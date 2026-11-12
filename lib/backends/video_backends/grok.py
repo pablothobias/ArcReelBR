@@ -106,7 +106,7 @@ class GrokVideoBackend(EntryBoundCapabilities):
 
     async def resume_video(self, job_id: str, request: VideoGenerationRequest) -> VideoGenerationResult:
         # Grok APIs are synchronous, without resumable job_id; orphan handlers mark [resume_unsupported] from NotImplementedError.
-        raise NotImplementedError("GrokVideoBackend 不支持 resume_video（同步型 API）")
+        raise NotImplementedError("GrokVideoBackend does not support resume_video (synchronous API)")
 
     async def generate(self, request: VideoGenerationRequest) -> VideoGenerationResult:
         """Generate videos without black-box generation retries; only downloads after URL receipt can retry independently."""

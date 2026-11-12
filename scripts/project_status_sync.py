@@ -62,7 +62,7 @@ MUTATION_BATCH = 20
 def gql(query: str, variables: dict[str, Any] | None = None) -> dict[str, Any]:
     token = os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
     if not token:
-        sys.exit("GH_TOKEN 未设置")
+        sys.exit("GH_TOKEN is not set")
     payload = json.dumps({"query": query, "variables": variables or {}}).encode()
     req = urllib.request.Request(
         API,
@@ -72,7 +72,7 @@ def gql(query: str, variables: dict[str, Any] | None = None) -> dict[str, Any]:
     with urllib.request.urlopen(req, timeout=30) as resp:
         body: dict[str, Any] = json.load(resp)
     if body.get("errors"):
-        raise RuntimeError(f"GraphQL 错误: {json.dumps(body['errors'], ensure_ascii=False)}")
+        raise RuntimeError(f"GraphQL error: {json.dumps(body['errors'], ensure_ascii=False)}")
     return body["data"]
 
 
@@ -156,7 +156,7 @@ def sync_issue(number: int) -> None:
     item = next((n for n in issue["projectItems"]["nodes"] if n["project"]["id"] == PROJECT_ID), None)
     if item is None:
         if state != "OPEN":
-            print(f"#{number}: 已关闭且不在板上，跳过")
+            print(f"#{number}: closed and not on the board, skipped")
             return
         # Add when built-in auto-add did not cover the issue.
         added = gql(
@@ -174,7 +174,7 @@ def sync_issue(number: int) -> None:
 
     current = (item.get("status") or {}).get("name")
     if current == desired:
-        print(f"#{number}: Status 已是 {desired}，无需变更")
+        print(f"#{number}: Status is already {desired}, no change needed")
         return
     _run_mutation_parts([_set_status_part(item["id"], desired)])
     print(f"#{number}: {current} -> {desired}")
@@ -195,7 +195,7 @@ def sync_pr(number: int) -> None:
     data = gql(PR_QUERY, {"owner": OWNER, "repo": REPO, "number": number})
     numbers = [n["number"] for n in data["repository"]["pullRequest"]["closingIssuesReferences"]["nodes"]]
     if not numbers:
-        print(f"PR #{number}: 无 closing reference，跳过")
+        print(f"PR #{number}: no closing reference, skipped")
         return
     for n in numbers:
         sync_issue(n)
@@ -301,16 +301,16 @@ def sync_all() -> None:
     for number in sorted(missing):
         sync_issue(number)
     print(
-        f"对账完成：{len(items)} 个 item，纠正 {changed} 个 Status，清除 {deleted} 个 PR item，补入 {len(missing)} 个 issue"
+        f"Reconciliation done: {len(items)} items, {changed} Status values corrected, {deleted} PR items removed, {len(missing)} issues added"
     )
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("--issue", type=int, nargs="+", help="同步指定 issue")
-    group.add_argument("--pr", type=int, help="同步该 PR closing reference 指向的 issue")
-    group.add_argument("--all", action="store_true", help="全量对账")
+    group.add_argument("--issue", type=int, nargs="+", help="Sync the given issues")
+    group.add_argument("--pr", type=int, help="Sync the issues this PR's closing references point to")
+    group.add_argument("--all", action="store_true", help="Reconcile everything")
     args = parser.parse_args()
     try:
         load_project_config()

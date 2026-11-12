@@ -177,7 +177,7 @@ class LocalMaterialStorage:
 
         path = self.project_path / content_version.locator.path
         if not path.is_file():
-            raise FileNotFoundError(f"版本文件不存在: {path}")
+            raise FileNotFoundError(f"Version file does not exist: {path}")
         verify_content(content_version, path)
         return path
 

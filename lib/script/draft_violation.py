@@ -81,13 +81,13 @@ def schema_violations(
         item_id = item.get(id_field) if isinstance(item, dict) and id_field is not None else None
         value = error.get("input")
         shown = (
-            f"（当前值：{json.dumps(value, ensure_ascii=False)}）"
+            f" (current value: {json.dumps(value, ensure_ascii=False)})"
             if error["type"] != "missing" and isinstance(value, (bool, int, float, str)) and len(str(value)) <= 40
             else ""
         )
         violations.append(
             DraftViolation(
-                f"草稿的 content.{'.'.join(str(part) for part in loc)} 不符合产出结构：{error['msg']}{shown}",
+                f"draft content.{'.'.join(str(part) for part in loc)} does not match the output schema: {error['msg']}{shown}",
                 code="schema_invalid",
                 item_index=index,
                 item_id=item_id if isinstance(item_id, str) else None,

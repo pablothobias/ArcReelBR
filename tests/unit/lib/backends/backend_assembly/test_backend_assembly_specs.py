@@ -462,7 +462,7 @@ class TestKlingSpec:
 
     def test_model_path_endpoint_refuses_dual_secret(self):
         spec = get_provider_spec("kling", "video", "kling-video-model-path")
-        with pytest.raises(ValueError, match="只支持 API Key"):
+        with pytest.raises(ValueError, match="supports API Key authentication only"):
             spec.build_backend(self._kling_config(access_key="ak-1", secret_key="sk-1"), "kling-4.0")
 
     def test_api_key_takes_priority_over_dual_secret_when_both_set(self):

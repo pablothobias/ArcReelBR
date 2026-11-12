@@ -127,14 +127,16 @@ class GeminiTextBackend:
 
             credentials_file = Path(credentials_path) if credentials_path else resolve_vertex_credentials_path()
             if credentials_file is None:
-                raise ValueError("未找到 Vertex AI 凭证文件\n请将服务账号 JSON 文件放入 vertex_keys/ 目录")
+                raise ValueError(
+                    "Vertex AI credentials file not found\nPut the service account JSON file in the vertex_keys/ directory"
+                )
 
             with open(credentials_file, encoding="utf-8") as f:
                 creds_data = json_module.load(f)
             project_id = creds_data.get("project_id")
 
             if not project_id:
-                raise ValueError(f"凭证文件 {credentials_file} 中未找到 project_id")
+                raise ValueError(f"project_id not found in credentials file {credentials_file}")
 
             credentials = service_account.Credentials.from_service_account_file(
                 str(credentials_file), scopes=VERTEX_SCOPES
@@ -149,7 +151,7 @@ class GeminiTextBackend:
             logger.info("GeminiTextBackend: 使用 Vertex AI 后端（凭证: %s）", credentials_file.name)
         else:
             if not api_key:
-                raise ValueError("Gemini API Key 未提供（API Key is required for AI Studio mode）。")
+                raise ValueError("Gemini API Key is missing (an API Key is required for AI Studio mode).")
             effective_base_url = normalize_base_url(base_url)
             self._client = genai.Client(
                 api_key=api_key, http_options=gemini_http_options(effective_base_url, transport_layer)

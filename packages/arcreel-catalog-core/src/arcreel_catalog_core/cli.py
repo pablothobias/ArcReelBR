@@ -15,9 +15,9 @@ from .reading import CatalogFormatError
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="python -m arcreel_catalog_core")
     commands = parser.add_subparsers(dest="command", required=True)
-    check = commands.add_parser("check", help=f"校验目录下的 {MANIFEST_FILENAME} 与 {CATALOG_FILENAME}")
+    check = commands.add_parser("check", help=f"Validate {MANIFEST_FILENAME} and {CATALOG_FILENAME} in the directory")
     check.add_argument("directory", type=Path)
-    write = commands.add_parser("write-manifest", help=f"按 {CATALOG_FILENAME} 写出 {MANIFEST_FILENAME}")
+    write = commands.add_parser("write-manifest", help=f"Write {MANIFEST_FILENAME} from {CATALOG_FILENAME}")
     write.add_argument("directory", type=Path)
     args = parser.parse_args(argv)
     directory: Path = args.directory

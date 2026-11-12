@@ -40,7 +40,7 @@ Glob for formal `scripts/episode_{N}.json`. Read only formal content, not planni
 ### Step 2: Generate JSON
 
 ```text
-mcp__arcreel__generate_episode_script({"episode_id": N, "instructions": "<附加指令原文，可选，无则省略>"})
+mcp__arcreel__generate_episode_script({"episode_id": N, "instructions": "<verbatim additional instructions; optional, omit if none>"})
 ```
 
 Wait for return. For `is_error: true`, inspect the error and attempt repair or report it.
@@ -81,7 +81,7 @@ checking:
 Next: main Agent may dispatch asset generation (character sheets, storyboards, etc.).
 ```
 
-For `generation_mode == reference_video`, use `| 总视频单元数 | XX 个 |`; otherwise use `| 总分镜数 | XX 个 |`. Include only the applicable count row.
+For `generation_mode == reference_video`, use `| Total video units | XX |`; otherwise use `| Total shots | XX |`. Include only the applicable count row.
 
 On failure:
 ```

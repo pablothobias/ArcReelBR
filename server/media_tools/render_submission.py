@@ -94,7 +94,8 @@ async def submit_render_task(
         )
         return ToolProblem(
             "generation_active_task_conflict",
-            "同一产物已有一个参数不同的渲染任务在排队或执行，请等它结束后再提交",
+            "Another render task for the same output with different parameters is queued or running; "
+            "wait for it to finish before submitting again",
             action=GenerationAction.WAIT_FOR_TASK,
             params={"task_id": exc.existing_task_id},
         )

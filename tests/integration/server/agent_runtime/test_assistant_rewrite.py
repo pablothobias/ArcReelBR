@@ -388,7 +388,7 @@ class TestRewriteRejections:
     async def test_empty_content_is_refused_before_any_side_effect(self, rewriting):
         service, runtime, session_id, _ = rewriting
 
-        with pytest.raises(ValueError, match=r"消息内容不能为空"):
+        with pytest.raises(ValueError, match=r"Message content cannot be empty"):
             await _rewrite(service, session_id, SECOND_USER_ENTRY, content="   ")
 
         assert runtime.interrupted == []

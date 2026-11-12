@@ -307,7 +307,7 @@ class TestArkGenerate:
         ark_backend._client.content_generation.tasks.get = MagicMock(return_value=get_result)
 
         request = VideoGenerationRequest(prompt="test", output_path=output)
-        with pytest.raises(RuntimeError, match="Ark 视频生成失败"):
+        with pytest.raises(RuntimeError, match="Ark video generation failed"):
             await ark_backend.generate(request)
 
     async def test_with_seed_and_flex(self, ark_backend, tmp_path):

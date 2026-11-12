@@ -53,7 +53,7 @@ def migrate_v10_to_v11(project_dir: Path) -> None:
         return
     data = load_json(pj)
     if not isinstance(data, dict):
-        raise ValueError("project.json 必须是对象")
+        raise ValueError("project.json must be an object")
     # Match runner int normalization: legacy project.json may store version strings.
     if int(data.get("schema_version") or 0) >= _TARGET_VERSION:
         return

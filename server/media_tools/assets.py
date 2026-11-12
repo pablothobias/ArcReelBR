@@ -58,7 +58,7 @@ ALL_TYPES: tuple[str, ...] = tuple(ASSET_SPECS.keys())
 
 AssetType = Literal["character", "scene", "prop", "product"]
 if get_args(AssetType) != ALL_TYPES:
-    raise RuntimeError("AssetType 须与 ASSET_SPECS 的资产类型逐项一致")
+    raise RuntimeError("AssetType must match the ASSET_SPECS asset types one to one")
 
 _EPISODE_ID_DESCRIPTION = (
     "Episode ID; when supplied, cover only assets referenced by this episode's formal script "
@@ -78,13 +78,13 @@ class ListPendingAssetsRequest(BaseModel):
     @model_validator(mode="after")
     def _episode_excludes_type(self) -> Self:
         if self.episode_id is not None and self.type is not None:
-            raise ValueError("episode_id 不能与 type 同时使用")
+            raise ValueError("episode_id cannot be combined with type")
         return self
 
 
 def _preview(description: str | None) -> str:
     if description is None:
-        return "（缺描述，补上前不会生成）"
+        return "(no description; not generated until one is added)"
     return description[:60] + "..." if len(description) > 60 else description
 
 
@@ -107,23 +107,29 @@ async def list_pending_assets(
             user_id=caller.user_id,
         )
         pending = [*plan.target_ids, *(item.unit_id for item in plan.preflight.items)]
-        where = f"{describe_episode_for_agent(project, value.episode_id)}引用的" if value.episode_id is not None else ""
+        where = (
+            f" referenced by {describe_episode_for_agent(project, value.episode_id)}"
+            if value.episode_id is not None
+            else ""
+        )
         types = (value.type,) if value.type else ALL_TYPES
         lines: list[str] = []
         for asset_type in types:
-            label = ASSET_SPECS[asset_type].label_zh
+            label = asset_type
             of_type = [unit_id for unit_id in pending if plan.units[unit_id].asset_type == asset_type]
             if not of_type:
-                lines.append(f"✅ 项目 '{scope.project_name}' {where}{label}都已有资产图")
+                lines.append(
+                    f"✅ All {label} assets{where} in project '{scope.project_name}' already have asset images"
+                )
                 continue
-            lines.append(f"\n📋 {where}待生成的{label} ({len(of_type)} 个):")
+            lines.append(f"\n📋 {label} assets{where} pending generation ({len(of_type)}):")
             for unit_id in of_type:
                 unit = plan.units[unit_id]
-                kind = f"（{unit.owner} 的衍生）" if unit.is_derivative else ""
-                generating = "（生成中）" if unit_id in plan.generating else ""
+                kind = f" (derivative of {unit.owner})" if unit.is_derivative else ""
+                generating = " (generating)" if unit_id in plan.generating else ""
                 lines.append(f"  {_EMOJI[asset_type]} {unit.name}{kind}{generating} — {_preview(unit.description)}")
         if not value.type and not pending:
-            lines.append(f"\n✅ 项目 '{scope.project_name}' {where}资产均已有资产图")
+            lines.append(f"\n✅ All assets{where} in project '{scope.project_name}' already have asset images")
         return ToolOutcome(value="\n".join(lines))
     except AssetBatchEpisodeNotFound as exc:
         return tool_problem(str(exc), code="episode_not_found", params={"episode_id": exc.episode_id})
@@ -152,11 +158,11 @@ class GenerateAssetsRequest(BaseModel):
     @model_validator(mode="after")
     def _names_need_one_type(self) -> Self:
         if self.names is not None and self.type is None:
-            raise ValueError("names 必须配合 type 使用")
+            raise ValueError("names requires type")
         if self.names is not None and self.all:
-            raise ValueError("all 与 names 互斥，不能同时使用")
+            raise ValueError("all and names are mutually exclusive")
         if self.episode_id is not None and (self.type is not None or self.names is not None):
-            raise ValueError("episode_id 不能与 type / names 同时使用")
+            raise ValueError("episode_id cannot be combined with type / names")
         return self
 
 

@@ -176,7 +176,7 @@ def test_remote_mcp_rejects_mismatched_projects_roots(tmp_path: Path) -> None:
         capabilities=_Capabilities(),
     )
 
-    with pytest.raises(ValueError, match="同一项目根"):
+    with pytest.raises(ValueError, match="same project root"):
         build_remote_mcp_server(projects=projects, services=services)
 
 

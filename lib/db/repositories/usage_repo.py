@@ -1156,11 +1156,11 @@ class UsageCursor:
             started_at = payload["started_at"]
             cursor_id = payload["id"]
             if not isinstance(started_at, str) or type(cursor_id) is not int or not 1 <= cursor_id <= 2**31 - 1:
-                raise ValueError("游标字段类型或范围无效")
+                raise ValueError("Invalid cursor field type or range")
             return cls(started_at=as_utc(datetime.fromisoformat(started_at)), id=cursor_id)
         except (binascii.Error, LookupError, OverflowError, TypeError, UnicodeError, ValueError) as exc:
             # OverflowError: extreme datetime offsets cross UTC datetime bounds; treat this the same as parsing failure.
-            raise UsageCursorError(f"无法解码的游标: {raw!r}") from exc
+            raise UsageCursorError(f"Cursor could not be decoded: {raw!r}") from exc
 
 
 @dataclass(frozen=True)
@@ -1183,10 +1183,10 @@ class UsageSessionCursor:
             last_started_at = payload["last_started_at"]
             session_id = payload["session_id"]
             if not isinstance(last_started_at, str) or not isinstance(session_id, str) or not session_id:
-                raise ValueError("游标字段类型或范围无效")
+                raise ValueError("Invalid cursor field type or range")
             return cls(last_started_at=as_utc(datetime.fromisoformat(last_started_at)), session_id=session_id)
         except (binascii.Error, LookupError, OverflowError, TypeError, UnicodeError, ValueError) as exc:
-            raise UsageCursorError(f"无法解码的游标: {raw!r}") from exc
+            raise UsageCursorError(f"Cursor could not be decoded: {raw!r}") from exc
 
 
 def _record_iso(value: datetime | None) -> str | None:

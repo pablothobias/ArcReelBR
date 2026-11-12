@@ -86,7 +86,7 @@ Read `project.json` for characters/scenes/props.
 Session-bound MCP call, without project argument:
 
 ```text
-mcp__arcreel__generate_script_plan({"episode_id": N, "source": "source/episode_N.txt", "instructions": "<附加指令原文，可选，无则省略>"})
+mcp__arcreel__generate_script_plan({"episode_id": N, "source": "source/episode_N.txt", "instructions": "<verbatim additional instructions; optional, omit if none>"})
 ```
 
 > dry_run=true returns prompt only for inspection. response_schema directly constrains structured JSON.
@@ -104,8 +104,8 @@ or rerun to draw another output. Paid output already exists, and repairing it co
 **Trigger**: `drafts/episode_{N}/script_plan_normalized_script.invalid.json` exists, regardless of formal JSON.
 
 1. `mcp__arcreel__open_draft({"episode_id": N, "doc_type": "drama_script_plan"})` returns `content`, `violations`, `revision`. Preserve edits, apply current main-Agent user feedback first, then repair affected `content` fields for nonempty `violations[]`
-2. `mcp__arcreel__patch_draft({"episode_id": N, "doc_type": "drama_script_plan", "content": <完整修改后正文>, "base_revision": "<open_draft 返回的 revision>"})`; record its new `revision`
-3. `mcp__arcreel__promote_draft({"episode_id": N, "doc_type": "drama_script_plan", "base_revision": "<patch_draft 返回的新 revision>"})` fully revalidates/promotes; repeat open → patch → promote on violations
+2. `mcp__arcreel__patch_draft({"episode_id": N, "doc_type": "drama_script_plan", "content": <full revised content>, "base_revision": "<revision returned by open_draft>"})`; record its new `revision`
+3. `mcp__arcreel__promote_draft({"episode_id": N, "doc_type": "drama_script_plan", "base_revision": "<new revision returned by patch_draft>"})` fully revalidates/promotes; repeat open → patch → promote on violations
 
 Successful promotion writes formal `script_plan_normalized_script.json` and clears the draft. Draft presence blocks content confirmation until resolved.
 
@@ -139,8 +139,8 @@ Edit returned `content.scenes[i]`, preserving JSON, then submit full `content` w
 **Step 3**: Promote to formal content
 
 ```text
-mcp__arcreel__patch_draft({"episode_id": N, "doc_type": "drama_script_plan", "content": <完整修改后正文>, "base_revision": "<open_draft 返回的 revision>"})
-mcp__arcreel__promote_draft({"episode_id": N, "doc_type": "drama_script_plan", "base_revision": "<patch_draft 返回的新 revision>"})
+mcp__arcreel__patch_draft({"episode_id": N, "doc_type": "drama_script_plan", "content": <full revised content>, "base_revision": "<revision returned by open_draft>"})
+mcp__arcreel__promote_draft({"episode_id": N, "doc_type": "drama_script_plan", "base_revision": "<new revision returned by patch_draft>"})
 ```
 
 Full validation writes formal `script_plan_normalized_script.json` and clears the draft; failures return individual reports,
@@ -186,43 +186,43 @@ Standard `script_plan_normalized_script.json` (one shot each; prompt_authoring s
 
 ```json
 {
-  "title": "本集标题",
+  "title": "Episode title",
   "scenes": [
     {
-      "scene_id": "E<集 ID>S01",
+      "scene_id": "E<episode ID>S01",
       "duration_seconds": <duration>,
       "segment_break": true,
-      "characters_in_scene": ["李明"],
-      "scenes": ["竹林"],
-      "props": ["长剑"],
-      "scene_description": "竹林深处晨雾弥漫，李明手持长剑缓缓踏入，目光坚定。",
+      "characters_in_scene": ["Li Ming"],
+      "scenes": ["Bamboo Forest"],
+      "props": ["Longsword"],
+      "scene_description": "Morning mist fills the depths of the bamboo forest; Li Ming slowly steps in, longsword in hand, his gaze resolute.",
       "utterances": [
-        {"kind": "voiceover", "speaker": null, "text": "多年之后，他终于回到了这里。"}
+        {"kind": "voiceover", "speaker": null, "text": "Many years later, he has finally returned."}
       ],
-      "source_text": "晨雾未散，李明握紧长剑，一步步走进竹林深处。"
+      "source_text": "The morning mist had not yet lifted. Li Ming gripped his longsword and walked step by step into the depths of the bamboo forest."
     },
     {
-      "scene_id": "E<集 ID>S02",
+      "scene_id": "E<episode ID>S02",
       "duration_seconds": <duration>,
       "segment_break": false,
-      "characters_in_scene": ["李明"],
+      "characters_in_scene": ["Li Ming"],
       "scenes": [],
       "props": [],
-      "scene_description": "李明凝视竹林深处，若有所思。",
+      "scene_description": "Li Ming gazes into the depths of the bamboo forest, lost in thought.",
       "utterances": [
-        {"kind": "dialogue", "speaker": "李明", "text": "师父，我回来了。"}
+        {"kind": "dialogue", "speaker": "Li Ming", "text": "Master, I'm back."}
       ],
-      "source_text": "他低声说：「师父，我回来了。」"
+      "source_text": "He said quietly, \"Master, I'm back.\""
     }
   ],
   "new_assets": [
-    {"type": "prop", "name": "长剑", "decision": "register", "reason": "第一段登场，贯穿全集", "description": "三尺青锋，乌木剑鞘", "aliases": [], "target": "", "asset_name": ""}
+    {"type": "prop", "name": "Longsword", "decision": "register", "reason": "Appears in shot 1 and recurs throughout the episode", "description": "A three-foot blue-steel blade in an ebony scabbard", "aliases": [], "target": "", "asset_name": ""}
   ]
 }
 ```
 
 > Values: `<duration>` must belong to Step 0 `supported_durations`.
-> `mcp__arcreel__generate_script_plan` injects `<集 ID>` from `episode_id`; placeholders avoid treating `E1` as hardcoded.
+> `mcp__arcreel__generate_script_plan` injects `<episode ID>` from `episode_id`; placeholders avoid treating `E1` as hardcoded.
 > `scene_description` contains only visuals, no embedded speech; verbatim speech goes in `utterances`, source in `source_text`.
 
 ## Notes
@@ -232,4 +232,4 @@ Standard `script_plan_normalized_script.json` (one shot each; prompt_authoring s
 - Duration priority: hard bounds (Step 0 `supported_durations`, no more than `max_duration`) > `default_duration` preference when non-null and episode total toward `episode_target_duration` (non-null soft target; fewer units when content is insufficient, overruns when needed) > content choices (longer tiers for fights, large scenes, emotional buildup)
 - segment_break marks real major scene/time/location changes
 - Verbatim speech in `utterances` (dialogue with speaker, voiceover without), source in `source_text`; `novel` voiceover follows context, `screenplay` remains verbatim, extras stay outside characters_in_scene
-- For derivatives (alternate appearances in `project.json` character `derivatives`), `characters_in_scene` follows shot state: `本体/衍生` when active, base name for normal appearance; `utterances[].speaker` always uses base name
+- For derivatives (alternate appearances in `project.json` character `derivatives`), `characters_in_scene` follows shot state: `base/derivative` when active, base name for normal appearance; `utterances[].speaker` always uses base name

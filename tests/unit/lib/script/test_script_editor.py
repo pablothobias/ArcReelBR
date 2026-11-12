@@ -175,27 +175,27 @@ class TestPatchField:
     def test_patch_id_field_rejected(self, id_field):
         # All segment/scene/unit ID fields reject direct edits; insert/split derive IDs. Agent changes
         # would misdirect other ID-based writeback helpers or create duplicate-ID ambiguity.
-        with pytest.raises(ScriptEditError, match="不可改分镜 id"):
+        with pytest.raises(ScriptEditError, match="cannot change the storyboard id field"):
             patch_field(_narration(), "E1S01", id_field, "X")
 
     def test_patch_end_frame_image_rejected(self):
         # Only last-frame set/clear endpoints write last-frame fields; allowing patch would permit arbitrary strings,
         # bypassing snapshot copying and reintroducing dangling references/out-of-bounds paths.
-        with pytest.raises(ScriptEditError, match="不可改 end_frame_image"):
+        with pytest.raises(ScriptEditError, match="cannot change end_frame_image"):
             patch_field(_narration(), "E1S01", "end_frame_image", "../../../etc/passwd")
 
     def test_patch_pending_authoring_rejected(self):
         # Only adding items sets pending-authoring, and prompt authoring clears it; patch must not let Agents edit this statement.
-        with pytest.raises(ScriptEditError, match="不可改 pending_authoring"):
+        with pytest.raises(ScriptEditError, match="cannot change pending_authoring"):
             patch_field(_narration(), "E1S01", "pending_authoring", False)
 
     @pytest.mark.parametrize("field", ["image_prompt", "video_prompt"])
     def test_patch_cannot_clear_a_prompt_to_none(self, field):
         # None means pending prompt generation, written only by mechanical script-plan conversion; after script models allow None,
         # patch becomes the only entry for clearing existing prompts and must reject that here.
-        with pytest.raises(ScriptEditError, match="清成 null"):
+        with pytest.raises(ScriptEditError, match="to null"):
             patch_field(_narration(), "E1S01", field, None)
-        with pytest.raises(ScriptEditError, match="清成 null"):
+        with pytest.raises(ScriptEditError, match="to null"):
             patch_field(_drama(), "E1S01", field, None)
 
     def test_patch_does_not_touch_generated_assets(self):

@@ -341,7 +341,7 @@ class TestSessionManagerUserInput:
     async def test_answer_user_question_raises_for_unknown_question(self, session_manager, meta_store):
         meta, managed, _client = await _seed(session_manager, meta_store, status="running")
         try:
-            with pytest.raises(ValueError, match=r"未找到待回答的问题"):
+            with pytest.raises(ValueError, match=r"Pending question not found"):
                 await session_manager.answer_user_question(
                     session_id=meta.id,
                     question_id="missing-question-id",

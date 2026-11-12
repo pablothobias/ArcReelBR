@@ -97,7 +97,7 @@ logger = logging.getLogger(__name__)
 #: Retired parameter names → current replacements. Keys were real parameters or names matching old video-unit structure:
 #: the first three are old target-ID parameters; ``shots`` and reference lists are removed unit fields;
 #: ``narration_delivery`` is the removed per-request delivery setting. Units now hold only ``text`` and
-#: ``duration_seconds``; references derive at execution from first-occurrence body ``@[名称]`` mentions;
+#: ``duration_seconds``; references derive at execution from first-occurrence body ``@[name]`` mentions;
 #: narration delivery is project configuration and does not affect video requests.
 _RETIRED_PARAMS: dict[str, str] = {
     "resume": "Query the durable batch, then use selected scope and force=false to resend only unsuccessful IDs",
@@ -105,8 +105,8 @@ _RETIRED_PARAMS: dict[str, str] = {
     "unit_id": "Use target.ids: pass unit_id directly for reference-video projects and select scene scope",
     "unit_ids": "Use target.ids: pass the unit_id list directly for reference-video projects and select selected scope",
     "shots": "Video units have no shots array; write their body in the script text field and edit it through patch_episode_script",
-    "references": "Video units have no reference list; reference images derive at execution from body mentions in @[名称] syntax",
-    "reference_images": "Video units have no reference list; reference images derive at execution from body mentions in @[名称] syntax",
+    "references": "Video units have no reference list; reference images derive at execution from body mentions in @[name] syntax",
+    "reference_images": "Video units have no reference list; reference images derive at execution from body mentions in @[name] syntax",
     "narration_delivery": "Video requests do not select narration delivery per call; all videos request the script-planned duration, and narration delivery is project configuration",
 }
 
@@ -346,7 +346,7 @@ def _confirmation_lines(admission: BatchAdmission) -> list[str]:
         tier_label = (
             f"{tier.request_duration_seconds}s tier" if tier.request_duration_seconds is not None else "tier unresolved"
         )
-        headline = f"- {tier_label} × {tier.unit_count}：{'、'.join(tier.unit_ids)}"
+        headline = f"- {tier_label} × {tier.unit_count}: {', '.join(tier.unit_ids)}"
         if tier.cost_amount is not None:
             suffix = " (priced units only)" if tier.unpriced_count else ""
             headline += f"; total {tier.cost_amount} {tier.cost_currency}{suffix}"

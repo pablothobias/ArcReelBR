@@ -60,17 +60,17 @@ _OPERATION = "edit_images"
 # Display label for tool output only; storyboard isn't an ASSET_SPECS member so this
 # can't reuse that dict directly (mirrors assets._EMOJI's separate table).
 _LABEL_ZH: dict[str, str] = {
-    "character": "角色",
-    "scene": "场景",
-    "prop": "道具",
-    "product": "商品",
-    "storyboard": "分镜图",
-    "character_derivative": "角色衍生图",
+    "character": "Character",
+    "scene": "Scene",
+    "prop": "Prop",
+    "product": "Product",
+    "storyboard": "Storyboard image",
+    "character_derivative": "Character derivative image",
 }
 
 EditableResourceType = Literal["character", "scene", "prop", "product", "storyboard", "character_derivative"]
 if get_args(EditableResourceType) != EDITABLE_RESOURCE_TYPES:
-    raise RuntimeError("EditableResourceType 须与 EDITABLE_RESOURCE_TYPES 逐项一致")
+    raise RuntimeError("EditableResourceType must match EDITABLE_RESOURCE_TYPES one to one")
 
 
 async def _i2i_unavailable_problem(
@@ -91,7 +91,10 @@ async def _i2i_unavailable_problem(
         # HTTP execution paths); do not invent an unregistered code.
         return GenerationProblem(
             code="image_capability_missing_i2i",
-            detail="当前项目图片供应商不支持图生图（i2i），无法执行编辑；请提示用户前往设置更换支持 i2i 的供应商",
+            detail=(
+                "The project's image provider does not support image-to-image (i2i), so edits cannot run; "
+                "tell the user to switch to an i2i-capable provider in settings"
+            ),
             action=GenerationAction.CONFIGURE_PROVIDER,
         )
     return None
@@ -129,10 +132,12 @@ def _build_specs(
         resource_id = edit.id.strip()
         instruction = edit.instruction.strip()
         if not resource_id:
-            warnings.append("⚠️  edits 中存在缺少 id 的条目，跳过")
+            warnings.append("⚠️  skipped edits entries that have no id")
             continue
         if resource_id in seen_ids:
-            warnings.append(f"⚠️  {label} '{resource_id}' 在 edits 中重复出现，仅保留第一条编辑指令")
+            warnings.append(
+                f"⚠️  {label} '{resource_id}' appears more than once in edits; only the first edit instruction is kept"
+            )
             continue
         seen_ids.add(resource_id)
         if not instruction:
@@ -140,7 +145,7 @@ def _build_specs(
                 resource_id,
                 problem=GenerationProblem(
                     code=GenerationProblemCode.UNIT_REQUEST_INVALID,
-                    detail=f"{label} '{resource_id}' 缺少编辑指令",
+                    detail=f"{label} '{resource_id}' has no edit instruction",
                     action=GenerationAction.FIX_INPUT,
                 ),
             )
@@ -160,7 +165,7 @@ def _build_specs(
                 resource_id,
                 problem=GenerationProblem(
                     code=GenerationProblemCode.UNIT_NOT_FOUND,
-                    detail=f"{label} '{resource_id}' 不存在",
+                    detail=f"{label} '{resource_id}' not found",
                     action=GenerationAction.FIX_INPUT,
                 ),
             )
@@ -182,7 +187,7 @@ def _build_specs(
                 resource_id,
                 problem=GenerationProblem(
                     code=GenerationProblemCode.UNIT_INPUT_UNUSABLE,
-                    detail=f"{label} '{resource_id}' 没有可编辑的当前图",
+                    detail=f"{label} '{resource_id}' has no current image to edit",
                     action=GenerationAction.GENERATE_DEPENDENCY,
                 ),
             )
@@ -235,7 +240,7 @@ class EditImagesRequest(BaseModel):
     @model_validator(mode="after")
     def _storyboard_needs_script(self) -> Self:
         if self.resource_type == "storyboard" and self.script_file is None:
-            raise ValueError("resource_type=storyboard 时 script_file 必填")
+            raise ValueError("script_file is required when resource_type=storyboard")
         return self
 
 
@@ -308,7 +313,7 @@ async def edit_images(
                 caller_source=caller.source,
             )
         if not specs and not builder.recorded_ids:
-            return tool_problem("\n".join([*warnings, "没有可执行的编辑任务"]))
+            return tool_problem("\n".join([*warnings, "No edit tasks to run"]))
 
         if request.value.preview:
             lanes: list[ImageLane] = ["i2i"] * len(specs)

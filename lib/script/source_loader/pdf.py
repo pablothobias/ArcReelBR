@@ -15,7 +15,7 @@ class PdfOxideExtractor:
         try:
             doc_ctx = PdfDocument(str(path))
         except Exception as exc:
-            raise CorruptFileError(filename=path.name, reason=f"PDF 打开失败: {exc}") from exc
+            raise CorruptFileError(filename=path.name, reason=f"failed to open PDF: {exc}") from exc
 
         pages_text: list[str] = []
         total_chars_via_chars_api = 0
@@ -25,13 +25,13 @@ class PdfOxideExtractor:
             try:
                 page_count = doc.page_count()
             except Exception as exc:
-                raise CorruptFileError(filename=path.name, reason=f"PDF 解析失败: {exc}") from exc
+                raise CorruptFileError(filename=path.name, reason=f"PDF parsing failed: {exc}") from exc
 
             for idx in range(page_count):
                 try:
                     page_text = doc.extract_text(idx) or ""
                 except Exception as exc:
-                    raise CorruptFileError(filename=path.name, reason=f"PDF 解析失败: {exc}") from exc
+                    raise CorruptFileError(filename=path.name, reason=f"PDF parsing failed: {exc}") from exc
                 pages_text.append(page_text)
                 try:
                     chars = doc.extract_chars(idx) or []
@@ -50,7 +50,7 @@ class PdfOxideExtractor:
         if chars_indicates_scanned or len(full) / page_count < _SCANNED_CHARS_PER_PAGE:
             raise CorruptFileError(
                 filename=path.name,
-                reason="疑似扫描版 PDF，需 OCR，本次不支持",
+                reason="looks like a scanned PDF that needs OCR, which is not supported",
             )
 
         return ExtractedText(text=full, used_encoding=None, chapter_count=0)

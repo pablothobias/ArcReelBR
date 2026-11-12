@@ -77,6 +77,7 @@ MESSAGES = {
     "val_asset_field_must_be_string": "{asset_type} '{name}'.{field} phải là chuỗi, hiện là {actual}",
     "val_asset_field_bad_timestamp": ("{asset_type} '{name}'.{field} không phải dấu thời gian ISO8601 hợp lệ: {value}"),
     "val_asset_field_must_be_string_list": ("{asset_type} '{name}'.{field} phải là danh sách chuỗi, hiện là {actual}"),
+    "val_asset_field_invalid_choice": "{asset_type} '{name}'.{field} phải là một trong {allowed}, hiện là {actual}",
     "val_asset_field_item_must_be_string": "{asset_type} '{name}'.{field}[{index}] phải là chuỗi, hiện là {actual}",
     "val_asset_name_duplicate": (
         "Trùng tên tài nguyên dự án: {duplicate_type} '{duplicate_name}' xung đột với "

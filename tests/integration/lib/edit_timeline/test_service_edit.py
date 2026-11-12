@@ -76,19 +76,19 @@ async def _edit(service: EditTimelineService, timeline_id: str, base_revision: i
             {"op": "set_trim", "clip": "c2", "trim": {"source_in": 0.2, "source_out": 1.8}},
             "c2",
             "trim",
-            "0 ≤ source_in < source_out ≤ 1.5，且至少保留 0.1 秒",
+            "0 ≤ source_in < source_out ≤ 1.5, keeping at least 0.1 seconds",
         ),
         (
             {"op": "set_trim", "clip": "c2", "trim": {"source_in": 0, "source_out": 1e308}},
             "c2",
             "trim",
-            "0 ≤ source_in < source_out ≤ 1.5，且至少保留 0.1 秒",
+            "0 ≤ source_in < source_out ≤ 1.5, keeping at least 0.1 seconds",
         ),
         (
             {"op": "set_transition", "clip": "c3", "transition": {"type": "dissolve", "duration": 0.5}},
             "c3",
             "transition",
-            "不是最后一个的片段",
+            "a clip that is not the last one",
         ),
         (
             {"op": "set_transition", "clip": "c1", "transition": {"type": "dissolve", "duration": 3}},
@@ -102,8 +102,13 @@ async def _edit(service: EditTimelineService, timeline_id: str, base_revision: i
             "transition.duration",
             "0.1–2.0",
         ),
-        ({"op": "move", "clip": "c9", "after": None}, "c9", "clip", "当前修订里的片段 ID"),
-        ({"op": "insert", "unit_id": "E9U9", "after": "c1"}, None, "unit_id", "集（id=1）脚本中的视频单元 ID"),
+        ({"op": "move", "clip": "c9", "after": None}, "c9", "clip", "a clip ID in the current revision"),
+        (
+            {"op": "insert", "unit_id": "E9U9", "after": "c1"},
+            None,
+            "unit_id",
+            "a video unit ID in the script of episode (id=1)",
+        ),
     ],
 )
 async def test_one_invalid_operation_rejects_the_whole_batch_and_locates_it(
@@ -118,7 +123,7 @@ async def test_one_invalid_operation_rejects_the_whole_batch_and_locates_it(
     assert error.code == "operation_invalid"
     assert (error.params["operation_index"], error.params["clip_id"]) == (1, clip_id)
     assert (error.params["field"], error.params["allowed"]) == (field, allowed)
-    assert "第 2 条操作" in str(error)
+    assert "Operation 2 " in str(error)
     readout = await service.read("demo", timeline_id)
     assert (readout.revision, readout.clips[0].source_volume) == (1, 1.0)
 
@@ -132,7 +137,7 @@ async def test_stale_base_still_applies_when_its_clips_were_untouched(service: E
 
     assert (result.revision, result.base_revision) == (3, 1)
     assert [(item.number, item.author) for item in result.concurrent_revisions] == [(2, AGENT)]
-    assert "已有他人写入修订 2" in result.message
+    assert "others wrote revision(s) 2" in result.message
     readout = await service.read("demo", timeline_id)
     # Preserve concurrent edits and apply this batch against the latest revision.
     assert [(clip.source_volume, clip.hold) for clip in readout.clips] == [(1.0, 0.5), (0.3, 0.0), (0.4, 0.0)]
@@ -281,7 +286,7 @@ async def test_transitions_must_fit_within_the_clips_they_straddle(service: Edit
 
     assert excinfo.value.code == "operation_invalid"
     assert (excinfo.value.params["operation_index"], excinfo.value.params["clip_id"]) == (0, "c3")
-    assert excinfo.value.params["allowed"] == "两侧转场时长之和 ≤ 1.0"
+    assert excinfo.value.params["allowed"] == "total of both transition durations ≤ 1.0"
 
 
 async def test_inserted_clips_reuse_units_with_voice_defaults_and_keep_one_narration_carrier(

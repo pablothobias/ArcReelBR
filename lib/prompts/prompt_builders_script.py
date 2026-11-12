@@ -19,7 +19,9 @@ from lib.speech.speech_rate import speech_rate_units_per_second
 def format_duration_constraint(supported_durations: list[int], default_duration: int | None) -> str:
     """Describe duration constraints. Use a range for at least five consecutive integers; otherwise enumerate."""
     if not supported_durations:
-        raise ValueError("supported_durations 不能为空：调用方必须提供 model 的合法时长列表")
+        raise ValueError(
+            "supported_durations must not be empty: the caller must provide the model's list of valid durations"
+        )
 
     sorted_d = sorted(set(supported_durations))
     is_continuous = len(sorted_d) >= 5 and all(sorted_d[i] == sorted_d[i - 1] + 1 for i in range(1, len(sorted_d)))
@@ -32,8 +34,8 @@ def format_duration_constraint(supported_durations: list[int], default_duration:
     if default_duration is not None:
         if default_duration not in sorted_d:
             raise ValueError(
-                f"default_duration={default_duration} 不在 supported_durations={sorted_d} 内，"
-                "调用方必须保证默认值合法（否则 prompt 会自相矛盾）"
+                f"default_duration={default_duration} is not in supported_durations={sorted_d}; "
+                "the caller must keep the default valid (otherwise the prompt contradicts itself)"
             )
         return f"Duration: {body}; default {default_duration} seconds"
     return f"Duration: {body}; choose according to content pacing"
@@ -318,9 +320,9 @@ def build_normalize_prompt(
     # Empty sets or nonmember defaults produce contradictory prompts; fail before generation for diagnosis.
     normalized_durations = sorted({int(d) for d in supported_durations})
     if not normalized_durations:
-        raise ValueError("supported_durations 不能为空：必须提供模型支持的秒数集合")
+        raise ValueError("supported_durations must not be empty: provide the set of seconds the model supports")
     if default_duration is not None and int(default_duration) not in normalized_durations:
-        raise ValueError(f"default_duration={default_duration} 不在 supported_durations={normalized_durations} 内")
+        raise ValueError(f"default_duration={default_duration} is not in supported_durations={normalized_durations}")
 
     # source_language may be a corrupted nonstring from project.json, which would break downstream .strip().
     source_language = source_language if isinstance(source_language, str) else None
@@ -379,7 +381,7 @@ def build_narration_split_prompt(
     """
     normalized_durations = sorted({int(d) for d in supported_durations})
     if not normalized_durations:
-        raise ValueError("supported_durations 不能为空：必须提供模型支持的秒数集合")
+        raise ValueError("supported_durations must not be empty: provide the set of seconds the model supports")
     if default_duration is not None and int(default_duration) not in normalized_durations:
         default_duration = None
 

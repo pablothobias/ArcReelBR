@@ -259,7 +259,7 @@ class AssistantService:
         """Message content sent to the CLI: a string for plain text, or a list with image blocks before the text block when images are present."""
         text = content.strip()
         if not text and not images:
-            raise ValueError("消息内容不能为空")
+            raise ValueError("Message content cannot be empty")
         if not images:
             return text
         blocks: list[dict[str, Any]] = [self._image_block(img) for img in images]

@@ -354,7 +354,7 @@ class TestDownloadToken:
             token = auth_module.create_download_token("admin", "project-a")
             import pytest
 
-            with pytest.raises(ValueError, match="project 不匹配"):
+            with pytest.raises(ValueError, match="project does not match"):
                 auth_module.verify_download_token(token, "project-b")
 
     def test_verify_download_token_expired(self):
@@ -388,7 +388,7 @@ class TestDownloadToken:
                 "exp": time.time() + 300,
             }
             token = jwt.encode(payload, secret, algorithm="HS256")
-            with pytest.raises(ValueError, match="purpose 不匹配"):
+            with pytest.raises(ValueError, match="purpose does not match"):
                 auth_module.verify_download_token(token, "demo")
 
 

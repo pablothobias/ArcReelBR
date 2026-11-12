@@ -157,7 +157,7 @@ class TestRecordBracket:
 
     async def test_missing_success_declaration_raises_runtime_error(self, db_factory: async_sessionmaker) -> None:
         ledger = Ledger(session_factory=db_factory)
-        with pytest.raises(RuntimeError, match=re.escape("未调用 call.success")):
+        with pytest.raises(RuntimeError, match=re.escape("without calling call.success")):
             async with ledger.record(project_name="demo", call_type="text", model="m", provider="anthropic"):
                 pass  # Normal exit without a success declaration.
 
@@ -699,7 +699,7 @@ class TestSettlementEvents:
         publisher = _RecordingPublisher()
         ledger = Ledger(session_factory=db_factory, publish_change=publisher)
 
-        with pytest.raises(RuntimeError, match=re.escape("未调用 call.success")):
+        with pytest.raises(RuntimeError, match=re.escape("without calling call.success")):
             async with ledger.record(project_name="demo", call_type="text", model="m", provider="anthropic"):
                 pass
 

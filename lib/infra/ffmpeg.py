@@ -60,14 +60,14 @@ def inspect_bundled_ffmpeg(binaries_dir: Path, *, run_version: VersionRunner = _
     """
     candidates = sorted(entry for entry in binaries_dir.iterdir() if entry.name.startswith("ffmpeg-"))
     if len(candidates) != 1:
-        return FfmpegStatus(None, None, "imageio-ffmpeg 未附带当前平台的 ffmpeg 可执行文件")
+        return FfmpegStatus(None, None, "imageio-ffmpeg does not include an ffmpeg executable for this platform")
     executable = candidates[0]
     try:
         result = run_version(executable)
     except (OSError, subprocess.SubprocessError) as exc:
-        return FfmpegStatus(executable, None, f"随包 ffmpeg 无法运行：{exc}")
+        return FfmpegStatus(executable, None, f"Bundled ffmpeg cannot run: {exc}")
     if result.returncode != 0:
-        return FfmpegStatus(executable, None, f"随包 ffmpeg 自检失败：退出码 {result.returncode}")
+        return FfmpegStatus(executable, None, f"Bundled ffmpeg self-check failed: exit code {result.returncode}")
     lines = result.stdout.decode(errors="replace").splitlines()
     return FfmpegStatus(executable, lines[0].strip() if lines else None, None)
 
@@ -90,7 +90,7 @@ def ffmpeg_executable() -> str:
     """
     status = ffmpeg_status()
     if status.executable is None or status.unavailable_reason is not None:
-        raise FfmpegUnavailableError(status.unavailable_reason or "随包 ffmpeg 不可用")
+        raise FfmpegUnavailableError(status.unavailable_reason or "Bundled ffmpeg is unavailable")
     return str(status.executable)
 
 

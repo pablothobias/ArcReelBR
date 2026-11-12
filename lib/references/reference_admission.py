@@ -8,7 +8,7 @@ same data in two panels.
 
 Two blocking axes:
 
-- **Unregistered references**: body ``@[名称]`` or storyboard ``characters_in_*`` / ``scenes`` /
+- **Unregistered references**: body ``@[name]`` or storyboard ``characters_in_*`` / ``scenes`` /
   ``props`` / ``products_in_shot`` names absent from the reference catalog. Leftovers after asset
   deletion and never-registered names take the same path; neither is silently dropped.
 - **Missing sheets**: registered characters/scenes/props without asset sheets. Original images only

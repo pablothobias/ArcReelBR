@@ -85,9 +85,9 @@ class TextOutputTruncatedError(NonRetryableError):
         self.output_tokens = output_tokens
         self.provider_id = provider_id
         self.custom_model = custom_model
-        detail = f"在 output_tokens={output_tokens} 处" if output_tokens is not None else ""
+        detail = f" at output_tokens={output_tokens}" if output_tokens is not None else ""
         super().__init__(
-            f"{provider}/{model} 的输出{detail}被模型输出上限截断，内容不完整。请改用输出能力更高的文本模型。"
+            f"{provider}/{model} output was cut off by the model output limit{detail}; the content is incomplete. Switch to a text model with a higher output limit."
         )
 
 
@@ -107,7 +107,9 @@ class StructuredOutputExhaustedError(NonRetryableError):
         self.provider = provider
         self.model = model
         self.reason = reason
-        super().__init__(f"{provider}/{model} 的结构化输出能力不足：{reason}。请更换文本模型或供应商后重试。")
+        super().__init__(
+            f"{provider}/{model} cannot produce the required structured output: {reason}. Switch the text model or provider, then retry."
+        )
 
 
 class SubscriptionQuotaPaused(NonRetryableError):
@@ -257,7 +259,7 @@ TEXT_TASK_TIERS: dict[TextTaskType, TextTaskTier] = {
 }
 
 if _missing := set(TextTaskType) - set(TEXT_TASK_TIERS):
-    raise RuntimeError(f"TextTaskType 成员未归档到 TEXT_TASK_TIERS: {sorted(m.value for m in _missing)}")
+    raise RuntimeError(f"TextTaskType members missing from TEXT_TASK_TIERS: {sorted(m.value for m in _missing)}")
 
 # Tasks requiring image input (vision). Reject unsupported resolved models instead of silently switching models.
 VISION_REQUIRED_TASKS: frozenset[TextTaskType] = frozenset({TextTaskType.STYLE_ANALYSIS})
@@ -455,7 +457,7 @@ def resolve_schema(schema: dict | type[BaseModel]) -> dict:
             if "$ref" in obj:
                 ref_name = obj["$ref"].split("/")[-1]
                 if ref_name in visited_refs:
-                    raise ValueError(f"检测到 schema 中的循环引用: {ref_name}")
+                    raise ValueError(f"Circular reference detected in schema: {ref_name}")
                 resolved = _inline(defs[ref_name], visited_refs | {ref_name})
                 extra = {k: v for k, v in obj.items() if k != "$ref"}
                 return {**resolved, **extra} if extra else resolved
@@ -495,7 +497,7 @@ def summarize_validation_error(exc: ValidationError) -> str:
         ".".join(str(part) for part in err.get("loc", ())) or "<root>" for err in exc.errors(include_input=False)[:5]
     ]
     suffix = "…" if exc.error_count() > 5 else ""
-    return f"{exc.error_count()} 处字段不符（{', '.join(locs)}{suffix}）"
+    return f"{exc.error_count()} field(s) invalid ({', '.join(locs)}{suffix})"
 
 
 def structured_fallback_reason(text: str, response_schema: dict | type | None, *, strict: bool = True) -> str | None:
@@ -525,10 +527,10 @@ def structured_fallback_reason(text: str, response_schema: dict | type | None, *
         try:
             response_schema.model_validate_json(text, strict=strict)
         except ValidationError as exc:
-            return f"返回内容不满足 response_schema（供应商可能未强制 schema）：{summarize_validation_error(exc)}"
+            return f"Response does not satisfy response_schema (the provider may not enforce the schema): {summarize_validation_error(exc)}"
         return None
     if not is_valid_json(text):
-        return "返回非 JSON 内容（供应商可能未支持结构化输出）"
+        return "Response is not JSON (the provider may not support structured output)"
     return None
 
 
@@ -584,7 +586,7 @@ async def prompt_json_fallback(
     raise StructuredOutputExhaustedError(
         provider=provider,
         model=model,
-        reason=f"prompt 注入降级 {PROMPT_JSON_FALLBACK_MAX_ATTEMPTS} 次尝试后输出仍不合规（{last_reason}）",
+        reason=f"output still invalid after {PROMPT_JSON_FALLBACK_MAX_ATTEMPTS} prompt-injection fallback attempts ({last_reason})",
     )
 
 
@@ -601,7 +603,7 @@ def _validate_fallback_text(text: str, schema_model: type | None) -> tuple[str |
             return None, summarize_validation_error(exc)
     if is_valid_json(text):
         return text, ""
-    return None, "输出不是合法 JSON"
+    return None, "output is not valid JSON"
 
 
 class TextBackend(Protocol):

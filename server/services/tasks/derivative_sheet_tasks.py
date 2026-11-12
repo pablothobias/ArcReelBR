@@ -71,12 +71,12 @@ def _locate_derivative(project: Mapping[str, Any], owner_name: str, derivative_n
     owner_key = resolve_asset_key(bucket, owner_name)
     entry = bucket[owner_key] if isinstance(bucket, dict) and owner_key is not None else None
     if not isinstance(entry, dict):
-        raise KeyError(f"{_SPEC.label_zh} '{owner_name}' 不存在")
+        raise KeyError(f"{_SPEC.asset_type.capitalize()} '{owner_name}' not found")
     table = entry.get(DERIVATIVES_FIELD)
     derivative_key = resolve_asset_key(table, derivative_name)
     derivative = table[derivative_key] if isinstance(table, dict) and derivative_key is not None else None
     if not isinstance(derivative, dict):
-        raise KeyError(f"衍生 '{derivative_name}' 不存在")
+        raise KeyError(f"Derivative '{derivative_name}' not found")
     return derivative
 
 

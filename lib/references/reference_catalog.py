@@ -1,6 +1,6 @@
 """Reference catalog: the sole constructor of registered project reference names.
 
-Body syntax ``@[名称]`` (:mod:`lib.script.reference_video.text_parser`) and storyboard
+Body syntax ``@[name]`` (:mod:`lib.script.reference_video.text_parser`) and storyboard
 ``characters_in_*`` / ``scenes`` / ``props`` / ``products_in_shot`` fields name registered
 references: asset names or character ``本体名/衍生名`` (``docs/adr/0072``). Data/draft validation,
 body-reference attribution, and reference-image projection all ask the same questions: is a name
@@ -58,7 +58,7 @@ def derivative_reference(base_name: str, derivative_name: str) -> str:
 def renamed_reference(name: str, old_name: str, new_name: str) -> str | None:
     """Rewrite a reference name for one asset rename, or return ``None`` when unrelated.
 
-    This is the sole name-level cascading-rename decision: body mentions (``@[名称]``) and
+    This is the sole name-level cascading-rename decision: body mentions (``@[name]``) and
     reference arrays/speaker fields carry the same names, so both rewrite paths share this
     function rather than independently deciding old-name matches.
 

@@ -50,7 +50,7 @@ describe("ScriptPreviewPanel", () => {
     expect(screen.getByText("角色「张三」未设置参考音频")).toBeInTheDocument();
   });
 
-  // Unregistered `@[名称]` is informational: saving/generation remain allowed, without blocking signals.
+  // Unregistered `@[name]` is informational: saving/generation remain allowed, without blocking signals.
   it("shows an unresolved-mention warning without blocking anything", async () => {
     vi.spyOn(API, "previewReferenceScript").mockResolvedValue(
       mkPreview({

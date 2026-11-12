@@ -210,7 +210,7 @@ class SpeechComposition:
         return SpeechPreparation(snapshot.unit_id, mode, tuple(utterances), tuple(problems))
 
 
-#: Dialogue with an empty speaker slot (``@[ ]：{台词}``). Speech markers require a nonempty speaker, so this
+#: Dialogue with an empty speaker slot (``@[ ]：{dialogue}``). Speech markers require a nonempty speaker, so this
 #: is not a marker and remains entirely in the description residue. Detect it separately so admission reports a missing speaker rather than a generic parse failure.
 _EMPTY_SPEAKER_LINE = re.compile(r"^\s*@\[\s*\]\s*[:：]\s*\{([^{}]+)\}\s*$")
 _MISSING = object()
@@ -462,7 +462,7 @@ def adapt_ad_shot(shot: Mapping[str, object]) -> SpeechUnitSnapshot:
 def adapt_video_unit(unit: Mapping[str, object]) -> SpeechUnitSnapshot:
     """Translate utterance lines from a self-contained reference-video unit body.
 
-    A leading ``@[名称]：`` followed by plain text stays a description here: telling a
+    A leading ``@[name]：`` followed by plain text stays a description here: telling a
     brace-less dialogue line apart from a scene label needs the asset type, and the unit
     body is the only input this adapter has. Machine drafts keep that judgement in
     ``lib.script.reference_video.draft_validation``, which does see the project asset tables.
@@ -530,7 +530,7 @@ def admit_script_unit(
     try:
         adapter = _SKELETON_ADAPTERS[skeleton_kind]
     except KeyError as exc:
-        raise ValueError(f"未知剧本骨架: {skeleton_kind!r}") from exc
+        raise ValueError(f"Unknown script skeleton: {skeleton_kind!r}") from exc
     source = dict(unit)
     if ignore_marker:
         source.pop("needs_replan", None)

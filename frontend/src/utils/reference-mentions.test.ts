@@ -204,7 +204,7 @@ describe("MENTION_RE prefix boundary", () => {
 });
 
 describe("inline speech marks", () => {
-  it("matches `@[角色]{台词}` with either colon, wrapped or bare, and no separator", () => {
+  it("matches `@[character]{dialogue}` with either colon, wrapped or bare, and no separator", () => {
     expect(marks("@[张三]：{我来了}")).toEqual([["张三", "我来了"]]);
     expect(marks("@张三:{我来了}")).toEqual([["张三", "我来了"]]);
     expect(marks("  @[角色甲（成年）] ： {我来了} ")).toEqual([["角色甲（成年）", "我来了"]]);
@@ -315,7 +315,7 @@ describe("splitScriptLines", () => {
   });
 });
 
-describe("@[角色/衍生]", () => {
+describe("@[character/derivative]", () => {
   const project = {
     characters: { 阿岚: { derivatives: { 战斗装: {}, 便装: {} } }, 青禾: {} },
     scenes: { 茶楼: {} },

@@ -498,7 +498,7 @@ class _Planner:
                         scene_id,
                         GenerationProblem(
                             code=GenerationProblemCode.UNIT_NOT_FOUND,
-                            detail=f"分镜 {scene_id} 不在当前剧本中",
+                            detail=f"Storyboard {scene_id} is not in the current script",
                             action=GenerationAction.FIX_INPUT,
                         ),
                     )
@@ -542,7 +542,7 @@ class _Planner:
                             state,
                             GenerationProblem(
                                 code=GenerationProblemCode.ARTIFACT_STATE_UNAVAILABLE,
-                                detail=f"同组分镜 {unavailable_ids} 的产物状态不可读，整张宫格无法生成",
+                                detail=f"Output state of storyboards {unavailable_ids} in the same group cannot be read, so the grid cannot be generated",
                                 action=GenerationAction.REPAIR_ARTIFACT_STATE,
                             ),
                         )
@@ -604,7 +604,7 @@ class _Planner:
             grid_ids = [record.id for record in conflicting]
             problem = GenerationProblem(
                 code=GenerationProblemCode.ACTIVE_TASK_CONFLICT,
-                detail=f"宫格 {grid_ids} 正在生成，与本张宫格覆盖的分镜部分重叠；等它完成后再提交",
+                detail=f"Grids {grid_ids} are generating and partly overlap the storyboards this grid covers; submit after they finish",
                 action=GenerationAction.WAIT_FOR_TASK,
                 params={"grid_ids": grid_ids},
             )
@@ -634,7 +634,7 @@ class _Planner:
         if pending_ids:
             problem = GenerationProblem(
                 code=GenerationProblemCode.UNIT_REQUEST_INVALID,
-                detail=f"同组分镜 {pending_ids} 的 image_prompt 尚未填写，整张宫格无法生成",
+                detail=f"image_prompt is not filled in for storyboards {pending_ids} in the same group, so the grid cannot be generated",
                 action=GenerationAction.FIX_INPUT,
                 params={"pending_ids": pending_ids},
             )

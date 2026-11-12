@@ -242,7 +242,7 @@ class MiniMaxImageBackend:
         # Log full responses for diagnosis but exclude bodies from exceptions, where 503/timeout substrings could
         # mislead default should_retry. Established policy retries by statuses, never strings.
         logger.error("MiniMax 图像响应缺少 image_urls/image_base64: %s", data)
-        raise RuntimeError("MiniMax 图像响应缺少 image_urls/image_base64")
+        raise RuntimeError("MiniMax image response is missing image_urls/image_base64")
 
     async def _download_result(self, url: str, output_path: Path) -> None:
         """Download issued image URLs via idempotent GET under shared artifact budgets.
@@ -252,7 +252,7 @@ class MiniMaxImageBackend:
         Other 4xx fail deterministically. Downloads have much larger budgets than generation because failed
         retrieval must not waste generation quota.
         """
-        await with_artifact_retry(lambda: download_image_to_path(url, output_path), label="MiniMax 图像")
+        await with_artifact_retry(lambda: download_image_to_path(url, output_path), label="MiniMax image")
 
 
 async def _write_base64_image(b64: str, output_path: Path) -> None:

@@ -175,7 +175,7 @@ class TestPreviewMatchesExecution:
         assert text == generator.image_calls[0]["prompt"]
 
     async def test_reference_numbering_covers_the_previous_storyboard_and_mentions(self, tmp_path, monkeypatch):
-        """Preview and execution share reference assembly: previous storyboard image is last; body @[登记名] becomes corresponding 图N."""
+        """Preview and execution share reference assembly: previous storyboard image is last; body @[registered name] becomes corresponding 图N."""
         project_path = prepare_files(tmp_path)
         pm = _pm_for("narration", project_path)
         seed_current_storyboard(pm, "E1S01")

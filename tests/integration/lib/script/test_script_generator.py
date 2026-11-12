@@ -302,7 +302,7 @@ class TestScriptGenerator:
         _write(project_path / "drafts" / "episode_1" / "script_plan_normalized_script.json", "[]")
         _activate_project_artifacts(project_path)
         generator = ScriptGenerator(project_path)
-        with pytest.raises(ValueError, match="顶层应为对象"):
+        with pytest.raises(ValueError, match="top level must be an object"):
             generator._load_drama_script_plan_content(1)
 
     async def test_load_drama_script_plan_content_rejects_non_list_scenes(self, tmp_path):
@@ -318,7 +318,7 @@ class TestScriptGenerator:
             {"title": "第一集", "scenes": {}},
         )
         generator = ScriptGenerator(project_path)
-        with pytest.raises(ValueError, match="scenes 必须是非空"):
+        with pytest.raises(ValueError, match="scenes must be a non-empty"):
             generator._load_drama_script_plan_content(1)
 
     async def test_load_drama_script_plan_content_rejects_empty_scenes(self, tmp_path):
@@ -334,7 +334,7 @@ class TestScriptGenerator:
             {"title": "第一集", "scenes": []},
         )
         generator = ScriptGenerator(project_path)
-        with pytest.raises(ValueError, match="scenes 必须是非空"):
+        with pytest.raises(ValueError, match="scenes must be a non-empty"):
             generator._load_drama_script_plan_content(1)
 
     async def test_load_drama_script_plan_content_rejects_non_dict_scene_item(self, tmp_path):
@@ -350,7 +350,7 @@ class TestScriptGenerator:
             {"title": "第一集", "scenes": [{"scene_id": "E1S01"}, 42]},
         )
         generator = ScriptGenerator(project_path)
-        with pytest.raises(ValueError, match="必须是分镜对象"):
+        with pytest.raises(ValueError, match="must be a storyboard object"):
             generator._load_drama_script_plan_content(1)
 
     async def test_load_drama_script_plan_content_rejects_empty_scene_id(self, tmp_path):
@@ -366,7 +366,7 @@ class TestScriptGenerator:
             {"title": "第一集", "scenes": [{"scene_id": ""}]},
         )
         generator = ScriptGenerator(project_path)
-        with pytest.raises(ValueError, match="scene_id 必须是非空字符串"):
+        with pytest.raises(ValueError, match="scene_id must be a non-empty string"):
             generator._load_drama_script_plan_content(1)
 
     async def test_load_drama_script_plan_content_rejects_rewritten_scene_id_collision(self, tmp_path):
@@ -382,7 +382,7 @@ class TestScriptGenerator:
             {"title": "第二集", "scenes": [{"scene_id": "E1S02_1"}, {"scene_id": "E2S02_1"}]},
         )
         generator = ScriptGenerator(project_path)
-        with pytest.raises(ValueError, match="改写到 episode=2 后重复"):
+        with pytest.raises(ValueError, match="duplicates after rewriting to episode=2"):
             generator._load_drama_script_plan_content(2)
 
     async def test_drama_prompt_authoring_rejects_script_plan_duration_out_of_constrained_set(
@@ -395,7 +395,7 @@ class TestScriptGenerator:
         content = _drama_script_plan_content()
         content["scenes"][0]["duration_seconds"] = 4
         generator = ScriptGenerator(project_path)
-        with pytest.raises(ValueError, match="script_plan 已定分镜时长非法"):
+        with pytest.raises(ValueError, match="script_plan has invalid storyboard durations"):
             await generator._assert_drama_script_plan_durations(content["scenes"])
 
     @pytest.mark.parametrize(
@@ -413,7 +413,7 @@ class TestScriptGenerator:
         content = _drama_script_plan_content()
         content["scenes"][0]["duration_seconds"] = raw
         generator = ScriptGenerator(project_path)
-        with pytest.raises(ValueError, match="script_plan 已定分镜时长非法"):
+        with pytest.raises(ValueError, match="script_plan has invalid storyboard durations"):
             await generator._assert_drama_script_plan_durations(content["scenes"])
 
     async def test_drama_prompt_authoring_checks_declared_default_when_duration_absent(
@@ -433,7 +433,7 @@ class TestScriptGenerator:
         content = _drama_script_plan_content()
         del content["scenes"][0]["duration_seconds"]
         generator = ScriptGenerator(project_path)
-        with pytest.raises(ValueError, match="script_plan 已定分镜时长非法"):
+        with pytest.raises(ValueError, match="script_plan has invalid storyboard durations"):
             await generator._assert_drama_script_plan_durations(content["scenes"])
 
     async def test_drama_prompt_authoring_checks_declared_default_when_duration_null(
@@ -453,7 +453,7 @@ class TestScriptGenerator:
         content = _drama_script_plan_content()
         content["scenes"][0]["duration_seconds"] = None
         generator = ScriptGenerator(project_path)
-        with pytest.raises(ValueError, match="script_plan 已定分镜时长非法"):
+        with pytest.raises(ValueError, match="script_plan has invalid storyboard durations"):
             await generator._assert_drama_script_plan_durations(content["scenes"])
 
     async def test_drama_prompt_authoring_accepts_script_plan_duration_within_constrained_set(
@@ -540,7 +540,7 @@ class TestScriptGenerator:
         _write_json(project_path / "project.json", {"title": "项目"})
 
         generator = ScriptGenerator(project_path)
-        with pytest.raises(ValueError, match=r"JSON 解析失败"):
+        with pytest.raises(ValueError, match=r"JSON parsing failed"):
             generator._parse_response("not-json", 1)
 
     async def test_parse_response_validation_error_returns_raw_data(self, tmp_path):
@@ -874,7 +874,7 @@ class TestScriptGenerator:
         # Empty visual output fails structural validation loudly, but model calls happened and request arguments remain assertable.
         fake = _FakeTextGenerator(json.dumps({"foo": "bar"}))
         generator = ScriptGenerator(project_path, generator=fake, config_resolver=_resolver())
-        with pytest.raises(ValueError, match="视觉层结构校验失败"):
+        with pytest.raises(ValueError, match="visual layer structure validation failed"):
             await generator.generate(1)
 
         assert fake.backend.last_request.max_output_tokens == DEFAULT_MAX_OUTPUT_TOKENS
@@ -887,7 +887,7 @@ class TestScriptGenerator:
         _write(project_path / "drafts" / "episode_1" / "script_plan_segments.md", "content")
 
         generator = ScriptGenerator(project_path)  # No backend.
-        with pytest.raises(RuntimeError, match="TextGenerator 未初始化"):
+        with pytest.raises(RuntimeError, match="TextGenerator is not initialized"):
             await generator.generate(1)
 
     @pytest.mark.parametrize(
@@ -907,7 +907,7 @@ class TestScriptGenerator:
 
         fake = _FakeTextGenerator(json.dumps(_valid_narration_response(), ensure_ascii=False))
         generator = ScriptGenerator(project_path, generator=fake)
-        with pytest.raises(ValueError, match="只接受纯文件名"):
+        with pytest.raises(ValueError, match="accepts only a bare file name"):
             await generator.generate(1, output_filename=bad_filename)
 
 
@@ -1562,7 +1562,7 @@ class TestLoadNarrationScriptPlan:
             violations=[],
         )
 
-        with pytest.raises(ValueError, match="草稿待处置"):
+        with pytest.raises(ValueError, match="has a pending draft"):
             sg._load_narration_script_plan(1, [4, 6, 8])
 
     def test_missing_json_without_legacy_md_raises(self, tmp_path):
@@ -1584,26 +1584,26 @@ class TestLoadNarrationScriptPlan:
         path = self._script_plan_path(sg, 1)
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text("{not json", encoding="utf-8")
-        with pytest.raises(ValueError, match=r"script_plan_segments\.json 解析失败"):
+        with pytest.raises(ValueError, match=r"script_plan_segments\.json parsing failed"):
             sg._load_narration_script_plan(1, [4, 6, 8])
 
     def test_invalid_structure_missing_novel_text_raises(self, tmp_path):
         sg = _bare_generator(tmp_path)
         self._write(sg, 1, {"segments": [{"segment_id": "E1S01", "duration_seconds": 4}]})
-        with pytest.raises(ValueError, match=r"script_plan_segments\.json 结构校验失败"):
+        with pytest.raises(ValueError, match=r"script_plan_segments\.json structure validation failed"):
             sg._load_narration_script_plan(1, [4, 6, 8])
 
     def test_duplicate_segment_id_raises(self, tmp_path):
         sg = _bare_generator(tmp_path)
         self._write(sg, 1, {"segments": [_script_plan_seg("E1S01", "甲"), _script_plan_seg("E1S01", "乙")]})
-        with pytest.raises(ValueError, match=r"segment_id 重复"):
+        with pytest.raises(ValueError, match=r"duplicate segment_id"):
             sg._load_narration_script_plan(1, [4, 6, 8])
 
     def test_post_rewrite_collision_raises(self, tmp_path):
         """Distinct IDs colliding after episode-prefix rewriting (E1S02 / E2S02 both E2S02 in episode2) fail loudly."""
         sg = _bare_generator(tmp_path)
         self._write(sg, 2, {"segments": [_script_plan_seg("E1S02", "甲"), _script_plan_seg("E2S02", "乙")]})
-        with pytest.raises(ValueError, match=r"segment_id 改写到 episode=2 后重复"):
+        with pytest.raises(ValueError, match=r"segment_id duplicates after rewriting to episode=2"):
             sg._load_narration_script_plan(2, [4, 6, 8])
 
     def test_duration_outside_supported_raises(self, tmp_path):
@@ -1615,14 +1615,14 @@ class TestLoadNarrationScriptPlan:
     def test_empty_segments_raises(self, tmp_path):
         sg = _bare_generator(tmp_path)
         self._write(sg, 1, {"segments": []})
-        with pytest.raises(ValueError, match=r"script_plan_segments\.json segments 为空"):
+        with pytest.raises(ValueError, match=r"script_plan_segments\.json segments is empty"):
             sg._load_narration_script_plan(1, [4, 6, 8])
 
     def test_missing_asset_arrays_raises(self, tmp_path):
         """Plan asset fields characters_in_segment/scenes/props are required; omissions fail loudly without implicit []."""
         sg = _bare_generator(tmp_path)
         self._write(sg, 1, {"segments": [{"segment_id": "E1S01", "novel_text": "甲", "duration_seconds": 4}]})
-        with pytest.raises(ValueError, match=r"script_plan_segments\.json 结构校验失败"):
+        with pytest.raises(ValueError, match=r"script_plan_segments\.json structure validation failed"):
             sg._load_narration_script_plan(1, [4, 6, 8])
 
     def test_explicit_empty_asset_arrays_pass(self, tmp_path):
@@ -1664,14 +1664,14 @@ class TestLoadReferenceScriptPlan:
     def test_duplicate_unit_id_raises(self, tmp_path):
         sg = self._generator(tmp_path)
         self._write(sg, 1, {"units": [self._unit("E1U01"), self._unit("E1U01")]})
-        with pytest.raises(ValueError, match=r"unit_id 重复"):
+        with pytest.raises(ValueError, match=r"duplicate unit_id"):
             sg._load_reference_script_plan(1, [4, 6, 8])
 
     def test_post_rewrite_collision_raises(self, tmp_path):
         """Distinct unit IDs colliding after episode rewriting (E1U01 / E2U01 → E2U01 in episode2) fail loudly. _add_metadata unconditionally rewrites E\\d+ before persistence; catch mixed LLM episode prefixes at plan reads rather than silently persisting collisions, like narration/drama loaders."""
         sg = self._generator(tmp_path)
         self._write(sg, 2, {"units": [self._unit("E1U01"), self._unit("E2U01")]})
-        with pytest.raises(ValueError, match=r"unit_id 改写到 episode=2 后重复"):
+        with pytest.raises(ValueError, match=r"unit_id duplicates after rewriting to episode=2"):
             sg._load_reference_script_plan(2, [4, 6, 8])
 
     def test_loading_preserves_duration_for_per_unit_admission(self, tmp_path):
@@ -1739,7 +1739,7 @@ class TestLoadReferenceScriptPlan:
     def test_empty_units_raises(self, tmp_path):
         sg = self._generator(tmp_path)
         self._write(sg, 1, {"units": []})
-        with pytest.raises(ValueError, match=r"script_plan_reference_units\.json units 为空"):
+        with pytest.raises(ValueError, match=r"script_plan_reference_units\.json units is empty"):
             sg._load_reference_script_plan(1, [4, 6, 8])
 
 
@@ -1813,7 +1813,7 @@ class TestAdScriptGeneration:
         assert "速干杯" in prompt
         assert "video unit" in prompt
         assert "Do not output shots, section, shot_id" in prompt
-        assert "@[名称]" in prompt
+        assert "@[name]" in prompt
 
     async def test_build_prompt_uses_project_source_language(self, tmp_path, video_request_facts):
         """Ad speech-rate conversion/output language follows project source_language like drama/narration, never reverting non-Chinese projects to Chinese/zh rates."""
@@ -1943,7 +1943,7 @@ class TestAdScriptGeneration:
         fake = _FakeTextGenerator(json.dumps({"foo": "bar"}))
         generator = ScriptGenerator(project_path, generator=fake)
 
-        with pytest.raises(ValueError, match="广告参考剧本结构校验失败"):
+        with pytest.raises(ValueError, match="Ad reference script failed structure validation"):
             await generator.generate(1)
 
         schema = fake.backend.last_request.response_schema
@@ -2124,7 +2124,7 @@ class TestAdReferenceSkeletonUnity:
         assert "shots" not in saved
         assert "reference_units" not in saved
         assert [unit["unit_id"] for unit in saved["video_units"]] == ["E1U1", "E1U2"]
-        # References are never persisted: bodies are authoritative; readers derive `@[名称]` references.
+        # References are never persisted: bodies are authoritative; readers derive `@[name]` references.
         assert "references" not in saved["video_units"][0]
         assert "@[速干杯]" in saved["video_units"][0]["text"]
 

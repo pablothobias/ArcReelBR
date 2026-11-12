@@ -36,7 +36,9 @@ router = APIRouter()
 
 # Usage views: generation calls exclude Agent records; Agent sessions include only Agent records.
 UsageView = Literal["generation", "agent"]
-_VIEW_DESCRIPTION = "视图：generation（生成调用，默认，不含 Agent 记录）或 agent（Agent 会话的记录）"
+_VIEW_DESCRIPTION = (
+    "View: generation (generation calls, default, excluding Agent records) or agent (Agent session records)"
+)
 
 
 def _view_filter(view: UsageView) -> bool:
@@ -44,7 +46,7 @@ def _view_filter(view: UsageView) -> bool:
     return view == "agent"
 
 
-_CALL_STATUS_DESCRIPTION = f"状态 ({'/'.join(CallStatus)})"
+_CALL_STATUS_DESCRIPTION = f"Status ({'/'.join(CallStatus)})"
 
 
 # ---------------------------------------------------------------------------
@@ -160,7 +162,7 @@ async def list_usage_records(
     media_type: str | None = Query(
         None, description="Media types (image/video/text/audio), comma-separated for multiple selections"
     ),
-    status: str | None = Query(None, description=f"{_CALL_STATUS_DESCRIPTION}，逗号分隔多选"),
+    status: str | None = Query(None, description=f"{_CALL_STATUS_DESCRIPTION}, comma-separated for multiple values"),
     segment_id: str | None = Query(None, description="Storyboard IDs, comma-separated for multiple selections"),
     since: datetime | None = Query(None, description="Inclusive start time, ISO 8601; timezone-naive values use UTC"),
     until: datetime | None = Query(None, description="Exclusive end time, ISO 8601; timezone-naive values use UTC"),

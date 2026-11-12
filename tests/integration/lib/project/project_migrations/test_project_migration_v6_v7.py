@@ -116,7 +116,7 @@ def test_existing_index_preserves_identity_boundaries_assets_and_content(tmp_pat
     unit = migrated["video_units"][0]
     assert unit["duration_seconds"] == 8
     assert unit["generated_assets"] == assets
-    # References no longer persist; write body `@[名称]` markers in old field order and derive them on read.
+    # References no longer persist; write body `@[name]` markers in old field order and derive them on read.
     text = unit["text"]
     assert extract_mentions(text)[:4] == ["咖啡", "演员", "厨房", "杯子"]
     assert text.index("缓慢转动") < text.index("醒来的第一口")

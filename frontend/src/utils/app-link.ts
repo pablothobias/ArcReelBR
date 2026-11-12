@@ -1,9 +1,9 @@
 /**
  * In-app links for Agent reply navigation, ordinary application paths supporting new tabs/copied addresses:
  *
- * - Edit views: `/app/projects/{项目名}/episodes/{集 ID}?view=edit&tl={剪辑时间线ID}&t={秒}`
+ * - Edit views: `/app/projects/{project name}/episodes/{episode ID}?view=edit&tl={timeline ID}&t={seconds}`
  *   `tl` / `t` are optional; `t` is global timeline seconds, with timelines choosing clips.
- * - Video-unit previews: `/app/projects/{项目名}/episodes/{集 ID}?unit={单元ID}&t={秒}`
+ * - Video-unit previews: `/app/projects/{project name}/episodes/{episode ID}?unit={unit ID}&t={seconds}`
  *   Open unit previews, with `t`, starting at `t`. Optional `t` is seconds from that unit video's beginning; IDs are script `segment_id` / `shot_id` / `scene_id` / `unit_id`.
  *
  * Episode IDs come from project-detail `episodes[].episode`, never broadcast positions. Encode project names as URL segments. Never mix formats: `view=edit` ignores `unit`, interpreting `t` as global timeline time.
@@ -38,7 +38,7 @@ export function parseSeconds(value: string | null): number | null {
   return Number.isFinite(seconds) ? seconds : null;
 }
 
-/** Extract/decode project names from episode paths `/app/projects/{项目名}/...`; return null on decode failures. */
+/** Extract/decode project names from episode paths `/app/projects/{project name}/...`; return null on decode failures. */
 function decodeProjectSegment(pathname: string): string | null {
   const segment = pathname.split("/")[3] ?? "";
   try {

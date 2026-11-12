@@ -52,7 +52,7 @@ from server.services.asset_library.global_library import (
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/assets", tags=["全局资产库"])
+router = APIRouter(prefix="/assets", tags=["Global asset library"])
 
 MAX_UPLOAD_BYTES = 5 * 1024 * 1024
 ALLOWED_EXTS = {".png", ".jpg", ".jpeg", ".webp"}

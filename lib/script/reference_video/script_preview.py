@@ -5,8 +5,8 @@ not persisted (see ADR 0064).
 
 Dialogue syntax shares inline splitting primitives with :mod:`lib.script.reference_video.text_parser`:
 
-- ``@[角色]{台词}`` (whitespace or ASCII/Chinese colons allowed between mention and braces) → ``dialogue`` utterance
-- Bare ``{台词}`` → ``voiceover`` utterance
+- ``@[character]{dialogue}`` (whitespace or ASCII/Chinese colons allowed between mention and braces) → ``dialogue`` utterance
+- Bare ``{dialogue}`` → ``voiceover`` utterance
 - Both can appear anywhere inline, with multiple marks per line. Unrecognized braces produce no
   utterances and remain verbatim, with warnings only. Never guess a speaker from the nearest inline
   mention: mistaken inference silently binds dialogue to the wrong character's reference audio.
@@ -253,9 +253,9 @@ def build_script_preview(
     were removed, and execution alone warns. Neither ``None`` (unlisted/unresolvable capabilities) nor
     ``0`` (no reference-image acceptance) clips, matching request projection's ``clamp_reference_assets``.
 
-    Unregistered ``@[名称]`` only warns, never blocks: authors wrote the body, with no machine contract
+    Unregistered ``@[name]`` only warns, never blocks: authors wrote the body, with no machine contract
     for previews to protect. Apply the same rule to missing character derivatives in speaker slots:
-    ``@[角色/衍生]`` never derives an image because speaker slots never do, so report its unregistered
+    ``@[character/derivative]`` never derives an image because speaker slots never do, so report its unregistered
     status separately or the editor stays silent. Do not repeat missing base characters here:
     ``derive_voice_bindings`` already reports unregistered speakers.
     """

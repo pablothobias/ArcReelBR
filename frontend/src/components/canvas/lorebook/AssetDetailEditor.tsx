@@ -11,6 +11,7 @@ import { TruncatedText } from "@/components/shared/TruncatedText";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SheetBody, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useProjectsStore } from "@/stores/projects-store";
 import { DEFAULT_CHARACTER_VOICE_BINDING } from "@/types";
@@ -109,6 +110,8 @@ export function AssetDetailEditor({
   const descriptionId = useId();
   const brandId = useId();
   const sellingPointsId = useId();
+  const occupancyId = useId();
+  const occupancyHintId = useId();
   const [viewingSheet, setViewingSheet] = useState(false);
   const [failedUrl, setFailedUrl] = useState<string | null>(null);
   const voiceBinding = useProjectsStore(
@@ -161,8 +164,9 @@ export function AssetDetailEditor({
 
   const generate = () => {
     if (busy || rejectIfAssetBusy(assetType, projectName, name, t, "assets:gallery_busy_hint")) return;
-    // Sheets derive only from descriptions/originals: changed descriptions outdate sheets after saving, before servers can observe it.
-    const willBeStale = value.description !== unit.savedValue.description;
+    // Sheets derive from descriptions/originals (and scene occupancy): changing them outdates sheets after saving, before servers can observe it.
+    const willBeStale =
+      value.description !== unit.savedValue.description || value.occupied !== unit.savedValue.occupied;
     void unit.saveAndGenerate(() => {
       if (!rejectIfAssetBusy(assetType, projectName, name, t, "assets:gallery_busy_hint")) return onGenerate(name);
     }, {
@@ -300,6 +304,24 @@ export function AssetDetailEditor({
               placeholder={t(DESCRIPTION_PLACEHOLDER[assetType])}
             />
           </EditorSection>
+
+          {assetType === "scene" && (
+            <EditorSection title={t("assets:scene_occupancy_label")} htmlFor={occupancyId}>
+              <div className="flex items-start gap-3">
+                <Switch
+                  id={occupancyId}
+                  checked={value.occupied}
+                  disabled={readOnly}
+                  onCheckedChange={(next) => setField("occupied", next)}
+                  aria-describedby={occupancyHintId}
+                  className="mt-0.5"
+                />
+                <p id={occupancyHintId} className="text-xs text-muted-foreground">
+                  {t(value.occupied ? "assets:scene_occupancy_occupied_hint" : "assets:scene_occupancy_empty_hint")}
+                </p>
+              </div>
+            </EditorSection>
+          )}
 
           {product && (
             <>

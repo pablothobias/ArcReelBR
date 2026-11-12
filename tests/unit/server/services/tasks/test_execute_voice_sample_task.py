@@ -176,7 +176,7 @@ class TestExecuteCharacterVoiceSampleTask:
             return 20.0
 
         monkeypatch.setattr(generation_tasks, "probe_audio_duration_seconds", _too_long)
-        with pytest.raises(ValueError, match="时长"):
+        with pytest.raises(ValueError, match="duration"):
             await generation_tasks.execute_character_voice_sample_task(
                 "demo", "艾莉", {"prompt": "你好", "voice": "Cherry"}, task_id="task-1"
             )

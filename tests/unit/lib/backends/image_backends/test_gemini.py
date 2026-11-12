@@ -242,7 +242,7 @@ class TestGenerate:
         backend_aistudio._client.aio.models.generate_content = AsyncMock(return_value=mock_response)
 
         request = ImageGenerationRequest(prompt="test", output_path=output_file)
-        with pytest.raises(RuntimeError, match="未返回图片"):
+        with pytest.raises(RuntimeError, match="returned no image"):
             await backend_aistudio.generate(request)
 
 

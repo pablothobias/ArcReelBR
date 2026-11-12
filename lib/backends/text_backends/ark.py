@@ -104,7 +104,7 @@ class ArkTextBackend:
             from lib.backends.text_backends.base import resolve_schema, structured_fallback_reason
 
             if request.response_schema is None:
-                raise ValueError("structured 模式要求 response_schema 非空")
+                raise ValueError("structured mode requires a non-empty response_schema")
             schema = resolve_schema(request.response_schema)
             kwargs: dict = {
                 "model": self._model,

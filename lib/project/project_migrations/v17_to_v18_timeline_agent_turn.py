@@ -138,7 +138,7 @@ def migrate_v17_to_v18(project_dir: Path) -> ArtifactBackfillOutcome | None:
     with project_metadata_lock(project_dir):
         project = json.loads(project_file.read_bytes())
         if not isinstance(project, dict):
-            raise ValueError("project.json 必须是对象")
+            raise ValueError("project.json must be an object")
         if parse_project_schema_version(project) >= TARGET_SCHEMA_VERSION:
             return None
         # Back up manifests before rewrites (gap backfill first backs up history), deduplicating both backfills' internal backups.

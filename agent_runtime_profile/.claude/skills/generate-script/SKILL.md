@@ -24,7 +24,7 @@ Call MCP tools; the session binds the project name, so no project argument is ne
 
 ```text
 mcp__arcreel__generate_episode_script({"episode_id": N})
-mcp__arcreel__generate_episode_script({"episode_id": N, "instructions": "<附加指令原文，可选，无则省略>"})
+mcp__arcreel__generate_episode_script({"episode_id": N, "instructions": "<verbatim additional instructions; optional, omit if none>"})
 mcp__arcreel__generate_episode_script({"episode_id": N, "dry_run": true})   # Preview prompt only
 ```
 
@@ -59,7 +59,7 @@ mcp__arcreel__generate_episode_script({"episode_id": N})
 For explicit full-ad regeneration, pass `regenerate: true` without deleting formal content first:
 
 ```text
-mcp__arcreel__generate_episode_script({"episode_id": N, "regenerate": true, "instructions": "<可选>"})
+mcp__arcreel__generate_episode_script({"episode_id": N, "regenerate": true, "instructions": "<optional>"})
 ```
 
 - Existing formal content first returns `script_overwrite_required`, a loss list (removed entries and associated storyboard/video media),
@@ -84,7 +84,7 @@ The MCP tool uses `ScriptGenerator` for these steps:
    - drama (storyboard, including grid_storyboard) → `DramaVisualScript` (`scene_id` + image_prompt + video_prompt)
    - ad storyboard → `AdVisualScript` (`shot_id` + image_prompt + video_prompt); full ad → `AdEpisodeScript` plus `new_assets` (storyboard), or `AdReferenceFlatScript` (reference_video); decisions rewrite references and register new assets in the same write as formal content
    - reference_video → `ReferencePromptAuthoringFlatScript`: one rewritten body per pending unit in order, preserving dialogue verbatim
-6. **Add metadata**: `episode` (internal ID), `content_mode`, `novel` (project title + episode title, falling back to “第 {播出位置} 集”), timestamps. SkipJsonSchema hides these from LLM, with backend injection from `project.json` preventing hallucination affecting consumers such as Jianying drafts.
+6. **Add metadata**: `episode` (internal ID), `content_mode`, `novel` (project title + episode title, falling back to the localized “Episode {broadcast position}”), timestamps. SkipJsonSchema hides these from LLM, with backend injection from `project.json` preventing hallucination affecting consumers such as Jianying drafts.
    - **No script skeleton writes top-level `generation_mode`**. Mode is a creation-locked project fact (`project.json` `generation_mode`), reflected by skeleton kind; consumers always dispatch from `project.json`, never look for it in scripts.
 
 ## Output format

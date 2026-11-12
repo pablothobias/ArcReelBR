@@ -77,6 +77,7 @@ MESSAGES = {
     "val_asset_field_must_be_string": "{asset_type} «{name}».{field} должно быть строкой, получено {actual}",
     "val_asset_field_bad_timestamp": "{asset_type} «{name}».{field} не является допустимой отметкой времени ISO8601: {value}",
     "val_asset_field_must_be_string_list": "{asset_type} «{name}».{field} должно быть списком строк, получено {actual}",
+    "val_asset_field_invalid_choice": "{asset_type} «{name}».{field} должно быть одним из значений {allowed}, получено {actual}",
     "val_asset_field_item_must_be_string": "{asset_type} «{name}».{field}[{index}] должно быть строкой, получено {actual}",
     "val_asset_name_duplicate": (
         "Повторяющееся имя материала проекта: {duplicate_type} «{duplicate_name}» конфликтует с "

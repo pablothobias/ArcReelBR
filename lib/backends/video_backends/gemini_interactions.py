@@ -118,7 +118,9 @@ class GeminiInteractionsVideoBackend(GeminiVideoBackend):
         interaction_id = getattr(interaction, "id", None)
         if not interaction_id:
             # Without IDs, provider_job_id cannot persist; process interruption would cause resubmission/duplicate billing.
-            raise RuntimeError("Gemini Interactions 提交成功但未返回 interaction ID，无法持久化 provider_job_id")
+            raise RuntimeError(
+                "Gemini Interactions submission succeeded but returned no interaction ID; cannot persist provider_job_id"
+            )
         await self._persist_provider_job_id(
             request, interaction_id, provider=PROVIDER_GEMINI, endpoint=self._request_base_url
         )
@@ -239,7 +241,7 @@ class GeminiInteractionsVideoBackend(GeminiVideoBackend):
         data = getattr(video, "data", None)
         if not data:
             logger.error("Interactions 视频完成但没有成片数据: interaction=%s", interaction.id)
-            raise RuntimeError("视频生成失败: API 未返回视频数据")
+            raise RuntimeError("Video generation failed: the API returned no video data")
 
         await run_noninterruptible_sync(request.output_path.parent.mkdir, parents=True, exist_ok=True)
         # Bytes are already in memory: decoding/writing is noninterruptible, persisted through .part then rename.
@@ -278,8 +280,8 @@ def _failure_message(interaction: Any) -> str | None:
     if status in _RUNNING_STATUSES or status == "completed":
         return None
     errors = [f"{getattr(e, 'code', '')}: {getattr(e, 'message', '')}" for e in (interaction.errors or [])]
-    detail = "; ".join(errors) if errors else "无错误详情"
-    return f"视频生成失败: interaction {interaction.id} 状态为 {status}（{detail}）"
+    detail = "; ".join(errors) if errors else "no error details"
+    return f"Video generation failed: interaction {interaction.id} status is {status} ({detail})"
 
 
 def _output_video_tokens(interaction: Any) -> int | None:

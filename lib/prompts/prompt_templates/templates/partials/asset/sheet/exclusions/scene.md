@@ -1,1 +1,1 @@
- people appearing in the shot,
+{% if occupied %} people beyond those described, close-ups of faces,{% else %} people appearing in the shot,{% endif %}

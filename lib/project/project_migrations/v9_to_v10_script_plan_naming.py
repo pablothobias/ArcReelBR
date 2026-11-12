@@ -73,7 +73,7 @@ def _rename_fields(payload: dict[str, Any], renames: dict[str, str], location: s
         if old not in migrated:
             continue
         if new in migrated:
-            raise ValueError(f"{location} 同时存在 {old} 与 {new}，无法判定保留哪一个")
+            raise ValueError(f"{location} has both {old} and {new}; cannot decide which one to keep")
         migrated[new] = migrated.pop(old)
     return migrated
 
@@ -93,17 +93,17 @@ def migrate_manifest(payload: dict[str, Any]) -> dict[str, Any]:
 
     entries = payload.get("entries")
     if not isinstance(entries, dict):
-        raise ValueError("产物清单 entries 必须是对象")
+        raise ValueError("Artifact manifest entries must be an object")
     migrated_entries: dict[str, Any] = {}
     for encoded_key, entry in entries.items():
         if not isinstance(encoded_key, str):
-            raise ValueError("产物清单 key 必须是字符串")
+            raise ValueError("Artifact manifest keys must be strings")
         parts = decode_artifact_key_parts(encoded_key)
         new_key = encoded_key
         if parts is not None and parts.kind in _ARTIFACT_KIND_RENAMES:
             new_key = encode_artifact_key_parts(_ARTIFACT_KIND_RENAMES[parts.kind], parts.components)
         if new_key in migrated_entries:
-            raise ValueError(f"产物清单改名后 key 冲突: {new_key}")
+            raise ValueError(f"Artifact manifest key conflicts after renaming: {new_key}")
         new_entry = entry
         if isinstance(entry, dict) and isinstance(entry.get("artifact_path"), str):
             new_entry = {**entry, "artifact_path": _rename_artifact_path(entry["artifact_path"])}
@@ -116,14 +116,14 @@ def _episode_entries(project_dir: Path, project: dict[str, Any]) -> list[tuple[P
     if episodes is None:
         return []
     if not isinstance(episodes, list):
-        raise ValueError("project.episodes 必须是数组")
+        raise ValueError("project.episodes must be an array")
     result: list[tuple[Path | None, int]] = []
     for index, entry in enumerate(episodes):
         if not isinstance(entry, dict):
-            raise ValueError(f"project.episodes[{index}] 必须是对象")
+            raise ValueError(f"project.episodes[{index}] must be an object")
         episode = entry.get("episode")
         if not isinstance(episode, int) or isinstance(episode, bool) or episode <= 0:
-            raise ValueError(f"project.episodes[{index}].episode 必须是正整数")
+            raise ValueError(f"project.episodes[{index}].episode must be a positive integer")
         script_file = entry.get("script_file")
         script_path = safe_join(project_dir, script_file) if isinstance(script_file, str) and script_file else None
         result.append((script_path, episode))
@@ -132,14 +132,14 @@ def _episode_entries(project_dir: Path, project: dict[str, Any]) -> list[tuple[P
 
 def _readable_object(path: Path, label: str) -> dict[str, Any] | None:
     if path.is_symlink():
-        raise ValueError(f"{label} 不是普通文件")
+        raise ValueError(f"{label} is not a regular file")
     if not path.exists():
         return None
     if not path.is_file():
-        raise ValueError(f"{label} 不是普通文件")
+        raise ValueError(f"{label} is not a regular file")
     payload = load_json(path)
     if not isinstance(payload, dict):
-        raise ValueError(f"{label} 必须是对象")
+        raise ValueError(f"{label} must be an object")
     return payload
 
 
@@ -154,13 +154,13 @@ def _plan_draft_renames(project_dir: Path, episodes: list[tuple[Path | None, int
         for old_name, new_name in DRAFT_FILE_RENAMES.items():
             source = drafts_dir / old_name
             if source.is_symlink():
-                raise ProjectMigrationError(f"{old_name} 不是普通文件", episode=episode, file=old_name)
+                raise ProjectMigrationError(f"{old_name} is not a regular file", episode=episode, file=old_name)
             if not source.is_file():
                 continue
             target = drafts_dir / new_name
             if target.exists():
                 raise ProjectMigrationError(
-                    f"{old_name} 与 {new_name} 同时存在，无法判定保留哪一个",
+                    f"{old_name} and {new_name} both exist; cannot decide which one to keep",
                     episode=episode,
                     file=old_name,
                 )
@@ -182,7 +182,7 @@ def plan_script_plan_draft_renames(project_dir: Path) -> tuple[tuple[Path, Path]
         return ()
     project = load_json(project_file)
     if not isinstance(project, dict):
-        raise ValueError("project.json 必须是对象")
+        raise ValueError("project.json must be an object")
     return tuple(_plan_draft_renames(project_dir, _episode_entries(project_dir, project)))
 
 
@@ -216,7 +216,7 @@ def migrate_v9_to_v10(project_dir: Path) -> None:
         return
     project = load_json(project_file)
     if not isinstance(project, dict):
-        raise ValueError("project.json 必须是对象")
+        raise ValueError("project.json must be an object")
     if int(project.get("schema_version") or 0) >= _TARGET_VERSION:
         return
 
@@ -240,7 +240,7 @@ def migrate_v9_to_v10(project_dir: Path) -> None:
             continue
         label = script_path.name
         try:
-            script = _readable_object(script_path, f"剧本 {label}")
+            script = _readable_object(script_path, f"script {label}")
         except ValueError as exc:
             raise ProjectMigrationError(str(exc), episode=episode, file=label) from exc
         if script is None:
@@ -249,7 +249,7 @@ def migrate_v9_to_v10(project_dir: Path) -> None:
         if not isinstance(metadata, dict):
             continue
         try:
-            renamed = _rename_fields(metadata, _SCRIPT_METADATA_FIELD_RENAMES, f"剧本 {label}.metadata")
+            renamed = _rename_fields(metadata, _SCRIPT_METADATA_FIELD_RENAMES, f"script {label}.metadata")
         except ValueError as exc:
             raise ProjectMigrationError(str(exc), episode=episode, file=label) from exc
         if renamed != metadata:
@@ -257,7 +257,7 @@ def migrate_v9_to_v10(project_dir: Path) -> None:
 
     manifest_file = project_dir / _MANIFEST_FILENAME
     try:
-        manifest = _readable_object(manifest_file, "产物清单")
+        manifest = _readable_object(manifest_file, "artifact manifest")
     except ValueError as exc:
         raise ProjectMigrationError(str(exc), file=_MANIFEST_FILENAME) from exc
     if manifest is not None:

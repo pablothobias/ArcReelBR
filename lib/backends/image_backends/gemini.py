@@ -99,7 +99,7 @@ class GeminiImageBackend:
             credentials_file = Path(credentials_path) if credentials_path else resolve_vertex_credentials_path()
 
             if credentials_file is None:
-                raise ValueError("未找到 Vertex AI 凭证文件")
+                raise ValueError("Vertex AI credentials file not found")
 
             with open(credentials_file, encoding="utf-8") as f:
                 creds_data = json_module.load(f)
@@ -311,4 +311,4 @@ class GeminiImageBackend:
                 output_path.parent.mkdir(parents=True, exist_ok=True)
                 output_path.write_bytes(content)
                 return
-        raise RuntimeError("API 未返回图片")
+        raise RuntimeError("The API returned no image")

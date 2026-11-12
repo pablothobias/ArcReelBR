@@ -5,7 +5,7 @@ lib.project.asset_types.ASSET_SPECS drives one route template across asset types
     router = build_asset_router(asset_type="character", pm_getter=lambda: get_project_manager())
 
 Derive URL segments, bucket keys, sheet fields and PATCH allowlists from spec
-(description + sheet_field + extra_string_fields + extra_list_fields). _I18N_KEYS maintains naming differences,
+(description + sheet_field + extra_string_fields + extra_list_fields + choice_fields). _I18N_KEYS maintains naming differences,
 such as the historical scene prefix "project_scene_*".
 
 Types enabling ``spec.supports_derivatives``, currently character only, also register derivative subresources;
@@ -43,6 +43,7 @@ from lib.project.asset_types import (
     DERIVATIVES_FIELD,
     AssetSpec,
     ProjectAssetNameConflictError,
+    is_valid_choice,
     localize_asset_type,
     record_asset_aliases,
     validate_asset_name,
@@ -107,6 +108,16 @@ def _require_owned_files(spec: AssetSpec, name: str, entry: Mapping[str, Any], v
         raise UnprocessableError(key, name=name).with_diagnostic(
             f"field '{field}' must point at a file named after the asset"
         )
+
+
+def _require_choice_fields(values: Mapping[str, Any], choice_fields: Iterable[tuple[str, tuple[str, ...]]]) -> None:
+    """Closed-vocabulary fields accept only declared values; omission/None counts as absent (the default)."""
+    for field, allowed in choice_fields:
+        value = values.get(field)
+        if not is_valid_choice(value, allowed):
+            raise UnprocessableError("asset_field_invalid_value").with_diagnostic(
+                f"field '{field}' must be one of {list(allowed)}"
+            )
 
 
 class _InvalidFieldValue(Exception):
@@ -203,6 +214,7 @@ def build_asset_router(
     result_key = asset_type
     update_fields: tuple[str, ...] = ("description", spec.sheet_field, *spec.extra_string_fields)
     update_list_fields: tuple[str, ...] = spec.extra_list_fields
+    update_choice_fields: tuple[str, ...] = tuple(field for field, _ in spec.choice_fields)
 
     router = APIRouter()
     register_asset_prompt_preview_routes(router, spec=spec, pm_getter=pm_getter)
@@ -243,6 +255,7 @@ def build_asset_router(
                 # validation of the same field, translate the error.
                 raise UnprocessableError("asset_voice_notice_dismissed_at_stale")
         _require_string_list_fields(extras, spec.extra_list_fields)
+        _require_choice_fields(extras, spec.choice_fields)
         _require_owned_files(spec, name, {}, extras)
         try:
 
@@ -258,6 +271,9 @@ def build_asset_router(
                     entry["voice_updated_at"] = datetime.now(UTC).isoformat()
                 for field in spec.extra_list_fields:
                     entry[field] = list(extras.get(field) or [])
+                for field in update_choice_fields:
+                    if extras.get(field) is not None:
+                        entry[field] = extras[field]
                 # Register derivatives only through subresources; ignore creation-body derivative fields and always initialize empty tables.
                 if spec.supports_derivatives:
                     entry[DERIVATIVES_FIELD] = {}
@@ -298,6 +314,7 @@ def build_asset_router(
             if value is not None and not isinstance(value, str):
                 raise _not_a_string(field)
         _require_string_list_fields(req, update_list_fields)
+        _require_choice_fields(req, spec.choice_fields)
 
         try:
 
@@ -306,7 +323,7 @@ def build_asset_router(
 
                 def _mutate(entry: dict) -> None:
                     _require_owned_files(spec, entry_name, entry, req)
-                    for field in (*update_fields, *update_list_fields):
+                    for field in (*update_fields, *update_list_fields, *update_choice_fields):
                         if req.get(field) is not None:
                             # voice_notice_dismissed_at identifies the acknowledged voice version and must copy
                             # this character’s voice_updated_at unchanged; arbitrary strings could inject

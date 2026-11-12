@@ -108,11 +108,12 @@ def jianying_draft_summary(value: JianyingDraftToolValue) -> str | None:
     if isinstance(value, GenerationBatchReadModel):
         return None
     draft = value.jianying_draft
-    label = "带旁白" if draft.narration == WITH_NARRATION else "不带旁白"
-    warnings = f"；警告 {len(draft.warnings)} 条" if draft.warnings else ""
+    label = "with-voiceover" if draft.narration == WITH_NARRATION else "without-voiceover"
+    warnings = f"; {len(draft.warnings)} warning(s)" if draft.warnings else ""
     return (
-        f"剪映草稿已导出：剪辑时间线 {draft.timeline_id} 修订 {draft.revision}，{label}版本，第 {draft.version} 版，"
-        f"时长 {draft.duration} 秒{warnings}。创作者在 Web 端填写本机剪映草稿目录后下载。"
+        f"JianYing draft exported: timeline {draft.timeline_id} revision {draft.revision}, {label} variant, "
+        f"version {draft.version}, duration {draft.duration}s{warnings}. The creator downloads it in the Web UI "
+        "after entering the local JianYing draft folder."
     )
 
 

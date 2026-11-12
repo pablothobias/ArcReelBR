@@ -296,7 +296,9 @@ def load_inference_rules(media_type: str) -> InferenceRules:
     _validator().validate(document)
     unknown = sorted(semantic_key_names(document) - set(BINDING_KEYS_BY_MEDIA_TYPE[media_type]))
     if unknown:
-        raise ValueError(f"inference_rules.{media_type}.json 提到 {media_type} 端点没有的语义键：{', '.join(unknown)}")
+        raise ValueError(
+            f"inference_rules.{media_type}.json mentions semantic keys that {media_type} endpoints do not have: {', '.join(unknown)}"
+        )
     return _rules_from(document)
 
 

@@ -5,7 +5,7 @@ and two resolvers containing content_mode / generation_mode interactions.
 
 - Narrow ``SKELETONS`` table: keys are script arrays (``segments`` / ``scenes`` / ``shots`` /
   ``video_units``), rows ``Skeleton(id_field, chars_field)``. ``chars_field`` may be ``None``:
-  ``video_units`` has no per-entry character list (derive characters from body ``text`` ``@[名称]`` mentions
+  ``video_units`` has no per-entry character list (derive characters from body ``text`` ``@[name]`` mentions
   on read). The table explicitly declares absence; consumers receiving ``None`` must explicitly derive or
   declare inapplicability, never use fake field names that make ``get()`` return empty.
 - Canonical ``resolve_declared_kind(content_mode, generation_mode)`` serves consumers with project configuration
@@ -109,20 +109,20 @@ def _validate_registry() -> None:
     """Import-time table consistency: all four skeletons and valid fields. Failure aborts startup (``docs/adr/0039`` approach)."""
     expected = {"segments", "scenes", "shots", "video_units"}
     if set(SKELETONS) != expected:
-        raise RuntimeError(f"SKELETONS 骨架种类不齐：期望 {expected}，实际 {set(SKELETONS)}")
+        raise RuntimeError(f"SKELETONS skeleton kinds are incomplete: expected {expected}, got {set(SKELETONS)}")
     for kind, skeleton in SKELETONS.items():
         if not skeleton.id_field:
-            raise RuntimeError(f"SKELETONS[{kind!r}].id_field 非法：{skeleton.id_field!r}")
+            raise RuntimeError(f"SKELETONS[{kind!r}].id_field is invalid: {skeleton.id_field!r}")
         # chars_field None is valid (explicit video_units absence); empty strings are invalid.
         if skeleton.chars_field is not None and not skeleton.chars_field:
-            raise RuntimeError(f"SKELETONS[{kind!r}].chars_field 非法：{skeleton.chars_field!r}")
+            raise RuntimeError(f"SKELETONS[{kind!r}].chars_field is invalid: {skeleton.chars_field!r}")
     for name, table in (
         ("SKELETON_ITEM_LABEL_KEYS", SKELETON_ITEM_LABEL_KEYS),
         ("SKELETON_ENTITY_TYPES", SKELETON_ENTITY_TYPES),
         ("SKELETON_ANCHOR_TYPES", SKELETON_ANCHOR_TYPES),
     ):
         if set(table) != expected:
-            raise RuntimeError(f"{name} 骨架种类不齐：期望 {expected}，实际 {set(table)}")
+            raise RuntimeError(f"{name} skeleton kinds are incomplete: expected {expected}, got {set(table)}")
 
 
 _validate_registry()
@@ -146,7 +146,7 @@ def resolve_declared_kind(content_mode: str | None, generation_mode: str | None)
         return "video_units" if generation_mode == "reference_video" else "segments"
     if content_mode == "drama":
         return "video_units" if generation_mode == "reference_video" else "scenes"
-    raise ValueError(f"未知或缺失 content_mode: {content_mode!r}")
+    raise ValueError(f"Unknown or missing content_mode: {content_mode!r}")
 
 
 def resolve_script_kind(script: dict[str, Any]) -> str:

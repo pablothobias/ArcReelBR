@@ -88,7 +88,9 @@ if (
     CHANNEL_FACT_OVERRIDE_KEYS - CAPABILITY_OVERRIDE_FIELDS.keys()
     or CHANNEL_FACT_OVERRIDE_KEYS & (MODEL_FACT_OVERRIDE_KEYS["video"])
 ):
-    raise RuntimeError("通道事实覆盖键须是 VideoCapabilities 字段，且不与视频模型事实覆盖键重名")
+    raise RuntimeError(
+        "Channel fact override keys must be VideoCapabilities fields and must not share names with video model fact override keys"
+    )
 
 
 def _unwrap_optional(expected: object) -> tuple[object, bool]:

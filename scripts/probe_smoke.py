@@ -57,28 +57,28 @@ async def main():
 
 async def _run_cases():
     await case(
-        "Case 1: 真 anthropic + 故意错的 key",
+        "Case 1: real anthropic + deliberately wrong key",
         preset_id="anthropic-official",
         base_url=None,
         api_key="sk-ant-fake-key-for-smoke-test-not-real",
         model=None,
     )
     await case(
-        "Case 2: 不存在的 host",
+        "Case 2: nonexistent host",
         preset_id=None,
         base_url="https://nonexistent.host.invalid",
         api_key="sk-ant-fake",
         model=None,
     )
     await case(
-        "Case 3: OpenAI 兼容端点（不带 /anthropic 子路径）",
+        "Case 3: OpenAI-compatible endpoint (without the /anthropic subpath)",
         preset_id=None,
         base_url="https://api.deepseek.com",
         api_key="sk-fake",
         model=None,
     )
     await case(
-        "Case 4: 带 query 的地址 → 入口校验拒绝",
+        "Case 4: URL with a query -> rejected by entry validation",
         preset_id=None,
         base_url="https://api.deepseek.com/anthropic?api_key=sk-fake",
         api_key="sk-fake",

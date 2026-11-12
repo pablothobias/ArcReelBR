@@ -101,7 +101,7 @@ class TestConstructionAndCapabilities:
 
     def test_access_key_secret_key_is_rejected(self):
         # Official: Access Key / Secret Key apply only to the legacy API.
-        with pytest.raises(ValueError, match="只支持 API Key"):
+        with pytest.raises(ValueError, match="supports API Key authentication only"):
             KlingModelPathVideoBackend(auth_mode="jwt", access_key="ak", secret_key="sk")
 
     def test_missing_api_key_is_rejected(self):
@@ -304,7 +304,7 @@ class TestResume:
     async def test_job_id_from_another_protocol_is_refused_before_any_request(self, tmp_path, job_id):
         with capture_http() as router:
             sent = router.route()
-            with pytest.raises(ValueError, match="不是由本调用端点提交的"):
+            with pytest.raises(ValueError, match="it was not submitted by this endpoint"):
                 await _backend().resume_video(job_id, _request(tmp_path))
         assert sent.call_count == 0
 

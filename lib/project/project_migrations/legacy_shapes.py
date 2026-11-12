@@ -735,7 +735,7 @@ def _relocate_derivative_sheet(work: _Work, derivative: object, owner: str, kept
     return {normalize_artifact_path(value): normalize_artifact_path(new_rel)}
 
 
-#: Reference field → destination under its own asset (subdirectory of the asset-type directory); sequences use ``名字_{序号}``. Sheets live directly in type directories.
+#: Reference field → destination under its own asset (subdirectory of the asset-type directory); sequences use ``{name}_{index}``. Sheets live directly in type directories.
 _REFERENCE_FILE_SUBDIRS = {"reference_image": "refs", "reference_audio": "refs_audio", "reference_images": "refs"}
 
 

@@ -70,7 +70,7 @@ def test_pure_construction_with_fake_roots() -> None:
     allowed, reason = policy.check_path_access(str(fake / "repo" / ".env"), "Read", cwd, user_id=_USER_ID)
     assert not allowed
     assert reason
-    assert "敏感文件" in reason
+    assert "sensitive files" in reason
 
 
 def test_policy_module_does_not_import_sdk_types() -> None:
@@ -97,7 +97,7 @@ def test_read_other_project_denied(policy: AgentAccessPolicy) -> None:
         str(_projects_dir(policy) / "other" / "x.json"), "Read", cwd, user_id=_USER_ID
     )
     assert not allowed
-    assert "跨项目" in reason or "项目" in reason
+    assert "cross-project" in reason or "project" in reason
 
 
 def test_read_lib_passes(policy: AgentAccessPolicy) -> None:
@@ -113,7 +113,7 @@ def test_write_cwd_external_denied(policy: AgentAccessPolicy) -> None:
         str(policy.project_root / "lib" / "foo.json"), "Write", cwd, user_id=_USER_ID
     )
     assert not allowed
-    assert "项目目录之外" in reason or "cwd" in reason or "项目" in reason
+    assert "outside the current project directory" in reason or "cwd" in reason or "project" in reason
 
 
 def test_write_cwd_internal_code_ext_denied(policy: AgentAccessPolicy) -> None:
@@ -121,7 +121,7 @@ def test_write_cwd_internal_code_ext_denied(policy: AgentAccessPolicy) -> None:
     for ext in (".py", ".js", ".ts", ".tsx", ".sh", ".yaml", ".yml", ".toml"):
         allowed, reason = policy.check_path_access(str(cwd / f"test{ext}"), "Write", cwd, user_id=_USER_ID)
         assert not allowed, f"扩展名 {ext} 应被拒"
-        assert "代码" in reason or "扩展名" in reason
+        assert "code files" in reason or "extension" in reason
 
 
 def test_write_cwd_internal_data_ext_allowed(policy: AgentAccessPolicy) -> None:
@@ -445,7 +445,7 @@ def test_sensitive_file_denied(policy: AgentAccessPolicy, tool: str, relative: s
     allowed, reason = policy.check_path_access(str(target), tool, cwd, user_id=_USER_ID)
     assert not allowed, f"{tool} {relative} 应被拒"
     assert reason
-    assert "敏感文件" in reason
+    assert "sensitive files" in reason
 
 
 @pytest.mark.parametrize("tool", ["Read", "Write", "Edit", "Glob", "Grep"])
@@ -457,7 +457,7 @@ def test_agent_profile_settings_denied(policy: AgentAccessPolicy, tool: str) -> 
     allowed, reason = policy.check_path_access(str(target), tool, cwd, user_id=_USER_ID)
     assert not allowed, f"{tool} agent_profile settings.json 应被拒"
     assert reason
-    assert "敏感文件" in reason
+    assert "sensitive files" in reason
 
 
 def test_read_host_file_outside_project_root_denied(policy: AgentAccessPolicy, tmp_path: Path) -> None:
@@ -471,7 +471,7 @@ def test_read_host_file_outside_project_root_denied(policy: AgentAccessPolicy, t
         allowed, reason = policy.check_path_access(str(outside / "id_rsa"), tool, cwd, user_id=_USER_ID)
         assert not allowed, f"{tool} 不应允许读 project_root 外的 host 文件"
         assert reason
-        assert "项目根外" in reason
+        assert "outside the project root" in reason
 
 
 def test_sensitive_glob_pattern_does_not_overmatch(policy: AgentAccessPolicy) -> None:
@@ -832,7 +832,7 @@ def test_memory_dirs_still_reject_code_extensions(policy: AgentAccessPolicy) -> 
     ):
         allowed, reason = policy.check_path_access(str(target), "Write", cwd, user_id=_USER_ID)
         assert not allowed, f"{target} 应被代码扩展名规则拒"
-        assert "代码" in reason
+        assert "code files" in reason
 
 
 @pytest.mark.parametrize("bad_user_id", ["", "..", "../other", "a/b", "\x00"])

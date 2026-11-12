@@ -42,7 +42,7 @@ def load_builtin_definitions(directory: Path | None = None) -> dict[str, dict[st
     """
     base = BUILTIN_DEFINITIONS_DIR if directory is None else directory
     if not base.is_dir():
-        raise BuiltinDefinitionError(f"随版定义目录不存在: {base}")
+        raise BuiltinDefinitionError(f"Bundled definitions directory does not exist: {base}")
     return {path.stem: load_builtin_definition(path) for path in sorted(base.glob("*.json"))}
 
 
@@ -51,19 +51,21 @@ def load_builtin_definition(path: Path) -> dict[str, Any]:
     key = path.stem
     if key.startswith(CUSTOM_ENDPOINT_KEY_PREFIX):
         raise BuiltinDefinitionError(
-            f"随版定义 {path.name} 的内置键占用了自定义端点前缀 {CUSTOM_ENDPOINT_KEY_PREFIX!r}"
+            f"Bundled definition {path.name} has a built-in key using the custom endpoint prefix {CUSTOM_ENDPOINT_KEY_PREFIX!r}"
         )
     try:
         document = json.loads(path.read_text(encoding="utf-8"))
     except json.JSONDecodeError as exc:
-        raise BuiltinDefinitionError(f"随版定义 {path.name} 不是合法 JSON: {exc}") from exc
+        raise BuiltinDefinitionError(f"Bundled definition {path.name} is not valid JSON: {exc}") from exc
     diagnostics = validate_definition(document)
     if not diagnostics.valid:
-        raise BuiltinDefinitionError(f"随版定义 {path.name} 未通过校验: {_format_issues(diagnostics.errors)}")
+        raise BuiltinDefinitionError(
+            f"Bundled definition {path.name} failed validation: {_format_issues(diagnostics.errors)}"
+        )
     author = document["meta"]["author"]
     if author != BUILTIN_DEFINITION_AUTHOR:
         raise BuiltinDefinitionError(
-            f"随版定义 {path.name} 的 meta.author 必须是 {BUILTIN_DEFINITION_AUTHOR!r}，实际 {author!r}"
+            f"Bundled definition {path.name} meta.author must be {BUILTIN_DEFINITION_AUTHOR!r}, got {author!r}"
         )
     return document
 

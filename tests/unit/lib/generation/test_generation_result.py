@@ -135,7 +135,7 @@ def test_explicit_selection_takes_named_ids_regardless_of_state(tmp_path: Path) 
 def test_explicit_empty_collection_is_invalid_not_everything(tmp_path: Path) -> None:
     """Explicit empty sets are caller errors, neither all nor silently empty batches."""
 
-    with pytest.raises(ValueError, match="不能为空"):
+    with pytest.raises(ValueError, match="must not be empty"):
         select_generation_targets(
             candidates=[_candidate("A")],
             requested_ids=[],
@@ -146,9 +146,9 @@ def test_explicit_empty_collection_is_invalid_not_everything(tmp_path: Path) -> 
 def test_normalize_requested_ids_is_the_single_gate_for_selection_intent() -> None:
     assert normalize_requested_ids(None, field="names") is None
     assert normalize_requested_ids(["B", "A", "B"], field="names") == ["B", "A"]
-    with pytest.raises(ValueError, match="不能为空数组"):
+    with pytest.raises(ValueError, match="must not be an empty array"):
         normalize_requested_ids([], field="names")
-    with pytest.raises(ValueError, match="必须是 ID 数组"):
+    with pytest.raises(ValueError, match="must be an array of IDs"):
         normalize_requested_ids("A", field="names")
 
 

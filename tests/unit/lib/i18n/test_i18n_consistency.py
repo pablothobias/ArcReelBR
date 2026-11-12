@@ -128,7 +128,7 @@ def test_format_placeholders_consistent():
     import string
 
     def placeholders(msg: str) -> set[tuple[str, str]]:
-        # Use `str.format` parsing: escaped `{{…}}` braces (e.g. `@[角色]：{台词}` syntax)
+        # Use `str.format` parsing: escaped `{{…}}` braces (e.g. `@[character]：{dialogue}` syntax)
         # are literal text, not placeholders; formatted `{delta:.0%}` still yields the correct field name.
         # Compare format_spec too: missing `.0%` / `.1f` would render raw numeric values in that language.
         return {(name, spec or "") for _, name, spec, _ in string.Formatter().parse(msg) if name}

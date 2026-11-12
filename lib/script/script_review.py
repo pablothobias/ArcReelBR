@@ -226,7 +226,9 @@ class ScriptPlanWriteConflict(Exception):
     """
 
     def __init__(self, *, expected: str | None, actual: str | None, current_content: dict[str, Any] | None):
-        super().__init__(f"script_plan 并发冲突：基线指纹 {expected}，盘上现值指纹 {actual}")
+        super().__init__(
+            f"script_plan concurrent write conflict: baseline fingerprint {expected}, current on-disk fingerprint {actual}"
+        )
         self.expected = expected
         self.actual = actual
         self.current_content = current_content
@@ -653,7 +655,7 @@ class ForeignFormalScriptError(ValueError):
 
     def __init__(self, episode: int, filename: str) -> None:
         super().__init__(
-            f"集（id={episode}）的规范剧本路径 scripts/{filename} 上是另一集的剧本，不能当作本集正式脚本读写"
+            f"The canonical script path scripts/{filename} of episode (id={episode}) holds another episode's script; it cannot be read or written as this episode's formal script"
         )
         self.episode = episode
         self.filename = filename

@@ -194,5 +194,5 @@ class ViduImageBackend:
                 raise redacted_status_error(exc) from None
         data = resp.json()
         if not data.get("task_id"):
-            raise RuntimeError(f"Vidu 图片任务创建响应缺少 task_id: {data}")
+            raise RuntimeError(f"Vidu image task creation response is missing task_id: {data}")
         return data

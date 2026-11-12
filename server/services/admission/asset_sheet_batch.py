@@ -302,9 +302,9 @@ def plan_asset_sheet_batch(
     """Select targets by scope and assess per-item admission; callers supply referenced assets for episode scopes."""
 
     if scope.names is not None and scope.asset_type is None:
-        raise ValueError("names 必须配合 type 使用")
+        raise ValueError("names requires type")
     if scope.episode_id is not None and (scope.asset_type is not None or scope.names is not None):
-        raise ValueError("episode_id 不能与 type / names 同时使用")
+        raise ValueError("episode_id cannot be combined with type / names")
 
     units = project_asset_sheet_units(project, scope.asset_type)
     if scope.episode_id is not None:
@@ -330,21 +330,21 @@ def plan_asset_sheet_batch(
     dependencies: dict[str, str] = {}
     for state in selection.targets:
         unit = by_id[state.unit_id]
-        label = ASSET_SPECS[unit.asset_type].label_zh
+        label = unit.asset_type.capitalize()
         if unit.description is None:
             builder.block(
                 unit.unit_id,
                 problem=(
                     _problem(
                         DERIVATIVE_DESCRIPTION_REQUIRED,
-                        f"衍生 '{unit.name}' 缺少外观变化描述，无法生成资产图",
+                        f"Derivative '{unit.name}' has no appearance-change description, so its asset image cannot be generated",
                         GenerationAction.FIX_INPUT,
                         name=unit.name,
                     )
                     if unit.is_derivative
                     else _problem(
                         ASSET_DESCRIPTION_REQUIRED,
-                        f"{label} '{unit.name}' 缺少 description，无法生成资产图",
+                        f"{label} '{unit.name}' has no description, so its asset image cannot be generated",
                         GenerationAction.FIX_INPUT,
                         name=unit.name,
                     )
@@ -362,7 +362,7 @@ def plan_asset_sheet_batch(
                     unit.unit_id,
                     problem=_problem(
                         DERIVATIVE_OWNER_SHEET_MISSING,
-                        f"角色 '{unit.owner}' 还没有可用的资产图，衍生 '{unit.name}' 无从生成",
+                        f"Character '{unit.owner}' has no usable asset image yet, so derivative '{unit.name}' cannot be generated",
                         GenerationAction.GENERATE_DEPENDENCY,
                         name=unit.owner,
                     ),

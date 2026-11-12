@@ -110,10 +110,14 @@ def migrate_project(project_dir: Path, dry_run: bool = False) -> dict:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="清理项目中的冗余字段")
-    parser.add_argument("--dry-run", action="store_true", help="仅预览不修改")
+    parser = argparse.ArgumentParser(description="Remove redundant fields from projects")
+    parser.add_argument("--dry-run", action="store_true", help="Preview only; change nothing")
     parser.add_argument(
-        "--projects-root", "--data-root", dest="data_root", default=None, help="数据根（默认按当前配置解析）"
+        "--projects-root",
+        "--data-root",
+        dest="data_root",
+        default=None,
+        help="Data root (default: resolved from the current configuration)",
     )
     args = parser.parse_args()
 
@@ -121,16 +125,16 @@ def main():
     projects_dir = layout.projects_dir
 
     if not projects_dir.exists():
-        print(f"❌ 项目目录不存在: {projects_dir}")
+        print(f"❌ Projects directory does not exist: {projects_dir}")
         return
 
     if args.dry_run:
-        print("🔍 预览模式 - 不会修改任何文件\n")
+        print("🔍 Preview mode - no files will be changed\n")
 
     total_stats = {"projects_processed": 0, "projects_cleaned": 0, "scripts_cleaned": 0, "fields_removed": []}
 
     for project_dir in list_project_dirs(projects_dir):
-        print(f"处理项目: {project_dir.name}")
+        print(f"Processing project: {project_dir.name}")
         stats = migrate_project(project_dir, args.dry_run)
 
         total_stats["projects_processed"] += 1
@@ -141,18 +145,18 @@ def main():
 
         if stats["fields_removed"]:
             for field in stats["fields_removed"]:
-                print(f"  - 移除: {field}")
+                print(f"  - removed: {field}")
         else:
-            print("  - 无需清理")
+            print("  - nothing to clean")
 
-    print(f"\n{'预览' if args.dry_run else '迁移'}完成:")
-    print(f"  - 处理项目: {total_stats['projects_processed']}")
-    print(f"  - 清理项目: {total_stats['projects_cleaned']}")
-    print(f"  - 清理剧本: {total_stats['scripts_cleaned']}")
-    print(f"  - 移除字段: {len(total_stats['fields_removed'])}")
+    print(f"\n{'Preview' if args.dry_run else 'Migration'} complete:")
+    print(f"  - projects processed: {total_stats['projects_processed']}")
+    print(f"  - projects cleaned: {total_stats['projects_cleaned']}")
+    print(f"  - scripts cleaned: {total_stats['scripts_cleaned']}")
+    print(f"  - fields removed: {len(total_stats['fields_removed'])}")
 
     if args.dry_run and total_stats["fields_removed"]:
-        print("\n要执行实际迁移，请移除 --dry-run 参数重新运行")
+        print("\nTo run the actual migration, run again without --dry-run")
 
 
 if __name__ == "__main__":

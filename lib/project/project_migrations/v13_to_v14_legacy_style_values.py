@@ -283,7 +283,7 @@ def migrate_v13_to_v14(project_dir: Path) -> ArtifactBackfillOutcome | None:
     project_bytes = pj.read_bytes()
     data = json.loads(project_bytes)
     if not isinstance(data, dict):
-        raise ValueError("project.json 必须是对象")
+        raise ValueError("project.json must be an object")
     if parse_project_schema_version(data) >= TARGET_SCHEMA_VERSION:
         return None
     migrated = migrate_project_dict(data)

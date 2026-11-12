@@ -234,8 +234,8 @@ class AppliedBatch:
 
 
 def _invalid(index: int, message: str, *, clip_id: str | None = None, **params: Any) -> EditTimelineError:
-    location = f"第 {index + 1} 条操作（operations[{index}]）"
-    subject = f"片段 {clip_id}：" if clip_id is not None else ""
+    location = f"Operation {index + 1} (operations[{index}]): "
+    subject = f"clip {clip_id}: " if clip_id is not None else ""
     return EditTimelineError(
         "operation_invalid", f"{location}{subject}{message}", operation_index=index, clip_id=clip_id, **params
     )
@@ -265,10 +265,10 @@ class _Batch:
                 return position
         raise _invalid(
             index,
-            "剪辑片段不存在（或已在本批前面的操作中删除）",
+            "edit clip does not exist (or was deleted by an earlier operation in this batch)",
             clip_id=clip_id,
             field=field,
-            allowed="当前修订里的片段 ID",
+            allowed="a clip ID in the current revision",
         )
 
     def _insertion_point(self, index: int, after: str | None) -> int:
@@ -289,18 +289,18 @@ class _Batch:
         if self.sources.unit(unit_id) is None or media is None:
             raise _invalid(
                 index,
-                f"视频单元 {unit_id} 已从脚本删除，不能截取",
+                f"video unit {unit_id} was deleted from the script and cannot be trimmed",
                 clip_id=clip_id,
                 field="trim",
-                allowed="引用脚本中现有视频单元的片段",
+                allowed="a clip referencing an existing video unit in the script",
             )
         if media.video_version is None or media.video_duration_us is None:
             raise _invalid(
                 index,
-                f"视频单元 {unit_id} 还没有可用视频，不能截取",
+                f"video unit {unit_id} has no usable video yet and cannot be trimmed",
                 clip_id=clip_id,
                 field="trim",
-                allowed="视频单元已有可用视频的片段",
+                allowed="a clip whose video unit already has a usable video",
             )
         return media.video_version, media.video_duration_us
 
@@ -317,14 +317,12 @@ class _Batch:
         # Millisecond rounding may put the out-point at most 1 ms beyond measured duration; clamp to video end.
         if whole_us < out_us <= whole_us + 1_000:
             out_us = whole_us
-        allowed = (
-            f"0 ≤ source_in < source_out ≤ {whole}，且至少保留 {microseconds_to_seconds(MIN_TRIM_MICROSECONDS)} 秒"
-        )
+        allowed = f"0 ≤ source_in < source_out ≤ {whole}, keeping at least {microseconds_to_seconds(MIN_TRIM_MICROSECONDS)} seconds"
         if not in_range or out_us > whole_us or out_us - in_us < MIN_TRIM_MICROSECONDS:
             raise _invalid(
                 index,
-                f"入出点 {spec.source_in}–{spec.source_out} 秒超出范围，current 视频（版本 {version}）"
-                f"共 {whole} 秒；合法范围：{allowed}",
+                f"in/out points {spec.source_in}–{spec.source_out} seconds are out of range; the current video "
+                f"(version {version}) is {whole} seconds long; allowed range: {allowed}",
                 clip_id=clip_id,
                 field="trim",
                 allowed=allowed,
@@ -335,7 +333,7 @@ class _Batch:
         if not 0.0 <= value <= 1.0:
             raise _invalid(
                 index,
-                f"原声音量 {value} 超出范围；合法范围：0–1",
+                f"source volume {value} is out of range; allowed range: 0–1",
                 clip_id=clip_id,
                 field="source_volume",
                 allowed="0–1",
@@ -347,7 +345,7 @@ class _Batch:
         if not 0 <= value <= limit:
             raise _invalid(
                 index,
-                f"定格延长 {value} 秒超出范围；合法范围：0–{limit} 秒",
+                f"hold extension {value} seconds is out of range; allowed range: 0–{limit} seconds",
                 clip_id=clip_id,
                 field="hold",
                 allowed=f"0–{limit}",
@@ -361,10 +359,10 @@ class _Batch:
         if len(reason) > REASON_MAX_LENGTH:
             raise _invalid(
                 index,
-                f"剪辑理由超过 {REASON_MAX_LENGTH} 个字符",
+                f"edit reason exceeds {REASON_MAX_LENGTH} characters",
                 clip_id=clip_id,
                 field="reason",
-                allowed=f"1–{REASON_MAX_LENGTH} 个字符或 null",
+                allowed=f"1–{REASON_MAX_LENGTH} characters or null",
             )
         return reason
 
@@ -376,7 +374,7 @@ class _Batch:
         if not low <= spec.duration <= high:
             raise _invalid(
                 index,
-                f"转场时长 {spec.duration} 秒超出范围；合法范围：{low}–{high} 秒",
+                f"transition duration {spec.duration} seconds is out of range; allowed range: {low}–{high} seconds",
                 clip_id=clip_id,
                 field="transition.duration",
                 allowed=f"{low}–{high}",
@@ -387,10 +385,10 @@ class _Batch:
         if transition is not None and position == len(self.clips) - 1:
             raise _invalid(
                 index,
-                "它是最后一个剪辑片段，后面没有下一片段，不能设置转场",
+                "it is the last clip and has no following clip, so it cannot have a transition",
                 clip_id=self.clips[position].id,
                 field="transition",
-                allowed="不是最后一个的片段",
+                allowed="a clip that is not the last one",
             )
 
     # ---- Adjacency ----
@@ -449,9 +447,9 @@ class _Batch:
         if unit is None:
             raise _invalid(
                 index,
-                f"视频单元 {operation.unit_id} 不在集（id={self.sources.script.episode}）的脚本里",
+                f"video unit {operation.unit_id} is not in the script of episode (id={self.sources.script.episode})",
                 field="unit_id",
-                allowed=f"集（id={self.sources.script.episode}）脚本中的视频单元 ID",
+                allowed=f"a video unit ID in the script of episode (id={self.sources.script.episode})",
             )
         clip_id = f"c{self.next_clip_number}"
         clip = EditClip(
@@ -482,10 +480,10 @@ class _Batch:
         if unit is None or unit.speech_mode is not SpeechMode.NARRATOR_VOICEOVER:
             raise _invalid(
                 index,
-                f"视频单元 {unit_id} 不是脚本里的画外音单位，没有旁白可挂",
+                f"video unit {unit_id} is not a voiceover unit in the script, so it has no narration to attach",
                 clip_id=operation.clip,
                 field="clip",
-                allowed="画外音单位的剪辑片段",
+                allowed="a clip of a voiceover unit",
             )
         for other, clip in enumerate(self.clips):
             if clip.unit_id == unit_id and other != position:
@@ -507,7 +505,11 @@ class _Batch:
         position = self._position(index, operation.clip)
         if operation.after == operation.clip:
             raise _invalid(
-                index, "不能放到自己之后", clip_id=operation.clip, field="after", allowed="其他片段的 ID 或 null"
+                index,
+                "a clip cannot be placed after itself",
+                clip_id=operation.clip,
+                field="after",
+                allowed="another clip's ID or null",
             )
         before = self._next_ids()
         moving = self.clips.pop(position)
@@ -525,10 +527,10 @@ class _Batch:
                 return position
         raise _invalid(
             index,
-            "BGM 片段不存在（或已在本批前面的操作中删除）",
+            "BGM clip does not exist (or was deleted by an earlier operation in this batch)",
             clip_id=clip_id,
             field="clip",
-            allowed="当前修订里的 BGM 片段 ID",
+            allowed="a BGM clip ID in the current revision",
         )
 
     def _touch_bgm(self, index: int, clip: BgmClip) -> BgmClip:
@@ -540,10 +542,10 @@ class _Batch:
         if media is None:
             raise _invalid(
                 index,
-                f"BGM {bgm_id} 不在项目里（或文件已不在）",
+                f"BGM {bgm_id} is not in the project (or its file is missing)",
                 clip_id=clip_id,
                 field="bgm_id",
-                allowed="list_bgm 列出的 BGM ID",
+                allowed="a BGM ID listed by list_bgm",
             )
         return media.duration_us
 
@@ -557,11 +559,12 @@ class _Batch:
         in_us = seconds_to_microseconds(source_in) if in_range else 0
         out_us = min(seconds_to_microseconds(out), whole_us) if in_range else 0
         minimum = microseconds_to_seconds(MIN_BGM_MICROSECONDS)
-        allowed = f"0 ≤ source_in < source_out ≤ {whole}，且至少保留 {minimum} 秒"
+        allowed = f"0 ≤ source_in < source_out ≤ {whole}, keeping at least {minimum} seconds"
         if not in_range or out_us - in_us < min(MIN_BGM_MICROSECONDS, whole_us):
             raise _invalid(
                 index,
-                f"入出点 {source_in}–{out} 秒超出范围，BGM {bgm_id} 共 {whole} 秒；合法范围：{allowed}",
+                f"in/out points {source_in}–{out} seconds are out of range; BGM {bgm_id} is {whole} seconds long; "
+                f"allowed range: {allowed}",
                 clip_id=clip_id,
                 field="source_in/source_out",
                 allowed=allowed,
@@ -571,13 +574,17 @@ class _Batch:
     def _bgm_volume(self, index: int, clip_id: str | None, value: float) -> float:
         if not 0.0 <= value <= 1.0:
             raise _invalid(
-                index, f"BGM 音量 {value} 超出范围；合法范围：0–1", clip_id=clip_id, field="volume", allowed="0–1"
+                index,
+                f"BGM volume {value} is out of range; allowed range: 0–1",
+                clip_id=clip_id,
+                field="volume",
+                allowed="0–1",
             )
         return value
 
     def _seconds_at_least_zero(self, index: int, clip_id: str | None, field: str, value: float) -> int:
         if value < 0:
-            raise _invalid(index, f"{field} 不能为负数", clip_id=clip_id, field=field, allowed="≥ 0")
+            raise _invalid(index, f"{field} cannot be negative", clip_id=clip_id, field=field, allowed="≥ 0")
         return seconds_to_microseconds(value)
 
     def _insert_bgm(self, index: int, operation: InsertBgm) -> None:
@@ -646,11 +653,12 @@ class _Batch:
             limit = microseconds_to_seconds(2 * duration_us)
             raise _invalid(
                 max(indexes),
-                f"片段时长 {microseconds_to_seconds(duration_us)} 秒，容不下两侧转场各占的一半："
-                f"进出两个转场的时长之和须 ≤ {limit} 秒，当前为 {microseconds_to_seconds(total_us)} 秒",
+                f"clip duration {microseconds_to_seconds(duration_us)} seconds cannot hold half of each adjacent "
+                f"transition: the incoming and outgoing transition durations must total ≤ {limit} seconds, "
+                f"currently {microseconds_to_seconds(total_us)} seconds",
                 clip_id=clip.id,
                 field="transition.duration",
-                allowed=f"两侧转场时长之和 ≤ {limit}",
+                allowed=f"total of both transition durations ≤ {limit}",
             )
 
     def _timeline_duration_us(self) -> int:
@@ -668,7 +676,7 @@ class _Batch:
             if clip.start_us >= total_us:
                 raise _invalid(
                     index,
-                    f"起点 {microseconds_to_seconds(clip.start_us)} 秒不在时间线内（时间线共 {total} 秒）",
+                    f"start {microseconds_to_seconds(clip.start_us)} seconds is outside the timeline (timeline length {total} seconds)",
                     clip_id=clip.id,
                     field="start",
                     allowed=f"0 ≤ start < {total}",
@@ -685,11 +693,12 @@ class _Batch:
             other = previous if subject is following else following
             raise _invalid(
                 max(indexes),
-                f"与 BGM 片段 {other.id}（{microseconds_to_seconds(other.start_us)}–"
-                f"{microseconds_to_seconds(other.start_us + bgm_clip_length_us(other))} 秒）重叠，同一时刻只能有一首 BGM",
+                f"overlaps BGM clip {other.id} ({microseconds_to_seconds(other.start_us)}–"
+                f"{microseconds_to_seconds(other.start_us + bgm_clip_length_us(other))} seconds); "
+                "only one BGM can play at a time",
                 clip_id=subject.id,
                 field="start",
-                allowed=f"不与 {other.id} 重叠的起点或更短的截取",
+                allowed=f"a start that does not overlap {other.id}, or a shorter trim",
             )
 
 

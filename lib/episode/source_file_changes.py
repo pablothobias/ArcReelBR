@@ -158,14 +158,16 @@ class _Change:
 def _filename_rel(project: Mapping[str, Any], filename: str) -> str:
     rel = f"source/{filename}"
     if "/" in filename or "\\" in filename or rel not in whole_source_files(project):
-        raise SourceFileChangeError("source_file_not_found", f"整本源文里没有这个文件：{filename}")
+        raise SourceFileChangeError("source_file_not_found", f"The whole source has no file named: {filename}")
     return rel
 
 
 def _entries(project: Mapping[str, Any]) -> list[dict[str, Any]]:
     entries = well_formed_ledger_entries(project)
     if entries is None:
-        raise SourceFileChangeError("ledger_invalid", "分集账本的形状异常，不能改动整本源文的文件")
+        raise SourceFileChangeError(
+            "ledger_invalid", "The episode ledger has an invalid shape; whole-source files cannot be changed"
+        )
     return entries
 
 
@@ -185,20 +187,24 @@ def _spans(project: Mapping[str, Any], docs: list[SourceDoc]) -> dict[int, Sourc
 def _require_doc(docs: list[SourceDoc], rel: str) -> SourceDoc:
     doc = next((doc for doc in docs if doc.rel_path == rel), None)
     if doc is None:
-        raise SourceFileChangeError("source_file_unreadable", f"源文件不是可读的 UTF-8 文本：{rel}")
+        raise SourceFileChangeError("source_file_unreadable", f"The source file is not readable UTF-8 text: {rel}")
     return doc
 
 
 def _check_fingerprint(project_dir: Path, project: Mapping[str, Any], doc: SourceDoc) -> None:
     """Reject external changes without updated ledgers."""
     if changed_outside_service(project_dir, project, doc):
-        raise SourceFileChangeError("source_changed", f"源文件在服务之外被改动过：{doc.rel_path}")
+        raise SourceFileChangeError(
+            "source_changed", f"The source file was changed outside the service: {doc.rel_path}"
+        )
 
 
 def _require_text(text: str) -> str:
     normalized = normalize_source_text(text)
     if not normalized.strip():
-        raise SourceFileChangeError("source_text_empty", "源文件不能为空；要去掉这个文件请删除它")
+        raise SourceFileChangeError(
+            "source_text_empty", "The source file cannot be empty; delete the file to remove it"
+        )
     return normalized
 
 
@@ -304,7 +310,9 @@ def _remember(path: Path, undo: ExitStack) -> None:
 
 def _write_text(path: Path, text: str, undo: ExitStack) -> None:
     if path.is_symlink():
-        raise SourceFileChangeError("episode_source_symlink", f"文件是符号链接，拒绝写入：{path.name}")
+        raise SourceFileChangeError(
+            "episode_source_symlink", f"The file is a symbolic link; refusing to write: {path.name}"
+        )
     _remember(path, undo)
     path.write_text(text, encoding="utf-8", newline="\n")
 
@@ -372,7 +380,10 @@ def _apply(
         if remap.episode in changed and remap.after is not None:
             text = span_text(texts, rels, remap.after)
             if text is None:
-                raise SourceFileChangeError("conflict", f"集（id={remap.episode}）的原文范围落不进改动后的整本源文")
+                raise SourceFileChangeError(
+                    "conflict",
+                    f"The source range of episode (id={remap.episode}) does not fit in the changed whole source",
+                )
             _write_text(episode_source_path(project_dir, remap.episode), text, undo)
     for episode in [*impact.retired, *impact.removed]:
         path = episode_source_path(project_dir, episode)
@@ -540,7 +551,8 @@ def move_whole_source_file(
         other = index - 1 if direction == "up" else index + 1
         if not 0 <= other < len(files):
             raise SourceFileChangeError(
-                "move_out_of_range", f"{filename} 已经在整本源文的{'最前' if direction == 'up' else '最后'}"
+                "move_out_of_range",
+                f"{filename} is already {'first' if direction == 'up' else 'last'} in the whole source",
             )
         docs = discover_sources(project_dir, project)
         for doc in docs:
@@ -590,11 +602,15 @@ def accept_external_source_change(
         docs = discover_sources(project_dir, project)
         doc = _require_doc(docs, rel)
         if not changed_outside_service(project_dir, project, doc):
-            raise SourceFileChangeError("source_not_changed", f"源文件没有在服务之外被改动过：{rel}")
+            raise SourceFileChangeError(
+                "source_not_changed", f"The source file was not changed outside the service: {rel}"
+            )
         snapshot = read_source_snapshot(project_dir, rel)
         if snapshot is None:
             if rel in cut_episode_source_files(project):
-                raise SourceFileChangeError("source_snapshot_missing", f"源文件没有快照，无法对齐：{rel}")
+                raise SourceFileChangeError(
+                    "source_snapshot_missing", f"The source file has no snapshot, so it cannot be aligned: {rel}"
+                )
             snapshot = doc.text
         old_docs = [SourceDoc(rel_path=rel, text=snapshot) if d.rel_path == rel else d for d in docs]
         remaps = remap_for_edit(old_docs, _spans(project, old_docs), rel=rel, new_text=doc.text)

@@ -131,7 +131,7 @@ describe("ReferenceVideoCard", () => {
     await user.type(ta, "推门而入。@主角");
     const lastCall = onChange.mock.calls.at(-1)!;
     expect(lastCall[0]).toBe("推门而入。@主角");
-    // Cards report bodies only; execution resolves references from `@[名称]`, not inline during editing.
+    // Cards report bodies only; execution resolves references from `@[name]`, not inline during editing.
     expect(lastCall).toHaveLength(1);
   });
 
@@ -202,7 +202,7 @@ describe("ReferenceVideoCard", () => {
   });
 
   it("offers each character form and inserts the derivative reference verbatim", async () => {
-    // Derivatives are independent names displayed as base / derivative, inserted as `@[本体/衍生]`.
+    // Derivatives are independent names displayed as base / derivative, inserted as `@[base/derivative]`.
     useProjectsStore.setState({
       currentProjectName: "proj",
       currentProjectData: {

@@ -124,11 +124,11 @@ def final_cut_summary(value: FinalCutToolValue) -> str | None:
         return None
     final_cut = value.final_cut
     acceptance = final_cut.acceptance
-    warnings = f"；警告 {len(final_cut.warnings)} 条" if final_cut.warnings else ""
+    warnings = f"; {len(final_cut.warnings)} warning(s)" if final_cut.warnings else ""
     return (
-        f"成片已渲染：剪辑时间线 {final_cut.timeline_id} 修订 {final_cut.revision}，第 {final_cut.version} 版，"
-        f"时长 {acceptance.video_duration} 秒（剪辑时间线 {acceptance.expected_duration} 秒）{warnings}。"
-        f"下载：{value.download_url}"
+        f"Final cut rendered: timeline {final_cut.timeline_id} revision {final_cut.revision}, version {final_cut.version}, "
+        f"duration {acceptance.video_duration}s (timeline {acceptance.expected_duration}s){warnings}. "
+        f"Download: {value.download_url}"
     )
 
 

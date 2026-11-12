@@ -1,4 +1,4 @@
-"""Reference-video body parser: recognition primitives for ``@[名称]`` references, dialogue, and narration markers.
+"""Reference-video body parser: recognition primitives for ``@[name]`` references, dialogue, and narration markers.
 
 Units persist only bodies; this module derives images and speech ownership on read (ADR 0064). Parse results
 are never persisted; editing the body changes every derivation.
@@ -26,7 +26,7 @@ from lib.script.script_models import ReferenceResource
 _BOM = "﻿"
 
 #: Allowed Chinese/English separator colons between speaker mentions and ``{``. Permit only one:
-#: a second is not ``@[角色]：{台词}``; prefer nonrecognition over silently degrading to narration.
+#: a second is not ``@[character]：{dialogue}``; prefer nonrecognition over silently degrading to narration.
 _SPEAKER_SEPARATORS = "：:"
 
 
@@ -36,7 +36,7 @@ def _normalize_source(text: str) -> str:
     Both are invisible byte differences that diverge byte-level decisions, so handle them together. BOMs
     may appear at any pasted line beginning, not just document starts, and divergence is line-based. NFC
     is asset-name comparison space (:func:`lib.project.asset_types.asset_name_comparison_key`): speakers
-    and ``@[名称]`` must equal registry keys; NFD bodies and NFC registry entries otherwise look identical
+    and ``@[name]`` must equal registry keys; NFD bodies and NFC registry entries otherwise look identical
     but compare unequal.
 
     Normalize at three line primitives (``split_speech_line`` / ``leading_mention_before_colon`` /
@@ -64,12 +64,12 @@ def _next_positions(text: str, targets: set[str]) -> list[int]:
 
 
 def _iter_mentions(text: str) -> Iterator[tuple[int, int, str]]:
-    """Yield (start, end, name) for @名称 / @[名称] mentions.
+    """Yield (start, end, name) for @name / @[name] mentions.
 
     The left side of `@` must not be an ASCII word character, otherwise the text
     is treated as an email/id fragment. Wrapped mentions may contain punctuation
     but cannot cross line breaks. Curly-brace wrapping is intentionally excluded
-    because the editor only writes `@[名称]` and the runtime contract stays on a
+    because the editor only writes `@[name]` and the runtime contract stays on a
     single wrapped form.
     """
     next_square = _next_positions(text, {"]"})
@@ -113,13 +113,13 @@ def _iter_mentions(text: str) -> Iterator[tuple[int, int, str]]:
 class SpeechMark:
     """One parsed inline speech marker.
 
-    Empty ``speaker`` means narration (``{台词}``); nonempty means character speech (``@[角色]{台词}``).
+    Empty ``speaker`` means narration (``{dialogue}``); nonempty means character speech (``@[character]{dialogue}``).
     Names use normalized asset comparison space; ``text`` is verbatim dialogue inside braces.
 
     ``raw`` is the complete original span in the normalized line (including speaker mention and following
     whitespace/colon), enabling lossless unregistered-speaker rendering without slicing original offsets again.
 
-    For ``@[角色/衍生]``, ``speaker`` stays the base name and ``derivative`` records the derivative
+    For ``@[character/derivative]``, ``speaker`` stays the base name and ``derivative`` records the derivative
     (``docs/adr/0072``). Voices belong to identities; derivatives share base audio/voice style.
     :attr:`speaker_reference` carries written appearance for registration checks and cascade renaming.
     """
@@ -139,18 +139,18 @@ class SpeechMark:
 def split_speech_line(line: str) -> list[str | SpeechMark]:
     """Split a line into ordered visual-description strings and speech markers, appearing anywhere inline.
 
-    Two language-independent markers: ``{台词}`` is narration; ``{台词}`` immediately following ``@[角色]``
+    Two language-independent markers: ``{dialogue}`` is narration; ``{dialogue}`` immediately following ``@[character]``
     with optional whitespace or one Chinese/English colon is character speech. Standalone
-    ``@[角色]：{台词}`` is a valid special case.
+    ``@[character]：{dialogue}`` is a valid special case.
 
     Recognize only the mention immediately before braces, never guess the nearest inline mention as
     speaker: mistakes silently bind dialogue to another character's reference audio. The following never
     form markers; retain braces in descriptions for caller-specific warnings or violations:
 
     - Empty dialogue (``{}`` / ``{   }``): ``Utterance`` requires nonempty text; acceptance would derive empty speech.
-    - Blank speaker (``@[ ]{台词}``) or derivative-only (``@[/劲装]{台词}``): dialogue requires a nonempty
+    - Blank speaker (``@[ ]{dialogue}``) or derivative-only (``@[/劲装]{dialogue}``): dialogue requires a nonempty
       speaker; without a base name, there is no identity to bind audio to.
-    - Malformed speakers (``@[]{台词}``, ``@[李明{台词}``, ``@[张三]：：{台词}``): a preceding ``]``
+    - Malformed speakers (``@[]{dialogue}``, ``@[李明{dialogue}``, ``@[张三]：：{dialogue}``): a preceding ``]``
       or extra colon without a usable mention never degrades to narration. The author intended a speaker;
       silent conversion to narration is harder to detect than an unrecognized marker.
 
@@ -232,13 +232,13 @@ def strip_speech_marks(line: str) -> str:
     """Normalized visual text after removing all speech markers.
 
     Both reference derivation and artifact basis use this: characters appearing only before dialogue braces
-    bind audio without images, while same-line ``@[名称]`` outside markers still derives references.
+    bind audio without images, while same-line ``@[name]`` outside markers still derives references.
     """
     return speech_line_description(split_speech_line(line))
 
 
 def leading_mention_before_colon(line: str) -> str | None:
-    """Return the name for leading ``@[名称]：``, otherwise ``None``; inspect names/colons, not braces.
+    """Return the name for leading ``@[name]：``, otherwise ``None``; inspect names/colons, not braces.
 
     Difference from strict speech-marker recognition identifies intended but malformed dialogue: missing/
     unmatched braces or blank speakers. Machine validation rejects those instead of treating them as visuals
@@ -287,8 +287,8 @@ def extract_mentions(text: str) -> list[str]:
     Order determines execution reference-image numbers; bodies are authoritative, with no independent reference list to drift.
 
     **Exclude speaker positions in speech markers**: giving offscreen speakers images encourages rendering them
-    on screen. ``@[角色]{台词}`` speakers drive only voice declarations/utterances, not images. Characters
-    mentioned only there have no images but retain speech/voice declarations; same-line ``@[名称]``
+    on screen. ``@[character]{dialogue}`` speakers drive only voice declarations/utterances, not images. Characters
+    mentioned only there have no images but retain speech/voice declarations; same-line ``@[name]``
     outside markers derives images normally.
     """
     seen: set[str] = set()
@@ -339,16 +339,16 @@ def speech_speaker_references(text: str) -> list[str]:
 
 
 def rewrite_mentions(text: str, old_name: str, new_name: str) -> tuple[str, int]:
-    """Rewrite @ references to *old_name* as ``@[new_name]``, returning ``(新文本, 改写数)``.
+    """Rewrite @ references to *old_name* as ``@[new_name]``, returning ``(new_text, rewrite_count)``.
 
-    Body primitive for asset renaming; recognize mentions like ``_iter_mentions``, including legacy bare ``@名字``
+    Body primitive for asset renaming; recognize mentions like ``_iter_mentions``, including legacy bare ``@name``
     upgraded to wrapped form. :func:`lib.references.reference_catalog.renamed_reference` decides matches and
-    replacements: character rename cascades ``@[旧角色/衍生]``; derivative rename (*old_name* ``角色/旧衍生``)
+    replacements: character rename cascades ``@[old character/derivative]``; derivative rename (*old_name* ``character/old derivative``)
     touches only that appearance. NFC comparison also matches NFD-persisted names. Perform no other
     normalization: never strip BOMs or normalize the whole body to NFC. Unmatched characters stay verbatim;
     renaming changes names only, never body encoding. Already-target-form mentions do not count as rewrites.
 
-    Rewrite speaker mentions too: ``@[旧角色/衍生]{台词}`` contains a reference to the renamed identity.
+    Rewrite speaker mentions too: ``@[old character/derivative]{dialogue}`` contains a reference to the renamed identity.
     """
     pieces: list[str] = []
     last = 0
@@ -374,7 +374,7 @@ def remap_mentions(text: str, remap: Callable[[str, bool], str | None]) -> str:
     """Rewrite body ``@`` references in one pass through *remap*, returning the new body.
 
     *remap* receives normalized names and whether they occupy speech-speaker positions, returning complete
-    replacements (such as ``@[新名]`` or a plain name), or ``None`` to preserve them. Rewrite multiple names
+    replacements (such as ``@[new name]`` or a plain name), or ``None`` to preserve them. Rewrite multiple names
     together without cascading replacements. Rebuild only changed lines through parser normalization; preserve unchanged lines verbatim.
     """
     pieces: list[str] = []
@@ -432,9 +432,9 @@ def derive_references_from_text(
 def render_mentions(text: str, render: Callable[[str], str]) -> str:
     """Replace each body ``@[X]`` / ``@X`` in place with ``render(X)``.
 
-    Normalize names to comparison space before ``render``, so NFD ``@[名称]`` matches NFC registration.
+    Normalize names to comparison space before ``render``, so NFD ``@[name]`` matches NFC registration.
     Never change any bytes outside mentions; return unmarked bodies and unparseable malformed markers
-    unchanged. Storyboard/grid routes replace ``@[名称]`` with image numbers;
+    unchanged. Storyboard/grid routes replace ``@[name]`` with image numbers;
     :func:`render_mentions_as_subjects` produces reference-video subject markers.
     """
     if "@" not in text:
@@ -477,8 +477,8 @@ def render_mentions_as_subjects(text: str, names: Collection[str]) -> str:
     clamping never narrows this set. Retain unknown mentions unchanged without deleting text; thus empty
     joined/trimmed input equals empty rendering, enabling lossless enqueue-side blank-prompt checks.
 
-    Normalize both bodies and ``names`` before membership checks. Otherwise NFD ``@[名称]`` fails to
-    match NFC registration, retaining the supposedly unregistered ``@[名称]`` marker directly in provider requests.
+    Normalize both bodies and ``names`` before membership checks. Otherwise NFD ``@[name]`` fails to
+    match NFC registration, retaining the supposedly unregistered ``@[name]`` marker directly in provider requests.
     """
     normalized_names = {asset_name_comparison_key(name) for name in names}
     text = _normalize_source(text)

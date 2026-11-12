@@ -1302,7 +1302,7 @@ class TestFilesRouter:
 
     def test_upload_spec_host_fields_must_be_paired(self):
         """Host constraints without 404 copy fail construction, never fetch empty translation keys during rejection."""
-        with pytest.raises(ValueError, match=r"host_bucket 与 host_not_found_key 必须成对登记"):
+        with pytest.raises(ValueError, match=r"host_bucket and host_not_found_key must be registered together"):
             files.UploadSpec(
                 allowed_exts=(".png",),
                 subdir=("x",),
@@ -1311,7 +1311,7 @@ class TestFilesRouter:
                 host_bucket="products",
             )
         # Reverse mismatches are configuration errors too: declared copy without host constraints is unreachable.
-        with pytest.raises(ValueError, match=r"host_bucket 与 host_not_found_key 必须成对登记"):
+        with pytest.raises(ValueError, match=r"host_bucket and host_not_found_key must be registered together"):
             files.UploadSpec(
                 allowed_exts=(".png",),
                 subdir=("x",),
@@ -1321,7 +1321,7 @@ class TestFilesRouter:
             )
 
         # Reference-audio metadata alone points to files; old-file-cleanup types must include host-existence constraints.
-        with pytest.raises(ValueError, match=r"tracks_stale_audio 必须登记宿主约束"):
+        with pytest.raises(ValueError, match=r"tracks_stale_audio requires a registered host constraint"):
             files.UploadSpec(
                 allowed_exts=(".wav",),
                 subdir=("x",),

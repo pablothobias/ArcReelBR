@@ -49,7 +49,14 @@ from lib.project.asset_derivatives import (
     DERIVATIVE_SOURCE_ROLE,
     build_derivative_sheet_basis,
 )
-from lib.project.asset_types import ASSET_SPECS, DERIVATIVES_FIELD, AssetSpec, asset_name_comparison_key
+from lib.project.asset_types import (
+    ASSET_SPECS,
+    DERIVATIVES_FIELD,
+    SCENE_OCCUPANCY_FIELD,
+    AssetSpec,
+    asset_choice,
+    asset_name_comparison_key,
+)
 from lib.prompts.prompt_builders import (
     build_character_derivative_prompt,
     build_character_prompt,
@@ -185,13 +192,16 @@ class StoryboardImageSemantics:
 
 @dataclass(frozen=True, slots=True)
 class AssetSheetSemantics:
-    """Sheet semantic inputs: description only from stored project entries; ``name`` uses comparison coordinates."""
+    """Sheet semantic inputs: description only from stored project entries; ``name`` uses comparison coordinates.
+
+    ``occupancy`` is the scene's explicit occupancy choice (``docs/adr/0127``), ``""`` for other asset types."""
 
     asset_type: str
     name: str
     description: str
     style: str
     style_description: str
+    occupancy: str = ""
 
 
 @dataclass(frozen=True, slots=True)
@@ -475,6 +485,7 @@ def asset_sheet_input(
             description=description,
             style=style,
             style_description=style_description,
+            occupancy=asset_choice(asset, spec, SCENE_OCCUPANCY_FIELD) if asset_type == "scene" else "",
         ),
         canvas_ratio=ASSET_SHEET_CANVAS_RATIO,
         references=tuple(assembly.references),
@@ -785,6 +796,7 @@ def _visual_basis(
                 aspect_ratio=canvas_ratio,
                 references=references,
                 absent=absent,
+                occupancy=semantics.occupancy,
             )
         case DerivativeSheetSemantics():
             # Unavailable base sheets mean no source; record the gap in absent.
@@ -801,10 +813,9 @@ def _visual_basis(
             )
 
 
-#: Sheet-prompt renderers by asset type.
+#: Sheet-prompt renderers by asset type; scenes render through their own case, which carries occupancy.
 _ASSET_SHEET_PROMPT_BUILDERS: dict[str, Callable[[str, str, str, str], str]] = {
     "character": build_character_prompt,
-    "scene": build_scene_prompt,
     "prop": build_prop_prompt,
     "product": build_product_prompt,
 }
@@ -818,6 +829,14 @@ def _render_prompt(semantics: GenerationSemantics, sent: Sequence[VisualReferenc
                 style=semantics.style,
                 style_description=semantics.style_description,
                 references=sent,
+            )
+        case AssetSheetSemantics(asset_type="scene"):
+            return build_scene_prompt(
+                semantics.name,
+                semantics.description,
+                semantics.style,
+                semantics.style_description,
+                occupancy=semantics.occupancy,
             )
         case AssetSheetSemantics():
             builder = _ASSET_SHEET_PROMPT_BUILDERS[semantics.asset_type]

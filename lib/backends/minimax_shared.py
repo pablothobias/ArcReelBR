@@ -63,7 +63,7 @@ _IMAGE_MIME_TYPES: dict[str, str] = {
 
 def resolve_minimax_api_key(api_key: str | None = None) -> str:
     if api_key is None or not api_key.strip():
-        raise ValueError("请到系统配置页填写 MiniMax API Key")
+        raise ValueError("Enter the MiniMax API Key in Settings")
     return api_key.strip()
 
 
@@ -153,7 +153,7 @@ def minimax_failure_reason(payload: object) -> str | None:
     status = base.get("status_code")
     if status is not None and status != 0:
         msg = base.get("status_msg") or ""
-        return f"MiniMax 图像生成失败 status_code={status}: {msg}".strip()
+        return f"MiniMax image generation failed status_code={status}: {msg}".strip()
     return None
 
 
@@ -202,7 +202,7 @@ def extract_minimax_video_task_id(submit_payload: dict) -> str:
     task_id = submit_payload.get("task_id")
     if not task_id:
         reason = _base_resp_error(submit_payload)
-        raise RuntimeError(reason or f"MiniMax 视频提交响应缺少 task_id: {submit_payload}")
+        raise RuntimeError(reason or f"MiniMax video submission response is missing task_id: {submit_payload}")
     return str(task_id)
 
 
@@ -224,7 +224,7 @@ def minimax_video_failure_reason(payload: dict) -> str | None:
     if minimax_video_status(payload) == MINIMAX_STATUS_FAIL:
         base = _as_dict(payload.get("base_resp"))
         return (
-            f"MiniMax 视频任务失败 task_id={payload.get('task_id')} "
+            f"MiniMax video task failed task_id={payload.get('task_id')} "
             f"status_code={base.get('status_code')}: {base.get('status_msg', '')}"
         ).strip()
     # Hard top-level base_resp errors, such as missing task_id/authentication failure: nonzero always fails.
@@ -235,7 +235,7 @@ def extract_minimax_file_id(query_payload: dict) -> str:
     """Extract file_id from status=Success query responses."""
     file_id = query_payload.get("file_id")
     if not file_id:
-        raise RuntimeError(f"MiniMax 视频任务完成但缺少 file_id: {query_payload}")
+        raise RuntimeError(f"MiniMax video task completed but file_id is missing: {query_payload}")
     return str(file_id)
 
 
@@ -244,7 +244,7 @@ def extract_minimax_download_url(retrieve_payload: dict) -> str:
     url = _as_dict(retrieve_payload.get("file")).get("download_url")
     if not url:
         reason = _base_resp_error(retrieve_payload)
-        raise RuntimeError(reason or f"MiniMax files/retrieve 响应缺少 download_url: {retrieve_payload}")
+        raise RuntimeError(reason or f"MiniMax files/retrieve response is missing download_url: {retrieve_payload}")
     return url
 
 
@@ -270,7 +270,7 @@ def minimax_v2_video_failure_reason(payload: dict) -> str | None:
     if status in (MINIMAX_V2_STATUS_FAILED, MINIMAX_V2_STATUS_CANCELLED):
         task = _as_dict(payload.get("task"))
         detail = task.get("error") or task.get("status_msg") or ""
-        return f"MiniMax 视频任务{status} task_id={task.get('id')}: {detail}".strip()
+        return f"MiniMax video task {status} task_id={task.get('id')}: {detail}".strip()
     return _base_resp_error(payload)
 
 
@@ -278,5 +278,5 @@ def extract_minimax_v2_download_url(query_payload: dict) -> str:
     """Extract temporary task.content.url downloads from status=succeeded query responses."""
     url = _as_dict(_as_dict(query_payload.get("task")).get("content")).get("url")
     if not url:
-        raise RuntimeError(f"MiniMax 视频任务完成但缺少 content.url: {query_payload}")
+        raise RuntimeError(f"MiniMax video task completed but content.url is missing: {query_payload}")
     return str(url)

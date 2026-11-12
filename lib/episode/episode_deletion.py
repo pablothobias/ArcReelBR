@@ -153,7 +153,7 @@ def _ledger_entry(project: Mapping[str, Any], episode: int) -> Mapping[str, Any]
     for entry in raw if isinstance(raw, list) else []:
         if isinstance(entry, Mapping) and parse_positive_episode_num(entry.get("episode")) == episode:
             return entry
-    raise EpisodeManagementError("episode_not_found", f"集（id={episode}）不在账本中")
+    raise EpisodeManagementError("episode_not_found", f"Episode (id={episode}) is not in the ledger")
 
 
 def _script_path(project_dir: Path, project: Mapping[str, Any], episode: int) -> Path | None:
@@ -316,7 +316,9 @@ def delete_episode(
     project_dir = pm.get_project_path(project_name)
     project = pm.load_project(project_name)
     if project.get("content_mode") == "ad":
-        raise EpisodeManagementError("ad_episode_locked", "广告/短片项目只有一集，不能新建或删除集")
+        raise EpisodeManagementError(
+            "ad_episode_locked", "Ad/short projects have exactly one episode; episodes cannot be added or deleted"
+        )
     impact = episode_deletion_impact(project_dir, project, episode)
     if revision != impact.revision:
         return EpisodeDeletionConfirmationRequired(impact=impact)

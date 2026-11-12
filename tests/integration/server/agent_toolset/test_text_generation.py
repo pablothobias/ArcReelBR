@@ -251,7 +251,7 @@ async def test_get_video_capabilities_reports_request_facts_failure(
     assert problem["code"] == "video_supported_durations_incompatible"
     assert problem["params"] == {"provider": "gemini-aistudio", "model": "veo-3.1-generate-preview", "resolution": "4k"}
     assert problem["action"] == "configure_video_model"
-    assert "video_supported_durations_incompatible（provider=gemini-aistudio" in problem["detail"]
+    assert "video_supported_durations_incompatible (provider=gemini-aistudio" in problem["detail"]
 
 
 async def test_get_video_capabilities_error(fake_ctx: ToolHarness) -> None:
@@ -546,7 +546,7 @@ async def test_generate_episode_script_without_pending_entries_says_how_to_rewri
 
 
 async def test_generate_episode_script_reports_unbound_scene_mentions(fake_ctx: ToolHarness, monkeypatch) -> None:
-    """Rewritten visual @[名称] mismatching references yields warnings in receipts for written scripts."""
+    """Rewritten visual @[name] mismatching references yields warnings in receipts for written scripts."""
     from lib.script.storyboard_mentions import WARN_STORYBOARD_MENTION_UNBOUND
     from server import text_generation as mod
 
@@ -766,7 +766,7 @@ async def test_generate_episode_script_facts_failure_reports_the_real_problem(
         "configure_provider",
         {"provider": "p", "model": "m", "resolution": "1080p", "capability": "i2v"},
     )
-    assert "video_supported_durations_incompatible（provider=p, model=m, resolution=1080p" in said(out)
+    assert "video_supported_durations_incompatible (provider=p, model=m, resolution=1080p" in said(out)
 
 
 @pytest.mark.parametrize("scope", ["all", "stale", None])

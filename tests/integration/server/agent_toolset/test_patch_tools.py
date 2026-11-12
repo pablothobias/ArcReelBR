@@ -283,7 +283,7 @@ class TestPatchEpisodeScript:
         assert saved[1]["video_prompt"]["action"] == "抬头"
 
     async def test_unbound_scene_mentions_are_reported_as_warnings(self, ctx: ToolHarness) -> None:
-        """Visual @[名称] not matching shot references or registration still commits, with warnings."""
+        """Visual @[name] not matching shot references or registration still commits, with warnings."""
         from lib.script.storyboard_mentions import WARN_STORYBOARD_MENTION_UNBOUND
 
         result = _committed(await _patch(ctx, _updates({"E1S02": {"image_prompt.scene": "@[角色A]与@[无名路人]对视"}})))
@@ -1116,9 +1116,9 @@ class TestPatchProject:
             {"table": "characters", "entries": {"李白": {"description": "白衣剑客"}}},
         )
         text1 = _said(out1)
-        assert "新增" in text1
+        assert "added" in text1
         assert "李白" in text1
-        assert "合并" not in text1
+        assert "merged" not in text1
 
         out2 = await run_declared_tool(
             PATCH_PROJECT,
@@ -1126,9 +1126,9 @@ class TestPatchProject:
             {"table": "characters", "entries": {"李白": {"description": "改后描述"}}},
         )
         text2 = _said(out2)
-        assert "合并改字段" in text2
+        assert "merged field changes" in text2
         assert "李白" in text2
-        assert "新增" not in text2
+        assert "added" not in text2
 
     async def test_response_lists_dropped_non_allowed_fields(self, ctx: ToolHarness) -> None:
         """Return text explicitly lists discarded fields such as reference_image / sheet_field,
@@ -1150,7 +1150,7 @@ class TestPatchProject:
         text = _said(out)
         assert "reference_image" in text
         assert "character_sheet" in text
-        assert "Agent 可编辑范围" in text or "已忽略" in text
+        assert "Agent's editable scope" in text or "ignored" in text
 
     async def test_existing_entry_with_only_dropped_fields_reports_noop(self, ctx: ToolHarness) -> None:
         """Existing entries with all submitted fields removed by allowlists/legacy stripping produce
@@ -1174,8 +1174,8 @@ class TestPatchProject:
         assert out.problem is None
         text = _said(out)
         # Report noop / no writable fields, not merged.
-        assert "合并改字段" not in text
-        assert "无可写字段已跳过" in text or "无变更" in text
+        assert "merged field changes" not in text
+        assert "with no writable fields" in text or "no changes" in text
         # Description unchanged.
         assert ctx.pm.load_project("demo")["characters"]["李白"]["description"] == "白衣剑客"
 
@@ -1198,7 +1198,7 @@ class TestPatchProject:
         text = _said(out)
         assert "type" in text
         assert "importance" in text
-        assert "历史字段" in text or "已废弃" in text
+        assert "legacy fields" in text or "deprecated" in text
 
     async def test_new_character_registers_derivatives(self, ctx: ToolHarness) -> None:
         out = await run_declared_tool(
@@ -1293,8 +1293,8 @@ class TestPatchProject:
         )
         assert out.problem is None
         text = _said(out)
-        assert "合并改字段" not in text
-        assert "无可写字段已跳过" in text or "无变更" in text
+        assert "merged field changes" not in text
+        assert "with no writable fields" in text or "no changes" in text
 
     @pytest.mark.parametrize(
         "derivatives",
@@ -1339,20 +1339,20 @@ class TestPatchProjectSettings:
         out = await run_declared_tool(PATCH_PROJECT, ctx, {"settings": {"episode_target_units": 1000}})
         assert out.problem is None
         assert ctx.pm.load_project("demo")["episode_target_units"] == 1000
-        assert "已更新" in _said(out)
+        assert "updated" in _said(out)
 
     async def test_clear_episode_target_units(self, ctx: ToolHarness) -> None:
         await run_declared_tool(PATCH_PROJECT, ctx, {"settings": {"episode_target_units": 1000}})
         out = await run_declared_tool(PATCH_PROJECT, ctx, {"settings": {"episode_target_units": None}})
         assert out.problem is None
         assert "episode_target_units" not in ctx.pm.load_project("demo")
-        assert "已清除" in _said(out)
+        assert "cleared" in _said(out)
 
     async def test_noop_when_same_value(self, ctx: ToolHarness) -> None:
         await run_declared_tool(PATCH_PROJECT, ctx, {"settings": {"episode_target_units": 800}})
         out = await run_declared_tool(PATCH_PROJECT, ctx, {"settings": {"episode_target_units": 800}})
         assert out.problem is None
-        assert "无变更" in _said(out)
+        assert "unchanged" in _said(out)
 
     async def test_non_whitelist_field_rejected(self, ctx: ToolHarness) -> None:
         out = await run_declared_tool(PATCH_PROJECT, ctx, {"settings": {"arbitrary_field": 1}})
@@ -1464,7 +1464,7 @@ class TestPatchProjectNarrationSettings:
         out = await run_declared_tool(PATCH_PROJECT, ctx, {"settings": {"narration_voice": "Ethan"}})
         assert out.problem is None
         assert ctx.pm.load_project("demo")["narration_voice"] == "Ethan"
-        assert "已更新" in _said(out)
+        assert "updated" in _said(out)
 
     async def test_modify_narration_voice(self, ctx: ToolHarness) -> None:
         await run_declared_tool(PATCH_PROJECT, ctx, {"settings": {"narration_voice": "Ethan"}})
@@ -1477,7 +1477,7 @@ class TestPatchProjectNarrationSettings:
         out = await run_declared_tool(PATCH_PROJECT, ctx, {"settings": {"narration_voice": None}})
         assert out.problem is None
         assert "narration_voice" not in ctx.pm.load_project("demo")
-        assert "已清除" in _said(out)
+        assert "cleared" in _said(out)
 
     @pytest.mark.parametrize("bad", ["", "   ", "\t\n", 1, 1.5, True, ["Ethan"], {"id": "Ethan"}])
     async def test_invalid_narration_voice_rejected(self, ctx: ToolHarness, bad: Any) -> None:
@@ -1502,14 +1502,14 @@ class TestPatchProjectNarrationSettings:
         out = await run_declared_tool(PATCH_PROJECT, ctx, {"settings": {"narration_speed": None}})
         assert out.problem is None
         assert "narration_speed" not in ctx.pm.load_project("demo")
-        assert "已清除" in _said(out)
+        assert "cleared" in _said(out)
 
     @pytest.mark.parametrize("bad", [0, -1.5, float("inf"), float("nan"), True, False, "fast", "", [1.2], 10**400])
     async def test_invalid_narration_speed_rejected(self, ctx: ToolHarness, bad: Any) -> None:
         out = await run_declared_tool(PATCH_PROJECT, ctx, {"settings": {"narration_speed": bad}})
         assert out.problem is not None
         # Oversized integers beyond float range get clear validation copy, not low-level overflow.
-        assert "narration_speed 必须是正的有限数值" in _said(out)
+        assert "narration_speed must be a positive finite number" in _said(out)
         assert "narration_speed" not in ctx.pm.load_project("demo")
 
     async def test_tts_project_keeps_complete_snapshot(self, ctx: ToolHarness) -> None:
@@ -1565,7 +1565,7 @@ class TestPatchProjectOverview:
         assert ov["genre"] == "悬疑"
         assert ov["theme"] == "复仇"
         assert ov["world_setting"] == "近未来"
-        assert "已更新" in _said(out)
+        assert "updated" in _said(out)
 
     async def test_merge_preserves_untouched_fields(self, ctx: ToolHarness) -> None:
         await run_declared_tool(PATCH_PROJECT, ctx, {"overview": {"synopsis": "原始梗概", "genre": "原题材"}})
@@ -1599,7 +1599,7 @@ class TestPatchProjectOverview:
         await run_declared_tool(PATCH_PROJECT, ctx, {"overview": {"synopsis": "同值"}})
         out = await run_declared_tool(PATCH_PROJECT, ctx, {"overview": {"synopsis": "同值"}})
         assert out.problem is None
-        assert "无变更" in _said(out)
+        assert "unchanged" in _said(out)
 
     async def test_overview_with_settings_rejected(self, ctx: ToolHarness) -> None:
         out = await run_declared_tool(
@@ -1729,7 +1729,7 @@ class TestRenameAssetTool:
             RENAME_ASSET, rename_ctx, {"table": "characters", "old_name": "角色A", "new_name": "主角甲"}
         )
         assert out.problem is not None
-        assert "可能上次重命名已成功" in _said(out)
+        assert "the previous rename may have succeeded" in _said(out)
 
     async def test_conflict_rejected(self, rename_ctx: ToolHarness) -> None:
         rename_ctx.pm.upsert_assets("demo", "characters", {"主角甲": {"description": "另一个"}})
@@ -1737,7 +1737,7 @@ class TestRenameAssetTool:
             RENAME_ASSET, rename_ctx, {"table": "characters", "old_name": "角色A", "new_name": "主角甲"}
         )
         assert out.problem is not None
-        assert "冲突" in _said(out)
+        assert "conflicts with existing asset" in _said(out)
         assert "角色A" in rename_ctx.pm.load_project("demo")["characters"]
 
 
@@ -1759,8 +1759,8 @@ class TestMergeAssetTool:
         )
 
         assert out.problem is None
-        assert "预览" in _said(out)
-        assert "《标题》（第 1 个，id=1）：正式脚本" in _said(out)
+        assert "Preview" in _said(out)
+        assert '"标题" (position 1, id=1): formal script' in _said(out)
         assert "角色A" in merge_ctx.pm.load_project("demo")["characters"]
         assert _load(merge_ctx)["segments"][0]["characters_in_segment"] == ["角色A"]
 

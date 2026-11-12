@@ -23,7 +23,7 @@ Stop enqueueing on a skeleton mismatch and regenerate the script for the project
 Treat each `video_units[]` entry as an independent generation call:
 
 - Construct a unified-reference-syntax prompt from the unit body (`text`).
-- At execution time, resolve reference images from body `@[名称]` mentions in first-mention order, without special sorting; use the asset image if available, otherwise all original images for that asset.
+- At execution time, resolve reference images from body `@[name]` mentions in first-mention order, without special sorting; use the asset image if available, otherwise all original images for that asset.
 - Let generation preflight project the unit's planned duration onto the provider's request tiers.
 - Stop the unit on `needs_replan` or speech ownership problems, and fix planning content first.
 - Whole-episode generation reuses only the current clip explicitly referenced by `generated_assets.video_clip`; a same-named orphan file does not mean the unit is complete.
@@ -41,7 +41,7 @@ Enqueue using MCP tools; this skill provides no Python or Shell generation scrip
 | Selected batch | `mcp__arcreel__generate_videos({"script": "episode_1.json", "target": {"scope": "selected", "ids": ["E1S01", "E1S05", "E1S10"]}})` |
 | All pending | `mcp__arcreel__generate_videos({"script": "episode_1.json", "target": {"scope": "all"}})` |
 
-Interpret `target.ids` as storyboard IDs for storyboard-to-video and as `unit_id` for reference-to-video. Whole-episode `target.episode_id` is the script's episode ID (the same number as in `episode_{集 ID}.json`, taken from plan `target.episode`), not its ordinal position.
+Interpret `target.ids` as storyboard IDs for storyboard-to-video and as `unit_id` for reference-to-video. Whole-episode `target.episode_id` is the script's episode ID (the same number as in `episode_{episode ID}.json`, taken from plan `target.episode`), not its ordinal position.
 
 ### Regenerate named video units
 
@@ -133,5 +133,5 @@ Check according to the project's generation mode:
 
 - storyboard: every target storyboard has an available image and executable action and speech.
 - Reference-to-video: every target unit has a nonempty body, valid planned duration, a single speech owner, and is not marked `needs_replan`.
-- reference: at execution time, the server resolves references from body `@[名称]` mentions in first-mention order; unregistered mentions produce warnings without blocking enqueueing. Let the server truncate to `max_reference_images`.
+- reference: at execution time, the server resolves references from body `@[name]` mentions in first-mention order; unregistered mentions produce warnings without blocking enqueueing. Let the server truncate to `max_reference_images`.
 - reference: the output path is `reference_videos/{unit_id}.mp4`.

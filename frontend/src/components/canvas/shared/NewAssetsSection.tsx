@@ -20,7 +20,7 @@ export interface NewAssetEntryRefs {
   /** One-based planning-entry position, used to address appearance locations. */
   position: number;
   kind: EpisodeItemKind;
-  /** All unnormalized names referenced in entries: arrays, speakers, body `@[名]`. */
+  /** All unnormalized names referenced in entries: arrays, speakers, body `@[name]`. */
   names: string[];
   snippet: string;
 }

@@ -741,7 +741,7 @@ def migrate_v15_to_v16(
         return None
     project = json.loads(project_file.read_bytes())
     if not isinstance(project, dict):
-        raise ValueError("project.json 必须是对象")
+        raise ValueError("project.json must be an object")
     if parse_project_schema_version(project) >= TARGET_SCHEMA_VERSION:
         return None
 

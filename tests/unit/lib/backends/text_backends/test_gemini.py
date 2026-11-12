@@ -406,14 +406,18 @@ class TestStructuredFallback:
         gc = AsyncMock(side_effect=[_resp(_PROSE), _resp(_PROSE), _resp(_PROSE)])
         backend._test_client.aio.models.generate_content = gc
 
-        with pytest.raises(StructuredOutputExhaustedError, match="结构化输出能力不足") as exc_info:
+        with pytest.raises(
+            StructuredOutputExhaustedError, match="cannot produce the required structured output"
+        ) as exc_info:
             await backend.generate(TextGenerationRequest(prompt="p", response_schema=_OverviewModel))
 
         assert gc.call_count == 3
         assert exc_info.value.provider == "gemini"
         assert exc_info.value.model == "gemini-3-flash-preview"
         # reason names attempt counts and final validation failure.
-        assert exc_info.value.reason == "prompt 注入降级 2 次尝试后输出仍不合规（1 处字段不符（<root>））"
+        assert exc_info.value.reason == (
+            "output still invalid after 2 prompt-injection fallback attempts (1 field(s) invalid (<root>))"
+        )
 
     async def test_fallback_logs_raw_model_output(self, backend, caplog):
         """Fallback-trigger warnings log raw model output for retrospective diagnosis."""

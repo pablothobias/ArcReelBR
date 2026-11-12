@@ -203,9 +203,9 @@ async def detect_signals(video_path: Path, frame_times: Sequence[float]) -> Vide
     try:
         result = await run_with_deadline(args, deadline_seconds=_DETECT_DEADLINE_SECONDS, capture_stderr=True)
     except SubprocessDeadlineExceeded:
-        raise SignalDetectionError(f"信号检测超时：{video_path.name}") from None
+        raise SignalDetectionError(f"Signal detection timed out: {video_path.name}") from None
     if result.returncode != 0:
-        raise SignalDetectionError(f"信号检测失败：{video_path.name}")
+        raise SignalDetectionError(f"Signal detection failed: {video_path.name}")
     return _parse_signals(result.stderr.decode(errors="replace"), _video_duration(frame_times))
 
 

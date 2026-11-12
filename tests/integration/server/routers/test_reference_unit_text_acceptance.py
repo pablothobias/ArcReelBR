@@ -1,7 +1,7 @@
 """Reference-body end-to-end acceptance: v8 → v9 migration → two write paths → real generation projection.
 
 Cover complete seams: old ``shots[]`` + ``references[]`` disk shapes migrate to bodies; REST/
-Agent tools read/write identical bodies, while projection derives images by first ``@[名称]`` mention order;
+Agent tools read/write identical bodies, while projection derives images by first ``@[name]`` mention order;
 no persisted reference list can diverge from bodies.
 """
 
@@ -316,7 +316,7 @@ async def test_body_shape_drives_the_reference_images_of_the_real_request(
 async def test_unresolved_mention_warns_in_the_editor_but_blocks_the_generation(
     acceptance: _Acceptance,
 ) -> None:
-    """Unregistered ``@[名称]`` warns in editors but blocks generation with names."""
+    """Unregistered ``@[name]`` warns in editors but blocks generation with names."""
     body = "@[无名氏] 从巷口走过，@[阿离] 回头"
     acceptance.patch_body_over_rest(body)
 

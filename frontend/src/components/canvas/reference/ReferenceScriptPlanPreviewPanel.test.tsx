@@ -156,7 +156,7 @@ describe("ReferenceScriptPlanPreviewPanel", () => {
     useProjectsStore.setState({ currentScripts: {} });
   });
 
-  // Body `@[名称]` highlights; references resolve at execution only, without separate image lists.
+  // Body `@[name]` highlights; references resolve at execution only, without separate image lists.
   it("renders the clean pending state with the highlighted body and no reference list", async () => {
     vi.spyOn(API, "getScriptReview").mockResolvedValue(pendingState());
     render(<ReferenceScriptPlanPreviewPanel projectName="p" episode={1} lookup={LOOKUP} />);

@@ -575,7 +575,7 @@ def test_combining_char_name_renders_identically_in_every_encoding_pairing(regis
     """All four NFC/NFD combining-name pairings render identical prompts and audio bindings.
 
     At this chain endpoint, missing normalization in speaker, subject mention, image numbering, or voice declaration silently leaks
-    ``@[名称]`` syntax to provider requests, prevents official dialogue reconstruction, or fails audio binding,
+    ``@[name]`` syntax to provider requests, prevents official dialogue reconstruction, or fails audio binding,
     leaving users with wrong faces and voices instead of errors.
     """
     project = {

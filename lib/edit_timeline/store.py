@@ -36,9 +36,13 @@ def _parse_document(path: Path) -> EditTimelineDocument:
     try:
         document = EditTimelineDocument.model_validate(json.loads(path.read_text(encoding="utf-8")))
     except (OSError, ValueError, ValidationError) as exc:
-        raise EditTimelineError("timeline_invalid", f"剪辑时间线文件无法解析：{path.name}", file=path.name) from exc
+        raise EditTimelineError(
+            "timeline_invalid", f"edit timeline file cannot be parsed: {path.name}", file=path.name
+        ) from exc
     if document.id != path.stem:
-        raise EditTimelineError("timeline_invalid", f"剪辑时间线文件与其 ID 不一致：{path.name}", file=path.name)
+        raise EditTimelineError(
+            "timeline_invalid", f"edit timeline file does not match its ID: {path.name}", file=path.name
+        )
     return document
 
 
@@ -104,10 +108,14 @@ class EditTimelineStore:
                     document = self._parse(path)
                     if document.episode != number:
                         raise EditTimelineError(
-                            "timeline_invalid", f"剪辑时间线文件与所在集不一致：{path.name}", file=path.name
+                            "timeline_invalid",
+                            f"edit timeline file does not match its episode: {path.name}",
+                            file=path.name,
                         )
                     return document
-        raise EditTimelineError("timeline_not_found", f"剪辑时间线「{timeline_id}」不存在", timeline_id=timeline_id)
+        raise EditTimelineError(
+            "timeline_not_found", f'Edit timeline "{timeline_id}" does not exist', timeline_id=timeline_id
+        )
 
     @contextmanager
     def locked_episode(self, episode: int) -> Generator[None]:

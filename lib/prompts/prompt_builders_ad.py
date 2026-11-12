@@ -77,9 +77,11 @@ def _format_products(products: dict) -> str:
 def _shot_duration_constraint(generation_mode: str | None, supported_durations: list[int] | None) -> str:
     """Render per-shot storyboard-to-video duration constraints; reference-to-video must use the self-contained unit builder."""
     if generation_mode == "reference_video":
-        raise ValueError("reference_video 路径须使用 build_ad_reference_prompt")
+        raise ValueError("The reference_video path must use build_ad_reference_prompt")
     if not supported_durations:
-        raise ValueError("storyboard 路径必须提供 supported_durations（视频模型的合法时长集合）")
+        raise ValueError(
+            "The storyboard path must provide supported_durations (the video model's set of valid durations)"
+        )
     return format_duration_constraint(supported_durations, None)
 
 
@@ -102,7 +104,7 @@ def _asset_registry_slot(
 def _pacing_slots(target_duration: int) -> dict[str, object]:
     """Pacing tier axis and target seconds for adaptation notes; exact tier matches need no adaptation note."""
     if not is_int(target_duration, minimum=1):
-        raise ValueError(f"target_duration 必须为正整数秒，当前为 {target_duration!r}")
+        raise ValueError(f"target_duration must be a positive integer number of seconds, got {target_duration!r}")
     tier = nearest_ad_tier(target_duration)
     return {
         "target_duration": target_duration,

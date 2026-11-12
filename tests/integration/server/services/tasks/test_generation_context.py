@@ -189,16 +189,16 @@ class TestLaneDeclaration:
         assert ctx.image.provider_model == ProviderModel("ark", "img-model-x")
         assert ctx.image.backend_name == "ark"
         assert ctx.image.backend_model == "img-model-x"
-        with pytest.raises(RuntimeError, match="video lane 未声明"):
+        with pytest.raises(RuntimeError, match="video lane is not declared"):
             _ = ctx.video
-        with pytest.raises(RuntimeError, match="audio lane 未声明"):
+        with pytest.raises(RuntimeError, match="audio lane is not declared"):
             _ = ctx.audio
 
     async def test_no_lane_declared_still_returns_generator(self, patched_session_factory, project_env, fake_assemble):
         ctx = await resolve_generation_context("demo", None, project={})
         assert isinstance(ctx.generator, MediaGenerator)
         assert fake_assemble == []
-        with pytest.raises(RuntimeError, match="image lane 未声明"):
+        with pytest.raises(RuntimeError, match="image lane is not declared"):
             _ = ctx.image
 
     async def test_preloaded_project_path_avoids_the_default_executor(
@@ -469,7 +469,7 @@ class TestVideoLane:
     async def test_submitted_job_requires_a_pinned_identity(self, patched_session_factory, project_env, fake_assemble):
         """Resume's discontinued-model exemption applies only to submission-locked identities. Without one, fail before current-config resolution or backend construction."""
         ark_model = _registry_video_model("ark")
-        with pytest.raises(ValueError, match="锁定提交时的执行身份"):
+        with pytest.raises(ValueError, match="pin the execution identity used at submission"):
             await resolve_generation_context(
                 "demo",
                 None,
@@ -901,7 +901,7 @@ class TestBackendCache:
                 provider_id, {"model": SEEDREAM_LITE}, resolver, generation_type="t2i"
             )
         assert excinfo.value.params["successor"] == "bytedance/doubao-seedream-5-0-pro"
-        with pytest.raises(ValueError, match="没有默认 t2i image 模型"):
+        with pytest.raises(ValueError, match="has no default t2i image model"):
             await generation_context._get_or_create_image_backend(provider_id, {}, resolver, generation_type="t2i")
         live = await generation_context._get_or_create_image_backend(
             provider_id, {"model": "relay-image"}, resolver, generation_type="t2i"
@@ -1124,7 +1124,7 @@ class TestValueObjectAssembly:
         )
         ctx = GenerationContext(generator=MediaGenerator(tmp_path / "p"), video_lane=lane)
         assert ctx.video is lane
-        with pytest.raises(RuntimeError, match="image lane 未声明"):
+        with pytest.raises(RuntimeError, match="image lane is not declared"):
             _ = ctx.image
 
     def test_lane_results_are_frozen(self):

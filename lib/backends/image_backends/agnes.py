@@ -254,7 +254,7 @@ class AgnesImageBackend:
             sorted(str(key) for key in data),
             len(data_items) if isinstance(data_items, list) else None,
         )
-        raise RuntimeError("Agnes 图像响应缺少 url/b64_json")
+        raise RuntimeError("Agnes image response is missing url/b64_json")
 
     async def _download_result(self, url: str, output_path: Path) -> None:
         """Download issued image URLs via idempotent GET under shared artifact budgets.
@@ -262,7 +262,7 @@ class AgnesImageBackend:
         Retry transients here, never restart nonidempotent generation POST. Shared predicates also retry
         403/404 because just-issued URLs may not have propagated in object storage. Other 4xx fail deterministically.
         """
-        await with_artifact_retry(lambda: download_image_to_path(url, output_path), label="Agnes 图像")
+        await with_artifact_retry(lambda: download_image_to_path(url, output_path), label="Agnes image")
 
 
 async def _write_base64_image(b64: str, output_path: Path) -> None:

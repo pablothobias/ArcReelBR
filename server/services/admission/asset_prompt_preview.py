@@ -84,6 +84,8 @@ class AssetPromptPreview:
     style_description: str | None = None
     #: Description the renderer used (stored unless a draft was supplied).
     description: str | None = None
+    #: Scene occupancy the renderer used (``"empty"``/``"occupied"``); ``None`` for other asset types and derivatives.
+    occupancy: str | None = None
     canvas_ratio: str | None = None
     references: tuple[dict[str, Any], ...] = ()
     #: Image-backend reference limit applied before rendering; ``None`` means no truncation (or unresolved backend).
@@ -98,6 +100,7 @@ def _semantic_fields(generation_input: AssetSheetInput | DerivativeSheetInput) -
             "style": semantics.style,
             "style_description": semantics.style_description,
             "description": semantics.description,
+            "occupancy": semantics.occupancy or None,
         }
     return {"description": semantics.description}
 

@@ -21,7 +21,7 @@ SKILL = REPO / "agent_runtime_profile/.claude/skills/edit-video/SKILL.md"
 REVIEWER = REPO / "agent_runtime_profile/.claude/agents/review-footage.md"
 APP_LINK = REPO / "frontend/src/utils/app-link.ts"
 
-_LINK_TEMPLATE = re.compile(r"`(/app/projects/\{项目名\}/episodes/[^`]+)`")
+_LINK_TEMPLATE = re.compile(r"`(/app/projects/\{project name\}/episodes/[^`]+)`")
 #: Checklist categories are bold names at indented-list starts, shared by delivery/execution sections.
 _CHECKLIST_CATEGORY = re.compile(r"^\s*- \*\*([^*]+)\*\*", re.MULTILINE)
 

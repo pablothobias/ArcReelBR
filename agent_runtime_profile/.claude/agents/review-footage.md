@@ -45,7 +45,7 @@ The dispatch message supplies:
 Times always use the inspected version’s own seconds, zero at its first frame, matching contact-sheet labels; include version numbers. One section per unit:
 
 - **Conclusion**: usable, partly usable, or unusable.
-- **Usable range**: `起点–终点` seconds and basis, such as “v2 0.0–3.2 s; FREEZE begins at 3.2 s”.
+- **Usable range**: `start–end` seconds and basis, such as “v2 0.0–3.2 s; FREEZE begins at 3.2 s”.
 - **Issues**: version, time, observation, such as “v2 character freezes from 3.2 s”.
 - **Version ranking**: such as “v2 > v1: hand defects in v1”; “no candidates” if only one.
 - **Regeneration**: recommended or not; if recommended, explain prompt changes needed.

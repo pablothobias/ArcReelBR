@@ -148,10 +148,10 @@ def ensure_disk_headroom(project_dir: Path) -> None:
         return
     megabyte = 1024 * 1024
     raise MigrationDiskSpaceError(
-        f"磁盘空间不足，无法迁移项目 {project_dir.name}："
-        f"迁移需在 {project_dir.parent} 复制整个项目目录，"
-        f"至少需要 {required // megabyte} MiB，当前可用 {free // megabyte} MiB。"
-        "请清理磁盘后重试，项目目录未被改动。"
+        f"Not enough disk space to migrate project {project_dir.name}: "
+        f"the migration copies the whole project directory in {project_dir.parent}, "
+        f"needing at least {required // megabyte} MiB, with {free // megabyte} MiB available. "
+        "Free up disk space and retry; the project directory was not changed."
     )
 
 

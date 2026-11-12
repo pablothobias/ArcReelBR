@@ -78,7 +78,9 @@ class TestResolveAssetKey:
         ],
     )
     def test_illegal_names_rejected(self, bad):
-        with pytest.raises(ValueError, match=r"含非法字符|不能为空或仅含空白字符|必须是字符串"):
+        with pytest.raises(
+            ValueError, match=r"contains illegal characters|cannot be empty or whitespace only|must be a string"
+        ):
             validate_asset_name(bad)
 
     @pytest.mark.parametrize(
@@ -108,19 +110,21 @@ class TestResolveAssetKey:
     def test_windows_unsafe_names_rejected(self, bad):
         """Names enter filenames; Windows reserved/control characters, trailing dots, and reserved device names
         can pass validation yet fail disk writing. Projects must migrate across platforms, so reject these consistently everywhere."""
-        with pytest.raises(ValueError, match=r"含非法字符|是 Windows 保留设备名|不能以点结尾"):
+        with pytest.raises(
+            ValueError, match=r"contains illegal characters|is a Windows reserved device name|cannot end with a dot"
+        ):
             validate_asset_name(bad)
 
     def test_mention_delimiter_rejected(self):
-        """Body references use ``@[名称]`` ending at the first ``]``; names containing ``]`` would truncate written references."""
-        with pytest.raises(ValueError, match="含非法字符"):
+        """Body references use ``@[name]`` ending at the first ``]``; names containing ``]`` would truncate written references."""
+        with pytest.raises(ValueError, match="contains illegal characters"):
             validate_asset_name("甲]乙")
         assert validate_asset_name("甲[乙") == "甲[乙"
 
     def test_non_string_reports_type_error(self):
-        with pytest.raises(ValueError, match="必须是字符串"):
+        with pytest.raises(ValueError, match="must be a string"):
             validate_asset_name(None)
-        with pytest.raises(ValueError, match="必须是字符串"):
+        with pytest.raises(ValueError, match="must be a string"):
             validate_asset_name(123)
 
     def test_reserved_device_names_not_overmatched(self):
@@ -140,27 +144,27 @@ def demo_pm(tmp_path):
 
 class TestProjectManagerCreationEntryPoints:
     def test_add_character_rejects_slash(self, demo_pm):
-        with pytest.raises(ValueError, match=r"含非法字符"):
+        with pytest.raises(ValueError, match=r"contains illegal characters"):
             demo_pm.add_character("demo", "李白/诗人", "desc")
         assert "李白/诗人" not in demo_pm.load_project("demo")["characters"]
 
     def test_add_project_character_rejects_slash(self, demo_pm):
-        with pytest.raises(ValueError, match=r"含非法字符"):
+        with pytest.raises(ValueError, match=r"contains illegal characters"):
             demo_pm.add_project_character("demo", "李白/诗人", "desc")
 
     def test_add_batch_rejects_slash(self, demo_pm):
-        with pytest.raises(ValueError, match=r"含非法字符"):
+        with pytest.raises(ValueError, match=r"contains illegal characters"):
             demo_pm.add_scenes_batch("demo", {"庙/宇": {"description": "d"}})
         assert "庙/宇" not in demo_pm.load_project("demo").get("scenes", {})
 
     def test_add_batch_rejects_normalized_collision(self, demo_pm):
         """Keys equal after strip must not silently overwrite; fail the whole batch loudly without writing, matching upsert_assets."""
-        with pytest.raises(ValueError, match="冲突"):
+        with pytest.raises(ValueError, match="conflict"):
             demo_pm.add_scenes_batch("demo", {"庙宇": {"description": "a"}, "  庙宇  ": {"description": "b"}})
         assert "庙宇" not in demo_pm.load_project("demo").get("scenes", {})
 
     def test_upsert_assets_rejects_slash(self, demo_pm):
-        with pytest.raises(ValueError, match=r"props: 资产名称 .+ 含非法字符"):
+        with pytest.raises(ValueError, match=r"props: Asset name .+ contains illegal characters"):
             demo_pm.upsert_assets("demo", "props", {"玉/佩": {"description": "d"}})
         assert "玉/佩" not in demo_pm.load_project("demo").get("props", {})
 
@@ -200,7 +204,7 @@ class TestNfcConvergence:
         assert list(chars) == [_NAME_NFD]
 
     def test_add_batch_rejects_nfc_nfd_collision(self, demo_pm):
-        with pytest.raises(ValueError, match="冲突"):
+        with pytest.raises(ValueError, match="conflict"):
             demo_pm.add_scenes_batch("demo", {_NAME_NFC: {"description": "a"}, _NAME_NFD: {"description": "b"}})
         assert demo_pm.load_project("demo").get("scenes", {}) == {}
 

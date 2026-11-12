@@ -76,7 +76,7 @@ class BgmLibraryService:
 
     def _project_dir(self, project_name: str) -> Path:
         if not self._projects.project_exists(project_name):
-            raise BgmError("project_not_found", f"项目「{project_name}」不存在", project=project_name)
+            raise BgmError("project_not_found", f'Project "{project_name}" does not exist', project=project_name)
         return self._projects.get_project_path(project_name)
 
     async def list(self, project_name: str) -> tuple[BgmTrack, ...]:
@@ -104,16 +104,19 @@ class BgmLibraryService:
         if extension not in BGM_EXTENSIONS:
             raise BgmError(
                 "bgm_unsupported_type",
-                f"BGM 只支持 {', '.join(BGM_EXTENSIONS)}，收到 {extension or '无扩展名'}",
+                f"BGM supports only {', '.join(BGM_EXTENSIONS)}; received {extension or 'no extension'}",
                 ext=extension,
                 allowed=", ".join(BGM_EXTENSIONS),
             )
         if len(content) > BGM_MAX_BYTES:
-            raise BgmError("bgm_too_large", "BGM 文件过大", max_mb=BGM_MAX_BYTES // (1024 * 1024))
+            raise BgmError("bgm_too_large", "BGM file is too large", max_mb=BGM_MAX_BYTES // (1024 * 1024))
         try:
             ffmpeg = await asyncio.to_thread(ffmpeg_executable)
         except FfmpegUnavailableError as exc:
-            raise BgmError("bgm_ffmpeg_unavailable", f"随包 ffmpeg 不可用，无法测量 BGM 响度：{exc}") from exc
+            raise BgmError(
+                "bgm_ffmpeg_unavailable",
+                f"The bundled ffmpeg is unavailable, so BGM loudness cannot be measured: {exc}",
+            ) from exc
         bgm_dir = project_dir / BGM_DIR
         bgm_id = f"bgm-{secrets.token_hex(4)}"
         staged = bgm_dir / f".{bgm_id}.{secrets.token_hex(4)}.upload{extension}"
@@ -141,11 +144,11 @@ class BgmLibraryService:
         try:
             probe = await probe_media(path, spawn=self._spawn)
         except MediaProbeError as exc:
-            raise BgmError("bgm_invalid_audio", f"BGM 文件无法解析：{exc}") from exc
+            raise BgmError("bgm_invalid_audio", f"BGM file cannot be parsed: {exc}") from exc
         audio = probe.first_stream("audio")
         duration = audio.duration_seconds if audio is not None else None
         if duration is None or duration <= 0:
-            raise BgmError("bgm_invalid_audio", "BGM 文件里没有可用的音频")
+            raise BgmError("bgm_invalid_audio", "BGM file contains no usable audio")
         return round(duration * 1_000_000)
 
     async def _loudness(self, ffmpeg: str, path: Path, duration_us: int) -> float:
@@ -154,9 +157,9 @@ class BgmLibraryService:
                 ffmpeg, path, duration_seconds=duration_us / 1_000_000, spawn=self._spawn
             )
         except LoudnessMeasurementError as exc:
-            raise BgmError("bgm_invalid_audio", f"BGM 的响度测不出来：{exc}") from exc
+            raise BgmError("bgm_invalid_audio", f"BGM loudness cannot be measured: {exc}") from exc
         if integrated <= SILENCE_LOUDNESS_LUFS:
-            raise BgmError("bgm_silent", "BGM 几乎没有声音，测不出可用的响度")
+            raise BgmError("bgm_silent", "BGM is nearly silent; no usable loudness can be measured")
         return integrated
 
     def _commit(
@@ -174,7 +177,7 @@ class BgmLibraryService:
             if not isinstance(bucket, dict):
                 bucket = project[PROJECT_BGM_FIELD] = {}
             if track.id in bucket:
-                raise RuntimeError(f"BGM ID 已被占用：{track.id}")
+                raise RuntimeError(f"BGM ID is already taken: {track.id}")
             bucket[track.id] = bgm_entry(track)
 
         def install(_project_file: Path) -> None:

@@ -40,10 +40,14 @@ protected: false
 {{ variant("text/reference_video_script_plan/task", source_kind) }}
 Each video_unit corresponds to **one video-generation call**; its body is a continuous visual description fully covered by that generation.
 This stage determines the **structure and content contract**: unit boundaries, duration (the billing unit), dialogue placement, and core asset identification. The user reviews and confirms this contract unit by unit.
-The subsequent prompt_authoring stage generates visual staging (shot size / composition / expanded camera movement) based on your divisions; do not write it at this stage.
+The subsequent prompt_authoring stage generates visual staging (shot size / composition / expanded camera movement) based on your divisions; do not invent it at this stage.
+The only staging you write here is **source-backed direction**: framing, camera movement, blocking, or background activity that the source or the additional instructions explicitly supply (see the body-writing guide). prompt_authoring keeps it and expands only what it leaves unspecified.
 
 **Output language**: all string values must use {{ target_language | output_language }}; keep JSON keys in English.
-Exceptions (preserve verbatim, do not translate): asset names in `@[名称]` must exactly match registered names in the candidate list below or designations in `new_assets`; copy `source_text` verbatim from the source.
+Exceptions (preserve verbatim, do not translate): asset names in `@[name]` must exactly match registered names in the candidate list below or designations in `new_assets`; copy `source_text` verbatim from the source.
+{% if instructions %}
+{{ partial("shared/direction_language_exception", names_rule="Asset names in `@[name]` and `source_text` keep the exceptions above.", stage_note="It does not change the speaking-rate estimate or the duration rules below.") }}
+{% endif %}
 **Structural constraints**: response_schema enforces fields / enums / required items; this prompt only explains **how to write each field’s content well**.
 
 # Context
@@ -87,7 +91,7 @@ You are currently generating episode {{ episode }}. Cover all source plot conten
   1. Hard constraint: `duration_seconds` is the unit’s duration (one duration per generation call), and must be one of the supported tiers ({{ durations }}).
      If the required narrative duration does not fit, split the unit into multiple units in narrative order; **never violate the duration contract**.
 {% if duration_tiers %}
-     This model also has two sets of tiers depending on whether reference images are present. Choose according to whether the unit’s **visual description contains `@` asset references** (speaker positions in dialogue tokens `@[角色]{台词}` do not count: they generate no reference image and only drive voice declarations): use ({{ duration_tiers.with_references }}) with `@` references and ({{ duration_tiers.without_references }}) without them. The server determines the tier using the reference images **currently available** for that unit: when referenced assets have no generated reference images yet, the unit uses the tiers without references. Choose one approach: either select a value from the tier set matching the unit’s reference state, or adjust the references by incorporating secondary assets into descriptive text without `@`, thereby using the no-reference tiers.
+     This model also has two sets of tiers depending on whether reference images are present. Choose according to whether the unit’s **visual description contains `@` asset references** (speaker positions in dialogue tokens `@[character]{dialogue}` do not count: they generate no reference image and only drive voice declarations): use ({{ duration_tiers.with_references }}) with `@` references and ({{ duration_tiers.without_references }}) without them. The server determines the tier using the reference images **currently available** for that unit: when referenced assets have no generated reference images yet, the unit uses the tiers without references. Choose one approach: either select a value from the tier set matching the unit’s reference state, or adjust the references by incorporating secondary assets into descriptive text without `@`, thereby using the no-reference tiers.
 {% endif %}
   2. Dialogue lower bound: first estimate the seconds needed to speak all dialogue and off-screen speech in the unit (approximately {{ speech_rate }} {{ speech_unit }}/second),
      then select a tier **not below** that duration. This is a one-way lower bound: never squeeze dialogue into a tier too short to finish speaking. Units without dialogue have no such lower bound.
@@ -95,7 +99,7 @@ You are currently generating episode {{ episode }}. Cover all source plot conten
   3. Default preference: {% if default_duration %}default to {{ default_duration }} seconds per unit{% if duration_tiers and duration_tiers.default_with_references_only %} (this default exists only in the tiers for units with `@` references; units in the other state follow the hard constraint above){% endif %}{% if duration_tiers and duration_tiers.default_without_references_only %} (this default exists only in the tiers for units without `@` references; units in the other state follow the hard constraint above){% endif %}; longer narrative needs may use longer tiers (content needs may override preferences, but not hard constraints){% else %}choose a tier according to narrative needs, without enforcing a default{% endif %}.
   4. Packing efficiency: organize body content within rules 1-3; {% if episode_target_duration %}pack toward this episode’s target duration: {{ partial("shared/episode_target_duration_rule") }}. Individual units may be shorter or longer within that target, need not approach the per-call limit of {{ max_duration }} seconds, and{% else %}bring unit durations close to {{ max_duration }} seconds;{% endif %} do not default to the shortest / conservative value.
 {% if max_reference_images %}
-- **Reference limit**: a unit’s **visual description** may `@` reference at most {{ max_reference_images }} distinct asset names (speaker positions in dialogue tokens `@[角色]{台词}` do not count: they generate no reference image). If exceeded, incorporate secondary characters into background descriptions without `@` references; do not compress the main assets.
+- **Reference limit**: a unit’s **visual description** may `@` reference at most {{ max_reference_images }} distinct asset names (speaker positions in dialogue tokens `@[character]{dialogue}` do not count: they generate no reference image). If exceeded, incorporate secondary characters into background descriptions without `@` references; do not compress the main assets.
 {% endif %}
 
 # Body-writing syntax
@@ -113,7 +117,11 @@ You are currently generating episode {{ episode }}. Cover all source plot conten
 {{ variant("text/reference_video_script_plan/dialogue_rule", source_kind) }}
 - Each unit’s body must `@` reference the scene asset for its location. When a new unit changes location, change to the scene for the new location;
   consecutive units at the same location repeat that scene reference in every unit (only describe a location in text when no candidate scene matches it).
-- Do not write shot size / composition / camera movement at this stage (prompt_authoring supplies them); clearly describe the narrative content and action process.
+- Do not invent shot size / composition / camera movement at this stage (prompt_authoring supplies them); clearly describe the narrative content and action process.
+- **Source-backed direction**: when the source or the additional instructions explicitly supply framing, camera movement, blocking (positions, distances, entrances and exits), or independent background activity for a unit,
+  write it into the unit body as plain visual description, keeping its meaning without embellishment; prompt_authoring treats staging already present in a body as confirmed and keeps it.
+  Do not add direction the source does not state. A cut in the source starts a new unit when both resulting units still satisfy the duration and packing rules above, each carrying its own framing; when a split would leave a unit too short for those rules (shot-dense passages, inserts, brief close-ups), keep the shots in one unit and write the later framing as a continuous camera move within the body, never as a cut. Describe independent background activity (passers-by, crowds, traffic) only where the source shows it or the additional instructions approve it; when supplied, carry it.
+  If supplied directions conflict with each other (for example, a held vanishing point together with camera travel), keep the source wording and do not add a move that contradicts it.
 
 {{ partial("shared/new_assets_rule") }}
 {% if instructions %}

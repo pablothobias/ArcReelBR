@@ -58,7 +58,7 @@ RESOURCE_TYPES: tuple[str, ...] = tuple(_PATTERNS)
 def _pattern(resource_type: str) -> ResourcePattern:
     pattern = _PATTERNS.get(resource_type)
     if pattern is None:
-        raise ValueError(f"不支持的资源类型: {resource_type}")
+        raise ValueError(f"Unsupported resource type: {resource_type}")
     return pattern
 
 

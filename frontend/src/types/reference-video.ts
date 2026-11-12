@@ -2,7 +2,7 @@
  * Reference-to-video unit types — mirrors lib/script/script_models.py Pydantic models.
  *
  * One "unit" produces one rendered video clip. Its body (`text`) is the single
- * source of truth: reference images are resolved from the `@[名称]` mentions at
+ * source of truth: reference images are resolved from the `@[name]` mentions at
  * execution time and never persisted or transported.
  */
 
@@ -59,7 +59,7 @@ export interface UnitGeneratedAssets {
 export interface ReferenceVideoUnit {
   /** Format: "E{episode}U{index}" */
   unit_id: string;
-  /** Unit body — free-form text carrying `@[名称]` mentions; the only persisted content truth. */
+  /** Unit body — free-form text carrying `@[name]` mentions; the only persisted content truth. */
   text: string;
   /** Planning duration in seconds — provider request duration is resolved during precheck. */
   duration_seconds: number;
@@ -222,7 +222,7 @@ export interface ScriptPreview {
  */
 export interface ReferenceScriptPlanUnit {
   unit_id: string;
-  /** Unit body, using `@[名称]` to reference registered assets. */
+  /** Unit body, using `@[name]` to reference registered assets. */
   text: string;
   /** Unit duration in seconds — one generation call, one duration. */
   duration_seconds: number;

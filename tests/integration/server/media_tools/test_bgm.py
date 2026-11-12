@@ -43,4 +43,4 @@ async def test_empty_library_says_where_bgm_comes_from(tmp_path: Path) -> None:
 
     assert listed.value == ()
     assert LIST_BGM.summary is not None
-    assert "BGM 轨" in LIST_BGM.summary(())
+    assert "BGM track" in LIST_BGM.summary(())

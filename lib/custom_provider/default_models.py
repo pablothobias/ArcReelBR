@@ -142,8 +142,8 @@ async def resolve_default_model(
     candidates = await filter_by_bucket(session, callable_models(candidates, media_type), generation_type)
     label = f"{generation_type} {media_type}" if generation_type is not None else media_type
     if not candidates:
-        raise ValueError(f"自定义供应商 {provider_id} 没有默认 {label} 模型")
+        raise ValueError(f"Custom provider {provider_id} has no default {label} model")
     if len(candidates) > 1:
         conflict = ", ".join(model.model_id for model in candidates)
-        raise ValueError(f"自定义供应商 {provider_id} 有多个默认 {label} 模型：{conflict}")
+        raise ValueError(f"Custom provider {provider_id} has multiple default {label} models: {conflict}")
     return candidates[0]

@@ -12,11 +12,11 @@ import type { AssetKind } from "@/types/reference-video";
  *
  * CJK (`\u4e00-\u9fff`) is outside word-character sets on both sides, permitting Chinese prefixes.
  *
- * Supports legacy `@名称` plus wrapped `@[名称]` for asset names
+ * Supports legacy `@name` plus wrapped `@[name]` for asset names
  * containing punctuation, spaces, or parentheses.
  *
  * Curly-brace wrapping (`@{名称}`) is intentionally unsupported: the editor
- * only emits `@[名称]`, and braces are the speech syntax (see {@link splitSpeechLine}).
+ * only emits `@[name]`, and braces are the speech syntax (see {@link splitSpeechLine}).
  */
 export const MENTION_RE = /(?<!\w)@(?:\[([^\]\r\n]+)\]|([\w\u4e00-\u9fff]+))/g;
 
@@ -36,7 +36,7 @@ const BOM_RE = /\uFEFF/gu;
  * comparison coordinates (see {@link normalizeAssetName}); NFD bodies against NFC registries can look identical
  * while comparing unequal.
  *
- * Normalize parser inputs, never just extracted results: BOM inside names (`@[名<U+FEFF>称]`) cannot be fixed per-name afterward,
+ * Normalize parser inputs, never just extracted results: BOM inside names (`@[na<U+FEFF>me]`) cannot be fixed per-name afterward,
  * since matching already used BOM-containing bytes.
  */
 function normalizeSource(text: string): string {
@@ -74,7 +74,7 @@ export function splitDerivativeReference(name: string): [string, string] {
 /**
  * Inline speech tokens; empty `speaker` means voiceover. `raw` preserves entire original spans.
  *
- * `@[角色/衍生]` speakers retain base names in `speaker` and derivative names in `derivative`: voices belong to
+ * `@[character/derivative]` speakers retain base names in `speaker` and derivative names in `derivative`: voices belong to
  * identities, with derivatives sharing base reference audio/timbre (backend `text_parser.SpeechMark`).
  */
 export interface SpeechMark {
@@ -106,8 +106,8 @@ export function isSpeechMark(part: SpeechPart): part is SpeechMark {
  * `lib/script/reference_video/text_parser.py::split_speech_line` across derivation paths;
  * changing either requires updating the other.
  *
- * Tokens appear anywhere inline: `{台词}` is voiceover; following `@[角色]` (with whitespace or one
- * Chinese/English colon), `{台词}` is that character speaking. Empty dialogue, whitespace-only speakers and malformed speakers
+ * Tokens appear anywhere inline: `{dialogue}` is voiceover; following `@[character]` (with whitespace or one
+ * Chinese/English colon), `{dialogue}` is that character speaking. Empty dialogue, whitespace-only speakers and malformed speakers
  * (`@[]{…}`, `@[张三]：：{…}`) never form tokens; braces remain descriptions for caller warnings.
  *
  * Deliberate backend difference: **never normalize source text**, only extracted speakers. Highlight tokenizers must reconstruct sources
@@ -224,7 +224,7 @@ export function splitScriptLines(text: string): string[] {
  * derivation. Mirrors `text_parser.py:extract_mentions`, including its rule that
  * **the speaker slot of a speech mark is excluded**: attaching a reference image to
  * a speaker would coax the model into drawing a character who only speaks off-screen.
- * Non-token `@[名称]` still enters image references, coexisting on the same lines.
+ * Non-token `@[name]` still enters image references, coexisting on the same lines.
  *
  * Names/deduplication are canonical; callers compare directly against normalized asset-table keys without further normalization.
  */

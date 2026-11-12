@@ -528,7 +528,7 @@ def test_check_exits_nonzero_on_violation_and_zero_when_clean(tmp_path: Path, ca
     dirty.rename(tests / "test_thing_lifecycle.py")
 
     assert main(["--root", str(tmp_path), "--check"]) == 0
-    assert "闸门通过：0 处违规" in capsys.readouterr().out
+    assert "Gate passed: 0 violations" in capsys.readouterr().out
 
 
 def test_parameter_defaults_and_module_level_self_stay_in_the_context(tmp_path: Path) -> None:
@@ -648,7 +648,7 @@ def test_nested_class_cases_are_named_by_their_full_path(tmp_path: Path) -> None
     violations = [v for v in gate_violations(_audit(tmp_path)) if v.rule == "DUP-BODY"]
     assert len(violations) == 1
     assert violations[0].guidance.startswith(
-        "`TestOuter::TestInner::test_twin` 的函数体去掉 docstring 后与同文件 `TestOuter::TestInner::test_it` 等同"
+        "`TestOuter::TestInner::test_twin` has the same function body as `TestOuter::TestInner::test_it` in the same file once docstrings are removed"
     )
 
 
@@ -1014,8 +1014,8 @@ def test_shared_symbol_used_by_fewer_than_two_files_is_reported(tmp_path: Path) 
     violations = [v for v in gate_violations(_audit(tmp_path)) if v.rule == "SHARED-SYMBOL-USAGE"]
 
     assert [(v.path, v.line) for v in violations] == [("tests/fakes.py", 5), ("tests/fakes.py", 9)]
-    assert "`used_once` 只被 1 个测试文件使用" in violations[0].guidance
-    assert "`Unused` 只被 0 个测试文件使用" in violations[1].guidance
+    assert "`used_once` is used by only 1 test files" in violations[0].guidance
+    assert "`Unused` is used by only 0 test files" in violations[1].guidance
 
 
 def test_shared_symbol_usage_covers_auth_deps_and_support_modules_but_not_test_files(tmp_path: Path) -> None:

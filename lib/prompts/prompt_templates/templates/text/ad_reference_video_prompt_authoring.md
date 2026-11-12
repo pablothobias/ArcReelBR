@@ -80,7 +80,7 @@ Asset candidates:
 
 {{ partial("shared/writing_syntax") }}
 
-Products, characters, scenes, and props all use the same `@[名称]` syntax. Names must be copied exactly from the candidate list; do not invent assets. This film is always episode {{ episode }}.
+Products, characters, scenes, and props all use the same `@[name]` syntax. Names must be copied exactly from the candidate list; do not invent assets. This film is always episode {{ episode }}.
 {% if instructions %}
 
 {{ partial("shared/additional_instructions") }}

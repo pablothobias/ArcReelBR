@@ -297,7 +297,7 @@ class OpenAIImageBackend:
         if not data:
             # Empty data often means moderation filters/gateway anomalies; give clear diagnostic errors.
             raise RuntimeError(
-                f"OpenAI 图片生成响应 data 为空 (model={self._model})，可能触发内容安全过滤或上游服务异常"
+                f"OpenAI image generation response data is empty (model={self._model}); a content safety filter or an upstream service error may be the cause"
             )
         await save_image_from_response_item(data[0], request.output_path)
         logger.info("OpenAI 图片生成完成: %s", request.output_path)

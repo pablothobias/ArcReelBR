@@ -20,7 +20,7 @@ You orchestrate video unit splitting, dividing episode source (a novel, or an au
 
 1. **All writes use tools**: initial generation uses `mcp__arcreel__generate_script_plan` (the project's text model); changes use “retrieve draft → patch draft → promote”. Never directly Write/Edit formal `script_plan_reference_units.json`: Web saving and migration share a file lock unavailable to your file tools; direct edits lose concurrent updates (runtime enforces the write ban and rejects them)
 2. **Machine-derived structure**: the model writes only “duration + source anchor + reference-syntax body”; the tool numbers `unit_id` in array order. It mechanically validates body syntax, asset references, source anchors, and dialogue quantity; violating content is not written to the formal file
-3. **Reference-driven visuals**: use only `@[名称]` for registered asset names or names in `new_assets`; do not describe appearance / clothes / scene details (reference images provide visual consistency)
+3. **Reference-driven visuals**: use only `@[name]` for registered asset names or names in `new_assets`; do not describe appearance / clothes / scene details (reference images provide visual consistency)
 4. **Return on completion**: finish all work independently and return, without waiting for user confirmation mid-task
 
 ## New episode assets (`new_assets`)
@@ -34,13 +34,13 @@ Script planning also recognizes assets. Before referencing assets, identify them
 
 Keep existing descriptions unchanged. Generation and promotion validate references as registered or in `new_assets`, and dispositions must resolve (merge targets and derivative bases exist). The user reviews dispositions at content confirmation, when they register alongside the formal script.
 
-For `skip` assets, confirmation converts visual-position `@[称呼]` to plain text, leaving speaker-position `@[称呼]{台词}` unchanged.
+For `skip` assets, confirmation converts visual-position `@[name]` to plain text, leaving speaker-position `@[name]{dialogue}` unchanged.
 
 ## Reference syntax (overview)
 
-The body is free text (possibly multiline), with one unit per generation call. Three markers may appear anywhere: `@[名称]` references assets, `@[角色名]{台词}` means that character speaks, and `{台词}` means voiceover. Braces are reserved for dialogue and voiceover.
+The body is free text (possibly multiline), with one unit per generation call. Three markers may appear anywhere: `@[name]` references assets, `@[character]{dialogue}` means that character speaks, and `{dialogue}` means voiceover. Braces are reserved for dialogue and voiceover.
 
-Character references also allow `@[本体/衍生]`: a **derivative** is another appearance of the same character, registered under its `project.json` `derivatives` table. Choose according to story state (see “Editing rules” below).
+Character references also allow `@[base/derivative]`: a **derivative** is another appearance of the same character, registered under its `project.json` `derivatives` table. Choose according to story state (see “Editing rules” below).
 
 When manually editing bodies, follow scene-reference rules below; initial splitting injects the same rules with the full syntax specification into the server tool's prompt.
 
@@ -74,7 +74,7 @@ Parse returned JSON and record:
 - `reference_unit_durations.units`: per-unit decisions for existing formal units (newly split units are not yet included). The server selects buckets by
   **available reference images**: `hydrated_capability` is the execution bucket, `allowed_durations` its effective tiers, and `problems` /
   `unavailable_references` identifies registered references lacking images. An asset without an image executes under no-reference tiers; do not plan it as image-backed
-- `max_reference_images`: per-unit reference limit (maximum deduplicated `@[名称]` body mentions); null means the catalog records no limit, so impose no hard count constraint
+- `max_reference_images`: per-unit reference limit (maximum deduplicated `@[name]` body mentions); null means the catalog records no limit, so impose no hard count constraint
 - `default_duration`: user-configured default seconds (may be null)
 - `episode_target_duration`: user-configured final episode target seconds (may be null), a **soft target** for summed episode unit durations, determining unit count
 
@@ -95,7 +95,7 @@ the main Agent's operation type is only intent context. If `invalid.json` exists
 **Step 1**: generate a structured split through the tool (the session binds project name; omit it):
 
 ```text
-mcp__arcreel__generate_script_plan({"episode_id": N, "source": "source/episode_N.txt", "instructions": "<附加指令原文，可选，无则省略>"})
+mcp__arcreel__generate_script_plan({"episode_id": N, "source": "source/episode_N.txt", "instructions": "<verbatim additional instructions; optional, omit if none>"})
 ```
 
 You may explicitly pass the episode's source path in `source`; omission defaults to derived episode source `source/episode_N.txt`.
@@ -122,8 +122,8 @@ If structure is invalid, follow **case B** below (retrieve draft → patch → p
 Normal drafts use a **flat draft structure** (`content.units[]` contains only `duration_seconds` / `source_text` / `text`); the tool derives `unit_id`, so never write it manually in drafts. If reports identify corrupted `content` or non-array `content.units`, repair the whole `content` using reported field paths; target `content.units[i]` only for unit-level violations.
 
 1. Call `mcp__arcreel__open_draft({"episode_id": N, "doc_type": "reference_script_plan"})` for complete `content`, `violations`, and `revision`. Preserve existing edits; first apply current user feedback, then locate nonempty `violations[]` on top of those changes
-2. Repair returned `content`, then call `mcp__arcreel__patch_draft({"episode_id": N, "doc_type": "reference_script_plan", "content": <完整修改后正文>, "base_revision": "<open_draft 返回的 revision>"})` and record its new `revision`; never Edit/Write formal files or `project.json` directly
-3. Call `mcp__arcreel__promote_draft({"episode_id": N, "doc_type": "reference_script_plan", "base_revision": "<patch_draft 返回的新 revision>"})` to fully validate and promote
+2. Repair returned `content`, then call `mcp__arcreel__patch_draft({"episode_id": N, "doc_type": "reference_script_plan", "content": <full revised content>, "base_revision": "<revision returned by open_draft>"})` and record its new `revision`; never Edit/Write formal files or `project.json` directly
+3. Call `mcp__arcreel__promote_draft({"episode_id": N, "doc_type": "reference_script_plan", "base_revision": "<new revision returned by patch_draft>"})` to fully validate and promote
 4. If violations remain, return to step 1 and continue; promotion may repeat with no round limit. Never fall back to rerunning the splitter
 
 Successful promotion writes formal `script_plan_reference_units.json` and clears the draft automatically. Content confirmation remains blocked while a draft exists; finish resolving it before continuing.
@@ -135,20 +135,20 @@ Successful promotion writes formal `script_plan_reference_units.json` and clears
 Do not modify formal files directly; persist changes through the editable draft's lock-protected channel:
 
 1. Call `mcp__arcreel__open_draft({"episode_id": N, "doc_type": "reference_script_plan", "source": "source/episode_N.txt"})` for complete `content` and `revision` (formal file unchanged)
-2. Modify returned `content.units[i]`, then call `mcp__arcreel__patch_draft({"episode_id": N, "doc_type": "reference_script_plan", "content": <完整修改后正文>, "base_revision": "<open_draft 返回的 revision>"})` and record its new `revision`. `unit_id` is derived; never write it manually
-3. Call `mcp__arcreel__promote_draft({"episode_id": N, "doc_type": "reference_script_plan", "base_revision": "<patch_draft 返回的新 revision>"})` to fully validate and promote to formal
+2. Modify returned `content.units[i]`, then call `mcp__arcreel__patch_draft({"episode_id": N, "doc_type": "reference_script_plan", "content": <full revised content>, "base_revision": "<revision returned by open_draft>"})` and record its new `revision`. `unit_id` is derived; never write it manually
+3. Call `mcp__arcreel__promote_draft({"episode_id": N, "doc_type": "reference_script_plan", "base_revision": "<new revision returned by patch_draft>"})` to fully validate and promote to formal
 4. Continue repairing and promoting reported violations with no round limit (as in case C). If abandoning changes midway, promote unchanged: unchanged content writes the original back and clears the draft
 
 > Content confirmation remains blocked while a draft exists; finish with promotion rather than leaving a draft behind.
 
 **Editing rules**:
 
-- Unit `duration_seconds` must come from the Step 0 `reference_unit_durations` set **matching that unit's reference state**: visual-description `@` references use `with_references`, otherwise `without_references` (the speaker position of dialogue marker `@[角色]{台词}` does not count: it generates no reference image, only voice declarations, matching reference derivation below). One duration per unit. If content does not fit the chosen tier, resplit into multiple units in narrative order; never violate durations. Resplit dialogue that cannot be spoken in the tier rather than squeezing it into a short tier. If the sets differ and desired duration is unavailable for the current reference state, either choose an allowed value in that set or adjust references to use the other set. Never assume either set contains the other; whether removing references widens or narrows options depends on the actual model, not a presumed broader no-reference set
-- Unit `text` is free text using reference syntax: put speech markers immediately after their action sentence, at its line end or on the next line. Use `@[名称]` names verbatim from the three `project.json` tables, character `derivatives` entries as `本体/衍生` (Read `project.json` if uncertain), or `content.new_assets` names (update corresponding entries if names change). For derivatives, choose per-unit story state: `@[本体/衍生]` while in that appearance, `@[本体]` after returning to base appearance; the same applies to speaker positions (voice still binds to the base). Every unit individually `@` references its location's scene; use textual descriptions only when no candidate scene matches, repeating the same wording across units. Do not write appearance / clothes / scene details
+- Unit `duration_seconds` must come from the Step 0 `reference_unit_durations` set **matching that unit's reference state**: visual-description `@` references use `with_references`, otherwise `without_references` (the speaker position of dialogue marker `@[character]{dialogue}` does not count: it generates no reference image, only voice declarations, matching reference derivation below). One duration per unit. If content does not fit the chosen tier, resplit into multiple units in narrative order; never violate durations. Resplit dialogue that cannot be spoken in the tier rather than squeezing it into a short tier. If the sets differ and desired duration is unavailable for the current reference state, either choose an allowed value in that set or adjust references to use the other set. Never assume either set contains the other; whether removing references widens or narrows options depends on the actual model, not a presumed broader no-reference set
+- Unit `text` is free text using reference syntax: put speech markers immediately after their action sentence, at its line end or on the next line. Use `@[name]` names verbatim from the three `project.json` tables, character `derivatives` entries as `base/derivative` (Read `project.json` if uncertain), or `content.new_assets` names (update corresponding entries if names change). For derivatives, choose per-unit story state: `@[base/derivative]` while in that appearance, `@[base]` after returning to base appearance; the same applies to speaker positions (voice still binds to the base). Every unit individually `@` references its location's scene; use textual descriptions only when no candidate scene matches, repeating the same wording across units. Do not write appearance / clothes / scene details
 - `source_text` must be a verbatim passage of episode source (trim ends, never alter or omit the middle); update anchors when unit boundaries change
 - In drama projects where episode source `source_kind` is `screenplay` (completed screenplay), copy dialogue/voiceover marker text verbatim from the author, changing it only when user feedback explicitly targets those words; adjust action and visuals as requested. Read type from `project.json`: for own-source episodes, the episode entry's `source_kind` in `episodes[]`; for derived episodes, `source_kind` of its `source_range.source_file` entry in `whole_source_files[]`; absent means `novel`. Initial generation switches rules through the tool based on this type
-- References are not persisted: resolve body `@[名称]` in first-mention order at execution (that order determines reference numbering); exceeding `max_reference_images` after deduplication violates the contract. Change references by editing body mentions; dialogue speaker positions do not count
-- Never write `unit_id` manually: promotion renumbers in array order as `E{集 ID}U{两位序号}`. Reorder/add/remove units by changing array entries; numbering follows automatically
+- References are not persisted: resolve body `@[name]` in first-mention order at execution (that order determines reference numbering); exceeding `max_reference_images` after deduplication violates the contract. Change references by editing body mentions; dialogue speaker positions do not count
+- Never write `unit_id` manually: promotion renumbers in array order as `E{episode ID}U{index}`. Reorder/add/remove units by changing array entries; numbering follows automatically
 
 **Read-only after content confirmation**: confirmation converts the entire plan into formal `scripts/episode_{N}.json`, disabling case B; retrieval (`open_draft`), modification, and promotion of editing copies return `script_plan_confirmed`. Never retry; stop and explain to the main Agent in the summary:
 
@@ -163,21 +163,21 @@ Standard `script_plan_reference_units.json` structure (one entry per unit; promp
 {
   "units": [
     {
-      "unit_id": "E<集 ID>U01",
+      "unit_id": "E<episode ID>U1",
       "duration_seconds": <duration>,
-      "source_text": "<本视频单元所依据的源文逐字片段>",
-      "text": "@[李明] 推开 @[酒馆] 的门，环视四周。\n@[李明]：{这地方比我想的还热闹。}\n@[李明] 走向柜台，把 @[长剑] 放在桌上。"
+      "source_text": "<verbatim source excerpt this video unit is based on>",
+      "text": "@[Li Ming] pushes open the door of @[Tavern] and looks around.\n@[Li Ming]: {This place is livelier than I expected.}\n@[Li Ming] walks to the counter and lays @[Longsword] on the table."
     }
   ],
   "new_assets": [
-    {"type": "scene", "name": "酒馆", "decision": "register", "reason": "本集主要场景", "description": "木梁低矮的临街酒馆，柜台后摆满酒坛", "aliases": [], "target": "", "asset_name": ""}
+    {"type": "scene", "name": "Tavern", "decision": "register", "reason": "Main location of this episode", "description": "A low-beamed street-side tavern with wine jars lining the shelves behind the counter", "aliases": [], "target": "", "asset_name": ""}
   ]
 }
 ```
 
 > Value rules: `<duration>` must use the Step 0 `reference_unit_durations` set matching the unit's reference state, near the length its content actually needs;
 > when `episode_target_duration` is non-null, package the episode toward that target (summed unit durations approach `episode_target_duration`; a soft target, so use fewer units for insufficient content and exceed it when content needs require), rather than unconditionally approaching `max_duration`.
-> Tool `mcp__arcreel__generate_script_plan` injects `<集 ID>` from its `episode_id` parameter at call time; placeholders avoid mistakenly hardcoding `E1`.
+> Tool `mcp__arcreel__generate_script_plan` injects `<episode ID>` from its `episode_id` parameter at call time; placeholders avoid mistakenly hardcoding `E1`.
 
 ### Return summary
 
@@ -185,7 +185,7 @@ Standard `script_plan_reference_units.json` structure (one entry per unit; promp
 ## Video unit splitting complete (reference-to-video)
 
 **Status**: DONE
-**Project**: {项目名}  **Episode**: “{标题}” (broadcast position {播出位置}, episode ID N)
+**Project**: {project name}  **Episode**: “{title}” (broadcast position {broadcast position}, episode ID N)
 
 | Metric | Value |
 |--------|------|

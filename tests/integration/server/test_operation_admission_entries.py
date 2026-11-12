@@ -162,7 +162,7 @@ async def test_ad_generation_ignores_an_unregistered_script_file(tmp_path: Path,
     assert status.operations["generate_script"].state == "admitted"
     assert outcome.problem is None
     assert "展示一瓶饮料" in str(outcome.value)
-    assert "本次没有要编写的条目" not in str(outcome.value)
+    assert "No entries to author this time" not in str(outcome.value)
 
 
 async def test_unreadable_project_data_is_returned_as_a_plan_blocker(tmp_path: Path) -> None:

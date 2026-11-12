@@ -2,7 +2,7 @@
 
 The ``storyboard/grid`` template renders the complete prompt; this module produces cell slot values.
 References follow the same rules as storyboard images: the first prompt line is a ``Reference_Images``
-type declaration, and ``@[登记名]`` in each cell body becomes “图N” according to the final reference
+type declaration, and ``@[registered name]`` in each cell body becomes “图N” according to the final reference
 list order (see :mod:`lib.prompts.reference_image_numbering`).
 """
 
@@ -69,7 +69,7 @@ def _extract_image_desc(scene: dict, references: Sequence[ReferenceImageSlot] = 
     """Extract image description from a scene.
 
     If image_prompt is a dict, join scene + composition fields.
-    If string, return as-is. ``@[登记名]`` in the scene text is rendered against *references*.
+    If string, return as-is. ``@[registered name]`` in the scene text is rendered against *references*.
     """
     image_prompt = project_grid_image_prompt(scene.get("image_prompt", ""))
     if isinstance(image_prompt, str):
@@ -144,7 +144,9 @@ def build_grid_prompt(
     if n_scenes > total:
         # Excess scenes have no output cells, causing positional mismatches during split backfill.
         # Callers must first chunk by max_cell_count (lib.script.grid.layout.plan_grid_chunks); fail loudly here.
-        raise ValueError(f"分镜数 {n_scenes} 超过 {rows}×{cols} 宫格的画格数 {total}，分组应先切块再构建 prompt")
+        raise ValueError(
+            f"Storyboard count {n_scenes} exceeds the {total} panels of a {rows}x{cols} grid; split the group into chunks before building the prompt"
+        )
 
     # Cell 0 opens the first storyboard; cells 1..n-1 connect adjacent storyboards; remaining cells are placeholders.
     effective_grid_ar = grid_aspect_ratio or aspect_ratio

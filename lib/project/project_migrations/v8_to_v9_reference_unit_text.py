@@ -7,7 +7,7 @@ creator value (ADR 0064). Remove both:
   existing literal ``镜头N：`` becomes ordinary body text, preserved verbatim. First adopt old shot
   durations at unit level (``lib.script.reference_video.duration_migration``), previously lazy in loading,
   because migration removes ``shots`` entirely.
-- Remove ``references[]``; resolve body ``@[名称]`` images at execution in first-mention order.
+- Remove ``references[]``; resolve body ``@[name]`` images at execution in first-mention order.
 - Remove ``migration_requires_content_replan``, evidence from v6→v7 shot folding with no remaining
   target after shot removal. Preserve implied ``needs_replan`` so problem units still block generation and require replanning.
 
@@ -66,18 +66,18 @@ def _unit_text(unit: dict[str, Any], location: str) -> str:
     if "shots" not in unit:
         text = unit.get("text")
         if not isinstance(text, str):
-            raise ValueError(f"{location} 既没有 shots 也没有字符串 text")
+            raise ValueError(f"{location} has neither shots nor a string text")
         return text
     shots = unit.get("shots")
     if not isinstance(shots, list):
-        raise ValueError(f"{location}.shots 必须是数组")
+        raise ValueError(f"{location}.shots must be an array")
     parts: list[str] = []
     for index, shot in enumerate(shots):
         if not isinstance(shot, dict):
-            raise ValueError(f"{location}.shots[{index}] 必须是对象")
+            raise ValueError(f"{location}.shots[{index}] must be an object")
         text = shot.get("text")
         if text is not None and not isinstance(text, str):
-            raise ValueError(f"{location}.shots[{index}].text 必须是字符串")
+            raise ValueError(f"{location}.shots[{index}].text must be a string")
         parts.append(text or "")
     return "\n".join(parts)
 
@@ -86,7 +86,7 @@ def _convert_unit(unit: object, location: str) -> dict[str, Any]:
     r"""Mechanically adopt shot durations, join bodies, and remove ``shots`` / ``references``."""
 
     if not isinstance(unit, dict):
-        raise ValueError(f"{location} 必须是对象")
+        raise ValueError(f"{location} must be an object")
     migrated = copy.deepcopy(unit)
     # Durations once lived on shots[*].duration and migrated lazily on loading; persisted data may still have only shot durations.
     # shots is removed below, making this the last chance to read durations; adopt them before joining bodies.
@@ -122,7 +122,7 @@ def _migrate_script_unit(unit: object, location: str) -> dict[str, Any]:
     Retain originals if unconvertible, converted results if model-invalid. Runtime replanning handles both (ADR 0098)."""
 
     if not isinstance(unit, dict):
-        raise ValueError(f"{location} 必须是对象")
+        raise ValueError(f"{location} must be an object")
     try:
         migrated = _convert_unit(unit, location)
     except ValueError as exc:
@@ -147,7 +147,7 @@ def migrate_reference_script(payload: dict[str, Any], *, location: str) -> dict[
 
     units = payload.get("video_units")
     if not isinstance(units, list):
-        raise ValueError(f"{location}.video_units 必须是数组")
+        raise ValueError(f"{location}.video_units must be an array")
     migrated = copy.deepcopy(payload)
     migrated["video_units"] = [
         _migrate_script_unit(unit, f"{location}.video_units[{index}]") for index, unit in enumerate(units)
@@ -160,7 +160,7 @@ def migrate_reference_script_plan_draft(payload: dict[str, Any], *, location: st
 
     units = payload.get("units")
     if not isinstance(units, list):
-        raise ValueError(f"{location}.units 必须是数组")
+        raise ValueError(f"{location}.units must be an array")
     migrated = copy.deepcopy(payload)
     migrated["units"] = [
         _migrate_unit(unit, f"{location}.units[{index}]", ReferenceScriptPlanUnit) for index, unit in enumerate(units)
@@ -171,21 +171,21 @@ def migrate_reference_script_plan_draft(payload: dict[str, Any], *, location: st
 def _episode_entries(project_dir: Path, project: dict[str, Any]) -> list[tuple[Path, int]]:
     episodes = project.get("episodes")
     if not isinstance(episodes, list):
-        raise ValueError("project.episodes 必须是数组")
+        raise ValueError("project.episodes must be an array")
     result: list[tuple[Path, int]] = []
     seen: set[Path] = set()
     for index, entry in enumerate(episodes):
         if not isinstance(entry, dict):
-            raise ValueError(f"project.episodes[{index}] 必须是对象")
+            raise ValueError(f"project.episodes[{index}] must be an object")
         episode = entry.get("episode")
         script_file = entry.get("script_file")
         if not isinstance(episode, int) or isinstance(episode, bool) or episode <= 0:
-            raise ValueError(f"project.episodes[{index}].episode 必须是正整数")
+            raise ValueError(f"project.episodes[{index}].episode must be a positive integer")
         if not isinstance(script_file, str) or not script_file:
-            raise ValueError(f"project.episodes[{index}].script_file 必须是非空字符串")
+            raise ValueError(f"project.episodes[{index}].script_file must be a nonempty string")
         path = safe_join(project_dir, script_file)
         if path in seen:
-            raise ValueError(f"多个 episode 指向同一剧本文件: {script_file}")
+            raise ValueError(f"Multiple episodes point to the same script file: {script_file}")
         seen.add(path)
         result.append((path, episode))
     return result
@@ -193,14 +193,14 @@ def _episode_entries(project_dir: Path, project: dict[str, Any]) -> list[tuple[P
 
 def _readable_file(path: Path, label: str) -> dict[str, Any] | None:
     if path.is_symlink():
-        raise ValueError(f"{label} 不是普通文件")
+        raise ValueError(f"{label} is not a regular file")
     if not path.exists():
         return None
     if not path.is_file():
-        raise ValueError(f"{label} 不是普通文件")
+        raise ValueError(f"{label} is not a regular file")
     payload = load_json(path)
     if not isinstance(payload, dict):
-        raise ValueError(f"{label} 必须是对象")
+        raise ValueError(f"{label} must be an object")
     return payload
 
 
@@ -227,7 +227,7 @@ def migrate_v8_to_v9(project_dir: Path) -> None:
         return
     project = load_json(project_file)
     if not isinstance(project, dict):
-        raise ValueError("project.json 必须是对象")
+        raise ValueError("project.json must be an object")
     if int(project.get("schema_version") or 0) >= _TARGET_VERSION:
         return
 
@@ -237,12 +237,12 @@ def migrate_v8_to_v9(project_dir: Path) -> None:
         for script_path, episode in _episode_entries(project_dir, project):
             label = script_path.name
             with _located(episode, label):
-                payload = _readable_file(script_path, f"剧本 {label}")
+                payload = _readable_file(script_path, f"script {label}")
                 if payload is not None:
-                    plans.append((script_path, migrate_reference_script(payload, location=f"剧本 {label}")))
+                    plans.append((script_path, migrate_reference_script(payload, location=f"script {label}")))
 
             draft_path = _reference_units_draft_path(project_dir, episode)
-            draft_label = f"第 {episode} 集 {draft_path.name}"
+            draft_label = f"episode {episode} {draft_path.name}"
             try:
                 draft = _readable_file(draft_path, draft_label)
                 if draft is not None:

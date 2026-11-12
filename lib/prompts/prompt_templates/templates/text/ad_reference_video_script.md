@@ -94,7 +94,7 @@ This film is always episode {{ episode }}. Each unit may have only one speech ow
 
 {{ partial("shared/writing_syntax") }}
 
-Products, characters, scenes, and props all use the same `@[名称]` syntax. Copy product names exactly from the candidate list. Copy character, scene, and prop names exactly from the candidates or use designations in `new_assets` (the same applies to speakers in dialogue tokens).
+Products, characters, scenes, and props all use the same `@[name]` syntax. Copy product names exactly from the candidate list. Copy character, scene, and prop names exactly from the candidates or use designations in `new_assets` (the same applies to speakers in dialogue tokens).
 
 {{ partial("shared/ad_new_assets_rule") }}
 {% if instructions %}

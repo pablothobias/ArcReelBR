@@ -20,6 +20,7 @@ slots:
   description: "Appearance description or changes relative to the base"
   style: "Project visual style"
   style_description: "Project style description"
+  occupied: "Whether the scene sheet explicitly shows the described people; false for other asset types"
 protected: false
 ---
 {{ variant("asset/sheet/style", asset_type) }}

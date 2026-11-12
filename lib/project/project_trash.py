@@ -208,7 +208,7 @@ def record_deletion(
     files. Any move failure restores moved files without partial records; after creation, failed commit
     compensates through :func:`withdraw`."""
     if "kind" not in obj or not (files or snapshot):
-        raise ValueError("删除记录需要对象类型与至少一个被删文件")
+        raise ValueError("A deletion record needs an object type and at least one deleted file")
     record_id = f"{datetime.now(UTC):%Y%m%dT%H%M%SZ}-{secrets.token_hex(4)}"
     record_dir = trash_dir(project_dir) / record_id
     stored = record_dir / FILES_DIRNAME
@@ -422,7 +422,7 @@ def _notify(project_dir: Path) -> None:
 def _checked_rel(rel: str) -> str:
     path = PurePosixPath(rel)
     if not rel or "\\" in rel or path.is_absolute() or any(part in {"", ".", ".."} for part in rel.split("/")):
-        raise ValueError(f"非法的项目内路径: {rel!r}")
+        raise ValueError(f"Invalid project-relative path: {rel!r}")
     return rel
 
 

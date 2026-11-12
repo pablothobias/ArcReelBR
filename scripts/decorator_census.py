@@ -138,12 +138,12 @@ def pad(text: str, width: int, *, align_right: bool = False) -> str:
 
 def render_rows(rows: Iterable[tuple[str, Tally]], label: str) -> list[str]:
     header_cells = [
-        pad("函数", 6, align_right=True),
-        pad("跳过", 6, align_right=True),
-        pad("跳过%", 7, align_right=True),
-        pad("函数行", 8, align_right=True),
-        pad("跳过行", 8, align_right=True),
-        pad("跳过行%", 8, align_right=True),
+        pad("funcs", 6, align_right=True),
+        pad("skip", 6, align_right=True),
+        pad("skip%", 7, align_right=True),
+        pad("f.lines", 8, align_right=True),
+        pad("s.lines", 8, align_right=True),
+        pad("s.line%", 8, align_right=True),
     ]
     lines = [" ".join([pad(label, 60), *header_cells])]
     lines.extend(
@@ -160,32 +160,38 @@ def render(root: Path, *, per_file: bool, min_skip: float) -> list[str]:
     if per_file:
         selected = [(name, t) for name, t in per_file_tallies.items() if t.skipped_line_ratio * 100 >= min_skip]
         selected.sort(key=lambda item: item[1].skipped_line_ratio, reverse=True)
-        lines.extend(render_rows(selected, "文件"))
+        lines.extend(render_rows(selected, "File"))
         return lines
     total = Tally()
     for tally in per_dir.values():
         total.add(tally)
-    lines.extend(render_rows(per_dir.items(), "目录"))
-    lines.extend(render_rows([("合计", total)], "")[1:])
+    lines.extend(render_rows(per_dir.items(), "Directory"))
+    lines.extend(render_rows([("Total", total)], "")[1:])
     return lines
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("roots", nargs="*", default=["lib", "server"], help="要统计的源码根目录，默认 lib 与 server")
-    parser.add_argument("--per-file", action="store_true", help="按文件列出并按跳过行占比降序，而不是按目录汇总")
+    parser.add_argument(
+        "roots", nargs="*", default=["lib", "server"], help="Source root directories to count; default lib and server"
+    )
+    parser.add_argument(
+        "--per-file",
+        action="store_true",
+        help="List per file, sorted by skipped-line ratio descending, instead of summarizing per directory",
+    )
     parser.add_argument(
         "--min-skip",
         type=float,
         default=0.0,
         metavar="PCT",
-        help="配合 --per-file：只列出跳过行占比不低于 PCT%% 的文件（准入核对用 50）",
+        help="With --per-file: list only files whose skipped-line ratio is at least PCT%% (use 50 for admission checks)",
     )
     args = parser.parse_args(argv)
     for raw in args.roots:
         root = Path(raw)
         if not root.is_dir():
-            print(f"不是目录：{raw}", file=sys.stderr)
+            print(f"Not a directory: {raw}", file=sys.stderr)
             return 2
         print("\n".join(render(root, per_file=args.per_file, min_skip=args.min_skip)))
         print()

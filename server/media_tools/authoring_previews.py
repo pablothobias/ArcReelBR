@@ -173,6 +173,7 @@ async def get_asset_prompt_preview(
             "description": preview.description,
             "style": preview.style,
             "style_description": preview.style_description,
+            "occupancy": preview.occupancy,
             "canvas_ratio": preview.canvas_ratio,
             "references": list(preview.references),
             "limits": {

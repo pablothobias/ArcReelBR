@@ -15,7 +15,13 @@ from pathlib import Path
 from lib.artifacts.artifact_manifest import ArtifactBasis
 from lib.artifacts.input_gap import InputGap, add_absent_inputs
 from lib.material.work_files import material_file_digest
-from lib.project.asset_types import ASSET_TYPES, asset_name_comparison_key, normalize_asset_name
+from lib.project.asset_types import (
+    ASSET_TYPES,
+    SCENE_OCCUPANCY_EMPTY,
+    SCENE_OCCUPANCY_VALUES,
+    asset_name_comparison_key,
+    normalize_asset_name,
+)
 from lib.project.project_schema import parse_project_schema_version
 from lib.prompts.prompt_style import normalize_style_value
 from lib.prompts.prompt_utils import project_storyboard_image_prompt
@@ -124,11 +130,15 @@ def build_asset_sheet_visual_basis(
     aspect_ratio: str,
     references: Sequence[VisualReference] = (),
     absent: Sequence[InputGap] = (),
+    occupancy: str = "",
 ) -> ArtifactBasis:
     """Describe one character, scene, prop, or product design sheet.
 
     ``absent`` records the generation-input gaps (``docs/adr/0098``). An empty
     description is accepted only together with recorded gaps.
+
+    ``occupancy`` enters the basis only for an occupied scene (``docs/adr/0127``): empty-scene and other
+    sheets keep their digests byte for byte, so existing sheets stay current.
     """
 
     if asset_type not in ASSET_TYPES:
@@ -140,12 +150,17 @@ def build_asset_sheet_visual_basis(
     _require_string("style", style)
     _require_string("style_description", style_description)
     canvas_ratio = _require_non_empty("aspect_ratio", aspect_ratio)
+    asset: dict[str, object] = {
+        "type": asset_type,
+        "id": canonical_id,
+        "description": normalized_description,
+    }
+    if occupancy and occupancy != SCENE_OCCUPANCY_EMPTY:
+        if asset_type != "scene" or occupancy not in SCENE_OCCUPANCY_VALUES:
+            raise ValueError(f"unsupported {asset_type} occupancy: {occupancy!r}")
+        asset["occupancy"] = occupancy
     inputs: dict[str, object] = {
-        "asset": {
-            "type": asset_type,
-            "id": canonical_id,
-            "description": normalized_description,
-        },
+        "asset": asset,
         "canvas": {"aspect_ratio": canvas_ratio},
         "references": _reference_evidence(references),
     }
@@ -551,7 +566,7 @@ def without_asset_names(kind: str, inputs: Mapping[str, object]) -> dict[str, ob
     """Rewrite storyboard/grid basis inputs to exclude asset names.
 
     Model inputs for these artifacts omit asset names: type declarations list 图N by type, and body
-    ``@[名称]`` renders as 图N for the asset's first reference image (``lib/prompts/reference_image_numbering.py``).
+    ``@[name]`` renders as 图N for the asset's first reference image (``lib/prompts/reference_image_numbering.py``).
     Align bases accordingly: asset-reference evidence drops names from logical identity, retaining type,
     role, kind, and content fingerprint. Image-prompt mentions identifying asset references become 图N;
     unmatched mentions remain unchanged because models see those names. Non-asset reference identities,

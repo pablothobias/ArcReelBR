@@ -163,7 +163,7 @@ class TestAssembleBuiltinEndToEnd:
         assert built == []
         assert excinfo.value.code == "provider_unsupported_media"
         # Only ready provider lacks usable default images; inference has no candidate and never selects retired models.
-        with pytest.raises(ValueError, match="未找到可用的 image 供应商"):
+        with pytest.raises(ValueError, match="No available image provider found"):
             await resolver.resolve_image_backend(None, None, generation_type="t2i")
 
     async def test_version_gated_default_is_neither_assembled_nor_resolved(self, db_factory, monkeypatch):
@@ -184,7 +184,7 @@ class TestAssembleBuiltinEndToEnd:
             await assemble_backend(provider_id="ark", media_type="image", model_id=None, resolver=resolver)
         assert (built, built_default) == ([], [])
         assert (named.value.code, missing.value.code) == ("model_not_in_provider_catalog", "provider_unsupported_media")
-        with pytest.raises(ValueError, match="未找到可用的 image 供应商"):
+        with pytest.raises(ValueError, match="No available image provider found"):
             await resolver.resolve_image_backend(None, None, generation_type="t2i")
 
     async def test_missing_model_takes_the_catalog_default(self, db_factory):
@@ -569,7 +569,7 @@ class TestAssembleCustomEndToEnd:
         pid = await self._seed_relay_image_models(
             db_factory, [{"model_id": SEEDREAM_LITE, "is_enabled": True, "is_default": True}]
         )
-        with pytest.raises(ValueError, match="没有默认 t2i image 模型"):
+        with pytest.raises(ValueError, match="has no default t2i image model"):
             await assemble_backend(
                 provider_id=pid,
                 media_type="image",

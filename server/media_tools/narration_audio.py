@@ -54,11 +54,12 @@ _OPERATION = "generate_narration_audio"
 
 _NARRATION_CONFIG_DETAILS = {
     "narration_delivery_post_production": (
-        "项目的旁白交付方式是后期配音，ArcReel 不为它生成旁白配音；用户要 TTS 配音时请其在项目设置里改为 TTS 配音"
+        "The project delivers voiceover as post-production dubbing, so ArcReel does not generate voiceover audio for it; "
+        "if the user wants TTS voiceover, ask them to switch to TTS voiceover in project settings"
     ),
-    "narration_tts_model_required": "项目选了 TTS 配音但没有 TTS 模型，请用户在项目设置里选择 TTS 模型",
-    "narration_tts_voice_required": "项目选了 TTS 配音但没有旁白音色，请用户在项目设置里填写音色",
-    "narration_tts_speed_invalid": "项目的配音语速无效，请用户在项目设置里改正或清空",
+    "narration_tts_model_required": "The project uses TTS voiceover but has no TTS model; ask the user to choose a TTS model in project settings",
+    "narration_tts_voice_required": "The project uses TTS voiceover but has no voiceover voice; ask the user to set a voice in project settings",
+    "narration_tts_speed_invalid": "The project's voiceover speed is invalid; ask the user to correct or clear it in project settings",
 }
 
 
@@ -69,7 +70,7 @@ def _tts_admission_problem(admission: SpeechAdmission) -> GenerationProblem | No
         first = admission.problems[0]
         return GenerationProblem(
             code=first.code.value,
-            detail=f"unit {admission.unit_id} 发声准入未通过：{first.reason.value}",
+            detail=f"unit {admission.unit_id} failed speech admission: {first.reason.value}",
             action=(
                 GenerationAction.REPLAN_UNIT if first.action.value == "replan_unit" else GenerationAction.FIX_INPUT
             ),
@@ -78,13 +79,13 @@ def _tts_admission_problem(admission: SpeechAdmission) -> GenerationProblem | No
     if admission.mode is not SpeechMode.NARRATOR_VOICEOVER:
         return GenerationProblem(
             code="tts_not_applicable",
-            detail=f"unit {admission.unit_id} 的发声不属于叙述旁白，不产出 TTS",
+            detail=f"unit {admission.unit_id} speech is not narrator voiceover, so no TTS is produced",
             action=GenerationAction.NONE,
         )
     if not canonical_narration_text(admission.preparation):
         return GenerationProblem(
             code=GenerationProblemCode.UNIT_REQUEST_INVALID,
-            detail=f"unit {admission.unit_id} 没有可合成的旁白文本",
+            detail=f"unit {admission.unit_id} has no voiceover text to synthesize",
             action=GenerationAction.FIX_INPUT,
         )
     return None
@@ -161,7 +162,7 @@ async def generate_narration_audio(
         ensure_route_skeleton(script, content_mode, project.get("generation_mode"))
         items, id_field, kind = resolve_items(script)
         if not items:
-            raise ValueError("剧本没有可配音的单元")
+            raise ValueError("The script has no units to voice")
         episode = (
             resolve_artifact_episode(
                 project=project,

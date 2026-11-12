@@ -1,1 +1,1 @@
-No people appear in the image.
+{% if occupied %}This sheet is an occupied environment reference: show only the people the description asks for, as anonymous occupants of the place rather than story characters, with no distinctive faces or close-ups, keeping the space itself clearly readable.{% else %}This sheet is an empty environment reference: no people appear in the image.{% endif %}

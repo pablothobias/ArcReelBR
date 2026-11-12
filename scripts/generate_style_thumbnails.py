@@ -72,7 +72,7 @@ async def load_grok_api_key() -> str:
     async with async_session_factory() as session:
         cred = await CredentialRepository(session).get_active("grok")
     if cred is None or not cred.api_key:
-        raise RuntimeError("未找到 grok 生效凭证（provider_credential 表）")
+        raise RuntimeError("No active grok credential found (provider_credential table)")
     return cred.api_key
 
 
@@ -115,7 +115,7 @@ async def main() -> None:
     template_ids = list_template_ids()
     missing = set(template_ids) - set(SUBJECTS)
     if missing:
-        raise RuntimeError(f"SUBJECTS 缺少: {sorted(missing)}")
+        raise RuntimeError(f"SUBJECTS is missing: {sorted(missing)}")
 
     api_key = await load_grok_api_key()
     backend = GrokImageBackend(api_key=api_key)
@@ -133,7 +133,7 @@ async def main() -> None:
             fail += 1
             print(f"  ❌ {tpl_id} — {msg}")
 
-    print(f"\n完成：成功 {ok} / 失败 {fail} / 共 {len(template_ids)}")
+    print(f"\nDone: succeeded {ok} / failed {fail} / total {len(template_ids)}")
     if fail:
         sys.exit(1)
 

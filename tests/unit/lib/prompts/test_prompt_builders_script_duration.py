@@ -33,7 +33,7 @@ class TestFormatDurationConstraint:
 
     def test_default_duration_must_be_in_supported(self):
         """default_duration outside supported sets raises, preventing self-contradictory prompts."""
-        with pytest.raises(ValueError, match="default_duration=6 不在"):
+        with pytest.raises(ValueError, match="default_duration=6 is not in"):
             format_duration_constraint([4, 8], default_duration=6)
 
     def test_continuous_range_uses_min_max_phrasing(self):
@@ -53,7 +53,7 @@ class TestBuildersRequireDurations:
     """After fallback removal, None/empty lists must not be silently refilled."""
 
     def test_format_constraint_rejects_empty(self):
-        with pytest.raises(ValueError, match="supported_durations 不能为空"):
+        with pytest.raises(ValueError, match="supported_durations must not be empty"):
             format_duration_constraint([], default_duration=None)
 
 

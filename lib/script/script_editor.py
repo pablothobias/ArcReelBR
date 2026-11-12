@@ -61,7 +61,7 @@ def resolve_items(script: dict[str, Any], *, kind: str | None = None) -> tuple[l
     if not isinstance(raw_items, list):
         type_name = type(raw_items).__name__
         raise ScriptEditError(
-            f"{kind} 必须是列表，当前为 {type_name}",
+            f"{kind} must be a list, got {type_name}",
             key="script_edit_items_not_list",
             kind=kind,
             type_name=type_name,
@@ -73,55 +73,63 @@ def _find_index(items: list[Any], id_field: str, item_id: str) -> int:
     for idx, item in enumerate(items):
         if isinstance(item, dict) and str(item.get(id_field)) == str(item_id):
             return idx
-    raise ScriptEditError(f"未找到 id={item_id!r} 的分镜（{id_field}）")
+    raise ScriptEditError(f"No storyboard item found with id={item_id!r} ({id_field})")
 
 
 def _set_nested(obj: dict[str, Any], field_path: str, value: Any) -> None:
     parts = field_path.split(".")
     if not parts or any(not p for p in parts):
-        raise ScriptEditError(f"非法字段路径: {field_path!r}")
+        raise ScriptEditError(f"Invalid field path: {field_path!r}")
     if parts[0] == "generated_assets":
         # patch is a pure field setter; asset lifecycle is separate from script editing (ADR-0003).
-        raise ScriptEditError("patch_episode_script 不可改 generated_assets；资产的生成/重生是独立的显式动作")
+        raise ScriptEditError(
+            "patch_episode_script cannot change generated_assets; asset generation/regeneration is a separate explicit action"
+        )
     if parts[0] == "needs_replan":
-        raise ScriptEditError("patch_episode_script 不可直接改重规划标记；修改 unit 规划内容后由系统重算")
+        raise ScriptEditError(
+            "patch_episode_script cannot change the replan flag directly; the system recomputes it after the unit's planned content changes"
+        )
     if parts[0] == PENDING_AUTHORING_FIELD:
         # The pending-authoring flag tracks visual-layer completeness; allowing patch would disguise missing visuals as authored.
         raise ScriptEditError(
-            f"patch_episode_script 不可改 {PENDING_AUTHORING_FIELD}；它由新增条目置位，写齐视觉层或提示词编写写回时清除"
+            f"patch_episode_script cannot change {PENDING_AUTHORING_FIELD}; it is set by newly added entries and cleared when the visual layer is completed or prompt authoring writes back"
         )
     if parts[0] == "end_frame_image":
         # The last-frame field holds service-created relative snapshot paths, written only by set/clear endpoints.
         # Allowing patch would bypass snapshot copying with arbitrary verbatim strings, reintroducing dangling
         # references and out-of-bounds paths.
-        raise ScriptEditError("patch_episode_script 不可改 end_frame_image；尾帧的设置/清除是独立的显式动作")
+        raise ScriptEditError(
+            "patch_episode_script cannot change end_frame_image; setting/clearing the last frame is a separate explicit action"
+        )
     if value is None and parts in (["image_prompt"], ["video_prompt"]):
         # None prompts mean pending generation, written only by mechanical script-plan conversion.
         # Once script models accept None, this is the sole barrier against patch clearing existing prompts.
         # Supply new values to rewrite, or use generate_episode_script(entry_ids=…) for model completion.
         raise ScriptEditError(
-            f"patch_episode_script 不可把 {parts[0]} 清成 null；待生成态只由脚本规划机械转换写入，"
-            "要重写请给出新的提示词"
+            f"patch_episode_script cannot clear {parts[0]} to null; the pending-generation state is written only by mechanical script plan conversion. "
+            "To rewrite, provide a new prompt"
         )
     if parts[0] in {"segment_id", "scene_id", "unit_id", "shot_id"}:
         # patch cannot change storyboard ids: insert/split allocate them, and structural validation does not
         # check uniqueness. Agent id edits would send id-based helpers (update_scene_asset, etc.) to wrong
         # items or create duplicate-id ambiguity. Add/remove with patch_episode_script insert / split / remove operations.
         raise ScriptEditError(
-            f"patch_episode_script 不可改分镜 id 字段 ({parts[0]})；id 由 insert/split 分配，不允许直接修改"
+            f"patch_episode_script cannot change the storyboard id field ({parts[0]}); ids are assigned by insert/split and cannot be edited directly"
         )
     cur: Any = obj
     # Report three exception categories separately for precise Agent errors: typos, types, and missing intermediate nodes.
     for p in parts[:-1]:
         if not isinstance(cur, dict):
-            raise ScriptEditError(f"父节点非对象 (类型 {type(cur).__name__}): {field_path!r}")
+            raise ScriptEditError(f"Parent node is not an object (type {type(cur).__name__}): {field_path!r}")
         if p not in cur:
-            raise ScriptEditError(f"字段路径不存在: {field_path!r}")
+            raise ScriptEditError(f"Field path does not exist: {field_path!r}")
         if not isinstance(cur[p], dict):
-            raise ScriptEditError(f"父节点非对象 (键 {p!r} 类型为 {type(cur[p]).__name__}): {field_path!r}")
+            raise ScriptEditError(
+                f"Parent node is not an object (key {p!r} has type {type(cur[p]).__name__}): {field_path!r}"
+            )
         cur = cur[p]
     if not isinstance(cur, dict):
-        raise ScriptEditError(f"父节点非对象: {field_path!r}")
+        raise ScriptEditError(f"Parent node is not an object: {field_path!r}")
     # The final leaf may be absent: Agents should fill optional fields omitted by LLMs (video_prompt.dialogue /
     # note, etc., with Pydantic defaults/default_factory and possible JSON omission), rather than remove+insert
     # an entire storyboard item. Missing parent/intermediate nodes still fail loudly: actual typos such as
@@ -154,8 +162,8 @@ def new_item_ids(script: dict[str, Any], count: int, *, floor: int = 0) -> list[
     ``floor`` is the episode's highest used main sequence (``ProjectManager.item_id_floor`` takes the
     maximum of the ledger's highest number and current script ids). Allocate without reuse: deleted
     items' numbers never return to new items. Never fill gaps or derive ids from anchors; array position
-    alone determines item order. Storyboard-family ids are ``E{集}S{序号:02d}``, reference-to-video units
-    ``E{集}U{序号}``.
+    alone determines item order. Storyboard-family ids are ``E{episode}S{index:02d}``, reference-to-video units
+    ``E{episode}U{index}``.
     """
     items, id_field, kind = resolve_items(script)
     ids = [str(item.get(id_field)) for item in items if isinstance(item, dict)]
@@ -204,7 +212,7 @@ def remove_segment(script: dict[str, Any], item_id: str) -> dict[str, Any]:
 def move_segment(script: dict[str, Any], item_id: str, after_id: str | None) -> dict[str, Any]:
     """Move ``item_id`` after ``after_id``, or to the beginning if ``after_id`` is ``None``. Content/artifacts stay unchanged."""
     if after_id == item_id:
-        raise ScriptEditError(f"id={item_id!r} 不能移到自己之后")
+        raise ScriptEditError(f"id={item_id!r} cannot be moved after itself")
     items, id_field, _ = resolve_items(script)
     item = items.pop(_find_index(items, id_field, item_id))
     idx = -1 if after_id is None else _find_index(items, id_field, after_id)
@@ -231,7 +239,7 @@ def split_segment(
     this function does not calculate it.
     """
     if len(parts) < 2:
-        raise ScriptEditError("split 至少需要 2 个部分")
+        raise ScriptEditError("split requires at least 2 parts")
     items, id_field, _ = resolve_items(script)
     idx = _find_index(items, id_field, item_id)
     anchor_assets = items[idx].get("generated_assets")

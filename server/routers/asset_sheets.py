@@ -67,7 +67,7 @@ class AssetSheetBatchRequest(BaseModel):
     @model_validator(mode="after")
     def _one_scope(self) -> Self:
         if (self.asset_type is None) == (self.episode_id is None):
-            raise ValueError("asset_type 与 episode_id 必须且只能给一个")
+            raise ValueError("Provide exactly one of asset_type and episode_id")
         return self
 
     def scope(self) -> AssetSheetScope:

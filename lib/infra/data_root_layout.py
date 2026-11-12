@@ -85,7 +85,9 @@ class DataRootLayout:
         raise ``ValueError``.
         """
         if not is_valid_memory_user_id(user_id):
-            raise ValueError(f"user_id 必须是单个路径段，不能为空或含路径分隔符 / 驱动器冒号 / NUL：{user_id!r}")
+            raise ValueError(
+                f"user_id must be a single path segment, not empty and without path separators, drive colons, or NUL: {user_id!r}"
+            )
         return self.users_dir / user_id / MEMORY_DIRNAME
 
     @property

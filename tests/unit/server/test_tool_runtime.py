@@ -468,7 +468,7 @@ async def test_patch_episode_meta_returns_typed_domain_outcome(tmp_path: Path, m
     assert outcome.problem is None
     assert outcome.value is not None
     assert outcome.value.model_dump(mode="json") == {
-        "message": "✅ 已更新分集title为「新标题」",
+        "message": '✅ Updated episode title to "新标题"',
         "script": "episode_1.json",
         "field": "title",
         "value": "新标题",

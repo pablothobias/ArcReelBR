@@ -311,7 +311,7 @@ async def test_video_batch_is_refused_whole_when_one_target_fails_admission(
     assert plan.admission.decision is BatchAdmissionDecision.BLOCKED
     refused = {unit.unit_id: [problem.code for problem in unit.problems] for unit in plan.admission.tickets}
     assert refused["E1S02"] == ["reference_asset_missing"]
-    with pytest.raises(ValueError, match="整批准入未通过"):
+    with pytest.raises(ValueError, match="failed whole-batch admission"):
         await submit_storyboard_video_batch(
             plan, project_name=PROJECT, queue=board_queue, source="webui", user_id=DEFAULT_USER_ID
         )

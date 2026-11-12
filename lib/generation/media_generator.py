@@ -580,7 +580,7 @@ class MediaGenerator:
         try:
             return safe_join(self.project_path, relative_path)
         except PathTraversalError as exc:
-            raise ValueError(f"非法资源 ID: '{resource_id}'") from exc
+            raise ValueError(f"Invalid resource ID: '{resource_id}'") from exc
 
     def _ensure_parent_dir(self, output_path: Path) -> None:
         """Ensure output directories exist"""

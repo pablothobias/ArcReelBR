@@ -222,7 +222,7 @@ def _extract_task_id(body: dict, *, prefer_video_id: bool) -> str:
         if isinstance(value, str) and value:
             return value
     # Expose field names only, never full responses containing prompts/signed URLs, matching _safe_body_for_log.
-    raise RuntimeError(f"Agnes 视频提交返回体缺少 task_id（字段: {sorted(body)}）")
+    raise RuntimeError(f"Agnes video submission response is missing task_id (fields: {sorted(body)})")
 
 
 def _extract_duration_seconds(final: dict, queried: dict | None, fallback: int) -> int:
@@ -267,7 +267,7 @@ def _failure_reason(state: dict) -> str | None:
         return None
     err = state.get("error")
     message = (err.get("message") or err.get("code") or "unknown") if isinstance(err, dict) else (err or "unknown")
-    return f"Agnes 视频生成失败: {message}"
+    return f"Agnes video generation failed: {message}"
 
 
 class AgnesVideoBackend(EntryBoundCapabilities, ProviderJobIdPersistenceMixin):
@@ -615,9 +615,13 @@ class AgnesVideoBackend(EntryBoundCapabilities, ProviderJobIdPersistenceMixin):
             video_url = _first_url_field(queried)
             if video_url is not None:
                 return video_url, queried
-            raise RuntimeError(f"Agnes 任务完成但 video_id 查询响应缺少成片 URL（字段: {sorted(queried)}）")
+            raise RuntimeError(
+                f"Agnes task completed but the video_id query response is missing the video URL (fields: {sorted(queried)})"
+            )
 
-        raise RuntimeError(f"Agnes 任务完成但缺少成片 URL 与 video_id（字段: {sorted(final)}）")
+        raise RuntimeError(
+            f"Agnes task completed but both the video URL and video_id are missing (fields: {sorted(final)})"
+        )
 
     async def _poll_and_build(
         self,

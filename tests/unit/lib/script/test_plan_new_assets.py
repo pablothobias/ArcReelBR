@@ -61,7 +61,11 @@ def test_a_derivative_differing_only_in_case_from_an_existing_derivative_is_take
     project = {"characters": {"Alice": {"description": "主角", "derivatives": {"Coat": {"description": "大衣"}}}}}
 
     assert _problems(project, [_derivative("coat")]) == [
-        ("new_asset_name_taken", 0, "new_assets[0]：衍生名「coat」与「Alice」已有的衍生「Coat」重名")
+        (
+            "new_asset_name_taken",
+            0,
+            'new_assets[0]: derivative name "coat" collides with derivative "Coat" of "Alice" (already registered)',
+        )
     ]
     assert _problem_codes(project, [_derivative("外套", asset_name="COAT")]) == [("new_asset_name_taken", 0)]
 
@@ -70,7 +74,11 @@ def test_two_new_derivatives_differing_only_in_case_under_one_base_cannot_both_r
     project = {"characters": {"Alice": {"description": "主角"}}}
 
     assert _problems(project, [_derivative("Coat"), _derivative("coat")]) == [
-        ("new_asset_name_taken", 1, "new_assets[1]：衍生名「coat」与「Alice」本集新增的衍生「Coat」重名")
+        (
+            "new_asset_name_taken",
+            1,
+            'new_assets[1]: derivative name "coat" collides with derivative "Coat" of "Alice" (newly added in this episode)',
+        )
     ]
 
 
@@ -94,7 +102,7 @@ def test_writing_a_derivative_rejects_a_case_variant_registered_after_resolution
     resolution = resolve_new_assets({"characters": {"Alice": {"description": "主角"}}}, [_derivative("Coat")])
     project = {"characters": {"Alice": {"description": "主角", "derivatives": {"coat": {"description": "大衣"}}}}}
 
-    with pytest.raises(ValueError, match="重名"):
+    with pytest.raises(ValueError, match="collides with existing derivative"):
         resolution.apply_to_project(project)
 
     assert list(project["characters"]["Alice"]["derivatives"]) == ["coat"]

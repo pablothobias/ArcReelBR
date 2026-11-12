@@ -39,7 +39,7 @@ def _table_offsets(data: bytes) -> dict[bytes, int]:
 def _table(data: bytes, tag: bytes) -> int:
     offset = _table_offsets(data).get(tag)
     if offset is None:
-        raise SubtitleFontError(f"字幕字体没有 {tag.decode()} 表")
+        raise SubtitleFontError(f"Subtitle font has no {tag.decode()} table")
     return offset
 
 
@@ -53,7 +53,7 @@ def _cmap_groups(data: bytes) -> tuple[tuple[int, ...], tuple[int, ...]]:
         subtables[(platform, encoding)] = cmap_offset + offset
     subtable = next((subtables[key] for key in _UNICODE_FULL_REPERTOIRE if key in subtables), None)
     if subtable is None or struct.unpack_from(">H", data, subtable)[0] != 12:
-        raise SubtitleFontError("字幕字体没有 format 12 的 Unicode cmap 子表")
+        raise SubtitleFontError("Subtitle font has no format 12 Unicode cmap subtable")
     (num_groups,) = struct.unpack_from(">I", data, subtable + 12)
     starts: list[int] = []
     ends: list[int] = []
@@ -73,7 +73,7 @@ def _font_data() -> bytes:
     try:
         return SUBTITLE_FONT_FILE.read_bytes()
     except OSError as exc:
-        raise SubtitleFontError(f"随包字幕字体不可读：{exc}") from exc
+        raise SubtitleFontError(f"Bundled subtitle font is unreadable: {exc}") from exc
 
 
 @functools.cache

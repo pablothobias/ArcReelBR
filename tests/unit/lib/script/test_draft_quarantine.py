@@ -41,7 +41,7 @@ from lib.script.draft_violation import (
 
 
 def _violation(code: str = "unregistered_asset", label: str = "unit E1U01") -> DraftViolation:
-    return DraftViolation(f"{label} 引用了未登记的资产名", code=code, label=label)
+    return DraftViolation(f"{label} references unregistered asset names", code=code, label=label)
 
 
 class TestEnvelope:
@@ -65,7 +65,7 @@ class TestEnvelope:
             {
                 "code": "unregistered_asset",
                 "label": "unit E1U01",
-                "message": "unit E1U01 引用了未登记的资产名",
+                "message": "unit E1U01 references unregistered asset names",
                 "line": None,
             }
         ]
@@ -331,7 +331,12 @@ class TestReport:
 
     def test_entries_carry_class_and_locator(self):
         assert violation_entries([_violation("blank_shot", "unit E2U07")]) == [
-            {"code": "blank_shot", "label": "unit E2U07", "message": "unit E2U07 引用了未登记的资产名", "line": None}
+            {
+                "code": "blank_shot",
+                "label": "unit E2U07",
+                "message": "unit E2U07 references unregistered asset names",
+                "line": None,
+            }
         ]
 
 

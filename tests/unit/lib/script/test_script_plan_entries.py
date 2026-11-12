@@ -63,7 +63,7 @@ class TestPlanVariant:
         assert entry_id_field(kind) == id_field
 
     def test_unknown_plan_kind_fails_loud(self) -> None:
-        with pytest.raises(ValueError, match="未知的脚本规划变体"):
+        with pytest.raises(ValueError, match="Unknown script plan variant"):
             plan_variant("ad")
 
 
@@ -116,5 +116,5 @@ class TestPlanEntryContent:
         }
 
     def test_unknown_plan_kind_fails_loud(self) -> None:
-        with pytest.raises(ValueError, match="未知的脚本规划变体"):
+        with pytest.raises(ValueError, match="Unknown script plan variant"):
             plan_entry_content("ad", {})

@@ -408,7 +408,7 @@ async def test_start_is_not_reentrant():
     actor = SessionActor(client_factory=lambda: client, on_message=lambda m: None)
     await actor.start()
     try:
-        with pytest.raises(AssertionError, match="不可重入"):
+        with pytest.raises(AssertionError, match="must not be called re-entrantly"):
             await actor.start()
     finally:
         await _disconnect(actor)

@@ -53,7 +53,9 @@ def configure(data_root: Path) -> None:
     sentinel = data_root / ".arcreel-perf-bench"
     if not sentinel.exists():
         if any(data_root.iterdir()):
-            raise SystemExit(f"--data-root {data_root} 不是空目录，也不是基准建的目录，拒绝使用")
+            raise SystemExit(
+                f"--data-root {data_root} is neither empty nor a directory created by the benchmark; refusing to use it"
+            )
         sentinel.touch()
     profile = data_root / "profile"
     profile.mkdir(exist_ok=True)

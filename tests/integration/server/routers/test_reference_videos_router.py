@@ -1686,7 +1686,7 @@ def test_reference_unit_task_spec_rejects_a_non_string_text() -> None:
 
     from server.services.admission.video_batch_admission import reference_unit_task_spec
 
-    with pytest.raises(ValueError, match="text 必须是字符串"):
+    with pytest.raises(ValueError, match="text must be a string"):
         reference_unit_task_spec({"unit_id": "E1U1", "text": 42}, "scripts/episode_1.json")
 
 

@@ -11,10 +11,10 @@ to handling decisions (see ``docs/adr/0092``):
   recording the appellation as an alias. ``target`` may address other new items by appellation or registered
   name; the same applies to derivative base characters.
 - ``derivative``: register a derivative under the ``target`` character. Rewrite visual references as
-  ``本体/衍生`` and dialogue speakers (drama ``utterances`` and ad storyboard video-prompt ``dialogue``)
+  ``base/derivative`` and dialogue speakers (drama ``utterances`` and ad storyboard video-prompt ``dialogue``)
   to the base character.
 - ``skip``: do not register. Remove from reference arrays; retain drama speakers' original names.
-  In reference-to-video bodies, visual ``@[名]`` references become plain text, while speaker slots remain unchanged.
+  In reference-to-video bodies, visual ``@[name]`` references become plain text, while speaker slots remain unchanged.
 
 Planning never changes existing asset descriptions: registration only adds entries, derivatives,
 and aliases. Programs merge by name only; aliases do not participate in matching.
@@ -65,7 +65,7 @@ class NewAssetsError(ValueError):
     """Unresolvable new-asset decisions reject the entire confirmation, changing neither project nor formal script."""
 
     def __init__(self, problems: Sequence[NewAssetProblem]):
-        super().__init__("；".join(problem.message for problem in problems))
+        super().__init__("; ".join(problem.message for problem in problems))
         self.problems = list(problems)
 
 
@@ -119,7 +119,7 @@ class NewAssetResolution:
     registrations: dict[str, dict[str, _Registration]]
     derivatives: list[tuple[str, str, str]]
     aliases: list[tuple[str, str, str]]
-    #: New items matching existing same-type names, automatically merged on confirmation: ``(类型, 称呼, 资产名)``.
+    #: New items matching existing same-type names, automatically merged on confirmation: ``(type, appellation, asset name)``.
     auto_merged: list[tuple[str, str, str]]
 
     def rewrite_entries(self, entries: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
@@ -168,7 +168,7 @@ class NewAssetResolution:
         return result
 
     def registered(self) -> list[dict[str, str]]:
-        """Assets/derivatives newly registered here (``{"type", "name"}``, derivatives named ``本体/衍生``), in type/registration order."""
+        """Assets/derivatives newly registered here (``{"type", "name"}``, derivatives named ``base/derivative``), in type/registration order."""
         assets = [
             {"type": asset_type, "name": name}
             for asset_type, registrations in self.registrations.items()
@@ -205,13 +205,15 @@ class NewAssetResolution:
             key = resolve_asset_key(characters, base) if isinstance(characters, dict) else None
             entry = characters.get(key) if isinstance(characters, dict) and key is not None else None
             if not isinstance(entry, dict):
-                raise ValueError(f"衍生「{derivative}」的本体角色「{base}」不存在")
+                raise ValueError(f'base character "{base}" of derivative "{derivative}" does not exist')
             table = ensure_derivative_table(entry)
             existing = find_derivative_name(table, derivative)
             if existing is None:
                 table[derivative] = {"description": description, ASSET_SPECS["character"].sheet_field: ""}
             elif asset_name_comparison_key(existing) != asset_name_comparison_key(derivative):
-                raise ValueError(f"衍生名「{derivative}」与「{base}」已有的衍生「{existing}」重名")
+                raise ValueError(
+                    f'derivative name "{derivative}" collides with existing derivative "{existing}" of "{base}"'
+                )
 
 
 def _remap_mention(outcome: _Outcome | None, speaker: bool) -> str | None:
@@ -226,7 +228,7 @@ def _parse_items(raw_items: object) -> tuple[list[PlanNewAsset | None], list[New
     if raw_items is None:
         return [], []
     if not isinstance(raw_items, list):
-        return [], [NewAssetProblem("new_asset_invalid", "new_assets 必须是数组", -1)]
+        return [], [NewAssetProblem("new_asset_invalid", "new_assets must be an array", -1)]
     items: list[PlanNewAsset | None] = []
     problems: list[NewAssetProblem] = []
     for index, raw in enumerate(raw_items):
@@ -234,12 +236,14 @@ def _parse_items(raw_items: object) -> tuple[list[PlanNewAsset | None], list[New
             items.append(PlanNewAsset.model_validate(raw))
         except ValidationError as exc:
             items.append(None)
-            problems.append(NewAssetProblem("new_asset_invalid", f"new_assets[{index}] 结构非法: {exc}", index))
+            problems.append(
+                NewAssetProblem("new_asset_invalid", f"new_assets[{index}] has an invalid structure: {exc}", index)
+            )
     return items, problems
 
 
 def _registered_names(project: Mapping[str, Any]) -> tuple[dict[str, dict[str, str]], dict[str, str]]:
-    """``(按类型的 判等键→登记名, 判等键→占用它的类型)``; the namespace spans all four asset types."""
+    """``(per-type equality key -> registered name, equality key -> type that occupies it)``; the namespace spans all four asset types."""
     registered: dict[str, dict[str, str]] = {asset_type: {} for asset_type in _TYPES}
     owners: dict[str, str] = {}
     for asset_type, spec in ASSET_SPECS.items():
@@ -255,7 +259,7 @@ def _registered_names(project: Mapping[str, Any]) -> tuple[dict[str, dict[str, s
 
 
 def _namespace_names(project: Mapping[str, Any]) -> dict[str, tuple[str, str]]:
-    """``判重键→(类型, 登记名)``: new names differing from existing assets only by case also collide,
+    """``dedup key -> (type, registered name)``: new names differing from existing assets only by case also collide,
     matching :func:`ensure_project_asset_name_available`.
     """
     names: dict[str, tuple[str, str]] = {}
@@ -295,10 +299,10 @@ class _Resolver:
                 continue
             owner = self.owners.get(key, item_types.get(key))
             if owner is not None and owner != item.type:
-                self._problem("new_asset_name_taken", index, f"「{item.name}」已是{_label(owner)}的名字")
+                self._problem("new_asset_name_taken", index, f'"{item.name}" is already the name of a {_label(owner)}')
                 continue
             if item.decision == "derivative" and item.type != "character":
-                self._problem("new_asset_derivative_not_character", index, "只有角色可以登记衍生")
+                self._problem("new_asset_derivative_not_character", index, "only characters can register derivatives")
                 continue
             if item.asset_name and not self._valid_name(item.asset_name, index, "asset_name"):
                 continue
@@ -319,7 +323,7 @@ class _Resolver:
         self._assets: dict[tuple[str, str], str | None] = {}
 
     def _problem(self, code: str, index: int, message: str) -> None:
-        self.problems.append(NewAssetProblem(code, f"new_assets[{index}]：{message}", index))
+        self.problems.append(NewAssetProblem(code, f"new_assets[{index}]: {message}", index))
 
     def _valid_name(self, name: str, index: int, field_name: str) -> bool:
         try:
@@ -363,7 +367,9 @@ class _Resolver:
             return registered
         index, item = found
         if key in chain:
-            self._problem("new_asset_merge_cycle", index, f"归并关系成环：{' → '.join((*chain, key))}")
+            self._problem(
+                "new_asset_merge_cycle", index, f"merge relationship forms a cycle: {' → '.join((*chain, key))}"
+            )
             return None
         result: str | None = None
         if item.decision == "register":
@@ -375,7 +381,8 @@ class _Resolver:
                 self._problem(
                     "new_asset_target_unresolved",
                     index,
-                    f"归入目标「{item.target}」不是已登记的{_label(asset_type)}，也不是本集登记的新增项",
+                    f'merge target "{item.target}" is neither a registered {_label(asset_type)} '
+                    "nor a new item registered in this episode",
                 )
             else:
                 result = target
@@ -394,13 +401,19 @@ class _Resolver:
         taken = self.namespace.get(namespace_key)
         if taken is not None:
             owner, existing = taken
-            self._problem("new_asset_name_taken", index, f"登记名「{final}」与已有{_label(owner)}「{existing}」重名")
+            self._problem(
+                "new_asset_name_taken",
+                index,
+                f'registered name "{final}" collides with existing {_label(owner)} "{existing}"',
+            )
             return None
         claimed = self.claimed.setdefault(namespace_key, (asset_type, final))
         if claimed != (asset_type, final):
             owner, existing = claimed
             self._problem(
-                "new_asset_name_taken", index, f"登记名「{final}」与本集新增的{_label(owner)}「{existing}」重名"
+                "new_asset_name_taken",
+                index,
+                f'registered name "{final}" collides with {_label(owner)} "{existing}" newly added in this episode',
             )
             return None
         registrations = self.registrations[asset_type]
@@ -436,14 +449,15 @@ class _Resolver:
             self._problem(
                 "new_asset_base_unresolved",
                 index,
-                f"衍生的本体「{item.target}」不是已登记的角色，也不是本集登记的新角色",
+                f'base character "{item.target}" of the derivative is neither a registered character '
+                "nor a new character registered in this episode",
             )
             return
         derivative = validate_asset_name(item.asset_name or item.name)
         existing = find_derivative_name(_derivatives_of(self.project, base), derivative)
-        owner = "已有的"
+        owner = "already registered"
         if existing is None:
-            owner = "本集新增的"
+            owner = "newly added in this episode"
             claimed = self.claimed_derivatives.setdefault(base, {})
             existing = find_derivative_name(claimed, derivative)
             if existing is None:
@@ -451,14 +465,16 @@ class _Resolver:
                 self.derivatives.append((base, derivative, item.description))
         if existing is not None and asset_name_comparison_key(existing) != asset_name_comparison_key(derivative):
             self._problem(
-                "new_asset_name_taken", index, f"衍生名「{derivative}」与「{base}」{owner}衍生「{existing}」重名"
+                "new_asset_name_taken",
+                index,
+                f'derivative name "{derivative}" collides with derivative "{existing}" of "{base}" ({owner})',
             )
             return
         self.outcomes[("character", key)] = _Outcome("derivative", base, existing or derivative)
 
 
 def _label(asset_type: str) -> str:
-    return ASSET_SPECS[asset_type].label_zh
+    return ASSET_SPECS[asset_type].asset_type
 
 
 def resolve_new_assets(project: Mapping[str, Any], raw_items: object) -> NewAssetResolution:
@@ -473,7 +489,7 @@ def new_asset_violations(project: Mapping[str, Any], raw_items: object) -> list[
     except NewAssetsError as exc:
         return [
             DraftViolation(
-                f"{problem.message}；请改正该项的 decision / target，或改用 register / skip",
+                f"{problem.message}; fix this item's decision / target, or use register / skip instead",
                 code=problem.code,
                 label=f"new_assets[{problem.index}]" if problem.index >= 0 else "new_assets",
             )
@@ -487,7 +503,7 @@ def unregistered_references(
 ) -> list[UnregisteredReference]:
     """List unresolved item references against ``project`` with this episode's new assets registered, in per-item appearance order.
 
-    Check reference arrays and visual ``@[名]`` positions in reference-to-video bodies, excluding dialogue speakers.
+    Check reference arrays and visual ``@[name]`` positions in reference-to-video bodies, excluding dialogue speakers.
     """
     catalog = build_reference_catalog(dict(project))
     visual = set().union(*(catalog.reference_names(asset_type) for asset_type in ASSET_SPECS))

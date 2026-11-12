@@ -35,9 +35,9 @@ class DocxExtractor:
                 result = mammoth.convert_to_markdown(fh)
             md_text = _strip_markdown_marks(result.value or "")
             if not md_text.strip():
-                raise CorruptFileError(filename=path.name, reason="DOCX 抽取结果为空")
+                raise CorruptFileError(filename=path.name, reason="DOCX extraction returned empty text")
             return ExtractedText(text=md_text, used_encoding=None, chapter_count=0)
         except CorruptFileError:
             raise
         except Exception as exc:
-            raise CorruptFileError(filename=path.name, reason=f"DOCX 解析失败: {exc}") from exc
+            raise CorruptFileError(filename=path.name, reason=f"DOCX parsing failed: {exc}") from exc

@@ -250,7 +250,7 @@ class TestOpenAIVideoBackend:
                 prompt="Bad content",
                 output_path=output_path,
             )
-            with pytest.raises(RuntimeError, match="Sora 视频生成失败"):
+            with pytest.raises(RuntimeError, match="Sora video generation failed"):
                 await backend.generate(request)
 
         # Failure should raise during polling, without entering download.
@@ -528,7 +528,7 @@ class TestOpenAIVideoBackend:
                 output_path=output_path,
                 duration_seconds=8,
             )
-            with pytest.raises(RuntimeError, match="Sora 视频生成失败"):
+            with pytest.raises(RuntimeError, match="Sora video generation failed"):
                 await backend.generate(request)
 
         assert mock_client.videos.retrieve.call_count == 1
@@ -565,7 +565,7 @@ class TestOpenAIVideoBackend:
                 output_path=output_path,
                 duration_seconds=8,
             )
-            with pytest.raises(RuntimeError, match="Sora 视频生成失败"):
+            with pytest.raises(RuntimeError, match="Sora video generation failed"):
                 await backend.generate(request)
 
         mock_client.videos.download_content.assert_not_called()
@@ -753,7 +753,7 @@ class TestProxyStatusSynonyms:
             from lib.backends.video_backends.openai import OpenAIVideoBackend
 
             backend = OpenAIVideoBackend(api_key="test-key", model="sora-2")
-            with pytest.raises(RuntimeError, match="Sora 视频生成失败"):
+            with pytest.raises(RuntimeError, match="Sora video generation failed"):
                 await backend.generate(
                     VideoGenerationRequest(prompt="p", output_path=tmp_path / "out.mp4", duration_seconds=8)
                 )
@@ -824,7 +824,7 @@ class TestFailureMessage:
                 )
 
         # Exact assertion: persist error text unchanged in task.error_message, without internal-type repr.
-        assert str(ei.value) == f"Sora 视频生成失败: {expected}"
+        assert str(ei.value) == f"Sora video generation failed: {expected}"
 
 
 _RELAY_A = "https://relay-a.example.com/v1"

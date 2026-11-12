@@ -151,7 +151,7 @@ class JianyingDraftJob:
             if frame is None:
                 raise JianyingDraftError(
                     "jianying_draft_hold_frame_unavailable",
-                    f"无法取出剪辑片段 {clip.clip_id} 的出点帧，定格延长写不进剪映草稿",
+                    f"Cannot extract the out-point frame of clip {clip.clip_id}, so the freeze extension cannot be written into the JianYing draft",
                     clip_id=clip.clip_id,
                 )
             hold_frames[clip.clip_id] = frame
@@ -178,7 +178,9 @@ class JianyingDraftJob:
                 expected_duration_us=self.placement.duration_us,
             )
         except JianyingDraftArchiveError as exc:
-            raise JianyingDraftError("jianying_draft_acceptance_failed", f"剪映草稿未通过验收：{exc}") from exc
+            raise JianyingDraftError(
+                "jianying_draft_acceptance_failed", f"JianYing draft failed acceptance: {exc}"
+            ) from exc
 
 
 @dataclass(frozen=True, slots=True)
@@ -207,19 +209,22 @@ class TimelineJianyingDraftService:
         narration = narration or default_draft_narration(project)
         if narration == WITH_NARRATION and project_narration_delivery(project) != USE_TTS:
             raise JianyingDraftError(
-                "jianying_draft_narration_unavailable", "只有 TTS 配音项目可以导出带旁白版本", narration=narration
+                "jianying_draft_narration_unavailable",
+                "Only TTS voiceover projects can export the with-voiceover variant",
+                narration=narration,
             )
         applicable = _applicable_issues(readout.issues, narration)
         blocking = [issue for issue in applicable if issue.severity is IssueSeverity.BLOCKING]
         if blocking:
             raise JianyingDraftError(
                 "jianying_draft_blocked",
-                "剪辑时间线有阻断导出的问题：" + "、".join(f"{issue.code}({issue.unit_id})" for issue in blocking),
+                "The timeline has issues that block export: "
+                + ", ".join(f"{issue.code}({issue.unit_id})" for issue in blocking),
                 issues=[issue.model_dump(mode="json") for issue in blocking],
             )
         if not any(clip.status != "unit_deleted" for clip in readout.clips):
             raise JianyingDraftError(
-                "jianying_draft_empty", "剪辑时间线没有可导出的剪辑片段", timeline_id=readout.timeline.id
+                "jianying_draft_empty", "The timeline has no clips to export", timeline_id=readout.timeline.id
             )
         check = JianyingDraftCheck(
             episode=readout.timeline.episode,
@@ -253,7 +258,7 @@ class TimelineJianyingDraftService:
         document = await asyncio.to_thread(lambda: EditTimelineStore(self._projects, project_name).find(timeline_id))
         target = document.revision(number)
         if target is None:
-            raise EditTimelineError("revision_not_found", f"剪辑时间线「{timeline_id}」没有修订 {number}")
+            raise EditTimelineError("revision_not_found", f'Timeline "{timeline_id}" has no revision {number}')
         project_dir = await asyncio.to_thread(self._projects.get_project_path, project_name)
         kind, _items = await asyncio.to_thread(
             load_episode_items, self._projects, project_name, checked.project, episode
@@ -266,7 +271,7 @@ class TimelineJianyingDraftService:
         except UnitMaterialUnavailableError as exc:
             raise JianyingDraftError(
                 "jianying_draft_presentation_unavailable",
-                f"视频单元 {exc.unit_id} 的素材无法用于剪映草稿：{exc}",
+                f"Media of video unit {exc.unit_id} cannot be used in a JianYing draft: {exc}",
                 unit_id=exc.unit_id,
             ) from exc
         aspect_ratio = resolve_video_aspect_ratio(checked.project, resource_type)
@@ -285,8 +290,8 @@ class TimelineJianyingDraftService:
         if missing_bgm := bgm_missing_issues(target.content, bgm_sources):
             raise JianyingDraftError(
                 "jianying_draft_blocked",
-                "BGM 不在项目里或文件已不在："
-                + "、".join(dict.fromkeys(issue.params["bgm_id"] for issue in missing_bgm)),
+                "BGM is not in the project or its file is gone: "
+                + ", ".join(dict.fromkeys(issue.params["bgm_id"] for issue in missing_bgm)),
                 issues=[issue.model_dump(mode="json") for issue in missing_bgm],
             )
         return JianyingDraftJob(
@@ -387,7 +392,7 @@ class TimelineJianyingDraftService:
         if status.status not in {ArtifactStatus.CURRENT, ArtifactStatus.STALE}:
             raise JianyingDraftError(
                 "jianying_draft_not_exported",
-                f"剪辑时间线「{timeline_id}」还没有导出过这个旁白版本的剪映草稿",
+                f'Timeline "{timeline_id}" has no exported JianYing draft for this voiceover variant yet',
                 timeline_id=timeline_id,
                 narration=narration,
             )

@@ -251,11 +251,11 @@ class AgentAccessPolicy:
             logical_norm = Path(os.path.normpath(str(logical)))
             resolved = logical.resolve()
         except (ValueError, OSError):
-            return False, "访问被拒绝：无效的文件路径"
+            return False, "Access denied: invalid file path"
 
         # Rule 0: unconditionally deny sensitive files.
         if self.is_sensitive_path(resolved):
-            return False, f"访问被拒绝：敏感文件不可访问 ({resolved})"
+            return False, f"Access denied: sensitive files are not accessible ({resolved})"
 
         if tool_name in self._WRITE_TOOLS:
             return self._check_write_access(resolved, project_cwd, logical_norm=logical_norm, user_id=user_id)
@@ -516,13 +516,13 @@ class AgentAccessPolicy:
         WINDOWS_BASH_PREFIX_WHITELIST to prevent drift between the constant and message."""
         allowed_lines = "\n".join(f"  - {prefix}" for prefix in cls.WINDOWS_BASH_PREFIX_WHITELIST)
         return (
-            f"未授权的 Bash 命令: {command[:200]}\n"
-            "当前 Bash 白名单仅允许以下前缀:\n"
+            f"Unauthorized Bash command: {command[:200]}\n"
+            "The current Bash allowlist permits only these prefixes:\n"
             f"{allowed_lines}\n"
-            "且命令不得包含 shell 元字符（; & | < > ` $ 或换行）或 .. 路径穿越——"
-            "复合命令请拆成多次独立调用，脚本路径不要用 .. 逃出目录。\n"
-            "python 仅允许跑 .claude/skills/<skill>/scripts/<script>.py 入口脚本。\n"
-            "其他 Bash 命令在 Windows 回退模式下不可用。"
+            "Commands must not contain shell metacharacters (; & | < > ` $ or newlines) or .. path traversal. "
+            "Split compound commands into separate calls, and do not use .. to leave a directory in script paths.\n"
+            "python may run only .claude/skills/<skill>/scripts/<script>.py entry scripts.\n"
+            "Other Bash commands are unavailable in Windows fallback mode."
         )
 
     # Read-only subagent (agent-definition ``name``) → all tools it may call. Agent frontmatter
@@ -541,8 +541,8 @@ class AgentAccessPolicy:
         if allowed is None or tool_name in allowed:
             return None
         return (
-            f"子智能体 {agent_type} 是只读的，不能调用 {tool_name}；"
-            f"只能使用 {'、'.join(sorted(allowed))}。需要改动时把建议写进报告，交给主对话执行。"
+            f"Subagent {agent_type} is read-only and cannot call {tool_name}; "
+            f"it may use only {', '.join(sorted(allowed))}. Put any needed changes in the report for the main conversation to carry out."
         )
 
     def filter_allowed_tools(self, tools: list[str]) -> list[str]:
@@ -634,16 +634,22 @@ class AgentAccessPolicy:
             return True, None
         # Within the data root: current project and current user memory are already allowed above; deny everything else.
         if self._is_within_for_compare(resolved, self._layout.projects_dir):
-            return False, (f"访问被拒绝：不允许跨项目读取 ({resolved} 不在当前项目 {project_cwd} 内)")
+            return False, (
+                f"Access denied: cross-project reads are not allowed ({resolved} is outside the current project {project_cwd})"
+            )
         if self._is_within_for_compare(resolved, self.data_root):
-            return False, (f"访问被拒绝：数据根内只能读取当前项目与你的记忆 ({resolved})")
+            return False, (
+                f"Access denied: within the data root you may read only the current project and your memory ({resolved})"
+            )
         if is_search and self._is_within_for_compare(self.data_root, resolved):
-            return False, (f"访问被拒绝：搜索范围包含数据根，请缩小到当前项目或具体的参考资料目录 ({resolved})")
+            return False, (
+                f"Access denied: the search scope includes the data root; narrow it to the current project or a specific reference directory ({resolved})"
+            )
         # Allow reference material within the repository root (lib/docs/agent_runtime_profile, etc.).
         if resolved.is_relative_to(self.project_root):
             return True, None
         # Deny other paths (host filesystem: ~/.ssh, /etc, etc.) by default.
-        return False, (f"访问被拒绝：路径在项目根外 ({resolved})")
+        return False, (f"Access denied: path is outside the project root ({resolved})")
 
     def _check_write_access(
         self, resolved: Path, project_cwd: Path, *, logical_norm: Path, user_id: str
@@ -666,7 +672,7 @@ class AgentAccessPolicy:
         # code-extension denial still applies: memory contains notes; relaxing extensions would hand executable scripts to Bash.
         in_user_memory = self._is_user_memory_path(resolved, user_id=user_id)
         if not in_user_memory and not any(resolved.is_relative_to(base) for base in bases):
-            return False, (f"访问被拒绝：不允许写入当前项目目录之外的路径 ({resolved})")
+            return False, (f"Access denied: writing outside the current project directory is not allowed ({resolved})")
 
         for rule in self.PROTECTED_WRITE_RULES:
             if any(rule.matches(target, bases) for target in (resolved, logical_norm)):
@@ -675,9 +681,9 @@ class AgentAccessPolicy:
         ext = resolved.suffix.lower()
         if ext in self._CODE_EXTENSIONS_FORBIDDEN:
             return False, (
-                f"不允许在项目内创建/编辑 {ext} 类型的代码文件。"
-                "Write/Edit 应用于数据文件 (.json/.md/.txt 等)；"
-                "代码逻辑请通过现有 skill 脚本完成。"
+                f"Creating or editing {ext} code files inside the project is not allowed. "
+                "Use Write/Edit for data files (.json/.md/.txt, etc.); "
+                "implement code logic through existing skill scripts."
             )
 
         return True, None
@@ -886,9 +892,9 @@ AgentAccessPolicy.PROTECTED_WRITE_RULES = (
         name="project_json",
         matches=AgentAccessPolicy._is_protected_project_json,
         deny_message=(
-            "访问被拒绝：scripts/*.json 与 project.json 不可用 Write/Edit 直改，"
-            "请改用 MCP 工具——剧本编辑走 mcp__arcreel__patch_episode_script，"
-            "角色/场景/道具走 mcp__arcreel__patch_project，资产改名走 mcp__arcreel__rename_asset。"
+            "Access denied: scripts/*.json and project.json cannot be edited directly with Write/Edit. "
+            "Use MCP tools instead: script edits go through mcp__arcreel__patch_episode_script, "
+            "characters/scenes/props through mcp__arcreel__patch_project, and asset renames through mcp__arcreel__rename_asset."
         ),
         sandbox_subpaths=("scripts", "project.json"),
     ),
@@ -896,10 +902,10 @@ AgentAccessPolicy.PROTECTED_WRITE_RULES = (
         name="edit_timeline",
         matches=AgentAccessPolicy._is_protected_edit_timeline,
         deny_message=(
-            "访问被拒绝：edit_timelines/ 下的剪辑时间线不可直接写入，每次剪辑都要经剪辑时间线工具追加修订；"
-            "新建与复制走 mcp__arcreel__create_timeline，查看走 mcp__arcreel__read_timeline，"
-            "修改走 mcp__arcreel__edit_timeline，改名走 mcp__arcreel__rename_timeline，"
-            "回滚走 mcp__arcreel__restore_revision。"
+            "Access denied: edit timelines under edit_timelines/ cannot be written directly; every edit must append a revision "
+            "through the timeline tools. Create and copy with mcp__arcreel__create_timeline, view with mcp__arcreel__read_timeline, "
+            "modify with mcp__arcreel__edit_timeline, rename with mcp__arcreel__rename_timeline, "
+            "and roll back with mcp__arcreel__restore_revision."
         ),
         sandbox_subpaths=("edit_timelines",),
     ),
@@ -907,9 +913,10 @@ AgentAccessPolicy.PROTECTED_WRITE_RULES = (
         name="source",
         matches=AgentAccessPolicy._is_protected_source,
         deny_message=(
-            "访问被拒绝：source/ 下的源文不可直接写入，改动要按对齐重映射分集账本；"
-            "新增或整份替换源文走 mcp__arcreel__upload_source，修改整本源文的文件或自带原文的集的原文走 "
-            "mcp__arcreel__edit_source_text。删除、调序整本源文的文件请用户在「分集」视图里操作。"
+            "Access denied: source text under source/ cannot be written directly; changes must remap the episode ledger by alignment. "
+            "Add or fully replace source text with mcp__arcreel__upload_source; edit whole-source files or the source text of "
+            "episodes with their own source text with mcp__arcreel__edit_source_text. To delete or reorder whole-source files, "
+            'ask the user to do it in the "Episodes" view.'
         ),
         sandbox_subpaths=("source",),
     ),
@@ -917,8 +924,8 @@ AgentAccessPolicy.PROTECTED_WRITE_RULES = (
         name="trash",
         matches=AgentAccessPolicy._is_protected_trash,
         deny_message=(
-            "访问被拒绝：.arcreel/trash/ 是项目回收站，不可直接写入或删除。"
-            "回收站的清空与彻底删除只能由用户在文件视图里操作。"
+            "Access denied: .arcreel/trash/ is the project trash and cannot be written or deleted directly. "
+            "Only the user can empty the trash or permanently delete items, from the file view."
         ),
         sandbox_subpaths=(f"{ARCREEL_DIRNAME}/{TRASH_DIRNAME}",),
     ),
@@ -926,11 +933,11 @@ AgentAccessPolicy.PROTECTED_WRITE_RULES = (
         name="media",
         matches=AgentAccessPolicy._is_protected_media,
         deny_message=(
-            "访问被拒绝：媒体目录（"
-            + "、".join(f"{name}/" for name in AGENT_PROTECTED_MEDIA_DIRS)
-            + "）下的文件与根目录的 style_reference 风格参考图不可直接写入、覆盖或删除，媒体只经生成与编辑工具写入。"
-            "删除未引用文件走 mcp__arcreel__delete_project_file，文件移入项目回收站，可用 "
-            "mcp__arcreel__restore_trash_record 恢复。"
+            "Access denied: files in media directories ("
+            + ", ".join(f"{name}/" for name in AGENT_PROTECTED_MEDIA_DIRS)
+            + ") and the root style_reference image cannot be written, overwritten or deleted directly; media is written only "
+            "through generation and editing tools. Delete unreferenced files with mcp__arcreel__delete_project_file; the file "
+            "moves to the project trash and can be restored with mcp__arcreel__restore_trash_record."
         ),
         sandbox_subpaths=(*AGENT_PROTECTED_MEDIA_DIRS, *AGENT_PROTECTED_MEDIA_FILES),
     ),
@@ -938,8 +945,9 @@ AgentAccessPolicy.PROTECTED_WRITE_RULES = (
         name="versions",
         matches=AgentAccessPolicy._is_protected_versions,
         deny_message=(
-            "访问被拒绝：versions/ 是版本历史，不可直接写入、覆盖或删除；版本记录与快照只经版本管理维护。"
-            "切换视频版本走 mcp__arcreel__select_video_version。"
+            "Access denied: versions/ is the version history and cannot be written, overwritten or deleted directly; version "
+            "records and snapshots are maintained only by version management. "
+            "Switch video versions with mcp__arcreel__select_video_version."
         ),
         sandbox_subpaths=("versions",),
     ),
@@ -947,14 +955,14 @@ AgentAccessPolicy.PROTECTED_WRITE_RULES = (
         name="formal_script_plan",
         matches=AgentAccessPolicy._is_protected_formal_script_plan,
         deny_message=(
-            "访问被拒绝：正式 script_plan 与待修复草稿（"
+            "Access denied: the formal script_plan and drafts awaiting repair ("
             + " / ".join(sorted(AGENT_PROTECTED_SCRIPT_PLAN_FILENAMES))
-            + "）不可用 Write/Edit 直改。"
-            "这些文件与 Web 端保存、迁移读改写、重生成共享一把文件锁，而 Write/Edit 取不到这把锁，"
-            "直改会与并发的保存互相丢失更新。"
-            f'请改用 MCP 工具——mcp__arcreel__{OPEN_DRAFT_TOOL_NAME}({{"episode_id": N, "doc_type": "..."}}) '
-            "读取可编辑草稿，用 mcp__arcreel__patch_draft 提交修改，再用 "
-            f"mcp__arcreel__{PROMOTE_TOOL_NAME} 校验并晋升回正式文件。"
+            + ") cannot be edited directly with Write/Edit. "
+            "These files share one file lock with Web saves, migration read-modify-writes and regeneration, and Write/Edit "
+            "cannot take that lock, so direct edits and concurrent saves would lose each other's updates. "
+            f'Use MCP tools instead: read the editable draft with mcp__arcreel__{OPEN_DRAFT_TOOL_NAME}({{"episode_id": N, "doc_type": "..."}}), '
+            "submit changes with mcp__arcreel__patch_draft, then validate and promote it back to the formal file with "
+            f"mcp__arcreel__{PROMOTE_TOOL_NAME}."
         ),
         sandbox_subpaths=("drafts",),
     ),

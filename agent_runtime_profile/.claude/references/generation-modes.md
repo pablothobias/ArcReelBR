@@ -41,13 +41,13 @@ Additional facts not expressed by the plan:
 - **Episode target duration** (non-ad): non-null `episode_target_duration` guides shot/unit count; unless `episode_target_units` is explicit, planning also converts it to source volume via speaking rate. Both are soft: fewer units for insufficient content, overruns for necessary content, warnings without blocking
 - **Reference-video unit duration**: one unit is one generation call and duration, chosen from effective tiers **matching its reference state** (`get_video_capabilities` `reference_unit_durations.with_references` / `.without_references`; some models restrict image-backed duration). Resplit content that cannot fit; never violate duration. Subagents query `mcp__arcreel__get_video_capabilities` at execution; **do not freeze values here**. Existing units follow server `reference_unit_durations.units[unit_id]`, based on currently available images; registered assets without sheets are not image-backed and appear in `problems` / `unavailable_references`
 - **Editing/final cuts**: all modes join/render via `edit-video` timelines; Veo extend is only **single-clip extension**, not joining shots
-- **BGM**: generation appends `Avoid: BGM、文字字幕、水印` to video prompts automatically; do not append manually or describe BGM / scores
+- **BGM**: generation appends `Avoid: BGM, text subtitles, watermarks, logos` to video prompts automatically; do not append manually or describe BGM / scores
 
 ## Prompt language
 
 - Image/video prompts use **Chinese**
 - Use narrative descriptions, not keyword lists
-- Reference video additionally uses `@[角色]/@[场景]/@[道具]` to reference assets; **never** describe appearance, clothing, or scene details supplied by references
+- Reference video additionally uses `@[character]/@[scene]/@[prop]` to reference assets; **never** describe appearance, clothing, or scene details supplied by references
 
 ## Directory differences
 

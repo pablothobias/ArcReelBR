@@ -736,7 +736,7 @@ describe("ReferenceVideoCanvas", () => {
     });
   });
 
-  // Unregistered `@[名称]` is informational, never affecting save/generate availability.
+  // Unregistered `@[name]` is informational, never affecting save/generate availability.
   it("keeps saving and generating available when the body mentions an unregistered name", async () => {
     const unit = mkUnit("E1U1", "推门。");
     vi.spyOn(API, "listReferenceVideoUnits").mockResolvedValue({ units: [unit], unit_capabilities: {} });

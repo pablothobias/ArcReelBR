@@ -231,7 +231,7 @@ class TestParseDraft:
         ):
             EpisodePlanner._parse_draft(raw, NarrationPlanDraft)
 
-        assert "不是合法 JSON" in exc_info.value.reasons[0]
+        assert "not valid JSON" in exc_info.value.reasons[0]
         assert any(raw[:20] in record.getMessage() for record in caplog.records)
 
     def test_rejects_bare_episode_dict_at_top_level(self, caplog):
@@ -244,7 +244,7 @@ class TestParseDraft:
         ):
             EpisodePlanner._parse_draft(raw, NarrationPlanDraft)
 
-        assert "不符合 schema" in exc_info.value.reasons[0]
+        assert "does not match the schema" in exc_info.value.reasons[0]
         assert "episodes" in exc_info.value.reasons[0]
         assert any(ANCHOR_EP1 in record.getMessage() for record in caplog.records)
 
@@ -391,10 +391,10 @@ class TestPlan:
         (project_dir / "source" / "episode_1.txt").write_text(SOURCE[: _end_of(ANCHOR_EP1)], encoding="utf-8")
         fake = _FakeTextGenerator([])
 
-        with pytest.raises(EpisodePlanningError, match="没有原文范围记录") as excinfo:
+        with pytest.raises(EpisodePlanningError, match="have no source range record") as excinfo:
             await EpisodePlanner(project_dir, generator=fake).plan()
 
-        assert "照常可以做脚本规划" in str(excinfo.value)
+        assert "can still get script plans as usual" in str(excinfo.value)
         assert "reset_episode_planning" in str(excinfo.value)
         assert fake.requests == []
         assert _load_project(project_dir)["episodes"] == [legacy]
@@ -510,7 +510,7 @@ class TestPlan:
         )
         planner = EpisodePlanner(project_dir, generator=fake)
 
-        with pytest.raises(EpisodePlanningError, match="没有原文范围记录"):
+        with pytest.raises(EpisodePlanningError, match="have no source range record"):
             await planner.plan()
 
         reset = reset_episode_planning(project_dir, confirm_consumed=True)
@@ -539,7 +539,7 @@ class TestPlan:
         assert len(fake.requests) == 2
         retry_prompt = fake.requests[1].prompt
         assert bad_anchor in retry_prompt  # The failure reason identifies the specific anchor.
-        assert "不存在" in retry_prompt
+        assert "does not occur in the source text window" in retry_prompt
         assert [s.title for s in result.episodes] == ["古玉藏诀"]
         project = _load_project(project_dir)
         assert len(project["episodes"]) == 1
@@ -565,8 +565,8 @@ class TestPlan:
         result = await EpisodePlanner(project_dir, generator=fake).plan()
 
         assert len(fake.requests) == 3
-        assert "2 次" in fake.requests[1].prompt  # Nonunique: report occurrence count.
-        assert "连续" in fake.requests[2].prompt  # Discontinuous: report range-advancement issue.
+        assert "occurs 2 times" in fake.requests[1].prompt  # Nonunique: report occurrence count.
+        assert "must advance continuously" in fake.requests[2].prompt  # Discontinuous: report range-advancement issue.
         assert [s.title for s in result.episodes] == ["丙"]
 
     async def test_plan_rejects_overlapping_anchor_occurrences_as_ambiguous(self, tmp_path: Path):
@@ -583,7 +583,7 @@ class TestPlan:
         result = await EpisodePlanner(project_dir, generator=fake).plan()
 
         assert len(fake.requests) == 2
-        assert "2 次" in fake.requests[1].prompt  # Count with overlaps allowed.
+        assert "occurs 2 times" in fake.requests[1].prompt  # Count with overlaps allowed.
         assert [s.title for s in result.episodes] == ["乙"]
 
     async def test_plan_resolves_anchor_with_halfwidth_punctuation(self, tmp_path: Path):
@@ -837,8 +837,8 @@ class TestPlan:
         result = await EpisodePlanner(project_dir, generator=fake).plan()
 
         assert len(fake.requests) == 2
-        assert "无法唯一定位" in fake.requests[1].prompt
-        assert "2 次" in fake.requests[1].prompt
+        assert "cannot be located uniquely" in fake.requests[1].prompt
+        assert "occurs 2 times" in fake.requests[1].prompt
         assert [s.title for s in result.episodes] == ["乙"]
 
     async def test_plan_continues_after_last_cut_episode_in_next_source_file(self, tmp_path: Path):
@@ -893,7 +893,7 @@ class TestPlan:
                 )
 
         fake = _ExhaustedGenerator()
-        with pytest.raises(EpisodePlanningError, match="结构化输出能力不足") as exc_info:
+        with pytest.raises(EpisodePlanningError, match="cannot produce the required structured output") as exc_info:
             await EpisodePlanner(project_dir, generator=fake).plan()
 
         assert fake.calls == 1
@@ -918,7 +918,7 @@ class TestPlan:
             [_plan_response([{"title": "古玉藏诀", "hook": "玉中剑诀来历成谜", "end_anchor": ANCHOR_EP1}])]
         )
 
-        with pytest.raises(PlanningConflictError, match="并发"):
+        with pytest.raises(PlanningConflictError, match="concurrent"):
             await EpisodePlanner(project_dir, generator=fake).plan()
 
         # Ledger remains exactly at the concurrent committed state; this call writes no episode entries or source fingerprints.
@@ -942,7 +942,7 @@ class TestPlan:
             [_plan_response([{"title": "古玉藏诀", "hook": "玉中剑诀来历成谜", "end_anchor": ANCHOR_EP1}])]
         )
 
-        with pytest.raises(PlanningConflictError, match="并发"):
+        with pytest.raises(PlanningConflictError, match="concurrent"):
             await EpisodePlanner(project_dir, generator=fake).plan()
 
         assert (project_dir / "project.json").read_text(encoding="utf-8") == after_concurrent_write[0]
@@ -1351,7 +1351,7 @@ class TestPlan:
 
         fake.generate = _generate_then_pollute
 
-        with pytest.raises(EpisodePlanningError, match="没有原文范围记录"):
+        with pytest.raises(EpisodePlanningError, match="have no source range record"):
             await planner.plan()
 
         episodes = _load_project(project_dir)["episodes"]

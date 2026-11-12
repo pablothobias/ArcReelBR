@@ -337,7 +337,7 @@ class TestBuildGridPrompt:
     def test_more_scenes_than_cells_fails_loud(self):
         # Excess scenes have no image cells; callers must chunk by max_cell_count first.
         scenes = [self._scene(f"S{i}", f"s{i}", f"a{i}") for i in range(1, 13)]
-        with pytest.raises(ValueError, match="切块"):
+        with pytest.raises(ValueError, match="split the group into chunks"):
             build_grid_prompt(
                 scenes=scenes, id_field="scene_id", rows=3, cols=3, style="realistic", style_description=""
             )

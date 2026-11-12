@@ -62,12 +62,12 @@ class TestApiKeyResolution:
         assert resolve_agnes_api_key("  sk-abc  ") == "sk-abc"
 
     def test_missing_raises(self):
-        with pytest.raises(ValueError, match=r"请到系统配置页填写 Agnes API Key"):
+        with pytest.raises(ValueError, match=r"Enter the Agnes API Key in Settings"):
             resolve_agnes_api_key(None)
 
     def test_blank_raises(self):
         # No environment fallback; missing values fail explicitly.
-        with pytest.raises(ValueError, match=r"请到系统配置页填写 Agnes API Key"):
+        with pytest.raises(ValueError, match=r"Enter the Agnes API Key in Settings"):
             resolve_agnes_api_key("   ")
 
 
@@ -83,5 +83,5 @@ class TestHeaders:
 
     def test_blank_key_raises(self):
         # Whitespace keys fail locally, never produce empty Bearer and defer 401 until requests.
-        with pytest.raises(ValueError, match=r"请到系统配置页填写 Agnes API Key"):
+        with pytest.raises(ValueError, match=r"Enter the Agnes API Key in Settings"):
             agnes_headers("   ")

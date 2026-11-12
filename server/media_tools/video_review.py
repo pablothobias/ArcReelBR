@@ -146,7 +146,8 @@ async def inspect_video_units(
     unit_ids = list(dict.fromkeys(request.value.unit_ids))
     if len(unit_ids) > MAX_FRAMES_PER_CALL:
         return tool_problem(
-            f"一次最多看 {MAX_FRAMES_PER_CALL} 帧，{len(unit_ids)} 个视频单元每个至少一帧已超出上限，请分批调用",
+            f"At most {MAX_FRAMES_PER_CALL} frames per call; {len(unit_ids)} video units at one frame each "
+            "already exceed the limit, so split the call into batches",
             code="frame_budget_exceeded",
             params={"max_frames_per_call": MAX_FRAMES_PER_CALL},
         )
@@ -161,7 +162,9 @@ async def inspect_video_units(
         project, missing = await asyncio.to_thread(find_missing_units)
         if missing:
             return tool_problem(
-                f"视频单元不存在：{', '.join(missing)}", code="video_unit_not_found", params={"unit_ids": missing}
+                f"Video units not found: {', '.join(missing)}",
+                code="video_unit_not_found",
+                params={"unit_ids": missing},
             )
 
         resource_type = "reference_videos" if is_reference_video_project(project) else "videos"
@@ -181,7 +184,8 @@ async def inspect_video_units(
                     version = current if current > 0 else None
                 elif version not in available:
                     return tool_problem(
-                        f"视频单元「{unit_id}」没有版本 v{version}；现有版本：{', '.join(map(str, available)) or '无'}",
+                        f'Video unit "{unit_id}" has no version v{version}; available versions: '
+                        f"{', '.join(map(str, available)) or 'none'}",
                         code="version_not_found",
                         params={"unit_id": unit_id, "available_versions": available},
                     )
@@ -217,7 +221,9 @@ async def inspect_video_units(
         units = [replace(unit, available_versions=tuple(available_by_unit[unit.unit_id])) for unit in units]
         return ToolOutcome(value=InspectVideoUnitsResult(frame_budget_per_unit=frames, units=tuple(units)))
     except FfmpegUnavailableError as exc:
-        return tool_problem(f"随包 ffmpeg 不可用，无法出联系表：{exc}", code="ffmpeg_unavailable")
+        return tool_problem(
+            f"Bundled ffmpeg is unavailable, so contact sheets cannot be built: {exc}", code="ffmpeg_unavailable"
+        )
     except Exception as exc:
         return tool_error(_OPERATION, exc)
 
@@ -284,8 +290,12 @@ def inspect_video_units_images(value: InspectVideoUnitsResult) -> list[ToolImage
 def inspect_video_units_summary(value: InspectVideoUnitsResult) -> str:
     sheets = len(_sheets_in_order(value))
     unseen = [unit.unit_id for unit in value.units if unit.status != "ok"]
-    text = f"已为 {len(value.units) - len(unseen)} 个视频单元出 {sheets} 张联系表，共 {value.total_frames} 帧（每单元预算 {value.frame_budget_per_unit} 帧，镜头多的单元会超出预算），图片按 image 序号附在后面"
-    return f"{text}；没有可看的画面：{', '.join(unseen)}" if unseen else text
+    text = (
+        f"Built {sheets} contact sheet(s) for {len(value.units) - len(unseen)} video units, "
+        f"{value.total_frames} frames in total ({value.frame_budget_per_unit} frames budgeted per unit; "
+        "units with many shots exceed the budget); the images follow in image order"
+    )
+    return f"{text}; nothing to view for: {', '.join(unseen)}" if unseen else text
 
 
 __all__ = [

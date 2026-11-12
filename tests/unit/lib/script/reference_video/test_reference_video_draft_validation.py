@@ -22,7 +22,7 @@ PROJECT = {
     "props": {"长剑": {}},
 }
 
-#: Project payload with character derivatives for registration checks of ``@[角色/衍生]`` (docs/adr/0072).
+#: Project payload with character derivatives for registration checks of ``@[character/derivative]`` (docs/adr/0072).
 DERIVATIVE_PROJECT = {
     "characters": {"李明": {"derivatives": {"劲装": {}}}, "王五": {}},
     "scenes": {"酒馆": {}},
@@ -54,11 +54,11 @@ class TestSourceTextAnchor:
         assert validate_source_text_anchor("unit E1U01", anchor, novel) is None
 
     def test_rewritten_text_rejected(self):
-        with pytest.raises(DraftViolation, match="不是小说原文的逐字片段"):
+        with pytest.raises(DraftViolation, match="is not a verbatim excerpt of the novel source text"):
             validate_source_text_anchor("unit E1U01", "李明走进了酒馆", "李明推开酒馆的门。")
 
     def test_blank_anchor_rejected(self):
-        with pytest.raises(DraftViolation, match="source_text 为空"):
+        with pytest.raises(DraftViolation, match="has an empty source_text"):
             validate_source_text_anchor("unit E1U01", "   ", "李明推开酒馆的门。")
 
 
@@ -111,22 +111,22 @@ class TestUnitText:
         assert refs == []
 
     def test_blank_text_rejected(self):
-        with pytest.raises(DraftViolation, match="正文为空"):
+        with pytest.raises(DraftViolation, match="has an empty body"):
             validate_unit_text("unit E1U01", "   \n  ", PROJECT, max_refs=None)
 
     def test_unclosed_brace_rejected(self):
-        with pytest.raises(DraftViolation, match="未闭合的花括号") as exc_info:
+        with pytest.raises(DraftViolation, match="has an unclosed brace") as exc_info:
             validate_unit_text("unit E1U01", "镜头1：@[李明] 说 {我来了", PROJECT, max_refs=None)
         assert exc_info.value.line == 0
 
     def test_fullwidth_braces_rejected_carries_line(self):
-        with pytest.raises(DraftViolation, match="全角花括号") as exc_info:
+        with pytest.raises(DraftViolation, match="uses fullwidth braces") as exc_info:
             validate_unit_text("unit E1U01", "镜头1：门开了\n@[李明]：｛我来了。｝", PROJECT, max_refs=None)
         assert exc_info.value.line == 1
 
     def test_brace_in_description_rejected(self):
         """Braces not recognized as speech markers still violate the contract; empty dialogue would derive contentless speech."""
-        with pytest.raises(DraftViolation, match="画面描述里使用了花括号"):
+        with pytest.raises(DraftViolation, match="uses braces in visual description"):
             validate_unit_text("unit E1U01", "镜头1：@[李明] 推门，音量 {}", PROJECT, max_refs=None)
 
     def test_inline_speech_marks_are_accepted(self):
@@ -137,15 +137,15 @@ class TestUnitText:
         assert [r.name for r in refs] == ["李明", "酒馆"]
 
     def test_unregistered_mention_rejected(self):
-        with pytest.raises(DraftViolation, match="未登记的资产名"):
+        with pytest.raises(DraftViolation, match="references unregistered asset names"):
             validate_unit_text("unit E1U01", "镜头1：@[路人甲] 走过", PROJECT, max_refs=None)
 
     def test_unregistered_speaker_rejected(self):
-        with pytest.raises(DraftViolation, match="说话人未登记"):
+        with pytest.raises(DraftViolation, match="dialogue speakers not registered as character assets"):
             validate_unit_text("unit E1U01", "镜头1：门开了\n@[无名氏]：{我来了。}", PROJECT, max_refs=None)
 
     def test_registered_derivative_accepted_in_a_mention_and_in_the_speaker_slot(self):
-        """``@[角色/衍生]`` and ``@[角色/衍生]{台词}`` both accept registered derivatives."""
+        """``@[character/derivative]`` and ``@[character/derivative]{dialogue}`` both accept registered derivatives."""
         refs = validate_unit_text(
             "unit E1U01", "镜头1：@[李明/劲装] 推门。@[李明/劲装]{我来了}", DERIVATIVE_PROJECT, max_refs=None
         )
@@ -153,12 +153,12 @@ class TestUnitText:
         assert [(r.type, r.name) for r in refs] == [("character", "李明/劲装")]
 
     def test_unregistered_derivative_in_a_mention_rejected(self):
-        with pytest.raises(DraftViolation, match="未登记的资产名"):
+        with pytest.raises(DraftViolation, match="references unregistered asset names"):
             validate_unit_text("unit E1U01", "镜头1：@[李明/夜行衣] 推门", DERIVATIVE_PROJECT, max_refs=None)
 
     def test_unregistered_derivative_in_the_speaker_slot_rejected(self):
         """Speaker positions do not derive references, so detect unregistered speakers separately here."""
-        with pytest.raises(DraftViolation, match="写了该角色没有的衍生") as excinfo:
+        with pytest.raises(DraftViolation, match="derivatives the character does not have") as excinfo:
             validate_unit_text("unit E1U01", "镜头1：门开了\n@[李明/夜行衣]{我来了}", DERIVATIVE_PROJECT, max_refs=None)
 
         assert excinfo.value.code == "unregistered_speaker_derivative"
@@ -186,21 +186,21 @@ class TestUnitText:
     def test_unregistered_mention_still_rejected_after_normalization(self):
         """Normalization removes encoding differences only, without relaxing registration; genuinely unregistered names still reject."""
         project = {"characters": {_NAME_NFC: {}}, "scenes": {}, "props": {}}
-        with pytest.raises(DraftViolation, match="未登记的资产名"):
+        with pytest.raises(DraftViolation, match="references unregistered asset names"):
             validate_unit_text("unit E1U01", f"镜头1：@[{_NAME_NFD}Ⅱ] 推门而入", project, max_refs=None)
 
     def test_over_max_refs_rejected(self):
-        with pytest.raises(DraftViolation, match="超过模型上限"):
+        with pytest.raises(DraftViolation, match="exceeding the model limit"):
             validate_unit_text("unit E1U01", "镜头1：@[李明] 与 @[王五] 在 @[酒馆]", PROJECT, max_refs=2)
 
     def test_fullwidth_braces_rejected(self):
         """Speech syntax does not recognize fullwidth braces; admitting them silently turns dialogue into description and derives speakers as reference images."""
-        with pytest.raises(DraftViolation, match="全角花括号"):
+        with pytest.raises(DraftViolation, match="uses fullwidth braces"):
             validate_unit_text("unit E1U01", "镜头1：门开了\n@[李明]：｛我来了。｝", PROJECT, max_refs=None)
 
     def test_dialogue_without_braces_rejected(self):
         """Dialogue missing braces becomes visual description: the entire spoken sentence disappears, while its speaker becomes a reference image."""
-        with pytest.raises(DraftViolation, match="台词写法不合法"):
+        with pytest.raises(DraftViolation, match="has an invalid dialogue line"):
             validate_unit_text("unit E1U01", "镜头1：门开了\n@[李明]：我来了。", PROJECT, max_refs=None)
 
     def test_dialogue_followed_by_description_is_accepted(self):
@@ -209,27 +209,27 @@ class TestUnitText:
         assert [r.name for r in refs] == []
 
     def test_non_character_mention_with_colon_is_a_description(self):
-        """Scene/prop subheadings are valid visual descriptions; do not classify every @[名称]： shape as malformed dialogue."""
+        """Scene/prop subheadings are valid visual descriptions; do not classify every @[name]： shape as malformed dialogue."""
         refs = validate_unit_text("unit E1U01", "镜头1：@[酒馆]：木门被风吹开，灯笼摇晃", PROJECT, max_refs=None)
         assert [(r.type, r.name) for r in refs] == [("scene", "酒馆")]
 
     def test_fullwidth_mention_delimiters_rejected(self):
         """Mention syntax rejects fullwidth `＠` / `［］`; otherwise reference images silently disappear from video requests."""
-        with pytest.raises(DraftViolation, match="写坏的资产引用"):
+        with pytest.raises(DraftViolation, match="has a malformed asset reference"):
             validate_unit_text("unit E1U01", "镜头1：@［李明］ 推开门", PROJECT, max_refs=None)
 
     def test_malformed_mention_rejected(self):
         """Malformed `@[` enters neither references nor recognized replacement, so it reaches provider requests unchanged."""
-        with pytest.raises(DraftViolation, match="写坏的资产引用"):
+        with pytest.raises(DraftViolation, match="has a malformed asset reference"):
             validate_unit_text("unit E1U01", "镜头1：@[李明 推开门", PROJECT, max_refs=None)
 
     def test_empty_mention_rejected(self):
-        with pytest.raises(DraftViolation, match="写坏的资产引用"):
+        with pytest.raises(DraftViolation, match="has a malformed asset reference"):
             validate_unit_text("unit E1U01", "镜头1：@[] 推开门", PROJECT, max_refs=None)
 
     def test_dialogue_only_text_rejected(self):
         """Dialogue-only bodies lack generatable visuals; a unit must produce imagery, not only sound."""
-        with pytest.raises(DraftViolation, match="没有画面描述"):
+        with pytest.raises(DraftViolation, match="has no visual description"):
             validate_unit_text("unit E1U01", "@[李明]：{我来了。}\n{风吹过。}", PROJECT, max_refs=None)
 
     def test_dialogue_written_on_shot_header_line_is_normative(self):
@@ -244,7 +244,7 @@ class TestDialogueLoad:
 
     def test_overload_rejected(self):
         long_line = "这是一段非常长的台词" * 6  # 60 characters ÷ 5 characters/second ≈ 12 seconds.
-        with pytest.raises(DraftViolation, match="超过该 unit"):
+        with pytest.raises(DraftViolation, match="exceeding the unit's"):
             validate_dialogue_load("unit E1U01", f"镜头1：门开了\n@[李明]：{{{long_line}}}", 4, "zh")
 
     def test_tolerance_admits_slight_overrun(self):
@@ -255,13 +255,13 @@ class TestDialogueLoad:
 
     def test_voiceover_counts_toward_budget(self):
         long_line = "画外音很长很长的一段" * 6
-        with pytest.raises(DraftViolation, match="超过该 unit"):
+        with pytest.raises(DraftViolation, match="exceeding the unit's"):
             validate_dialogue_load("unit E1U01", f"镜头1：空镜\n{{{long_line}}}", 4, "zh")
 
     def test_project_override_changes_budget(self):
         """Project speech-rate overrides apply: the same dialogue overloads under slow settings and passes under fast settings."""
         text = "镜头1：门开了\n@[李明]：{一二三四五六七八九十一二三四五六七八九十。}"
-        with pytest.raises(DraftViolation, match="超过该 unit"):
+        with pytest.raises(DraftViolation, match="exceeding the unit's"):
             validate_dialogue_load("unit E1U01", text, 4, "zh", 2.0)
         validate_dialogue_load("unit E1U01", text, 4, "zh", 10.0)
 
@@ -307,21 +307,21 @@ class TestDialoguePreserved:
         assert_dialogue_preserved("unit E1U01", script_plan, prompt_authoring)
 
     def test_rewritten_dialogue_rejected(self):
-        with pytest.raises(DraftViolation, match="第 1 条台词被改写"):
+        with pytest.raises(DraftViolation, match="dialogue line 1 was rewritten"):
             assert_dialogue_preserved("unit E1U01", self.SCRIPT_PLAN, "镜头1：@[李明] 推门\n@[李明]：{我到了。}")
 
     def test_speaker_change_rejected(self):
-        with pytest.raises(DraftViolation, match="第 1 条台词被改写"):
+        with pytest.raises(DraftViolation, match="dialogue line 1 was rewritten"):
             assert_dialogue_preserved("unit E1U01", self.SCRIPT_PLAN, "镜头1：@[李明] 推门\n@[王五]：{我来了。}")
 
     def test_added_dialogue_rejected(self):
-        with pytest.raises(DraftViolation, match="台词条数被改动"):
+        with pytest.raises(DraftViolation, match="dialogue line count changed"):
             assert_dialogue_preserved(
                 "unit E1U01", self.SCRIPT_PLAN, "镜头1：@[李明] 推门\n@[李明]：{我来了。}\n{夜色深沉。}"
             )
 
     def test_dropped_dialogue_rejected(self):
-        with pytest.raises(DraftViolation, match="台词条数被改动"):
+        with pytest.raises(DraftViolation, match="dialogue line count changed"):
             assert_dialogue_preserved("unit E1U01", self.SCRIPT_PLAN, "镜头1：@[李明] 推门")
 
 

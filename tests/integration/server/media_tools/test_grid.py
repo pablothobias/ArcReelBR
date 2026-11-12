@@ -83,7 +83,7 @@ async def test_generate_grid_list_only(fake_ctx: ToolHarness) -> None:
     ]
     out = await run_declared_tool("generate_grid", fake_ctx, {"script": "episode_1.json", "list_only": True})
     assert isinstance(out.value, GridPlanPreview)
-    assert "分组" in out.value.plan
+    assert "group(s):" in out.value.plan
 
 
 @pytest.mark.parametrize(
@@ -122,7 +122,7 @@ async def test_generate_grid_list_only_shows_split_for_oversized_group(fake_ctx:
     out = await run_declared_tool("generate_grid", fake_ctx, {"script": "episode_1.json", "list_only": True})
     assert isinstance(out.value, GridPlanPreview)
     text = out.value.plan
-    assert "2 张宫格: grid_9 (3×3) + grid_4 (2×2)" in text
+    assert "2 grid(s): grid_9 (3×3) + grid_4 (2×2)" in text
 
 
 async def test_generate_grid_falls_back_on_null_aspect_ratio(fake_ctx: ToolHarness) -> None:
@@ -662,7 +662,7 @@ async def test_generate_grid_legacy_unresolvable_episode_fails_before_enqueue(
     out = await run_declared_tool("generate_grid", fake_ctx, {"script": "draft.json"}, batch_waiter=batch_waiter)
 
     assert out.problem is not None
-    assert "无法确定集号" in out.problem.detail
+    assert "Cannot determine the episode number" in out.problem.detail
     enqueue.assert_not_awaited()
 
 
@@ -796,7 +796,7 @@ async def test_generate_grid_reuses_an_identical_in_flight_grid(fake_ctx: ToolHa
     )
 
     assert read_generation_result(out).succeeded == ["E1S02"]
-    assert "沿用已在生成中的任务（未重复提交）" in out.value["summary"]
+    assert "reused the task already generating (not resubmitted)" in out.value["summary"]
     assert enqueued == [in_flight.id]
     assert [g.id for g in GridManager(fake_ctx.project_path).list_all()] == [in_flight.id]
 
@@ -833,7 +833,7 @@ async def test_concurrent_submissions_share_one_grid_instead_of_paying_twice(fak
     assert enqueued == [grid.id, grid.id]
     assert [read_generation_result(out).succeeded for out in outs] == [scene_ids, scene_ids]
     # Scheduling chooses the first entrant; exactly one submission reuses the other grid.
-    assert sum("沿用已在生成中的任务（未重复提交）" in out.value["summary"] for out in outs) == 1
+    assert sum("reused the task already generating (not resubmitted)" in out.value["summary"] for out in outs) == 1
 
 
 async def test_a_submission_does_not_hold_back_others_while_its_grid_generates(fake_ctx: ToolHarness) -> None:
@@ -861,7 +861,7 @@ async def test_a_submission_does_not_hold_back_others_while_its_grid_generates(f
     second_done.set()
 
     assert read_generation_result(second).succeeded == scene_ids
-    assert "沿用已在生成中的任务（未重复提交）" in second.value["summary"]
+    assert "reused the task already generating (not resubmitted)" in second.value["summary"]
     assert read_generation_result(await first).succeeded == scene_ids
     assert len(set(enqueued)) == 1
 
@@ -1026,8 +1026,8 @@ async def test_generate_grid_list_only_shows_each_grid_record_and_action(fake_ct
 
     assert isinstance(out.value, GridPlanPreview)
     text = out.value.plan
-    assert f"等待切分落格，本次不重生成；记录 {unsplit.id} 联合图已就绪、未切分" in text
-    assert f"正在生成，本次沿用、不重复提交；记录 {in_flight.id} 生成中" in text
+    assert f"awaiting split; not regenerated in this run; record {unsplit.id} combined image ready, not split" in text
+    assert f"generating; reused in this run, not resubmitted; record {in_flight.id} generating" in text
 
 
 async def test_generate_grid_refuses_ad_projects(fake_ctx: ToolHarness) -> None:
@@ -1135,7 +1135,7 @@ async def test_split_grids_reports_a_problem_when_nothing_was_split(fake_ctx: To
 
     assert out.problem is not None
     assert out.problem.params["results"] == [
-        {"grid_id": "not-a-grid-id", "status": "not_found", "detail": "宫格不存在"}
+        {"grid_id": "not-a-grid-id", "status": "not_found", "detail": "grid not found"}
     ]
 
 

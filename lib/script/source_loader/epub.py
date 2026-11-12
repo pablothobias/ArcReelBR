@@ -97,7 +97,7 @@ class _Archive:
 
     def read(self, name: str) -> bytes:
         if name not in self._names:
-            raise _EpubFormatError(f"缺少文件 {name}")
+            raise _EpubFormatError(f"missing file {name}")
         return self._zf.read(name)
 
     def xml(self, name: str) -> ET.Element:
@@ -113,7 +113,7 @@ def _find_package_path(archive: _Archive) -> str:
     packages = [r for r in rootfiles if (r.get("media-type") or "").strip().lower() == _PACKAGE_MEDIA_TYPE]
     candidates = packages or [r for r in rootfiles if not r.get("media-type")]
     if not candidates:
-        raise _EpubFormatError("container.xml 未指定包文档")
+        raise _EpubFormatError("container.xml does not specify a package document")
     # EPUB 3.3 defines full-path as a URL relative to the container root.
     return _resolve("", candidates[0].get("full-path", ""))
 
@@ -174,7 +174,7 @@ def _read_book(archive: _Archive) -> list[tuple[str | None, bytes]]:
     manifest = _parse_manifest(package, package_path)
     spines = _children(package, "spine")
     if not spines:
-        raise _EpubFormatError("包文档缺少 spine")
+        raise _EpubFormatError("package document is missing a spine")
     spine = spines[0]
 
     ncx = manifest.get(spine.get("toc") or "") or next(
@@ -212,10 +212,10 @@ class EpubExtractor:
         # Upload parsing boundary: zip/XML/codec exceptions on malformed input are open-ended
         # (corrupted compression, encrypted entries, unknown encodings, invalid filenames); convert collectively to CorruptFileError.
         except Exception as exc:
-            raise CorruptFileError(filename=path.name, reason=f"EPUB 解析失败: {exc}") from exc
+            raise CorruptFileError(filename=path.name, reason=f"EPUB parsing failed: {exc}") from exc
 
         if not chapters:
-            raise CorruptFileError(filename=path.name, reason="EPUB 不含正文章节")
+            raise CorruptFileError(filename=path.name, reason="EPUB contains no body chapters")
 
         parts: list[str] = []
         for idx, (title, content) in enumerate(chapters, start=1):

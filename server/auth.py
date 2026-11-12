@@ -247,9 +247,9 @@ def verify_download_token(token: str, project_name: str) -> dict:
         }
     payload = jwt.decode(token, get_token_secret(), algorithms=["HS256"])
     if payload.get("purpose") != "download":
-        raise ValueError("token purpose 不匹配")
+        raise ValueError("token purpose does not match")
     if payload.get("project") != project_name:
-        raise ValueError("token project 不匹配")
+        raise ValueError("token project does not match")
     return payload
 
 
@@ -473,7 +473,7 @@ def _verify_and_get_payload(token: str) -> dict:
     if payload is None:
         raise HTTPException(
             status_code=401,
-            detail="token 无效或已过期",
+            detail="Token is invalid or expired",
             headers={"WWW-Authenticate": "Bearer"},
         )
     return payload
@@ -486,7 +486,7 @@ async def _verify_and_get_payload_async(token: str) -> dict:
         if payload is None:
             raise HTTPException(
                 status_code=401,
-                detail="API Key 无效、已过期或不存在",
+                detail="API key is invalid, expired or does not exist",
                 headers={"WWW-Authenticate": "Bearer"},
             )
         return payload
@@ -515,7 +515,7 @@ async def get_current_user(
     if not token:
         raise HTTPException(
             status_code=401,
-            detail="未认证",
+            detail="Not authenticated",
             headers={"WWW-Authenticate": "Bearer"},
         )
     payload = await _verify_and_get_payload_async(token)

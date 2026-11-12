@@ -129,7 +129,7 @@ class GrokImageBackend:
 
         # Moderation checks.
         if not response.respect_moderation:
-            raise RuntimeError("Grok 图片生成被内容审核拒绝")
+            raise RuntimeError("Grok image generation was rejected by content moderation")
 
         # Download images locally.
         await download_image_to_path(response.url, request.output_path)

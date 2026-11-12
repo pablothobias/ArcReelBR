@@ -285,7 +285,7 @@ def test_migration_rejects_version_snapshot_paths_outside_project(tmp_path: Path
     original_project = (project_dir / "project.json").read_bytes()
     original_versions = (project_dir / "versions" / "versions.json").read_bytes()
 
-    with pytest.raises(ValueError, match="版本快照路径"):
+    with pytest.raises(ValueError, match="Version snapshot path"):
         migrate_v5_to_v6(project_dir)
 
     assert external.read_bytes() == b"external-version"
@@ -497,7 +497,7 @@ def test_migration_rejects_symlinked_asset_directory_without_touching_target(tmp
         pytest.skip(f"当前平台不允许创建目录符号链接: {exc}")
     original_project = (project_dir / "project.json").read_bytes()
 
-    with pytest.raises(ValueError, match="迁移写入路径不得为符号链接"):
+    with pytest.raises(ValueError, match="Migration write path must not be a symbolic link"):
         migrate_v5_to_v6(project_dir)
 
     assert external_sheet.read_bytes() == b"external-scene"
@@ -531,7 +531,7 @@ def test_migration_rejects_symlinked_non_asset_write_roots(tmp_path: Path, write
         pytest.skip(f"当前平台不允许创建目录符号链接: {exc}")
     original_project = (project_dir / "project.json").read_bytes()
 
-    with pytest.raises(ValueError, match="迁移写入路径不得为符号链接"):
+    with pytest.raises(ValueError, match="Migration write path must not be a symbolic link"):
         migrate_v5_to_v6(project_dir)
 
     assert marker.read_text(encoding="utf-8") == "external"
@@ -562,7 +562,7 @@ def test_migration_rejects_symlinked_draft_write_target(tmp_path: Path) -> None:
         pytest.skip(f"当前平台不允许创建符号链接: {exc}")
     original_project = (project_dir / "project.json").read_bytes()
 
-    with pytest.raises(ValueError, match="迁移写入路径不得为符号链接"):
+    with pytest.raises(ValueError, match="Migration write path must not be a symbolic link"):
         migrate_v5_to_v6(project_dir)
 
     assert outside.read_text(encoding="utf-8") == "镜头1：@[ Trim ] 入场"

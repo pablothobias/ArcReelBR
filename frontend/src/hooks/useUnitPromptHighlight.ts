@@ -22,7 +22,7 @@ import {
  * `name` from `mentionNameFromMatch` is canonical. One residual case remains: BOM inside bare mentions
  * (`@张<U+FEFF>三`) is excluded by `MENTION_RE` bare-name character classes, so highlighting stops before BOM,
  * treating names as unregistered. Reference derivation uses `extractMentions` on normalized lines and is unaffected; only editor coloring
- * differs. Wrapped `@[名<U+FEFF>称]` avoids this: BOM stays inside brackets, whole names normalize after extraction.
+ * differs. Wrapped `@[na<U+FEFF>me]` avoids this: BOM stays inside brackets, whole names normalize after extraction.
  */
 
 /**
@@ -33,8 +33,8 @@ import {
 export type { MentionLookup } from "@/utils/reference-mentions";
 
 /**
- * `speech` represents parser-recognized utterance markers (`@[角色]{台词}` / `{台词}`). `text` always contains their entire
- * raw source (including `@[名称]` and braces), so token sequences still reconstruct source exactly; empty `speaker`
+ * `speech` represents parser-recognized utterance markers (`@[character]{dialogue}` / `{dialogue}`). `text` always contains their entire
+ * raw source (including `@[name]` and braces), so token sequences still reconstruct source exactly; empty `speaker`
  * means voiceover. No separate dialogue-body field: rendering needs entire raw spans, with no consumer for extracted bodies.
  */
 export type Token =

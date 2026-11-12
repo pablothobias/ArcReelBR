@@ -129,7 +129,7 @@ def test_build_reference_units_split_prompt_contains_constraints_and_candidates(
     assert "at most 3 distinct asset names" in prompt
     assert "default to 4 seconds" in prompt
     # Key writing discipline
-    assert "@[名称]" in prompt
+    assert "@[name]" in prompt
     assert "appearance" in prompt
     # Three script_plan content contracts: source anchors, dialogue placement, speaking-rate lower bounds.
     assert "source_text" in prompt
@@ -240,7 +240,7 @@ def test_build_reference_units_split_prompt_states_both_tiers_without_containmen
 
 
 def test_build_reference_units_split_prompt_excludes_dialogue_speaker_from_reference_rule():
-    """Coupled constraints inspect visual descriptions; dialogue speakers in `@[角色]{台词}` do not count.
+    """Coupled constraints inspect visual descriptions; dialogue speakers in `@[character]{dialogue}` do not count.
 
     ``extract_mentions`` excludes speaking-marker speakers from references (offscreen speakers
     create no images; see shot_parser docstring). Merely asking whether body text contains `@`
@@ -253,7 +253,7 @@ def test_build_reference_units_split_prompt_excludes_dialogue_speaker_from_refer
         text_supported_durations=[4, 6, 8],
         default_duration=None,
     )
-    assert "speaker positions in dialogue tokens `@[角色]{台词}` do not count" in prompt
+    assert "speaker positions in dialogue tokens `@[character]{dialogue}` do not count" in prompt
 
 
 def test_build_reference_units_split_prompt_scopes_default_to_its_tier():

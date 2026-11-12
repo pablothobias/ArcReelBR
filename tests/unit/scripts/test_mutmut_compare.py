@@ -68,7 +68,7 @@ def test_baseline_killed_timeout_alone_blocks_the_verdict_until_rechecked() -> N
     assert report.pending_recheck
     assert report.regressed == []
     assert report.baseline_killed_recheck == [("lib.b.x_g__mutmut_1", -24)]
-    assert render(report).splitlines()[-1].startswith("验收未完成")
+    assert render(report).splitlines()[-1].startswith("Verification incomplete")
 
 
 def test_killed_equivalent_mutant_invalidates_the_round() -> None:
@@ -79,7 +79,7 @@ def test_killed_equivalent_mutant_invalidates_the_round() -> None:
     assert not report.passed
     assert report.untouched_killed == ["lib.a.x_f__mutmut_5"]
     assert report.equivalent_killed == ["lib.a.x_f__mutmut_5"]
-    assert "整轮作废" in render(report)
+    assert "the whole round is void" in render(report)
 
 
 def test_equivalent_mutant_with_abnormal_exit_code_blocks_the_verdict_until_rechecked() -> None:
@@ -91,23 +91,28 @@ def test_equivalent_mutant_with_abnormal_exit_code_blocks_the_verdict_until_rech
     assert report.pending_recheck
     assert report.equivalent_recheck == [("lib.a.x_f__mutmut_5", -11)]
     assert report.untouched_killed == []
-    assert "等价变异体待复核 1" in render(report)
-    assert "验收未完成" in render(report)
+    assert "equivalent mutants pending recheck 1" in render(report)
+    assert "Verification incomplete" in render(report)
 
 
 @pytest.mark.parametrize(
     ("current", "reworked", "equivalent", "expected_fragment"),
     [
-        ({**_BASELINE, "lib.c.x_h__mutmut_1": 1}, ["lib.a.x_f__mutmut_2"], [], "本轮独有 lib.c.x_h__mutmut_1"),
-        (dict(_BASELINE), ["lib.zzz__mutmut_9"], [], "不在基线中：lib.zzz__mutmut_9"),
-        (dict(_BASELINE), ["lib.a.x_f__mutmut_1"], [], "在基线已是 killed"),
-        (dict(_BASELINE), ["lib.a.x_f__mutmut_2"], ["lib.a.x_f__mutmut_2"], "既在改造名单又在等价变异体名单"),
-        (dict(_BASELINE), [], [], "改造名单为空"),
+        ({**_BASELINE, "lib.c.x_h__mutmut_1": 1}, ["lib.a.x_f__mutmut_2"], [], "this round only lib.c.x_h__mutmut_1"),
+        (dict(_BASELINE), ["lib.zzz__mutmut_9"], [], "is not in the baseline: lib.zzz__mutmut_9"),
+        (dict(_BASELINE), ["lib.a.x_f__mutmut_1"], [], "is already killed in the baseline"),
+        (
+            dict(_BASELINE),
+            ["lib.a.x_f__mutmut_2"],
+            ["lib.a.x_f__mutmut_2"],
+            "is in both the reworked list and the equivalent-mutant list",
+        ),
+        (dict(_BASELINE), [], [], "Reworked list is empty"),
         (
             dict(_BASELINE),
             ["lib.a.x_f__mutmut_2"],
             ["lib.b.x_g__mutmut_1"],
-            "等价变异体名单里的 mutant 在基线已是 killed",
+            "Equivalent-list mutant is already killed in the baseline",
         ),
     ],
 )
@@ -135,8 +140,9 @@ def test_changed_function_hash_invalidates_even_when_mutant_names_match() -> Non
 
     assert not report.passed
     assert report.invalid == [
-        "基线与本轮有 1 个函数源码哈希不同：mutant 名可能没变但语义已变，先重建基线",
-        "  源码已变 lib.a.x_f",
+        "1 function source hashes differ between baseline and this round: mutant names may be unchanged while"
+        " their meaning changed; rebuild the baseline first",
+        "  source changed lib.a.x_f",
     ]
 
 
@@ -151,20 +157,21 @@ def test_mismatched_function_hash_sets_invalidate_the_comparison() -> None:
 
     assert not report.passed
     assert report.invalid == [
-        "基线与本轮的函数哈希集合不一致（基线独有 1，本轮独有 0）：源码变了或 .meta 不完整，先重建基线",
-        "  基线独有哈希 lib.b.x_g",
+        "Function hash sets differ between baseline and this round (baseline only 1, this round only 0):"
+        " the source changed or .meta is incomplete; rebuild the baseline first",
+        "  baseline-only hash lib.b.x_g",
     ]
 
 
 def test_load_meta_rejects_meta_without_hash_for_every_mutant(tmp_path: Path) -> None:
     payload = {"exit_code_by_key": {"lib.a.x_f__mutmut_1": 1}}
     (tmp_path / "a.py.meta").write_text(json.dumps(payload), encoding="utf-8")
-    with pytest.raises(ValueError, match=r"缺少 exit_code_by_key 或 hash_by_function_name"):
+    with pytest.raises(ValueError, match=r"is missing exit_code_by_key or hash_by_function_name"):
         load_meta(tmp_path)
 
     payload["hash_by_function_name"] = {"x_other": "h1"}
     (tmp_path / "a.py.meta").write_text(json.dumps(payload), encoding="utf-8")
-    with pytest.raises(ValueError, match=r"hash_by_function_name 缺少 mutant 对应的函数：\['x_f'\]"):
+    with pytest.raises(ValueError, match=r"hash_by_function_name is missing the functions of these mutants: \['x_f'\]"):
         load_meta(tmp_path)
 
 
@@ -182,14 +189,14 @@ def test_load_meta_merges_meta_files_recursively_and_rejects_duplicates(tmp_path
     assert snapshot.function_hashes == {"lib.a.x_f": "h1", "server.b.x_g": "h2"}
 
     _write_meta(tmp_path / "dup", "a.py.meta", {"lib.a.x_f__mutmut_1": 1})
-    with pytest.raises(ValueError, match=r"lib\.a\.x_f__mutmut_1 在 .* 下出现多次"):
+    with pytest.raises(ValueError, match=r"lib\.a\.x_f__mutmut_1 appears more than once under .*"):
         load_meta(tmp_path)
 
 
 def test_load_meta_rejects_meta_file_mixing_modules(tmp_path: Path) -> None:
     _write_meta(tmp_path, "mixed.py.meta", {"lib.a.x_f__mutmut_1": 1, "lib.b.x_g__mutmut_1": 0}, {"x_f": "h1"})
 
-    with pytest.raises(ValueError, match=r"混有多个模块的 mutant：\['lib\.a', 'lib\.b'\]"):
+    with pytest.raises(ValueError, match=r"mixes mutants from several modules: \['lib\.a', 'lib\.b'\]"):
         load_meta(tmp_path)
 
 
@@ -211,11 +218,11 @@ def test_main_exit_codes_follow_verdict(tmp_path: Path, capsys: pytest.CaptureFi
     args = ["--baseline", str(tmp_path / "baseline"), "--current", str(tmp_path / "current"), "--reworked"]
 
     assert main([*args, str(reworked)]) == EXIT_OK
-    assert "验收通过" in capsys.readouterr().out
+    assert "Verification passed" in capsys.readouterr().out
 
     reworked.write_text("lib.a.x_f__mutmut_2\nlib.a.x_f__mutmut_4\n", encoding="utf-8")
     assert main([*args, str(reworked)]) == EXIT_FAILED
-    assert "改造后仍存活" in capsys.readouterr().out
+    assert "Still surviving after rework" in capsys.readouterr().out
 
     reworked.write_text("lib.a.x_f__mutmut_1\n", encoding="utf-8")
     assert main([*args, str(reworked)]) == EXIT_INVALID
@@ -224,7 +231,7 @@ def test_main_exit_codes_follow_verdict(tmp_path: Path, capsys: pytest.CaptureFi
     _write_round(tmp_path / "baseline", _BASELINE, {"lib.a.x_f": "h1"})
     _write_round(tmp_path / "current", {**_BASELINE, "lib.a.x_f__mutmut_2": 1}, {"lib.a.x_f": "h1-changed"})
     assert main([*args, str(reworked)]) == EXIT_INVALID
-    assert "源码已变 lib.a.x_f" in capsys.readouterr().out
+    assert "source changed lib.a.x_f" in capsys.readouterr().out
 
     assert main([*args, str(tmp_path / "missing.txt")]) == EXIT_INVALID
-    assert "读取输入失败" in capsys.readouterr().err
+    assert "Failed to read input" in capsys.readouterr().err

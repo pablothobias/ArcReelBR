@@ -173,7 +173,7 @@ class TestDefaultBackends:
         resolver = ConfigResolver.__new__(ConfigResolver)
         fake_svc = _FakeConfigService(settings={}, ready_providers=[])
         async with db_factory() as session:
-            with pytest.raises(ValueError, match="未找到可用的 video 供应商"):
+            with pytest.raises(ValueError, match="No available video provider found"):
                 await resolver._resolve_default_video_backend(fake_svc, session)
 
     async def test_image_backend_explicit(self):
@@ -198,7 +198,7 @@ class TestDefaultBackends:
         resolver = ConfigResolver.__new__(ConfigResolver)
         fake_svc = _FakeConfigService(settings={}, ready_providers=[])
         async with db_factory() as session:
-            with pytest.raises(ValueError, match="未找到可用的 image 供应商"):
+            with pytest.raises(ValueError, match="No available image provider found"):
                 await resolver._resolve_default_image_backend(fake_svc, session)
 
     @pytest.mark.parametrize(("generation_type", "expected_model"), [("t2i", "t2i-m"), ("i2i", "i2i-m")])
@@ -1308,7 +1308,7 @@ class TestResolveVideoBackend:
                 )
             )
             await session.flush()
-            with pytest.raises(ValueError, match="未找到可用的 video 供应商"):
+            with pytest.raises(ValueError, match="No available video provider found"):
                 await resolver._auto_resolve_backend(fake_svc, session, "video")
 
     async def test_falls_through_to_global_default(self):

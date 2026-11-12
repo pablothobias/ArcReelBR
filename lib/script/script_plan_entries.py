@@ -59,7 +59,7 @@ def plan_variant(kind: ScriptPlanKind) -> ScriptPlanVariant:
 
     variant = PLAN_VARIANTS.get(kind)
     if variant is None:
-        raise ValueError(f"未知的脚本规划变体: {kind!r}")
+        raise ValueError(f"Unknown script plan variant: {kind!r}")
     return variant
 
 

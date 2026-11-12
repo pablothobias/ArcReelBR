@@ -9,7 +9,7 @@ Three responsibilities:
 - **Part one**: shorthand ``<X>@Image N`` bindings (numbers follow sent reference-image order), plus centralized
   voice declarations (``<X>: Dialogue voice reference @Audio N; use only timbre, speech rate, and emotion; the body text is authoritative for dialogue; Voice characteristics: …``). Audible A/B models receive voice descriptions;
   neither silent path (class C models without audio or episode audio disabled) does
-- **Part two**: body with character-speech markers (``<X> says {台词}``); speakerless narration (bare ``{台词}``)
+- **Part two**: body with character-speech markers (``<X> says {dialogue}``); speakerless narration (bare ``{dialogue}``)
   never reaches video models, using TTS/post-production voiceover instead
 - **Part three**: shared style + ``Avoid`` (all video exclusions for this route); append clone/twin exclusions
   when at least two different characters appear. Product references additionally receive fidelity instructions
@@ -350,12 +350,12 @@ def _render_segment_two(text: str, subjects: Collection[str], characters: dict, 
     speakers retain original text (``derive_voice_bindings`` already warns), as do unrecognized braces, never
     stripped, leaving the author's malformed passage visible in the result.
 
-    Speaker appearances match visual references: ``@[张三/劲装]{台词}`` renders as ``<张三/劲装> says {台词}``;
+    Speaker appearances match visual references: ``@[张三/劲装]{dialogue}`` renders as ``<张三/劲装> says {dialogue}``;
     each character has one subject-marker form in a prompt (``docs/adr/0072``). Voice still binds to the base
     via ``SpeechMark.speaker``, independent of appearance. Unregistered speaker derivatives fall back to
     base markers; unlike unregistered visual mentions, generated speaker markers have no original text to retain.
 
-    Entire speakerless narration markers (bare ``{台词}``) are omitted from video prompts, using TTS or
+    Entire speakerless narration markers (bare ``{dialogue}``) are omitted from video prompts, using TTS or
     post-production (ADR 0040 / 0061). Audible video models otherwise read instructions too or lip-sync
     characters to narration. Same-line visual descriptions remain; only the marker disappears.
     """

@@ -41,7 +41,7 @@ def max_item_number(item_ids: Iterable[object], episode: int) -> int:
 
 
 def format_item_id(episode: int, kind: str, number: int) -> str:
-    """Storyboard IDs use ``E{集}S{序号:02d}``; reference units use ``E{集}U{序号}``."""
+    """Storyboard IDs use ``E{episode}S{index:02d}``; reference units use ``E{episode}U{index}``."""
 
     letter = ITEM_ID_LETTERS[kind]
     return f"E{episode}S{number:02d}" if letter == "S" else f"E{episode}U{number}"

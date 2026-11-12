@@ -75,7 +75,7 @@ class TestAssertAudioSwitchSupported:
         await _seed_settings(db_factory, default_video_backend=_ALWAYS_AUDIBLE, video_generate_audio="false")
         bind_session_factory(monkeypatch, db_factory)
 
-        with pytest.raises(ValueError, match=r"成片恒有声，无法关闭音频") as exc_info:
+        with pytest.raises(ValueError, match=r"always outputs audio, so audio cannot be turned off") as exc_info:
             await assert_audio_switch_supported({}, "i2v")
 
         assert "dashscope/wan2.7-i2v" in str(exc_info.value)

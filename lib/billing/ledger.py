@@ -250,7 +250,9 @@ class Ledger:
             raise
         else:
             if call._settlement is None:
-                raise RuntimeError(f"ledger.record(call_type={call_type!r}) 正常退出但未调用 call.success(result)")
+                raise RuntimeError(
+                    f"ledger.record(call_type={call_type!r}) exited normally without calling call.success(result)"
+                )
             try:
                 await self._finish_success(call_id, call._settlement, output_path=output_path)
             except asyncio.CancelledError:

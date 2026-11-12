@@ -155,7 +155,7 @@ def _holder_note() -> str:
         note = LOCK_PATH.read_text(encoding="utf-8").strip()
     except OSError:
         return ""
-    return f"（当前持有者：{note}）" if note else ""
+    return f" (current holder: {note})" if note else ""
 
 
 def _write_holder(handle: IO[str] | None, note: str) -> None:
@@ -180,12 +180,12 @@ def _acquire_gate_lock() -> portalocker.Lock:
             lock.acquire(timeout=0, fail_when_locked=True)
         except portalocker.AlreadyLocked:
             if not announced:
-                print(f"[gate] 另一份闸门正在运行，排队等待 {LOCK_PATH} {_holder_note()}", flush=True)
+                print(f"[gate] another gate run is active; queued waiting on {LOCK_PATH}{_holder_note()}", flush=True)
                 announced = True
             time.sleep(1.0)
             continue
         if announced:
-            print(f"[gate] 等待 {time.monotonic() - waited_from:.0f}s 后拿到锁", flush=True)
+            print(f"[gate] acquired the lock after waiting {time.monotonic() - waited_from:.0f}s", flush=True)
         return lock
 
 
@@ -207,7 +207,7 @@ def run_domains(domains: list[str]) -> int:
             code = _run(step)
             if code != 0:
                 return code
-        print(f"\n[gate] {' '.join(domains)} 全部通过，用时 {time.monotonic() - started:.0f}s", flush=True)
+        print(f"\n[gate] {' '.join(domains)} all passed in {time.monotonic() - started:.0f}s", flush=True)
         return 0
     finally:
         _write_holder(lock.fh, "")
@@ -222,32 +222,35 @@ def main(argv: list[str] | None = None) -> int:
         nargs="?",
         const="origin/main",
         metavar="BASE",
-        help="按相对 BASE（默认 origin/main）的改动选域，可与点名的域合并",
+        help="Select domains from changes relative to BASE (default origin/main); can be combined with named domains",
     )
-    parser.add_argument("--list", action="store_true", help="列出各域的触发路径与步骤后退出")
+    parser.add_argument("--list", action="store_true", help="List each domain's trigger paths and steps, then exit")
     args = parser.parse_args(argv)
     if args.list:
         for name, steps in DOMAINS.items():
             triggers = TRIGGERS.get(name)
-            print(f"{name}    # {' '.join(triggers) if triggers else '按改动选域时总是跑'}")
+            print(f"{name}    # {' '.join(triggers) if triggers else 'always runs when selecting by changes'}")
             for step in steps:
                 print(f"  {step.describe()}")
         return 0
     unknown = [name for name in args.domains if name not in DOMAINS]
     if unknown:
-        parser.error(f"未知的域：{', '.join(unknown)}；可选 {', '.join(DOMAINS)}")
+        parser.error(f"Unknown domains: {', '.join(unknown)}; choose from {', '.join(DOMAINS)}")
     selected: set[str] = set(args.domains)
     if args.changed is not None:
         try:
             paths = changed_paths(args.changed)
         except subprocess.CalledProcessError as error:
-            parser.error(f"读取相对 {args.changed} 的改动失败：{error.stderr.strip()}")
+            parser.error(f"Failed to read changes relative to {args.changed}: {error.stderr.strip()}")
         picked = select_domains(paths)
-        print(f"[gate] 相对 {args.changed} 改动 {len(paths)} 个文件，命中域：{' '.join(picked)}", flush=True)
+        print(
+            f"[gate] {len(paths)} files changed relative to {args.changed}; matched domains: {' '.join(picked)}",
+            flush=True,
+        )
         selected.update(picked)
     domains = [name for name in DOMAINS if name in selected]
     if not domains:
-        parser.error("至少给一个域名或 --changed，或用 --list 查看")
+        parser.error("Give at least one domain name or --changed, or use --list to see them")
     return run_domains(domains)
 
 

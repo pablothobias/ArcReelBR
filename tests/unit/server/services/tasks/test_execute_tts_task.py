@@ -796,7 +796,7 @@ class TestExecuteTtsTask:
         assert gen.audio_calls[0]["speed"] is None
 
     async def test_no_text_no_script_file_raises(self, tts_env):
-        with pytest.raises(ValueError, match=re.escape("payload.text 或 payload.script_file")):
+        with pytest.raises(ValueError, match=re.escape("payload.text or payload.script_file")):
             await generation_tasks.execute_tts_task("demo", "E1S01", {})
 
     async def test_segment_not_found_raises(self, tts_env):
@@ -804,7 +804,7 @@ class TestExecuteTtsTask:
             await generation_tasks.execute_tts_task("demo", "NOPE", {"script_file": "episode_1.json"})
 
     async def test_blank_novel_text_raises(self, tts_env):
-        with pytest.raises(ValueError, match="无可合成的旁白文本"):
+        with pytest.raises(ValueError, match="has no voiceover text to synthesize"):
             await generation_tasks.execute_tts_task("demo", "E1S02", {"script_file": "episode_1.json"})
 
     def test_tts_registered_as_a_skeleton_driven_task(self):

@@ -3,7 +3,7 @@
 Migrate existing projects’ characters from scripts into project.json.
 
 Usage:
-    python scripts/migrate_to_project_json.py <项目名>
+    python scripts/migrate_to_project_json.py <project-name>
     python scripts/migrate_to_project_json.py --all  # Migrate every project
 """
 
@@ -33,20 +33,20 @@ def migrate_project(pm: ProjectManager, project_name: str, dry_run: bool = False
         Whether migration succeeded.
     """
     print(f"\n{'=' * 50}")
-    print(f"迁移项目: {project_name}")
+    print(f"Migrating project: {project_name}")
     print("=" * 50)
 
     try:
         project_dir = pm.get_project_path(project_name)
     except FileNotFoundError:
-        print(f"  ❌ 项目不存在: {project_name}")
+        print(f"  ❌ Project does not exist: {project_name}")
         return False
 
     # Check whether project.json already exists.
     project_file = project_dir / "project.json"
     if project_file.exists():
-        print("  ⚠️  project.json 已存在，跳过迁移")
-        print(f"  如需重新迁移，请先删除 {project_file}")
+        print("  ⚠️  project.json already exists, skipping migration")
+        print(f"  To migrate again, delete {project_file} first")
         return True
 
     # Collect characters from all scripts.
@@ -56,10 +56,10 @@ def migrate_project(pm: ProjectManager, project_name: str, dry_run: bool = False
     script_files = list(scripts_dir.glob("*.json")) if scripts_dir.exists() else []
 
     if not script_files:
-        print("  ⚠️  未找到剧本文件")
+        print("  ⚠️  No script files found")
 
     for script_file in sorted(script_files):
-        print(f"\n  📖 处理剧本: {script_file.name}")
+        print(f"\n  📖 Processing script: {script_file.name}")
 
         with open(script_file, encoding="utf-8") as f:
             script = json.load(f)
@@ -69,12 +69,12 @@ def migrate_project(pm: ProjectManager, project_name: str, dry_run: bool = False
         for name, char_data in characters.items():
             if name not in all_characters:
                 all_characters[name] = char_data.copy()
-                print(f"      👤 发现角色: {name}")
+                print(f"      👤 Found character: {name}")
             else:
                 # Merge data, preferring versions with asset images.
                 if char_data.get("character_sheet") and not all_characters[name].get("character_sheet"):
                     all_characters[name] = char_data.copy()
-                    print(f"      👤 更新角色: {name} (有资产图)")
+                    print(f"      👤 Updated character: {name} (has asset image)")
 
         # Extract episode information.
         novel_info = script.get("novel", {})
@@ -102,7 +102,7 @@ def migrate_project(pm: ProjectManager, project_name: str, dry_run: bool = False
                 "script_file": f"scripts/{script_file.name}",
             }
         )
-        print(f"      📺 剧集 {episode_num}: {scenes_count} 个场景")
+        print(f"      📺 Episode {episode_num}: {scenes_count} scenes")
 
     # Deduplicate and sort episodes.
     seen_episodes = {}
@@ -146,54 +146,58 @@ def migrate_project(pm: ProjectManager, project_name: str, dry_run: bool = False
     if not clues_dir.exists():
         if not dry_run:
             clues_dir.mkdir(parents=True, exist_ok=True)
-        print("\n  📁 创建目录: clues/")
+        print("\n  📁 Created directory: clues/")
 
-    print("\n  📊 迁移摘要:")
-    print(f"      - 角色: {len(all_characters)} 个 ({completed_chars} 个有资产图)")
-    print(f"      - 剧集: {len(episodes)} 个")
-    print("      - 线索: 0 个 (待添加)")
+    print("\n  📊 Migration summary:")
+    print(f"      - characters: {len(all_characters)} ({completed_chars} with asset images)")
+    print(f"      - episodes: {len(episodes)}")
+    print("      - clues: 0 (to be added)")
 
     if dry_run:
-        print("\n  🔍 预览模式 - 不会实际写入文件")
-        print("\n  将创建 project.json:")
+        print("\n  🔍 Preview mode - no files will be written")
+        print("\n  Would create project.json:")
         print(json.dumps(project_data, ensure_ascii=False, indent=2)[:500] + "...")
     else:
         # Write project.json.
         with open(project_file, "w", encoding="utf-8") as f:
             json.dump(project_data, f, ensure_ascii=False, indent=2)
-        print("\n  ✅ 已创建 project.json")
+        print("\n  ✅ Created project.json")
 
         # Optionally remove script characters, keeping original backups.
         # Keep characters in scripts for backward compatibility.
-        print("  ℹ️  保留剧本中的 characters 字段以保持向后兼容")
+        print("  ℹ️  Keeping the characters field in scripts for backward compatibility")
 
     return True
 
 
 def main():
-    parser = argparse.ArgumentParser(description="迁移项目数据到 project.json")
-    parser.add_argument("project", nargs="?", help="项目名称，或使用 --all 迁移所有项目")
-    parser.add_argument("--all", action="store_true", help="迁移所有项目")
-    parser.add_argument("--dry-run", action="store_true", help="预览模式，不实际执行")
+    parser = argparse.ArgumentParser(description="Migrate project data to project.json")
+    parser.add_argument("project", nargs="?", help="Project name, or use --all to migrate every project")
+    parser.add_argument("--all", action="store_true", help="Migrate every project")
+    parser.add_argument("--dry-run", action="store_true", help="Preview mode; do not actually run")
     parser.add_argument(
-        "--projects-root", "--data-root", dest="data_root", default=None, help="数据根（默认按当前配置解析）"
+        "--projects-root",
+        "--data-root",
+        dest="data_root",
+        default=None,
+        help="Data root (default: resolved from the current configuration)",
     )
 
     args = parser.parse_args()
 
     if not args.project and not args.all:
         parser.print_help()
-        print("\n❌ 请指定项目名称或使用 --all")
+        print("\n❌ Specify a project name or use --all")
         sys.exit(1)
 
     # Initialize ProjectManager.
     pm = ProjectManager(args.data_root or DataRootLayout.current().root)
 
-    print("🚀 开始迁移...")
-    print(f"   项目目录: {pm.projects_dir}")
+    print("🚀 Starting migration...")
+    print(f"   Projects directory: {pm.projects_dir}")
 
     if args.dry_run:
-        print("   📋 预览模式已启用")
+        print("   📋 Preview mode enabled")
 
     success_count = 0
     fail_count = 0
@@ -211,7 +215,7 @@ def main():
             if pm.projects_dir.is_dir()
             else []
         )
-        print(f"   发现 {len(projects)} 个项目")
+        print(f"   Found {len(projects)} projects")
 
         for project_name in projects:
             if migrate_project(pm, project_name, dry_run=args.dry_run):
@@ -225,9 +229,9 @@ def main():
             fail_count = 1
 
     print("\n" + "=" * 50)
-    print("迁移完成!")
-    print(f"   ✅ 成功: {success_count}")
-    print(f"   ❌ 失败: {fail_count}")
+    print("Migration complete!")
+    print(f"   ✅ Succeeded: {success_count}")
+    print(f"   ❌ Failed: {fail_count}")
     print("=" * 50)
 
     sys.exit(0 if fail_count == 0 else 1)

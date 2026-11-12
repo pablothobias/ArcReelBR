@@ -130,7 +130,7 @@ class TaskNotCancellableError(Exception):
     """The task has started and cannot be cancelled: only queued tasks allow cancellation; running tasks finish normally."""
 
     def __init__(self, task_id: str) -> None:
-        super().__init__(f"任务 '{task_id}' 正在执行，不可取消")
+        super().__init__(f"Task '{task_id}' is running and cannot be cancelled")
         self.task_id = task_id
 
 
@@ -756,7 +756,7 @@ class TaskRepository(BaseRepository):
         result = await self.session.execute(self._scope_query(select(Task).where(Task.task_id == task_id), Task))
         task = result.scalar_one_or_none()
         if not task:
-            raise ValueError(f"任务 '{task_id}' 不存在")
+            raise ValueError(f"Task '{task_id}' does not exist")
         if task.status == "running":
             raise TaskNotCancellableError(task_id)
 
@@ -800,7 +800,7 @@ class TaskRepository(BaseRepository):
         result = await self.session.execute(self._scope_query(select(Task).where(Task.task_id == task_id), Task))
         task = result.scalar_one_or_none()
         if not task:
-            raise ValueError(f"任务 '{task_id}' 不存在")
+            raise ValueError(f"Task '{task_id}' does not exist")
 
         cancelled: list[dict[str, Any]] = []
         skipped_terminal: list[dict[str, Any]] = []

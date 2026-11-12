@@ -1035,7 +1035,7 @@ class SessionManager:
                     session_id=None,
                     sdk_stderr=sdk_stderr,
                 ) from startup_exception
-            raise TimeoutError("SDK 会话创建超时")
+            raise TimeoutError("SDK session creation timed out")
 
         startup_stderr.stop()
 
@@ -1061,7 +1061,9 @@ class SessionManager:
                 await self.meta_store.update_status(sdk_id, "error")
             except Exception:
                 logger.exception("持久化 error 状态失败 session_id=%s", sdk_id)
-            raise RuntimeError("新会话首条用户消息写入事件日志失败") from managed.initial_user_entry_error
+            raise RuntimeError(
+                "Failed to write the new session's first user message to the event log"
+            ) from managed.initial_user_entry_error
 
         return sdk_id
 
@@ -2073,11 +2075,13 @@ class SessionManager:
                     victim.session_id,
                     exc_info=True,
                 )
-                raise SessionCapacityError("存在未能关闭的空闲会话，当前无法释放并发槽位，请稍后重试") from exc
+                raise SessionCapacityError(
+                    "An idle session could not be closed, so no concurrency slot can be freed now; retry later"
+                ) from exc
             return
 
         # All sessions running: reject.
-        raise SessionCapacityError(f"当前有{len(active)}个正在进行的会话，已达到最大上限，请稍后重试")
+        raise SessionCapacityError(f"{len(active)} sessions are in progress, which is the maximum; retry later")
 
     _PATROL_INTERVAL = 300  # 5 minutes.
 
@@ -2214,13 +2218,13 @@ class SessionManager:
             # Whitelist fallback: deny any tool that was not pre-approved
             # by allowed_tools or settings.json allow rules.
             reason = getattr(_context, "decision_reason", None)  # SDK 0.1.74+
-            reason_line = f"上游决策原因: {reason}\n" if reason else ""
+            reason_line = f"Upstream decision reason: {reason}\n" if reason else ""
             hint = (
-                f"未授权的工具调用: {tool_name}"
+                f"Unauthorized tool call: {tool_name}"
                 f"({json.dumps(input_data, ensure_ascii=False)[:200]})\n"
                 f"{reason_line}"
-                "请检查工具名是否正确，以及 file_path / 命令是否触发了 "
-                "settings.json 的 deny 规则或 PreToolUse hook（跨项目/cwd 外写/代码扩展名）。"
+                "Check that the tool name is correct and whether file_path / the command triggered a "
+                "settings.json deny rule or a PreToolUse hook (cross-project access, writes outside cwd, code extensions)."
             )
             return PermissionResultDeny(message=hint)
 
@@ -2348,12 +2352,12 @@ class SessionManager:
         """Resolve AskUserQuestion answers for a running session."""
         managed = self.sessions.get(session_id)
         if managed is None:
-            raise ValueError("会话未运行或无待回答问题")
+            raise ValueError("The session is not running or has no pending question")
         # SDK control requests may deliver questions before actors read CLI running reports.
         if managed.status != "running" and question_id not in managed.pending_questions:
-            raise ValueError("会话未运行或无待回答问题")
+            raise ValueError("The session is not running or has no pending question")
         if not managed.resolve_pending_question(question_id, answers):
-            raise ValueError("未找到待回答的问题")
+            raise ValueError("Pending question not found")
 
     def _session_channel(self, session_id: str) -> SseChannel:
         """Get the session broadcast channel, registering one if absent."""

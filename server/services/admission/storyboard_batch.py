@@ -143,7 +143,7 @@ def load_episode_storyboard_script(
 
     project = projects.load_project(project_name)
     if is_reference_video_project(project):
-        raise StoryboardBatchRouteMismatch("参考生视频项目没有分镜图步骤")
+        raise StoryboardBatchRouteMismatch("Reference-to-video projects have no storyboard image step")
     entry = find_episode(project, episode_id)
     recorded = entry.get("script_file") if entry is not None else None
     if not isinstance(recorded, str) or not recorded:
@@ -196,7 +196,7 @@ def storyboard_image_prompt(segment: dict[str, Any], style: str, style_descripti
 
     image_prompt = segment.get("image_prompt", "")
     if not image_prompt:
-        raise ValueError(f"分镜 {segment[id_field]} 缺少 image_prompt 字段")
+        raise ValueError(f"Storyboard {segment[id_field]} is missing the image_prompt field")
     return render_storyboard_image_prompt(image_prompt, style=style, style_description=style_description)
 
 
@@ -654,7 +654,7 @@ async def submit_storyboard_video_batch(
     """Submit an admitted whole-batch plan as a durable batch without awaiting results."""
 
     if not plan.admission.admitted:
-        raise ValueError("整批准入未通过的规划不能提交")
+        raise ValueError("A plan that failed whole-batch admission cannot be submitted")
     builder = GenerationResultBuilder(VIDEO_BATCH_OPERATION, GenerationSelectionMode.MISSING_ONLY)
     for state in plan.selection.skipped:
         builder.skip(state)

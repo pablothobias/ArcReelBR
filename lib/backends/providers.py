@@ -66,6 +66,6 @@ def require_provider_pair(kind: str, backend: object | None, provider_id: str | 
     """
     if (backend is None) != (provider_id is None):
         raise ValueError(
-            f"{kind} backend 与 provider_id 必须成对提供："
+            f"{kind} backend and provider_id must be provided together: "
             f"backend={'set' if backend is not None else 'None'}, provider_id={provider_id!r}"
         )

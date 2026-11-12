@@ -175,7 +175,7 @@ def _window(
 
 def _check_bucket_count(first: date, last: date) -> None:
     if (last - first).days + 1 > MAX_DAILY_BUCKETS:
-        raise UsageWindowTooWideError(f"窗口 {first} ~ {last} 超过 {MAX_DAILY_BUCKETS} 个日桶")
+        raise UsageWindowTooWideError(f"Window {first} ~ {last} exceeds {MAX_DAILY_BUCKETS} daily buckets")
 
 
 def _daily_buckets(

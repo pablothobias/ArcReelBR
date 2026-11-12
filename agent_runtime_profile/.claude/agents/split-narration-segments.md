@@ -80,7 +80,7 @@ round's edits.
 **Step 1**: generate a structured split through the tool (the session binds project name; omit it):
 
 ```text
-mcp__arcreel__generate_script_plan({"episode_id": N, "source": "source/episode_N.txt", "instructions": "<附加指令原文，可选，无则省略>"})
+mcp__arcreel__generate_script_plan({"episode_id": N, "source": "source/episode_N.txt", "instructions": "<verbatim additional instructions; optional, omit if none>"})
 ```
 
 > dry_run=true returns only the prompt without calling the model, for inspection. response_schema constrains structured storyboard JSON. Before writing, the tool validates unique segment_id, durations from `supported_durations`, assets registered or in `new_assets`, resolvable dispositions, and verbatim source coverage by storyboard bodies.
@@ -126,9 +126,9 @@ Modify returned `content.segments[i]` (retaining valid JSON) following **editing
 
 - `novel_text` must preserve source verbatim, including punctuation; dialogue storyboards include full speech and attribution. Concatenating all storyboards in order must exactly equal the source. Promotion mechanically checks this and rejects omissions, rewrites, or reordering. If a request changes source wording itself, this subagent cannot do it: promotion will reject incomplete coverage, so draft editing wastes a round. Stop and report this to the main Agent, which decides whether to first modify episode source through `mcp__arcreel__edit_source_text` (the containing whole-source file for derived episodes), then rerun splitting
 - `duration_seconds` must belong to `supported_durations` queried in Step 0
-- Keep `segment_id` in `E{集 ID}S{两位序号}` format (such as `E1S01`), unique episode-wide, prefixed with episode ID N
+- Keep `segment_id` in `E{episode ID}S{two-digit index}` format (such as `E1S01`), unique episode-wide, prefixed with episode ID N
 - `characters_in_segment` / `scenes` / `props` reference registered `project.json` names (Read `project.json` if uncertain) or names in `content.new_assets`; explicitly use empty `[]` when no asset applies. When changing referenced names, update corresponding `new_assets` entries too
-- For character derivatives (another appearance, in the character's `project.json` `derivatives` table), use story state in `characters_in_segment`: `本体/衍生` when in that appearance, base name when back to normal base appearance
+- For character derivatives (another appearance, in the character's `project.json` `derivatives` table), use story state in `characters_in_segment`: `base/derivative` when in that appearance, base name when back to normal base appearance
 - Set `segment_break` to `true` only for actual scene changes (time jump / spatial shift / plot turn)
 
 Add/remove array entries to add/remove storyboards.
@@ -136,8 +136,8 @@ Add/remove array entries to add/remove storyboards.
 **Step 3**: promote to the formal file
 
 ```text
-mcp__arcreel__patch_draft({"episode_id": N, "doc_type": "narration_script_plan", "content": <完整修改后正文>, "base_revision": "<open_draft 返回的 revision>"})
-mcp__arcreel__promote_draft({"episode_id": N, "doc_type": "narration_script_plan", "base_revision": "<patch_draft 返回的新 revision>"})
+mcp__arcreel__patch_draft({"episode_id": N, "doc_type": "narration_script_plan", "content": <full revised content>, "base_revision": "<revision returned by open_draft>"})
+mcp__arcreel__promote_draft({"episode_id": N, "doc_type": "narration_script_plan", "base_revision": "<new revision returned by patch_draft>"})
 ```
 
 Full validation writes formal `script_plan_segments.json` and automatically removes the draft; otherwise, per-item reports return.
@@ -156,35 +156,35 @@ Standard `script_plan_segments.json` structure (one entry per storyboard; prompt
 
 ```json
 {
-  "episode": <集 ID>,
+  "episode": <episode ID>,
   "segments": [
     {
-      "segment_id": "E<集 ID>S01",
-      "novel_text": "裴与出征后的第二年，千里加急给我送回一个襁褓中的婴儿。",
+      "segment_id": "E<episode ID>S01",
+      "novel_text": "In the second year after Pei Yu left for the war, he sent a swaddled infant back to me by express courier.",
       "duration_seconds": <duration>,
       "segment_break": false,
-      "characters_in_segment": ["裴与"],
+      "characters_in_segment": ["Pei Yu"],
       "scenes": [],
       "props": []
     },
     {
-      "segment_id": "E<集 ID>S02",
-      "novel_text": "「夫人，这是侯爷的亲笔信。」老管家递上一封火漆封印的书信。",
+      "segment_id": "E<episode ID>S02",
+      "novel_text": "\"My lady, this letter is in the marquis's own hand.\" The old steward handed over a wax-sealed letter.",
       "duration_seconds": <duration>,
       "segment_break": false,
-      "characters_in_segment": ["老管家"],
-      "scenes": ["府门"],
-      "props": ["书信"]
+      "characters_in_segment": ["Old Steward"],
+      "scenes": ["Manor Gate"],
+      "props": ["Letter"]
     }
   ],
   "new_assets": [
-    {"type": "character", "name": "老管家", "decision": "register", "reason": "第二段首次出场，有台词", "description": "年过六旬，灰布长衫，背微驼", "aliases": [], "target": "", "asset_name": ""}
+    {"type": "character", "name": "Old Steward", "decision": "register", "reason": "First appears in segment 2 and speaks", "description": "In his sixties, gray cotton long robe, slightly stooped", "aliases": [], "target": "", "asset_name": ""}
   ]
 }
 ```
 
 > Value rules: `<duration>` must belong to `supported_durations` from Step 0; preserve `novel_text` verbatim, including punctuation.
-> Tool `mcp__arcreel__generate_script_plan` injects `<集 ID>` from its `episode_id` parameter at call time; placeholders avoid mistakenly hardcoding `E1`.
+> Tool `mcp__arcreel__generate_script_plan` injects `<episode ID>` from its `episode_id` parameter at call time; placeholders avoid mistakenly hardcoding `E1`.
 
 ### Return summary
 
@@ -192,7 +192,7 @@ Standard `script_plan_segments.json` structure (one entry per storyboard; prompt
 ## Storyboard splitting complete (narration/commentary · script_plan)
 
 **Status**: DONE
-**Project**: {项目名}  **Episode**: “{标题}” (broadcast position {播出位置}, episode ID N)
+**Project**: {project name}  **Episode**: “{title}” (broadcast position {broadcast position}, episode ID N)
 
 | Metric | Value |
 |--------|------|

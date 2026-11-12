@@ -2,7 +2,7 @@
 
 Reference names (assets or character ``本体名/衍生名``) occur in five places: skeleton reference arrays
 (``characters_in_*`` / ``scenes`` / ``props`` / ``products_in_shot``), ``speaker`` fields,
-unit-body ``@[名称]`` markers, visual-description ``@[名称]`` markers, and merge/derivative ``target``
+unit-body ``@[name]`` markers, visual-description ``@[name]`` markers, and merge/derivative ``target``
 fields in plan new-assets lists. Cascade rename/merge must update all; reference checks must count all.
 They differ only in how names are processed, never the site set; separate traversals would let new sites
 be recognized by only one side, missing renames or usage reports.
@@ -32,7 +32,7 @@ _ALL_REFERENCE_LIST_FIELDS: frozenset[str] = frozenset(
 )
 
 #: Five site shapes: ``name`` is a full array reference, ``speaker`` holds a base-character name,
-#: ``text`` is a unit body containing ``@[名称]``, ``scene`` is a visual description containing ``@[名称]``
+#: ``text`` is a unit body containing ``@[name]``, ``scene`` is a visual description containing ``@[name]``
 #: (``image_prompt.scene`` or text-form ``image_prompt``), and ``target`` names merge targets or derivative
 #: bases in new-asset lists. Like speakers, targets use table-entry names, never ``本体名/衍生名``.
 SiteKind = Literal["name", "speaker", "text", "scene", "target"]

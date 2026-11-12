@@ -162,7 +162,9 @@ def _normalized_name(name: str) -> str:
     try:
         return _TIMELINE_NAME.validate_python(name)
     except ValidationError as exc:
-        raise EditTimelineError("timeline_name_invalid", "剪辑时间线显示名须为 1–40 个字符", name=name) from exc
+        raise EditTimelineError(
+            "timeline_name_invalid", "Edit timeline display name must be 1–40 characters", name=name
+        ) from exc
 
 
 def _ensure_name_free(store: EditTimelineStore, episode: int, name: str, *, excluding: str | None = None) -> None:
@@ -172,7 +174,10 @@ def _ensure_name_free(store: EditTimelineStore, episode: int, name: str, *, excl
         for existing in store.list_documents(episode)
     ):
         raise EditTimelineError(
-            "timeline_name_conflict", f"集（id={episode}）已有名为「{name}」的剪辑时间线", episode=episode, name=name
+            "timeline_name_conflict",
+            f'Episode (id={episode}) already has an edit timeline named "{name}"',
+            episode=episode,
+            name=name,
         )
 
 
@@ -232,7 +237,9 @@ class EditTimelineService:
 
     def _store(self, project_name: str) -> EditTimelineStore:
         if not self._projects.project_exists(project_name):
-            raise EditTimelineError("project_not_found", f"项目「{project_name}」不存在", project=project_name)
+            raise EditTimelineError(
+                "project_not_found", f'Project "{project_name}" does not exist', project=project_name
+            )
         return EditTimelineStore(self._projects, project_name)
 
     def _create_from_script_sync(
@@ -363,7 +370,7 @@ class EditTimelineService:
             if target.content == latest.content:
                 raise EditTimelineError(
                     "revision_unchanged",
-                    f"修订 {number} 的内容与最新修订 {latest.number} 相同，无需回滚",
+                    f"Revision {number} has the same content as latest revision {latest.number}; no rollback needed",
                     timeline_id=timeline_id,
                     revision=number,
                     latest_revision=latest.number,
@@ -413,8 +420,9 @@ class EditTimelineService:
             self._restore_sync, project_name, timeline_id, document.episode, revision, author
         )
         message = (
-            f"剪辑时间线「{document.name}」已回滚：新修订 {written.document.latest.number} 的内容取自修订 {revision}，"
-            f"回滚前的最新修订 {written.previous_latest.number} 仍保留在历史里"
+            f'Edit timeline "{document.name}" was rolled back: new revision {written.document.latest.number} '
+            f"takes its content from revision {revision}; the latest revision before the rollback, "
+            f"{written.previous_latest.number}, remains in history"
         )
         return await self._write_result(project_name, script, sources, unit_ids, written, message)
 
@@ -455,11 +463,13 @@ class EditTimelineService:
         if not normalized_summary or len(normalized_summary) > REVISION_SUMMARY_MAX_LENGTH:
             raise EditTimelineError(
                 "revision_summary_invalid",
-                f"改动摘要须为 1–{REVISION_SUMMARY_MAX_LENGTH} 个字符",
+                f"Change summary must be 1–{REVISION_SUMMARY_MAX_LENGTH} characters",
                 allowed=f"1–{REVISION_SUMMARY_MAX_LENGTH}",
             )
         if not operations:
-            raise EditTimelineError("operation_invalid", "operations 至少要有一条操作", allowed="1 条及以上")
+            raise EditTimelineError(
+                "operation_invalid", "operations must contain at least one operation", allowed="1 or more"
+            )
         document = await asyncio.to_thread(lambda: self._store(project_name).find(timeline_id))
         base = self._base_revision(document, base_revision)
         script = await asyncio.to_thread(load_episode_script_units, self._projects, project_name, document.episode)
@@ -481,11 +491,14 @@ class EditTimelineService:
             ConcurrentRevision(number=revision.number, author=revision.author, summary=revision.summary)
             for revision in written.document.revisions[written.base_revision : written.previous_latest.number]
         )
-        message = f"剪辑时间线「{document.name}」已追加修订 {written.document.latest.number}：{normalized_summary}"
+        message = (
+            f'Edit timeline "{document.name}" appended revision {written.document.latest.number}: {normalized_summary}'
+        )
         if concurrent:
             message += (
-                f"；修订 {written.base_revision} 之后已有他人写入修订 "
-                f"{', '.join(str(item.number) for item in concurrent)}，本批涉及的片段未被改动，已在最新修订上应用"
+                f"; after revision {written.base_revision}, others wrote revision(s) "
+                f"{', '.join(str(item.number) for item in concurrent)}; they did not change the clips in this batch, "
+                "so it was applied on the latest revision"
             )
         return await self._write_result(project_name, script, sources, unit_ids, written, message, concurrent)
 
@@ -524,7 +537,7 @@ class EditTimelineService:
         if base is None:
             raise EditTimelineError(
                 "revision_not_found",
-                f"剪辑时间线「{document.id}」没有修订 {number}（最新修订为 {document.latest.number}）",
+                f'Edit timeline "{document.id}" has no revision {number} (latest revision is {document.latest.number})',
                 timeline_id=document.id,
                 revision=number,
                 latest_revision=document.latest.number,
@@ -619,8 +632,8 @@ class EditTimelineService:
             clip_ids = sorted_clip_ids(conflicting)
             raise EditTimelineError(
                 "revision_conflict",
-                f"修订 {base.number} 之后剪辑时间线已被改到修订 {document.latest.number}，"
-                f"本批涉及的片段 {', '.join(clip_ids)} 期间被改动过；请重新读取后再改",
+                f"After revision {base.number}, the edit timeline was changed to revision {document.latest.number}, "
+                f"and clips {', '.join(clip_ids)} in this batch were changed meanwhile; read it again before editing",
                 timeline_id=document.id,
                 base_revision=base.number,
                 latest_revision=document.latest.number,
@@ -670,7 +683,7 @@ class EditTimelineService:
         if target is None:
             raise EditTimelineError(
                 "revision_not_found",
-                f"剪辑时间线「{document.id}」没有修订 {number}（最新修订为 {document.latest.number}）",
+                f'Edit timeline "{document.id}" has no revision {number} (latest revision is {document.latest.number})',
                 timeline_id=document.id,
                 revision=number,
                 latest_revision=document.latest.number,

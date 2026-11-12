@@ -1,1 +1,1 @@
-Retain the screenplay’s scene divisions / scene changes: mark a change of scene (location / time / scene transition) “是”, and shots within the same scene “否”; do not fragment the author’s scenes again.
+Retain the screenplay’s scene divisions / scene changes: mark a change of scene (location / time / scene transition) `true`, and shots within the same scene `false`; do not fragment the author’s scenes again.

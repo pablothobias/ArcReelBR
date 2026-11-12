@@ -37,7 +37,7 @@ class GridManager:
         a newline into the final filename.
         """
         if _GRID_ID_RE.fullmatch(grid_id) is None:
-            raise ValueError(f"非法宫格 ID: {grid_id!r}")
+            raise ValueError(f"Invalid grid ID: {grid_id!r}")
         return safe_join(self._dir, f"{grid_id}{suffix}")
 
     def image_path(self, grid_id: str) -> Path:

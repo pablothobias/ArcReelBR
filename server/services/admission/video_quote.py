@@ -138,7 +138,7 @@ class VideoQuoteSheet:
         lines = [
             *log,
             "Preflight complete; no tasks enqueued.",
-            *(f"- {unit.unit_id}：{_unit_line(unit)}" for unit in self.units),
+            *(f"- {unit.unit_id}: {_unit_line(unit)}" for unit in self.units),
         ]
         total = self.estimated_total
         unpriced = self.unpriced_count
@@ -148,7 +148,7 @@ class VideoQuoteSheet:
             )
         else:
             if total:
-                amounts = "、".join(f"{amount:g} {currency}" for currency, amount in total.items())
+                amounts = ", ".join(f"{amount:g} {currency}" for currency, amount in total.items())
                 lines.append(f"Estimated total: {amounts}" + (" (priced units only)" if unpriced else ""))
             if unpriced:
                 lines.append(

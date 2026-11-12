@@ -123,7 +123,7 @@ class TestMigrateV13ToV14File:
         d = tmp_path / "demo"
         d.mkdir()
         (d / "project.json").write_text("[]", encoding="utf-8")
-        with pytest.raises(ValueError, match=r"project\.json 必须是对象"):
+        with pytest.raises(ValueError, match=r"project\.json must be an object"):
             migrate_v13_to_v14(d)
 
     def test_unmigratable_style_needs_no_manifest(self, tmp_path: Path):

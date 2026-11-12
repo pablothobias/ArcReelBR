@@ -237,7 +237,7 @@ class TestDashScopeAudioBackend:
         with _dashscope_audio_routes(download=httpx.Response(200, content=b"")) as routes:
             b = DashScopeAudioBackend(api_key="sk")
             out = tmp_path / "empty.wav"
-            with pytest.raises(RuntimeError, match="空内容"):
+            with pytest.raises(RuntimeError, match="empty content"):
                 await b.synthesize(AudioSynthesisRequest(text="hi", output_path=out, voice="Cherry"))
 
         assert routes.synthesize.call_count == 1
@@ -489,7 +489,7 @@ class TestOpenAIAudioBackend:
 
             b = OpenAIAudioBackend(api_key="sk", model="tts-1")
             out = tmp_path / "empty.wav"
-            with pytest.raises(RuntimeError, match="空响应体"):
+            with pytest.raises(RuntimeError, match="empty response body"):
                 await b.synthesize(AudioSynthesisRequest(text="hi", output_path=out, voice="alloy"))
 
         assert len(mock_client.requests) == 1

@@ -20,7 +20,7 @@ class ProjectDeletedDuringTaskError(RuntimeError):
     """The task-claimed project was deleted during execution."""
 
     def __init__(self, project_name: str) -> None:
-        super().__init__(f"项目 '{project_name}' 已在任务执行期间删除")
+        super().__init__(f"Project '{project_name}' was deleted while the task was running")
         self.project_name = project_name
 
 

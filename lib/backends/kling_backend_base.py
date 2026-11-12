@@ -91,7 +91,7 @@ class KlingBackendBase:
             self._jwt = None
             self._static_api_key = resolve_kling_api_key(api_key)
         else:
-            raise ValueError(f"未知 Kling auth_mode: {auth_mode}")
+            raise ValueError(f"Unknown Kling auth_mode: {auth_mode}")
 
     @property
     def name(self) -> str:

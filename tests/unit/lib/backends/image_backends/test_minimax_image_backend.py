@@ -345,7 +345,7 @@ class TestResponseHandling:
             from lib.backends.image_backends.minimax import MiniMaxImageBackend
 
             b = MiniMaxImageBackend(api_key="sk")
-            with pytest.raises(RuntimeError, match="缺少 image_urls/image_base64"):
+            with pytest.raises(RuntimeError, match="is missing image_urls/image_base64"):
                 await b.generate(ImageGenerationRequest(prompt="x", output_path=tmp_path / "o.png"))
         download.assert_not_called()
 

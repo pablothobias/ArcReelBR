@@ -75,9 +75,9 @@ class TestGridManager:
             "grid_123",
             "grid_000000000000\n",
         ):
-            with pytest.raises(ValueError, match="非法宫格 ID"):
+            with pytest.raises(ValueError, match="Invalid grid ID"):
                 gm.get(bad)
-            with pytest.raises(ValueError, match="非法宫格 ID"):
+            with pytest.raises(ValueError, match="Invalid grid ID"):
                 gm.move_to_trash(bad)
 
     def test_grids_dir_created(self, tmp_path):

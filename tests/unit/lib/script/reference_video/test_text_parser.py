@@ -248,7 +248,7 @@ def test_resolve_references_matches_across_encoding_forms(registered: str, writt
 @pytest.mark.parametrize("registered", [_NAME_NFC, _NAME_NFD], ids=["登记NFC", "登记NFD"])
 @pytest.mark.parametrize("written", [_NAME_NFC, _NAME_NFD], ids=["出场NFC", "出场NFD"])
 def test_render_mentions_as_subjects_matches_across_encoding_forms(registered: str, written: str):
-    """Replace with subject markers despite different encodings; missing replacements leak ``@[名称]`` unchanged into provider requests."""
+    """Replace with subject markers despite different encodings; missing replacements leak ``@[name]`` unchanged into provider requests."""
     assert render_mentions_as_subjects(f"@[{written}] 推门而入", [registered]) == f"<{_NAME_NFC}> 推门而入"
 
 
@@ -290,17 +290,17 @@ def test_empty_speech_text_is_not_a_mark():
 
 
 def test_blank_speaker_slot_is_not_a_mark():
-    """``@[ ]{台词}`` has an empty speaker; dialogue requires a nonempty speaker and does not degrade to voiceover."""
+    """``@[ ]{dialogue}`` has an empty speaker; dialogue requires a nonempty speaker and does not degrade to voiceover."""
     assert _marks("@[ ]：{我来了}") == []
 
 
 def test_malformed_speaker_slot_does_not_fall_back_to_voiceover():
-    """``@[]：{台词}`` means someone speaks; silent conversion to voiceover is harder to detect than nonrecognition."""
+    """``@[]：{dialogue}`` means someone speaks; silent conversion to voiceover is harder to detect than nonrecognition."""
     assert _marks("@[]：{我来了}") == []
 
 
 def test_repeated_separator_colon_does_not_fall_back_to_voiceover():
-    """``@[张三]：：{台词}`` consumes only one separator colon; the remaining colon makes it nondialogue syntax."""
+    """``@[张三]：：{dialogue}`` consumes only one separator colon; the remaining colon makes it nondialogue syntax."""
     assert _marks("@[张三]：：{我来了}") == []
     assert strip_speech_marks("@[张三]：：{我来了}") == "@[张三]：：{我来了}"
     assert _marks("门开了。@[张三]:: {我来了}") == []
@@ -347,7 +347,7 @@ def test_email_like_prefix_is_not_a_speaker():
     assert _marks("a@b{我来了}") == [("", "我来了")]
 
 
-# @[角色/衍生] (docs/adr/0072).
+# @[character/derivative] (docs/adr/0072).
 
 
 def _proj_with_derivatives(**by_character: list[str]) -> dict:

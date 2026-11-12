@@ -1423,7 +1423,7 @@ class TestIdentityInvariant:
         assert row["provider"] == "gemini-aistudio"
 
     def test_media_backend_without_provider_id_raises(self, tmp_path: Path) -> None:
-        with pytest.raises(ValueError, match=r"image backend 与 provider_id 必须成对提供"):
+        with pytest.raises(ValueError, match=r"image backend and provider_id must be provided together"):
             MediaGenerator(
                 tmp_path / "projects" / "demo",
                 image_backend=_FakeImageBackend(provider="gemini", model="m"),
@@ -1431,14 +1431,14 @@ class TestIdentityInvariant:
             )
 
     def test_media_provider_id_without_backend_raises(self, tmp_path: Path) -> None:
-        with pytest.raises(ValueError, match=r"video backend 与 provider_id 必须成对提供"):
+        with pytest.raises(ValueError, match=r"video backend and provider_id must be provided together"):
             MediaGenerator(
                 tmp_path / "projects" / "demo",
                 video_provider_id="gemini-aistudio",
             )
 
     def test_text_missing_provider_id_raises(self, acct: _AccountingDb) -> None:
-        with pytest.raises(ValueError, match=r"text backend 与 provider_id 必须成对提供"):
+        with pytest.raises(ValueError, match=r"text backend and provider_id must be provided together"):
             TextGenerator(
                 _FakeTextBackend(provider="gemini", model="m"),
                 Ledger(session_factory=acct.factory),

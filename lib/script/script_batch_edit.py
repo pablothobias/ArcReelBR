@@ -170,7 +170,7 @@ class ScriptBatchEditResult(BaseModel):
     revision: str
     affected_ids: tuple[str, ...] = ()
     problems: tuple[ScriptBatchEditProblem, ...] = ()
-    #: Post-commit notices for affected entries (such as unbound visual ``@[名称]``),
+    #: Post-commit notices for affected entries (such as unbound visual ``@[name]``),
     #: locale-neutral ``{"key", "params"}`` entries, without affecting ``success``.
     warnings: tuple[dict[str, Any], ...] = ()
 

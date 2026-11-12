@@ -1276,7 +1276,7 @@ def declarative_requires_api_key(definition: Mapping[str, Any]) -> bool:
 
 def _require_declarative_base_url(definition: Mapping[str, Any], provider: CustomProvider) -> None:
     if declarative_requires_base_url(definition) and not provider.base_url:
-        raise ValueError("声明式调用端点需要 base_url")
+        raise ValueError("Declarative endpoints require base_url")
 
 
 def _build_declarative_video(
@@ -1435,7 +1435,7 @@ def _build_comfyui_runtime(
         if media_type not in ("image", "video"):
             raise ComfyuiError("provider_unsupported_media", provider_id=provider.provider_id, media_type=media_type)
         if not provider.base_url:
-            raise ValueError("ComfyUI 调用端点需要 base_url")
+            raise ValueError("ComfyUI endpoints require base_url")
         if media_type == "image":
             image_delegate = ComfyuiImageBackend(
                 provider_id=provider.provider_id,
@@ -1504,7 +1504,9 @@ def merge_builtin_definitions(registry: dict[str, EndpointSpec], directory: Path
     """
     for key, definition in load_builtin_definitions(directory).items():
         if key in registry:
-            raise BuiltinDefinitionError(f"随版定义 {key}.json 的内置键与已有 endpoint 重复")
+            raise BuiltinDefinitionError(
+                f"Bundled definition {key}.json has a built-in key that duplicates an existing endpoint"
+            )
         registry[key] = declarative_endpoint_spec(key, definition)
 
 

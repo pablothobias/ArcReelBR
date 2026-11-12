@@ -65,11 +65,11 @@ _DOCUMENTS: dict[str, str] = {
     ),
     QUARANTINE_KIND_SCRIPT_PLAN: (
         "Reference-to-video script-planning draft: `units` contains ordered video units; `source_text` excerpts the source verbatim. "
-        "`text` is the unit body, referencing registered assets with `@[名称]`."
+        "`text` is the unit body, referencing registered assets with `@[name]`."
     ),
     QUARANTINE_KIND_PROMPT_AUTHORING: (
         "Reference-to-video prompt-authoring draft: `units` corresponds one-to-one to the formal script's video units. "
-        "`text` is that unit's prompt body, referencing registered assets with `@[名称]`."
+        "`text` is that unit's prompt body, referencing registered assets with `@[name]`."
     ),
 }
 
@@ -102,20 +102,22 @@ def merge_repair(content: dict[str, Any], scope: RepairScope, response: object) 
 
     Unexpected reply shapes raise ``ValueError``."""
     if not isinstance(response, dict):
-        raise ValueError("模型回复不是 JSON 对象")
+        raise ValueError("The model reply is not a JSON object")
     reply = cast(dict[str, Any], response)
     items = reply.get(scope.root)
     if scope.indices is None:
         if not isinstance(items, list) or not items:
-            raise ValueError(f"模型回复缺少非空的 {scope.root} 数组")
+            raise ValueError(f"The model reply lacks a non-empty {scope.root} array")
         # Keep only original top-level fields/item arrays; do not add model-invented fields.
         return {**content, **{key: value for key, value in reply.items() if key in content or key == scope.root}}
     if not isinstance(items, list) or len(cast(list[Any], items)) != len(scope.indices):
-        raise ValueError(f"模型回复的 {scope.root} 条目数与待修复条目数（{len(scope.indices)}）不符")
+        raise ValueError(
+            f"The number of {scope.root} entries in the model reply does not match the number of entries to repair ({len(scope.indices)})"
+        )
     merged = copy.deepcopy(content)
     for index, item in zip(scope.indices, cast(list[Any], items), strict=True):
         if not isinstance(item, dict):
-            raise ValueError(f"模型回复的 {scope.root} 条目不是 JSON 对象")
+            raise ValueError(f"A {scope.root} entry in the model reply is not a JSON object")
         merged[scope.root][index] = item
     return merged
 
@@ -180,10 +182,10 @@ class DraftRepair:
         draft, unreadable = await asyncio.to_thread(_read_draft)
         if draft is None:
             detail = "is not a valid JSON envelope" if unreadable else "does not exist"
-            raise DraftWorkflowError("draft_not_found", f"集（id={episode}）{doc_type} draft {detail}")
+            raise DraftWorkflowError("draft_not_found", f"Episode (id={episode}) {doc_type} draft {detail}")
         if draft_owner(draft) == DRAFT_OWNER_AGENT:
             raise DraftWorkflowError(
-                "draft_agent_owned", f"集（id={episode}）{doc_type} draft is being edited by the agent"
+                "draft_agent_owned", f"Episode (id={episode}) {doc_type} draft is being edited by the agent"
             )
         actual_revision = draft_revision(draft)
         if unprefixed(base_revision) != unprefixed(actual_revision):
@@ -206,7 +208,7 @@ class DraftRepair:
             # Missing referenced catalog models are reselectable configuration issues; propagate unchanged for caller provider-configuration guidance.
             raise
         except Exception as exc:
-            raise DraftWorkflowError("draft_repair_failed", f"AI 修复未完成：{exc}") from exc
+            raise DraftWorkflowError("draft_repair_failed", f"AI repair did not complete: {exc}") from exc
         return await self.workflow.save(episode, doc_type, content, base_revision)
 
     async def _repaired_content(
@@ -251,7 +253,7 @@ class DraftRepair:
         except ModelNotInCatalogError:
             raise
         except ValueError as exc:
-            raise DraftWorkflowError("draft_repair_failed", f"草稿无法重新校验：{exc}") from exc
+            raise DraftWorkflowError("draft_repair_failed", f"The draft cannot be revalidated: {exc}") from exc
         return violation_entries(revalidation.violations)
 
     async def _source_text(self, episode: int, kind: str, draft: QuarantinedDraft) -> str | None:

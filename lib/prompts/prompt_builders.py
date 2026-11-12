@@ -14,6 +14,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 
+from lib.project.asset_types import SCENE_OCCUPANCY_EMPTY, SCENE_OCCUPANCY_OCCUPIED, SCENE_OCCUPANCY_VALUES
 from lib.prompts.prompt_style import normalize_style_value
 from lib.prompts.prompt_templates.builtin import builtin_templates
 from lib.prompts.prompt_utils import (
@@ -32,7 +33,15 @@ from lib.prompts.reference_image_numbering import (
 _LEGACY_IMAGE_AVOID_LINE = "Avoid: 水印、多余文字、Logo"
 
 
-def _asset_prompt(asset_type: str, name: str, description: str, style: str = "", style_description: str = "") -> str:
+def _asset_prompt(
+    asset_type: str,
+    name: str,
+    description: str,
+    style: str = "",
+    style_description: str = "",
+    *,
+    occupied: bool = False,
+) -> str:
     return builtin_templates.render(
         "asset/sheet",
         asset_type=asset_type,
@@ -40,6 +49,7 @@ def _asset_prompt(asset_type: str, name: str, description: str, style: str = "",
         description=description,
         style=normalize_style_value(style),
         style_description=normalize_style_value(style_description),
+        occupied=occupied,
     )
 
 
@@ -53,9 +63,20 @@ def build_character_derivative_prompt(description: str) -> str:
     return _asset_prompt("character_derivative", "", description)
 
 
-def build_scene_prompt(name: str, description: str, style: str = "", style_description: str = "") -> str:
-    """Unoccupied scene asset image."""
-    return _asset_prompt("scene", name, description, style, style_description)
+def build_scene_prompt(
+    name: str,
+    description: str,
+    style: str = "",
+    style_description: str = "",
+    *,
+    occupancy: str = SCENE_OCCUPANCY_EMPTY,
+) -> str:
+    """Scene asset image: an empty environment by default, or with the described people when explicitly occupied."""
+    if occupancy not in SCENE_OCCUPANCY_VALUES:
+        raise ValueError(f"unsupported scene occupancy: {occupancy!r}")
+    return _asset_prompt(
+        "scene", name, description, style, style_description, occupied=occupancy == SCENE_OCCUPANCY_OCCUPIED
+    )
 
 
 def build_prop_prompt(name: str, description: str, style: str = "", style_description: str = "") -> str:
@@ -87,7 +108,7 @@ def render_storyboard_image_prompt(
     Both inject project style, reference-image type declarations and ``Avoid`` constraints.
     ``references`` is the image list actually sent with the request, in final orchestration
     order; positions supply 图N numbers. Insert the ``Reference_Images`` declaration between
-    the style block and ``Scene``. Replace body ``@[名称]`` mentions with their numbers, or bare
+    the style block and ``Scene``. Replace body ``@[name]`` mentions with their numbers, or bare
     names when unmatched. Omit the declaration when no references exist. Include product
     reference fidelity requirements in the declaration.
     """

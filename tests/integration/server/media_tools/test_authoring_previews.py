@@ -40,7 +40,7 @@ from tests.fakes import (
 )
 from tests.integration.server.agent_tool_support import ToolHarness, run_declared_tool
 
-_UNIT_TEXT = "@[酒馆] 门口，@[张三/劲装] 推开门。\n@[张三/劲装]：{进来吧}\n@[李四]：{好}"
+_UNIT_TEXT = "@[Tavern] doorway, @[Zed/Armor] pushes the door open.\n@[Zed/Armor]: {Come in}\n@[Lee]: {Fine}"
 
 
 def _write_json(path: Path, payload: dict[str, Any]) -> None:
@@ -51,17 +51,19 @@ def _write_json(path: Path, payload: dict[str, Any]) -> None:
 def _build_project(tmp_path: Path, *, generation_mode: str, script: dict[str, Any] | None) -> Path:
     project_dir = tmp_path / "projects" / "demo"
     characters = {
-        "张三": {
-            "description": "青年剑客",
-            "character_sheet": "characters/张三.png",
-            "reference_audio": "characters/refs_audio/张三.mp3",
-            "voice_style": "低沉",
-            "derivatives": {"劲装": {"description": "黑色劲装", "character_sheet": "characters/张三-劲装.png"}},
+        "Zed": {
+            "description": "Young swordsman",
+            "character_sheet": "characters/Zed.png",
+            "reference_audio": "characters/refs_audio/Zed.mp3",
+            "voice_style": "Deep",
+            "derivatives": {
+                "Armor": {"description": "Black fighting outfit", "character_sheet": "characters/Zed-Armor.png"}
+            },
         },
-        "李四": {
-            "description": "掌柜",
-            "character_sheet": "characters/李四.png",
-            "reference_audio": "characters/refs_audio/李四.mp3",
+        "Lee": {
+            "description": "Innkeeper",
+            "character_sheet": "characters/Lee.png",
+            "reference_audio": "characters/refs_audio/Lee.mp3",
         },
     }
     _write_json(
@@ -71,21 +73,21 @@ def _build_project(tmp_path: Path, *, generation_mode: str, script: dict[str, An
             "title": "T",
             "content_mode": "drama",
             "generation_mode": generation_mode,
-            "style": "水墨",
-            "style_description": "暖色电影质感",
+            "style": "Ink wash",
+            "style_description": "Warm cinematic texture",
             "characters": characters,
-            "scenes": {"酒馆": {"description": "老酒馆", "scene_sheet": "scenes/酒馆.png"}},
+            "scenes": {"Tavern": {"description": "Old tavern", "scene_sheet": "scenes/Tavern.png"}},
             "props": {},
             "episodes": [{"episode": 1, "title": "E1", "script_file": "scripts/episode_1.json"}],
         },
     )
     for relative, data in {
-        "characters/张三.png": b"base",
-        "characters/张三-劲装.png": b"derivative",
-        "characters/李四.png": b"li",
-        "scenes/酒馆.png": b"tavern",
-        "characters/refs_audio/张三.mp3": b"audio-zhang",
-        "characters/refs_audio/李四.mp3": b"audio-li",
+        "characters/Zed.png": b"base",
+        "characters/Zed-Armor.png": b"derivative",
+        "characters/Lee.png": b"li",
+        "scenes/Tavern.png": b"tavern",
+        "characters/refs_audio/Zed.mp3": b"audio-zed",
+        "characters/refs_audio/Lee.mp3": b"audio-lee",
     }.items():
         (project_dir / relative).parent.mkdir(parents=True, exist_ok=True)
         (project_dir / relative).write_bytes(data)
@@ -156,7 +158,7 @@ async def test_reference_unit_preview_reports_send_order_bindings_and_digests(tm
     assert preview["storyboard_image"]["unavailable"] == "prompt_preview_not_applicable"
     text = preview["video"]["text"]
     # Reference markers use the English form Seedance documents, in send order (resolves MCP-007).
-    assert "<酒馆>@Image 1, <张三/劲装>@Image 2." in text
+    assert "<Tavern>@Image 1, <Zed/Armor>@Image 2." in text
     assert "@Audio 1" in text
     assert "@Audio 2" in text
     assert "@图片" not in text
@@ -164,18 +166,18 @@ async def test_reference_unit_preview_reports_send_order_bindings_and_digests(tm
     request = preview["reference_video"]
     images = request["images"]
     assert [(image["marker"], image["type"], image["name"]) for image in images] == [
-        ("@Image 1", "scene", "酒馆"),
-        ("@Image 2", "character", "张三/劲装"),
+        ("@Image 1", "scene", "Tavern"),
+        ("@Image 2", "character", "Zed/Armor"),
     ]
     derivative = images[1]
-    assert (derivative["base_name"], derivative["is_derivative"], derivative["kind"]) == ("张三", True, "sheet")
-    assert derivative["artifact_path"] == "characters/张三-劲装.png"
-    assert derivative["sha256"] == sha256_file_with_size(project_dir / "characters/张三-劲装.png")[0]
+    assert (derivative["base_name"], derivative["is_derivative"], derivative["kind"]) == ("Zed", True, "sheet")
+    assert derivative["artifact_path"] == "characters/Zed-Armor.png"
+    assert derivative["sha256"] == sha256_file_with_size(project_dir / "characters/Zed-Armor.png")[0]
     # Speech binds to base characters; audio numbers follow first speaker mention and match the request order.
     audio = request["audio"]
     assert [(entry["marker"], entry["speaker"], entry["artifact_path"]) for entry in audio] == [
-        ("@Audio 1", "张三", "characters/refs_audio/张三.mp3"),
-        ("@Audio 2", "李四", "characters/refs_audio/李四.mp3"),
+        ("@Audio 1", "Zed", "characters/refs_audio/Zed.mp3"),
+        ("@Audio 2", "Lee", "characters/refs_audio/Lee.mp3"),
     ]
     assert all(entry["sha256"] for entry in audio)
     # Every reported marker is literally present in the rendered text: preview rows and prompt cannot drift.
@@ -219,8 +221,8 @@ async def test_reference_unit_preview_reports_clamped_references_and_warnings(tm
 
     assert outcome.problem is None, outcome.problem
     request = outcome.value.reference_video
-    assert [image.name for image in request.images] == ["酒馆"]
-    assert {"type": "character", "name": "张三/劲装", "reason": "clamped"} in request.unavailable_references
+    assert [image.name for image in request.images] == ["Tavern"]
+    assert {"type": "character", "name": "Zed/Armor", "reason": "clamped"} in request.unavailable_references
     assert any(warning["key"] == "reference_images_clamped" for warning in outcome.value.video.warnings)
     # Soft voice tier: no audio binding is sent, so no audio marker is promised.
     assert request.audio == ()
@@ -348,7 +350,7 @@ async def test_captured_submission_reads_the_task_execution_checkpoint(
     captured = outcome.value.captured_submission
     assert captured["task_id"] == "t1"
     assert captured["prompt"] == "captured prompt"
-    assert [media["logical_name"] for media in captured["media"]] == ["酒馆"]
+    assert [media["logical_name"] for media in captured["media"]] == ["Tavern"]
     assert "staged_locator" not in captured["media"][0]
     assert outcome.value.preview_basis == "current_configuration"
 
@@ -368,10 +370,10 @@ def _checkpoint_json(project_dir: Path) -> str:
         "t1",
         (
             ProviderMediaInput(
-                path=project_dir / "scenes" / "酒馆.png",
+                path=project_dir / "scenes" / "Tavern.png",
                 role="reference_image",
                 logical_type="scene",
-                logical_name="酒馆",
+                logical_name="Tavern",
                 kind="sheet",
             ),
         ),
@@ -381,8 +383,8 @@ def _checkpoint_json(project_dir: Path) -> str:
         kind_version=1,
         inputs={
             "unit_id": "E1U1",
-            "visual_lines": ["推门"],
-            "style": "水墨",
+            "visual_lines": ["Pushes the door"],
+            "style": "Ink wash",
             "canvas": {"aspect_ratio": "9:16"},
             "request_references": [],
         },
@@ -523,7 +525,7 @@ async def test_asset_prompt_preview_renders_base_sheet_with_style(tmp_path, prev
     before = {path: path.read_bytes() for path in project_dir.rglob("*") if path.is_file()}
 
     outcome = await run_declared_tool(
-        GET_ASSET_PROMPT_PREVIEW, _harness(tmp_path, preview_queue), {"asset_type": "character", "name": "张三"}
+        GET_ASSET_PROMPT_PREVIEW, _harness(tmp_path, preview_queue), {"asset_type": "character", "name": "Zed"}
     )
 
     assert outcome.problem is None, outcome.problem
@@ -531,10 +533,29 @@ async def test_asset_prompt_preview_renders_base_sheet_with_style(tmp_path, prev
     assert value["target_kind"] == "asset_sheet"
     assert value["preview_basis"] == "current_configuration"
     assert value["text"]
-    assert "青年剑客" in value["text"]
-    assert value["style"] == "水墨"
-    assert value["description"] == "青年剑客"
+    assert "Young swordsman" in value["text"]
+    assert value["style"] == "Ink wash"
+    assert value["description"] == "Young swordsman"
+    assert value["occupancy"] is None
     assert _files_unchanged(project_dir, before)
+    await _no_tasks(preview_queue)
+
+
+async def test_asset_prompt_preview_reports_and_renders_scene_occupancy(tmp_path, preview_queue):
+    project_dir = _build_project(tmp_path, generation_mode="storyboard", script=None)
+    harness = _harness(tmp_path, preview_queue)
+    empty = await run_declared_tool(GET_ASSET_PROMPT_PREVIEW, harness, {"asset_type": "scene", "name": "Tavern"})
+    project_file = project_dir / "project.json"
+    project = json.loads(project_file.read_text(encoding="utf-8"))
+    project["scenes"]["Tavern"]["occupancy"] = "occupied"
+    project_file.write_text(json.dumps(project, ensure_ascii=False), encoding="utf-8")
+
+    occupied = await run_declared_tool(GET_ASSET_PROMPT_PREVIEW, harness, {"asset_type": "scene", "name": "Tavern"})
+
+    assert empty.value["occupancy"] == "empty"
+    assert "empty environment reference" in empty.value["text"]
+    assert occupied.value["occupancy"] == "occupied"
+    assert "occupied environment reference" in occupied.value["text"]
     await _no_tasks(preview_queue)
 
 
@@ -544,17 +565,17 @@ async def test_asset_prompt_preview_derivative_uses_the_base_sheet_reference(tmp
     outcome = await run_declared_tool(
         GET_ASSET_PROMPT_PREVIEW,
         _harness(tmp_path, preview_queue),
-        {"asset_type": "character", "name": "张三", "derivative": "劲装", "description": "白色劲装"},
+        {"asset_type": "character", "name": "Zed", "derivative": "Armor", "description": "White fighting outfit"},
     )
 
     assert outcome.problem is None, outcome.problem
     value = outcome.value
     assert value["target_kind"] == "derivative_sheet"
     assert value["draft_description"] is True
-    assert "白色劲装" in value["text"]
+    assert "White fighting outfit" in value["text"]
     assert value["style"] is None
     sent = [reference for reference in value["references"] if reference["sent"]]
-    assert [reference["artifact_path"] for reference in sent] == ["characters/张三.png"]
+    assert [reference["artifact_path"] for reference in sent] == ["characters/Zed.png"]
     # Digests are exposed only as the shared generation input observes them; never computed from prompt text.
     assert "content_digest" in sent[0]
     assert value["limits"]["sent_reference_count"] == 1
@@ -565,9 +586,9 @@ async def test_asset_prompt_preview_unknown_asset_is_a_problem(tmp_path, preview
     _build_project(tmp_path, generation_mode="storyboard", script=None)
     ctx = _harness(tmp_path, preview_queue)
 
-    unknown = await run_declared_tool(GET_ASSET_PROMPT_PREVIEW, ctx, {"asset_type": "prop", "name": "剑"})
+    unknown = await run_declared_tool(GET_ASSET_PROMPT_PREVIEW, ctx, {"asset_type": "prop", "name": "Sword"})
     no_derivatives = await run_declared_tool(
-        GET_ASSET_PROMPT_PREVIEW, ctx, {"asset_type": "scene", "name": "酒馆", "derivative": "夜"}
+        GET_ASSET_PROMPT_PREVIEW, ctx, {"asset_type": "scene", "name": "Tavern", "derivative": "Night"}
     )
 
     assert unknown.problem is not None
@@ -589,11 +610,11 @@ def _fake_overview_generator(calls: list[str]):
             class _Result:
                 text = json.dumps(
                     {
-                        "synopsis": "剑客重返酒馆",
-                        "genre": "武侠",
-                        "theme": "归来",
-                        "world_setting": "江湖",
-                        "language": "zh",
+                        "synopsis": "A swordsman returns to the tavern",
+                        "genre": "Wuxia",
+                        "theme": "Return",
+                        "world_setting": "The martial world",
+                        "language": "en",
                     },
                     ensure_ascii=False,
                 )
@@ -610,7 +631,7 @@ def _fake_overview_generator(calls: list[str]):
 async def test_overview_authorization_must_be_a_real_boolean(tmp_path, preview_queue, monkeypatch):
     project_dir = _build_project(tmp_path, generation_mode="storyboard", script=None)
     (project_dir / "source").mkdir()
-    (project_dir / "source" / "novel.txt").write_text("张三推开酒馆的门。", encoding="utf-8")
+    (project_dir / "source" / "novel.txt").write_text("Zed enters the tavern.", encoding="utf-8")
     calls: list[str] = []
     use_text_generator(monkeypatch, _fake_overview_generator(calls))
 
@@ -626,7 +647,7 @@ async def test_overview_authorization_must_be_a_real_boolean(tmp_path, preview_q
 async def test_overview_requires_explicit_authorization_and_calls_nothing(tmp_path, preview_queue, monkeypatch):
     project_dir = _build_project(tmp_path, generation_mode="storyboard", script=None)
     (project_dir / "source").mkdir()
-    (project_dir / "source" / "novel.txt").write_text("张三推开酒馆的门。", encoding="utf-8")
+    (project_dir / "source" / "novel.txt").write_text("Zed enters the tavern.", encoding="utf-8")
     calls: list[str] = []
     use_text_generator(monkeypatch, _fake_overview_generator(calls))
 
@@ -635,7 +656,7 @@ async def test_overview_requires_explicit_authorization_and_calls_nothing(tmp_pa
     assert outcome.problem is not None
     assert outcome.problem.code == "confirmation_required"
     assert outcome.problem.params["sources"] == [
-        {"filename": "novel.txt", "chars_used": 9, "total_chars": 9, "truncated": False}
+        {"filename": "novel.txt", "chars_used": 22, "total_chars": 22, "truncated": False}
     ]
     assert calls == []
     assert "overview" not in json.loads((project_dir / "project.json").read_text(encoding="utf-8"))
@@ -644,7 +665,7 @@ async def test_overview_requires_explicit_authorization_and_calls_nothing(tmp_pa
 async def test_overview_generates_with_the_fake_text_model_and_reports_impacts(tmp_path, preview_queue, monkeypatch):
     project_dir = _build_project(tmp_path, generation_mode="storyboard", script=None)
     (project_dir / "source").mkdir()
-    (project_dir / "source" / "novel.txt").write_text("张三推开酒馆的门。", encoding="utf-8")
+    (project_dir / "source" / "novel.txt").write_text("Zed enters the tavern.", encoding="utf-8")
     calls: list[str] = []
     use_text_generator(monkeypatch, _fake_overview_generator(calls))
 
@@ -655,12 +676,12 @@ async def test_overview_generates_with_the_fake_text_model_and_reports_impacts(t
     assert outcome.problem is None, outcome.problem
     value = outcome.value
     assert calls == ["create:overview", "generate"]
-    assert value["overview"]["synopsis"] == "剑客重返酒馆"
+    assert value["overview"]["synopsis"] == "A swordsman returns to the tavern"
     assert value["previous_overview"] is None
     assert value["stale_impacts"]["changed_fields"] == ["synopsis", "genre", "theme", "world_setting"]
     assert value["stale_impacts"]["basis_changed"] is True
     saved = json.loads((project_dir / "project.json").read_text(encoding="utf-8"))
-    assert saved["overview"]["synopsis"] == "剑客重返酒馆"
+    assert saved["overview"]["synopsis"] == "A swordsman returns to the tavern"
     await _no_tasks(preview_queue)
 
 

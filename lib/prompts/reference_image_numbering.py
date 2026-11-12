@@ -1,8 +1,8 @@
-"""Reference image numbering as “图N”: type declarations and body ``@[名称]`` replacement.
+"""Reference image numbering as “图N”: type declarations and body ``@[name]`` replacement.
 
 Storyboard/grid references reach image models as arrays, identified as “图N”. After orchestration finalizes
 the list, this module mechanically renders a nameless type declaration (YAML key
-``Reference_Images``) and replaces body ``@[名称]`` with the corresponding “图N”. Numbers are list positions
+``Reference_Images``) and replaces body ``@[name]`` with the corresponding “图N”. Numbers are list positions
 (starting at 1); compression and execution-time copying preserve count/order, so numbering occurs once here
 with consistent semantics across image backends.
 
@@ -164,7 +164,7 @@ def mention_replacements(references: Sequence[ReferenceImageSlot]) -> dict[str, 
 
 
 def render_reference_mentions(text: str, references: Sequence[ReferenceImageSlot]) -> str:
-    """Replace body ``@[名称]`` with matching “图N”; unmatched mentions render as bare names."""
+    """Replace body ``@[name]`` with matching “图N”; unmatched mentions render as bare names."""
     replacements = mention_replacements(references)
     return render_mentions(text, lambda name: replacements.get(name, name))
 

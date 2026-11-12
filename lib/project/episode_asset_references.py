@@ -4,7 +4,7 @@ Compute required sheets once here, shared by episode batch generation, Agent epi
 asset generation, and production-state missing-referenced-sheet checks, without three independent sets.
 
 Share :func:`lib.script.script_references.payload_reference_names` with cascading renames/reference
-status (arrays, ``speaker``, body ``@[名称]``). :class:`ReferenceCatalog` resolves ownership; unregistered
+status (arrays, ``speaker``, body ``@[name]``). :class:`ReferenceCatalog` resolves ownership; unregistered
 names do not count. Derivative ``本体/衍生`` also references its base, since derivative sheets edit base
 sheets and cannot generate without an available base sheet."""
 

@@ -204,7 +204,7 @@ class ViduVideoBackend(EntryBoundCapabilities):
     async def resume_video(self, job_id: str, request: VideoGenerationRequest) -> VideoGenerationResult:
         # Vidu cannot resume: polling is entirely inline in generate, without independent resumable polling entry points.
         # Orphan handlers mark [resume_unsupported] from NotImplementedError.
-        raise NotImplementedError("ViduVideoBackend 暂不支持 resume_video")
+        raise NotImplementedError("ViduVideoBackend does not support resume_video yet")
 
     async def generate(self, request: VideoGenerationRequest) -> VideoGenerationResult:
         endpoint, body = await asyncio.to_thread(self._build_request, request)
@@ -360,9 +360,9 @@ class ViduVideoBackend(EntryBoundCapabilities):
     def _select_endpoint(self, request: VideoGenerationRequest) -> str:
         # Explicit start/end_image with missing files must fail, never silently degrade to text2video.
         if request.start_image is not None and not Path(request.start_image).exists():
-            raise FileNotFoundError(f"start_image 文件不存在: {request.start_image}")
+            raise FileNotFoundError(f"start_image file does not exist: {request.start_image}")
         if request.end_image is not None and not Path(request.end_image).exists():
-            raise FileNotFoundError(f"end_image 文件不存在: {request.end_image}")
+            raise FileNotFoundError(f"end_image file does not exist: {request.end_image}")
         return _endpoint_for(request)
 
     @classmethod
@@ -412,7 +412,7 @@ class ViduVideoBackend(EntryBoundCapabilities):
         resp = await submit_post(lambda: client.post(endpoint, json=body), provider=PROVIDER_VIDU, request=request)
         data = resp.json()
         if not data.get("task_id"):
-            raise RuntimeError(f"Vidu 视频任务创建响应缺少 task_id: {data}")
+            raise RuntimeError(f"Vidu video task creation response is missing task_id: {data}")
         return data
 
     async def _download_video(self, url: str, output_path: Path) -> None:

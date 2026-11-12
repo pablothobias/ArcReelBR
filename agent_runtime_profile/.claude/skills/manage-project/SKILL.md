@@ -13,7 +13,7 @@ Provides batch character/scene/prop writes in project.json, project-level settin
 | Tool | Function | Caller |
 |------|------|--------|
 | `mcp__arcreel__patch_project` (SDK tool) | Add/update project.json characters/scenes/props (upsert by table+name), top-level settings, or project overview (overview branch) | Subagent / main Agent |
-| `mcp__arcreel__rename_asset` (SDK tool) | Cascade-rename an asset: update asset-table keys, name references in all episode scripts and script_plan drafts (reference arrays / speaker / `@[名称]` mentions), associated files, and version history together | Subagent / main Agent |
+| `mcp__arcreel__rename_asset` (SDK tool) | Cascade-rename an asset: update asset-table keys, name references in all episode scripts and script_plan drafts (reference arrays / speaker / `@[name]` mentions), associated files, and version history together | Subagent / main Agent |
 | `mcp__arcreel__merge_asset` (SDK tool) | Merge two same-table assets registered for one identity: redirect references to the survivor, retain the merged name as an alias, or merge as a derivative of the surviving character | Main Agent |
 | `mcp__arcreel__get_video_capabilities` (SDK tool) | Query video model capabilities (model granularity, resolved by the project's unique generation_mode, consistent project-wide, no episode required) | **Subagent** (query independently while executing tasks) |
 
@@ -25,21 +25,23 @@ Write through `mcp__arcreel__patch_project` (the session binds the project name;
 each entry upserts by name: add absent names, merge changed fields for existing names. **Revising existing asset descriptions requires explicit user
 intent** (avoid silently overwriting manually edited fields). Script planning discovers this episode's new assets and registers them at content confirmation; no advance registration here is needed.
 `aliases` is a string list used only for identity recognition in script planning; aliases must not appear in references.
+A scene's `occupancy` decides whether its scene sheet is drawn as an empty environment (`"empty"`, the default when absent) or with the people its description asks for (`"occupied"`). Set `"occupied"` only when the user explicitly asks for an occupied scene sheet; never infer it from description wording, source text or genre. Changing it makes the existing scene sheet stale.
 
 ```text
-mcp__arcreel__patch_project({"table": "characters", "entries": {"角色名": {"description": "...", "voice_style": "..."}}})
-mcp__arcreel__patch_project({"table": "characters", "entries": {"角色名": {"derivatives": {"战斗装": {"description": "换上黑色重甲，其余外观保持不变"}}}}})
-mcp__arcreel__patch_project({"table": "scenes", "entries": {"场景名": {"description": "..."}}})
-mcp__arcreel__patch_project({"table": "props", "entries": {"道具名": {"description": "..."}}})
+mcp__arcreel__patch_project({"table": "characters", "entries": {"Character name": {"description": "...", "voice_style": "..."}}})
+mcp__arcreel__patch_project({"table": "characters", "entries": {"Character name": {"derivatives": {"Battle armor": {"description": "Wears black heavy armor; the rest of the appearance stays unchanged"}}}}})
+mcp__arcreel__patch_project({"table": "scenes", "entries": {"Scene name": {"description": "..."}}})
+mcp__arcreel__patch_project({"table": "scenes", "entries": {"Scene name": {"occupancy": "occupied"}}})
+mcp__arcreel__patch_project({"table": "props", "entries": {"Prop name": {"description": "..."}}})
 mcp__arcreel__patch_project({"settings": {"episode_target_units": 1000}})
 mcp__arcreel__patch_project({"settings": {"episode_target_duration": 90}})
 mcp__arcreel__patch_project({"settings": {"source_language": "en"}})
 mcp__arcreel__patch_project({"settings": {"narration_voice": "Ethan", "narration_speed": 1.2}})
-mcp__arcreel__patch_project({"overview": {"genre": "悬疑", "theme": "复仇与救赎"}})
+mcp__arcreel__patch_project({"overview": {"genre": "Mystery", "theme": "Revenge and redemption"}})
 ```
 
 A character entry's `derivatives` table registers another appearance of that character beyond the base (persisting across scenes and representable through image generation),
-referenced in scripts as `@[角色/衍生]`. It merges by derivative name: update descriptions for existing names, add new names, and preserve unmentioned derivatives unchanged (including their asset images).
+referenced in scripts as `@[character/derivative]`. It merges by derivative name: update descriptions for existing names, add new names, and preserve unmentioned derivatives unchanged (including their asset images).
 Write only `description` for derivatives: changes relative to the base, worded as image-edit instructions; the generation pipeline writes asset images back.
 Rename a derivative through the derivative subresource rename endpoint (the character card's “Derivatives” overlay in Web); writing a new name with `patch_project` only creates another entry.
 

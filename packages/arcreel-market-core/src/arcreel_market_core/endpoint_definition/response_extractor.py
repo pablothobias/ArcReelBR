@@ -42,7 +42,7 @@ def extract_value(spec: object, response_body: object) -> object | None:
         elif isinstance(item, Mapping):
             hit = _decode_then(item, response_body, accept)
         else:
-            raise TypeError("提取路径项必须是字符串或对象")
+            raise TypeError("Extraction path items must be strings or objects")
         if hit is not None:
             return hit
     return None
@@ -60,7 +60,7 @@ def map_status(raw: object, status_map: Mapping[str, str] | None = None) -> Prov
     if key in normalized_map:
         mapped = ProviderJobStatus(normalized_map[key])
         if mapped not in _DECLARATIVE_STATUSES:
-            raise ValueError(f"声明式状态不支持：{mapped.value}")
+            raise ValueError(f"Unsupported declarative status: {mapped.value}")
         return mapped
     fallback = normalize_provider_status(raw)
     return ProviderJobStatus.FAILED if fallback is ProviderJobStatus.EXPIRED else fallback
@@ -76,13 +76,13 @@ def normalize_extract_spec(spec: object) -> tuple[Sequence[object], str]:
     if isinstance(spec, list):
         return spec, "string"
     if not isinstance(spec, Mapping):
-        raise TypeError("提取规则必须是路径数组或对象")
+        raise TypeError("Extraction rules must be a path array or an object")
     paths = spec.get("paths")
     if not isinstance(paths, list):
-        raise TypeError("提取规则缺少 paths 数组")
+        raise TypeError("Extraction rules are missing the paths array")
     accept = spec.get("accept", "string")
     if accept not in {"string", "scalar"}:
-        raise ValueError(f"未知 accept：{accept}")
+        raise ValueError(f"Unknown accept: {accept}")
     return paths, accept
 
 

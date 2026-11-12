@@ -46,8 +46,8 @@ async def list_bgm(
 
 def bgm_list_summary(items: tuple[BgmListItem, ...]) -> str:
     if not items:
-        return "项目里还没有 BGM；BGM 由创作者在剪辑视图的 BGM 轨上传"
-    return "\n".join(f"- {item.id}「{item.name}」{item.duration} 秒" for item in items)
+        return "The project has no BGM yet; the creator uploads BGM on the BGM track in the edit view"
+    return "\n".join(f'- {item.id} "{item.name}" {item.duration}s' for item in items)
 
 
 __all__ = ["BgmListItem", "ListBgmRequest", "bgm_list_summary", "list_bgm"]

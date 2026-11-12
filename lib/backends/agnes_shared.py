@@ -20,7 +20,7 @@ _V1_SUFFIX = "/v1"
 
 def resolve_agnes_api_key(api_key: str | None = None) -> str:
     if api_key is None or not api_key.strip():
-        raise ValueError("请到系统配置页填写 Agnes API Key")
+        raise ValueError("Enter the Agnes API Key in Settings")
     return api_key.strip()
 
 

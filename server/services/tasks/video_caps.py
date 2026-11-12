@@ -235,8 +235,9 @@ class AudioSwitchConflict(ValueError):
 
     def __init__(self, provider_id: str, model_id: str) -> None:
         super().__init__(
-            f"{provider_id}/{model_id} 的成片恒有声，无法关闭音频；"
-            "请让用户在设置中把音频开关改回开启后重试（当前配置会让声音照常出现，但音色约束被裁掉）"
+            f"{provider_id}/{model_id} always outputs audio, so audio cannot be turned off; "
+            "ask the user to turn the audio switch back on in settings and retry "
+            "(the current setting still produces sound but drops the voice constraints)"
         )
         self.provider_id = provider_id
         self.model_id = model_id

@@ -40,7 +40,7 @@ def test_unavailable_when_the_wheel_ships_no_binary(tmp_path: Path):
 
     assert not status.available
     assert status.executable is None
-    assert status.unavailable_reason == "imageio-ffmpeg 未附带当前平台的 ffmpeg 可执行文件"
+    assert status.unavailable_reason == "imageio-ffmpeg does not include an ffmpeg executable for this platform"
 
 
 def test_unavailable_when_the_binary_cannot_start(tmp_path: Path):
@@ -50,7 +50,7 @@ def test_unavailable_when_the_binary_cannot_start(tmp_path: Path):
     status = inspect_bundled_ffmpeg(_binaries_dir(tmp_path, "ffmpeg-linux-aarch64-v7.0.2"), run_version=_cannot_exec)
 
     assert not status.available
-    assert status.unavailable_reason == "随包 ffmpeg 无法运行：Permission denied"
+    assert status.unavailable_reason == "Bundled ffmpeg cannot run: Permission denied"
 
 
 def test_unavailable_when_the_self_check_exits_non_zero(tmp_path: Path):
@@ -59,4 +59,4 @@ def test_unavailable_when_the_self_check_exits_non_zero(tmp_path: Path):
     )
 
     assert not status.available
-    assert status.unavailable_reason == "随包 ffmpeg 自检失败：退出码 1"
+    assert status.unavailable_reason == "Bundled ffmpeg self-check failed: exit code 1"

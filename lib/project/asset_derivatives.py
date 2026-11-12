@@ -67,7 +67,7 @@ def split_derivative_artifact_id(artifact_id: str) -> tuple[str, str]:
     """Split IDs into (base, derivative), valid only with both nonempty."""
     owner, separator, derivative = artifact_id.partition(DERIVATIVE_ID_SEPARATOR)
     if not separator or not owner or not derivative or DERIVATIVE_ID_SEPARATOR in derivative:
-        raise ValueError(f"不是合法的衍生资产图 id: {artifact_id!r}")
+        raise ValueError(f"Not a valid derivative asset sheet id: {artifact_id!r}")
     return owner, derivative
 
 
@@ -152,7 +152,7 @@ def normalize_agent_derivatives(raw: object, *, spec: AssetSpec, field_path: str
     *field_path* locates the table in errors, constructed from caller-specific input shapes."""
 
     if not isinstance(raw, Mapping):
-        raise ValueError(f"{field_path}.{DERIVATIVES_FIELD} 必须是对象（衍生名 → {{description}}）")
+        raise ValueError(f"{field_path}.{DERIVATIVES_FIELD} must be an object (derivative name → {{description}})")
     normalized: dict[str, dict[str, Any]] = {}
     raw_keys: dict[str, object] = {}
     for raw_name, attrs in raw.items():
@@ -162,17 +162,17 @@ def normalize_agent_derivatives(raw: object, *, spec: AssetSpec, field_path: str
             raise ValueError(f"{field_path}.{DERIVATIVES_FIELD}: {exc}") from None
         if name in normalized:
             raise ValueError(
-                f"{field_path}.{DERIVATIVES_FIELD} 含规范化后冲突的衍生名 {name!r}："
-                f"原始键 {raw_keys[name]!r} 与 {raw_name!r} 在规范化（strip + NFC）后等价"
+                f"{field_path}.{DERIVATIVES_FIELD} contains derivative names that conflict after normalization {name!r}: "
+                f"raw keys {raw_keys[name]!r} and {raw_name!r} are equivalent after normalization (strip + NFC)"
             )
         if not isinstance(attrs, Mapping):
-            raise ValueError(f"{field_path}.{DERIVATIVES_FIELD}[{name!r}] 必须是对象")
+            raise ValueError(f"{field_path}.{DERIVATIVES_FIELD}[{name!r}] must be an object")
         extra = sorted(str(key) for key in attrs if key != "description")
         if extra:
-            raise ValueError(f"{field_path}.{DERIVATIVES_FIELD}[{name!r}] 含不可写字段: {extra}")
+            raise ValueError(f"{field_path}.{DERIVATIVES_FIELD}[{name!r}] contains non-writable fields: {extra}")
         description = attrs.get("description")
         if not isinstance(description, str):
-            raise ValueError(f"{field_path}.{DERIVATIVES_FIELD}[{name!r}].description 必须是字符串")
+            raise ValueError(f"{field_path}.{DERIVATIVES_FIELD}[{name!r}].description must be a string")
         normalized[name] = {"description": description, spec.sheet_field: ""}
         raw_keys[name] = raw_name
     return normalized
@@ -188,7 +188,9 @@ def merge_agent_derivatives(entry: dict[str, Any], normalized: Mapping[str, dict
     for name, derivative in normalized.items():
         key = find_derivative_name(table, name)
         if key is not None and asset_name_comparison_key(key) != asset_name_comparison_key(name):
-            raise ValueError(f"衍生名 {name!r} 与已有衍生 {key!r} 冲突（按 strip + Unicode NFC、不区分大小写判定）")
+            raise ValueError(
+                f"Derivative name {name!r} conflicts with existing derivative {key!r} (compared after strip + Unicode NFC, case-insensitively)"
+            )
         current = table.get(key) if key is not None else None
         if key is not None and isinstance(current, dict):
             current["description"] = derivative["description"]
@@ -242,7 +244,7 @@ def resolve_derivative_target(
     owner_key = resolve_asset_key(bucket, owner_name)
     entry = bucket.get(owner_key) if isinstance(bucket, Mapping) and owner_key is not None else None
     if owner_key is None or not isinstance(entry, Mapping):
-        raise KeyError(f"{spec.label_zh} '{owner_name}' 不存在")
+        raise KeyError(f"{spec.label_en.capitalize()} '{owner_name}' does not exist")
     table = derivative_table(entry)
     derivative_key = resolve_asset_key(table, derivative_name)
     if derivative_key is None or not isinstance(table.get(derivative_key), Mapping):

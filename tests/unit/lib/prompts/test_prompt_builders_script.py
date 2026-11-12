@@ -330,7 +330,7 @@ class TestScreenplaySourceKind:
         novel = self._normalize_prompt("novel")
         screenplay = self._normalize_prompt("screenplay")
         assert (
-            "\n- **segment_break**: Use your judgment during adaptation: mark the first shot after a location / time jump or scene change “是”"
+            "\n- **segment_break**: Use your judgment during adaptation: mark the first shot after a location / time jump or scene change `true`"
             in novel
         )
         assert "\n- **segment_break**: Retain the screenplay’s scene divisions / scene changes" in screenplay
@@ -684,7 +684,7 @@ class TestPromptAuthoringPromptGuards:
 
     def test_drama_prompt_authoring_scene_id_preserves_edit_suffix_no_fixed_format(self):
         """Visual prompt_authoring scene_id preserves exact script_plan IDs, including split/edit suffixes such as E2S02_1.
-        Never impose E{集}S{两位序号}; models dropping suffixes would fail whole-episode exact-string merges."""
+        Never impose E{episode}S{two-digit index}; models dropping suffixes would fail whole-episode exact-string merges."""
         text = self._drama_prompt()
         assert "exactly match" in text
         assert "suffixes" in text
@@ -791,7 +791,7 @@ class TestBuildNarrationSplitPrompt:
     def test_empty_supported_durations_raises(self):
         import pytest
 
-        with pytest.raises(ValueError, match=r"supported_durations 不能为空"):
+        with pytest.raises(ValueError, match=r"supported_durations must not be empty"):
             self._prompt(supported_durations=[])
 
     def test_novel_text_verbatim_instruction(self):

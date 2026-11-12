@@ -249,10 +249,10 @@ def _asset_sheet_metadata_mutator(
         bucket = project.get(spec.bucket_key)
         key = resolve_asset_key(bucket, resource_id)
         if not isinstance(bucket, dict) or key is None:
-            raise KeyError(f"{spec.label_zh} '{resource_id}' 不存在")
+            raise KeyError(f"{spec.asset_type.capitalize()} '{resource_id}' not found")
         entry = bucket[key]
         if not isinstance(entry, dict):
-            raise ValueError(f"{spec.label_zh} '{resource_id}' metadata must be an object")
+            raise ValueError(f"{spec.asset_type.capitalize()} '{resource_id}' metadata must be an object")
         entry[spec.sheet_field] = sheet_path
 
     return _mutate
@@ -273,7 +273,7 @@ def _write_storyboard_image_metadata(
         items, id_field, _char_field, _scene_field, _prop_field = get_storyboard_items(script)
         resolved = find_storyboard_item(items, id_field, resource_id)
         if resolved is None:
-            raise KeyError(f"场景 '{resource_id}' 不存在")
+            raise KeyError(f"Scene '{resource_id}' not found")
         item, _index = resolved
         pm._set_scene_asset_in_script(script, resource_id, "storyboard_image", artifact_path)
         if not isinstance(item.get("generated_assets"), Mapping):

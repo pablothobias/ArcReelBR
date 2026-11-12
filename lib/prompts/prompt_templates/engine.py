@@ -142,43 +142,45 @@ class PromptTemplates:
         self._sources: dict[str, list[str]] = {}
         self._registry: dict[str, tuple[TemplateMeta, str, Template]] = {}
         if not directory.is_dir():
-            raise TemplateError(f"模版目录不存在: {directory}")
+            raise TemplateError(f"Template directory does not exist: {directory}")
         for path in sorted(directory.rglob("*.md")):
             try:
                 self._load(path, directory)
             except (JinjaError, ValidationError, yaml.YAMLError) as exc:
-                raise TemplateError(f"{path}: 加载失败: {exc}") from exc
+                raise TemplateError(f"{path}: failed to load: {exc}") from exc
 
     def _load(self, path: Path, directory: Path) -> None:
         if directory / "partials" in path.parents:
             return
         raw = path.read_text(encoding="utf-8")
         if not raw.startswith("---\n") or "\n---\n" not in raw[4:]:
-            raise TemplateError(f"{path}: 缺少 YAML frontmatter")
+            raise TemplateError(f"{path}: missing YAML frontmatter")
         header, body = raw[4:].split("\n---\n", 1)
         metadata = TemplateMeta.model_validate(yaml.safe_load(header))
         if metadata.id.startswith("partials/"):
-            raise TemplateError(f"{path}: 模版 id 使用了保留前缀 partials/: {metadata.id}")
+            raise TemplateError(f"{path}: template id uses the reserved prefix partials/: {metadata.id}")
         if metadata.id in self._registry:
-            raise TemplateError(f"{path}: 重复模版 id {metadata.id}")
+            raise TemplateError(f"{path}: duplicate template id {metadata.id}")
         partials: dict[str, str] = {}
         referenced = self._collect(metadata, body, partials, set(), ())
         self._sources[metadata.id] = list(partials)
         if undeclared := referenced - metadata.slots.keys():
-            raise TemplateError(f"{metadata.id}: 未声明槽位 {sorted(undeclared)}")
+            raise TemplateError(f"{metadata.id}: undeclared slots {sorted(undeclared)}")
         if unused := metadata.slots.keys() - referenced:
-            raise TemplateError(f"{metadata.id}: 未使用槽位 {sorted(unused)}")
+            raise TemplateError(f"{metadata.id}: unused slots {sorted(unused)}")
         self._registry[metadata.id] = metadata, body, self._env.from_string(body)
 
     def render(self, template_id: str, **slots: Any) -> str:
         metadata, _, template = self._get(template_id)
         if missing := metadata.slots.keys() - slots.keys():
-            raise TemplateError(f"{template_id}: 缺少槽位 {sorted(missing)}（缺值须显式传 None）")
+            raise TemplateError(
+                f"{template_id}: missing slots {sorted(missing)} (pass None explicitly for absent values)"
+            )
         if extra := slots.keys() - metadata.slots.keys():
-            raise TemplateError(f"{template_id}: 多余槽位 {sorted(extra)}")
+            raise TemplateError(f"{template_id}: extra slots {sorted(extra)}")
         for axis, values in metadata.applies_to.items():
             if axis in slots and slots[axis] not in values:
-                raise TemplateError(f"{template_id}: {axis} 的轴值无效: {slots[axis]!r}")
+                raise TemplateError(f"{template_id}: invalid axis value for {axis}: {slots[axis]!r}")
         depth = 0
         opening = f"\x00{uuid4().hex}\x00"
         closing = f"\x00{uuid4().hex}\x00"
@@ -206,7 +208,7 @@ class PromptTemplates:
             body = template.render({**slots, "partial": _blank, "variant": _blank})
             rendered = template.render({**slots, "partial": partial, "variant": variant})
         except JinjaError as exc:
-            raise TemplateError(f"{template_id}: 渲染失败: {exc}") from exc
+            raise TemplateError(f"{template_id}: rendering failed: {exc}") from exc
         injected = _inject_fragments(
             rendered,
             opening,
@@ -227,7 +229,7 @@ class PromptTemplates:
     def read_partial(self, name: str) -> PartialEntry:
         """Get one inventory entry by partial name; only partials referenced by at least one template are known."""
         if name not in self._partial_sources:
-            raise TemplateError(f"未知片段: {name}")
+            raise TemplateError(f"Unknown partial: {name}")
         return self._partial_entry(name)
 
     def _partial_entry(self, name: str) -> PartialEntry:
@@ -245,14 +247,14 @@ class PromptTemplates:
         try:
             return self._registry[template_id]
         except KeyError:
-            raise TemplateError(f"未知模版: {template_id}") from None
+            raise TemplateError(f"Unknown template: {template_id}") from None
 
     def _partial_path(self, name: str) -> Path:
         path = (self._partials_dir / f"{name}.md").resolve()
         if not path.is_relative_to(self._partials_dir):
-            raise TemplateError(f"片段路径越界: {name}")
+            raise TemplateError(f"Partial path escapes the template directory: {name}")
         if not path.is_file():
-            raise TemplateError(f"缺少片段: {name}")
+            raise TemplateError(f"Missing partial: {name}")
         return path
 
     def _read_partial(self, name: str) -> str:
@@ -265,7 +267,7 @@ class PromptTemplates:
                 try:
                     protected = _PartialHeader.model_validate(yaml.safe_load(header) or {}).protected
                 except ValidationError as exc:
-                    raise TemplateError(f"片段 {name}: frontmatter 无效: {exc}") from exc
+                    raise TemplateError(f"Partial {name}: invalid frontmatter: {exc}") from exc
             self._partial_sources[name] = raw, protected
         return self._partial_sources[name][0]
 
@@ -282,7 +284,7 @@ class PromptTemplates:
         variables = meta.find_undeclared_variables(ast) - provided
         for call in ast.find_all(nodes.Call):
             if not isinstance(call.node, nodes.Name) or call.node.name not in {"partial", "variant"}:
-                raise TemplateError(f"{metadata.id}: 只允许 partial / variant 调用")
+                raise TemplateError(f"{metadata.id}: only partial / variant calls are allowed")
             kind = call.node.name
             count = 1 if kind == "partial" else 2
             if (
@@ -292,21 +294,25 @@ class PromptTemplates:
                 or not isinstance(call.args[0], nodes.Const)
                 or not isinstance(call.args[0].value, str)
             ):
-                raise TemplateError(f"{metadata.id}: 片段名必须是字面量，参数须显式传入")
+                raise TemplateError(
+                    f"{metadata.id}: partial names must be literals, and arguments must be passed explicitly"
+                )
             name = call.args[0].value
             if not name.startswith(("shared/", f"{metadata.id}/")) or ".." in name.split("/"):
-                raise TemplateError(f"{metadata.id}: 片段必须位于 shared/ 或模版 id 目录: {name}")
+                raise TemplateError(
+                    f"{metadata.id}: partials must live under shared/ or the template id directory: {name}"
+                )
             names = [name]
             if kind == "variant":
                 axis = call.args[1]
                 if not isinstance(axis, nodes.Name) or axis.name not in metadata.applies_to:
-                    raise TemplateError(f"{metadata.id}: 变体轴须声明于 applies_to")
+                    raise TemplateError(f"{metadata.id}: variant axes must be declared in applies_to")
                 names = [f"{name}/{value}" for value in metadata.applies_to[axis.name]]
                 if not names:
-                    raise TemplateError(f"{metadata.id}: 变体轴不可为空")
+                    raise TemplateError(f"{metadata.id}: variant axis must not be empty")
             for partial_name in names:
                 if partial_name in stack:
-                    raise TemplateError(f"{metadata.id}: 片段循环引用: {partial_name}")
+                    raise TemplateError(f"{metadata.id}: circular partial reference: {partial_name}")
                 text = self._read_partial(partial_name)
                 partials[partial_name] = text
                 variables |= self._collect(
@@ -322,17 +328,17 @@ class PromptTemplates:
     def _validate_syntax(self, metadata: TemplateMeta, ast: nodes.Template, stack: tuple[str, ...]) -> None:
         for statement in ast.find_all(nodes.Stmt):
             if not isinstance(statement, (nodes.Output, nodes.If, nodes.For)):
-                raise TemplateError(f"{metadata.id}: 不支持的模版语法 {type(statement).__name__}")
+                raise TemplateError(f"{metadata.id}: unsupported template syntax {type(statement).__name__}")
         if next(ast.find_all(nodes.Compare), None) is not None:
-            raise TemplateError(f"{metadata.id}: 条件仅允许槽位真值判断，不允许比较")
+            raise TemplateError(f"{metadata.id}: conditions may only test slot truthiness; comparisons are not allowed")
         for conditional in ast.find_all((nodes.If, nodes.CondExpr)):
             if not _truthiness(conditional.test):
-                raise TemplateError(f"{metadata.id}: 条件仅允许槽位真值判断")
+                raise TemplateError(f"{metadata.id}: conditions may only test slot truthiness")
             names = list(conditional.test.find_all(nodes.Name))
             if isinstance(conditional.test, nodes.Name):
                 names.append(conditional.test)
             if any(name.name in metadata.applies_to for name in names):
-                raise TemplateError(f"{metadata.id}: 条件不得判断轴值")
+                raise TemplateError(f"{metadata.id}: conditions must not test axis values")
         for loop in ast.find_all(nodes.For):
             if (
                 not stack
@@ -341,7 +347,7 @@ class PromptTemplates:
                 or loop.test is not None
                 or loop.recursive
             ):
-                raise TemplateError(f"{metadata.id}: 循环只允许在 lists/ 列表片段中展开列表槽位")
+                raise TemplateError(f"{metadata.id}: loops may only expand list slots inside lists/ list partials")
 
 
 class _Fragment(str):

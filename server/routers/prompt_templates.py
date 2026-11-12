@@ -77,5 +77,5 @@ def _output_json_schema(spec: str | None) -> dict[str, Any] | None:
     module_name, _, class_name = spec.partition(":")
     model = getattr(importlib.import_module(module_name), class_name)
     if not (isinstance(model, type) and issubclass(model, BaseModel)):
-        raise TypeError(f"output_schema 不是 pydantic 模型: {spec}")
+        raise TypeError(f"output_schema is not a pydantic model: {spec}")
     return model.model_json_schema()

@@ -662,7 +662,7 @@ async def _admit_units_batch(
         refused_ticket(
             unit_id,
             code=GenerationProblemCode.UNIT_NOT_FOUND,
-            detail=f"unit {unit_id} 不在 video_units 中",
+            detail=f"unit {unit_id} is not in video_units",
             action=GenerationAction.FIX_INPUT,
         )
         for unit_id in selection.unmatched_ids

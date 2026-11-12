@@ -116,5 +116,5 @@ class TestMigrateV10ToV11File:
         d = tmp_path / "demo"
         d.mkdir()
         (d / "project.json").write_text("[]", encoding="utf-8")
-        with pytest.raises(ValueError, match=r"project\.json 必须是对象"):
+        with pytest.raises(ValueError, match=r"project\.json must be an object"):
             migrate_v10_to_v11(d)

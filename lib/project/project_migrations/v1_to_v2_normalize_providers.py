@@ -25,7 +25,7 @@ _LEGACY_PROVIDER_ALIASES: dict[str, str] = {
 }
 
 assert all(target in PROVIDER_REGISTRY for target in _LEGACY_PROVIDER_ALIASES.values()), (
-    "legacy 别名目标必须是规范 provider id"
+    "legacy alias targets must be canonical provider ids"
 )
 
 # Normalize seven project.json provider-ID fields individually.

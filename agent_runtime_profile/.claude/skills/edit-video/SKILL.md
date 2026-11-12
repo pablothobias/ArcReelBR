@@ -57,8 +57,8 @@ End each editing round with one delivery, containing all three items in the same
 
 1. **Change summary**: List what changed and why by clip number, including selected video versions. Then list remaining blocking and warning problems in result `issues`, and explain unfulfilled requests and reasons.
 2. **“Jump here to inspect” links**: Attach an in-app Markdown link to every problem. Paths start with `/app/`, omit the domain, and URL-encode the project name as a path segment:
-   - For a problem on a timeline clip: `/app/projects/{项目名}/episodes/{集 ID}?view=edit&tl={剪辑时间线ID}&t={秒}`. `t` is global timeline time: the clip's `start` plus “problem timestamp minus this clip's in-point”.
-   - For a problem on a unit outside the timeline: `/app/projects/{项目名}/episodes/{集 ID}?unit={单元ID}&t={秒}`. `t` is time within that unit's own video.
+   - For a problem on a timeline clip: `/app/projects/{project name}/episodes/{episode ID}?view=edit&tl={timeline ID}&t={seconds}`. `t` is global timeline time: the clip's `start` plus “problem timestamp minus this clip's in-point”.
+   - For a problem on a unit outside the timeline: `/app/projects/{project name}/episodes/{episode ID}?unit={unit ID}&t={seconds}`. `t` is time within that unit's own video.
 3. **Checklist**: When creator decisions are pending, after sending the delivery message, ask them all at once using AskUserQuestion multi-select (`multiSelect: true`), one question per category:
    - **Regenerate**: First preview with `mcp__arcreel__generate_videos` (`preview: true`, `target` set to `selected` with all candidate units listed, `force: true`). Each option states the video unit, problem and timestamp, whether prompts change, estimated cost, and duration tier (if the tier changes, state the planned duration and requested tier); also include “Regenerate all” with total cost. Units marked `blocked` in the preview must not become options; explain the gaps in the change summary.
    - **Rewrite voiceover**: Each option states original text → revised text and estimated seconds saved.

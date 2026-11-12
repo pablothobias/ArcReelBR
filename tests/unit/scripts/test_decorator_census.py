@@ -130,9 +130,9 @@ def test_main_prints_directory_summary_with_total_and_rejects_non_directory(
     out = capsys.readouterr().out
     assert "pkg/sub" in out
     assert "100.0%" in out
-    table = [line for line in out.splitlines() if line.startswith(("目录", "pkg", "合计"))]
+    table = [line for line in out.splitlines() if line.startswith(("Directory", "pkg", "Total"))]
     assert len(table) == 3
     assert [display_width(line) for line in table] == [display_width(table[0])] * 3
 
     assert main(["missing"]) == 2
-    assert "不是目录" in capsys.readouterr().err
+    assert "Not a directory" in capsys.readouterr().err

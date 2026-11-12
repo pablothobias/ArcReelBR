@@ -293,7 +293,7 @@ async def test_the_gap_left_by_a_deleted_middle_episode_is_planned_back(
     assert [episode["title"] for episode in episodes] == ["第1集", "第2集", "第3集"]
     assert episodes[1]["source_range"] == middle["source_range"]
     assert episodes[1]["episode"] > middle["episode"]
-    assert "这段未切分的原文已全部规划完毕" in (tasks[-1].result_json or "")
+    assert "This unsplit source range is fully planned" in (tasks[-1].result_json or "")
 
 
 async def test_replanning_fills_a_candidate_window_by_window_and_leaves_the_ledger_alone(

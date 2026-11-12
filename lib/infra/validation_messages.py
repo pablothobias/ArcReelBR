@@ -57,13 +57,13 @@ class ValidationResult:
         errors = self.errors
         warnings = self.warnings
         if self.valid:
-            msg = "验证通过"
+            msg = "Validation passed"
             if warnings:
-                msg += f"\n警告 ({len(warnings)}):\n" + "\n".join(f"  - {warning}" for warning in warnings)
+                msg += f"\nWarnings ({len(warnings)}):\n" + "\n".join(f"  - {warning}" for warning in warnings)
             return msg
 
-        msg = f"验证失败 ({len(errors)} 个错误)"
-        msg += "\n错误:\n" + "\n".join(f"  - {error}" for error in errors)
+        msg = f"Validation failed ({len(errors)} errors)"
+        msg += "\nErrors:\n" + "\n".join(f"  - {error}" for error in errors)
         if warnings:
-            msg += f"\n警告 ({len(warnings)}):\n" + "\n".join(f"  - {warning}" for warning in warnings)
+            msg += f"\nWarnings ({len(warnings)}):\n" + "\n".join(f"  - {warning}" for warning in warnings)
         return msg

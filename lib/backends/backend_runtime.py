@@ -433,7 +433,7 @@ async def poll_with_retry[T](
             logger.warning("%s轮询异常（将重试）: %s - %s", prefix, type(e).__name__, str(e)[:200])
             if consecutive_failures >= VIDEO_POLL_MAX_CONSECUTIVE_FAILURES:
                 raise RuntimeError(
-                    f"{prefix}连续轮询失败 {VIDEO_POLL_MAX_CONSECUTIVE_FAILURES} 次，最后错误: {e}"
+                    f"{prefix}polling failed {VIDEO_POLL_MAX_CONSECUTIVE_FAILURES} times in a row, last error: {e}"
                 ) from e
             retry_after = _retry_after_seconds(e)
             wait_time = (
@@ -457,7 +457,7 @@ async def poll_with_retry[T](
 
         remaining = max_wait - (active_clock.monotonic() - start)
         if remaining <= 0:
-            raise TimeoutError(f"{prefix}任务超时（{max_wait:.0f}秒）")
+            raise TimeoutError(f"{prefix}task timed out ({max_wait:.0f}s)")
         # Wait no longer than remaining budgets; next query always starts at or before max_wait deadlines.
         await active_clock.sleep(min(wait_time, remaining))
 

@@ -1,7 +1,7 @@
 """Pure cascading-rename layer: script/draft references, file-relocation plans, and result reports.
 
 Assets use name identity (docs/adr/0057). Cascades atomically update bucket keys, all script/plan
-references (arrays/speaker/``@[名称]``), and named files (stem = asset name). **Side-effect-free**
+references (arrays/speaker/``@[name]``), and named files (stem = asset name). **Side-effect-free**
 portions here mutate dict references/return counts and plan (src,dst) relocations, letting ProjectManager
 scan under locks before persistence, sharing dry-run/execution scans. :class:`AssetDeletionPreview`
 shares the same reference scans.
@@ -37,7 +37,9 @@ class AssetRenameConflictError(ValueError):
     """Normalized target conflicts with existing same-type assets; reject wholly without persistence."""
 
     def __init__(self, conflict_name: str):
-        super().__init__(f"目标名与既有资产 {conflict_name!r} 冲突（按 NFC 归一判定），请换一个名字或先处理既有资产")
+        super().__init__(
+            f"The target name conflicts with existing asset {conflict_name!r} (compared after NFC normalization); choose another name or handle the existing asset first"
+        )
         self.conflict_name = conflict_name
 
 
@@ -48,7 +50,9 @@ class AssetRenameFileCollisionError(ValueError):
     ``os.replace`` would silently destroy them."""
 
     def __init__(self, destination: Path):
-        super().__init__(f"迁移目标文件已存在: {destination}，请先移除该文件或换一个名字")
+        super().__init__(
+            f"The destination file already exists: {destination}; remove that file first or choose another name"
+        )
         self.destination = destination
 
 
@@ -59,7 +63,9 @@ class AssetRenameHistoryCollisionError(ValueError):
     unrecoverably. Like orphan files, fail loudly for user handling instead of silent destruction."""
 
     def __init__(self, resource_id: str):
-        super().__init__(f"新名 {resource_id!r} 下已有保留的版本历史，请先清理该历史或换一个名字")
+        super().__init__(
+            f"Retained version history already exists under the new name {resource_id!r}; clean up that history first or choose another name"
+        )
         self.resource_id = resource_id
 
 
@@ -108,7 +114,7 @@ def rewrite_payload_references(payload: dict, asset_type: str, old_name: str, ne
     """Rewrite *old_name* to *new_name* in script/draft payload references in place, returning count.
 
     :func:`lib.script.script_references.iter_reference_sites` defines arrays, ``speaker``, bodies/visual
-    ``@[名称]``. ``character`` also rekeys legacy embedded top-level ``characters`` mirrors and updates paths.
+    ``@[name]``. ``character`` also rekeys legacy embedded top-level ``characters`` mirrors and updates paths.
 
     *old_name* may be ``角色/衍生``. :func:`lib.references.reference_catalog.renamed_reference` centralizes
     matching: base renames include all derivatives; derivative renames affect only that character's set.
@@ -179,8 +185,8 @@ def renamed_file_stem(stem: str, old_name: str, new_name: str, *, allow_sequence
     """Derive stems under filename = asset-name invariants; None when unrelated to old names.
 
     Default normalized stems must **exactly** match old names (sheets/image/audio references).
-    ``allow_sequence`` means all files here mechanically use ``名_{序号}`` (product references, sequenced
-    uploads in server/routers/files.py). Then accept **only** ``旧名_{序号}``, not exact old stems.
+    ``allow_sequence`` means all files here mechanically use ``{name}_{index}`` (product references, sequenced
+    uploads in server/routers/files.py). Then accept **only** ``{old name}_{index}``, not exact old stems.
     ``validate_asset_name`` permits underscore-number suffixes: with products ``Cup_1`` and ``Cup``,
     ``Cup``'s first ``Cup_1.png`` would otherwise appear to belong to ``Cup_1``. ``Cup_1`` is therefore ambiguous. Never enable
     ``allow_sequence`` for ordinary directories, or sibling “旧名_2” files move and references dangle.
@@ -209,7 +215,7 @@ def rewrite_entry_paths(entry: dict, spec: AssetSpec, old_name: str, new_name: s
     """Update named entry paths (sheet/image/audio/multiple-reference sequence) in place, returning count.
 
     Share predicates with :func:`plan_asset_file_renames` per dimension: only asset-root/``refs`` /
-    ``refs_audio`` paths with matching stems. Permit ``旧名_{序号}`` only in sequence-asset ``refs``;
+    ``refs_audio`` paths with matching stems. Permit ``{old name}_{index}`` only in sequence-asset ``refs``;
     require exact names elsewhere. Preserve user-directed other paths such as ``thumbnails/旧名.png``:
     those files do not move, so rewriting would break valid references."""
     base = PurePosixPath(spec.subdir)
@@ -244,7 +250,7 @@ def rewrite_entry_paths(entry: dict, spec: AssetSpec, old_name: str, new_name: s
 
 
 def _named_file_layout(spec: AssetSpec) -> tuple[tuple[PurePosixPath, bool], ...]:
-    """Project-relative named-file directories and whether each accepts ``名字_{序号}``."""
+    """Project-relative named-file directories and whether each accepts ``{name}_{index}``."""
     base = PurePosixPath(spec.subdir)
     sequenced_refs = "reference_images" in spec.extra_list_fields
     return ((base, False), (base / "refs", sequenced_refs), (base / "refs_audio", False))
@@ -306,7 +312,7 @@ def plan_asset_file_renames(
     ``.DS_Store``; atomic temps resemble ``tmpXXXX.tmp``). Leading dots are valid names; blanket
     skipping would leave invalid paths after renaming ``.甲``.
 
-    Permit ``旧名_{序号}`` only in ``refs`` for sequences (``reference_images``), where upload naming
+    Permit ``{old name}_{index}`` only in ``refs`` for sequences (``reference_images``), where upload naming
     is mechanical and cannot be sibling names. Else require exact names, avoiding sibling “旧名_2” sheets.
 
     Occupied destinations raise :class:`AssetRenameFileCollisionError` before writes, rejecting wholly.

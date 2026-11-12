@@ -260,7 +260,7 @@ PROJECT_WITH_DERIVATIVE = {
 
 
 class TestDerivativeWarnings:
-    """Editors only warn on ``@[角色/衍生]`` without blocking (docs/adr/0064 / 0072)."""
+    """Editors only warn on ``@[character/derivative]`` without blocking (docs/adr/0064 / 0072)."""
 
     def test_registered_derivative_is_silent(self):
         preview = build_script_preview("@[张三/劲装] 推门。@[张三/劲装]{我来了}", PROJECT_WITH_DERIVATIVE, _SOFT)

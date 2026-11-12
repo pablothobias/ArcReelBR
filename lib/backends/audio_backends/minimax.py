@@ -63,16 +63,16 @@ def _decode_audio(payload: object) -> bytes:
     base = base if isinstance(base, dict) else {}
     code = base.get("status_code")
     if code not in (None, 0):
-        raise RuntimeError(f"MiniMax 语音合成失败 status_code={code}: {base.get('status_msg', '')}".strip())
+        raise RuntimeError(f"MiniMax speech synthesis failed status_code={code}: {base.get('status_msg', '')}".strip())
     data = body.get("data")
     data = data if isinstance(data, dict) else {}
     audio_hex = data.get("audio")
     if not isinstance(audio_hex, str) or not audio_hex:
-        raise RuntimeError("MiniMax 语音合成响应缺少 data.audio")
+        raise RuntimeError("MiniMax speech synthesis response is missing data.audio")
     try:
         return bytes.fromhex(audio_hex)
     except ValueError as exc:
-        raise RuntimeError("MiniMax 语音合成响应的 data.audio 不是合法 hex") from exc
+        raise RuntimeError("MiniMax speech synthesis response data.audio is not valid hex") from exc
 
 
 class MiniMaxAudioBackend:

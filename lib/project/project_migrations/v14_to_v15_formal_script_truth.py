@@ -388,7 +388,7 @@ def migrate_v14_to_v15(project_dir: Path) -> ArtifactBackfillOutcome | None:
     project_bytes = project_file.read_bytes()
     project = json.loads(project_bytes)
     if not isinstance(project, dict):
-        raise ValueError("project.json 必须是对象")
+        raise ValueError("project.json must be an object")
     if parse_project_schema_version(project) >= TARGET_SCHEMA_VERSION:
         return None
 
@@ -403,7 +403,7 @@ def migrate_v14_to_v15(project_dir: Path) -> ArtifactBackfillOutcome | None:
         if work.script is not None:
             path = try_safe_join(project_dir, work.script_rel)
             if path is None:
-                raise ValueError(f"第 {work.episode} 集剧本路径越界: {work.script_rel}")
+                raise ValueError(f"Script path of episode {work.episode} is out of bounds: {work.script_rel}")
             path.parent.mkdir(parents=True, exist_ok=True)
             atomic_write_json(path, work.script)
 

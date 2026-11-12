@@ -67,7 +67,7 @@ def start_blank_script_detailed(pm: ProjectManager, project_name: str, episode: 
     """
     project = pm.load_project(project_name)
     if find_episode(project, episode) is None:
-        raise BlankScriptError("episode_not_found", f"集（id={episode}）不在分集账本里")
+        raise BlankScriptError("episode_not_found", f"Episode (id={episode}) is not in the episode ledger")
     project_path = pm.get_project_path(project_name)
     plan_path = script_review.script_plan_path(project_path, project, episode)
     draft_kinds = [
@@ -92,11 +92,15 @@ def start_blank_script_detailed(pm: ProjectManager, project_name: str, episode: 
         resolver = active_artifact_currency_resolver(project_path, project)
         key = ArtifactKey.episode_script(episode)
         if resolver.resolve_usable_entry(key, artifact_path=f"scripts/{filename}") is not None:
-            raise BlankScriptError("formal_script_exists", f"集（id={episode}）已有正式脚本 scripts/{filename}")
+            raise BlankScriptError(
+                "formal_script_exists", f"Episode (id={episode}) already has a formal script scripts/{filename}"
+            )
         for kind in draft_kinds:
             draft = read_quarantine(project_path, episode, kind)
             if draft is not None and draft_owner(draft) == DRAFT_OWNER_AGENT:
-                raise BlankScriptError("draft_agent_owned", f"集（id={episode}）的草稿正由 Agent 编辑")
+                raise BlankScriptError(
+                    "draft_agent_owned", f"The draft of episode (id={episode}) is being edited by the Agent"
+                )
 
         cleared_review = False
 
@@ -104,7 +108,7 @@ def start_blank_script_detailed(pm: ProjectManager, project_name: str, episode: 
             nonlocal cleared_review
             entry = find_episode(p, episode)
             if entry is None:
-                raise BlankScriptError("episode_not_found", f"集（id={episode}）不在分集账本里")
+                raise BlankScriptError("episode_not_found", f"Episode (id={episode}) is not in the episode ledger")
             # Old confirmation belongs to the discarded plan; retaining it would falsely confirm later identical plans.
             cleared_review = entry.pop(script_review.REVIEW_FIELD, None) is not None
 

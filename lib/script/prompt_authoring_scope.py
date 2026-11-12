@@ -119,8 +119,10 @@ class PromptOverwriteRequired(ValueError):
     """Explicit rewrite replaces existing visuals without an overwrite token matching the current formal script."""
 
     def __init__(self, overwrite: PromptOverwrite) -> None:
-        ids = "、".join(entry.entry_id for entry in overwrite.entries)
-        super().__init__(f"显式重写会替换这些条目已有的视觉层内容，需先确认覆盖: {ids}")
+        ids = ", ".join(entry.entry_id for entry in overwrite.entries)
+        super().__init__(
+            f"An explicit rewrite would replace the existing visual layer of these entries; confirm the overwrite first: {ids}"
+        )
         self.overwrite = overwrite
 
 

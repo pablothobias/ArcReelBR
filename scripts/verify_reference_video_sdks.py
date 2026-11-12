@@ -39,9 +39,9 @@ def _positive_int(value: str) -> int:
     try:
         ivalue = int(value)
     except ValueError as exc:
-        raise argparse.ArgumentTypeError(f"必须是整数: {value!r}") from exc
+        raise argparse.ArgumentTypeError(f"must be an integer: {value!r}") from exc
     if ivalue < 1:
-        raise argparse.ArgumentTypeError(f"必须 >= 1: {ivalue}")
+        raise argparse.ArgumentTypeError(f"must be >= 1: {ivalue}")
     return ivalue
 
 
@@ -104,9 +104,9 @@ class RunResult:
 def render_report(results: list[RunResult], *, generated_at: datetime | None = None) -> str:
     ts = (generated_at or datetime.now()).isoformat(sep=" ", timespec="seconds")
     lines: list[str] = [
-        "# Reference-to-Video SDK 验证报告",
+        "# Reference-to-Video SDK verification report",
         "",
-        f"生成时间：{ts}",
+        f"Generated at: {ts}",
         "",
     ]
     if not results:

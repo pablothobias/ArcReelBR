@@ -194,7 +194,7 @@ async def test_workflow_plan_adapters_report_corrupt_script_as_server_failure(
     assert outcome.problem is not None
     assert outcome.problem.model_dump() == {
         "code": "internal_error",
-        "detail": "get_workflow_plan 失败: segments must be an array of objects",
+        "detail": "get_workflow_plan failed: segments must be an array of objects",
     }
 
     with TestClient(_adapter_app(pm, monkeypatch), raise_server_exceptions=False) as client:

@@ -374,7 +374,7 @@ class AudioLaneResult:
 
 def _lane_not_declared(lane: str, request_hint: str) -> RuntimeError:
     return RuntimeError(
-        f"{lane} lane 未声明：调用 resolve_generation_context 时传入 {request_hint} 才能访问该 lane 的解析产物"
+        f"{lane} lane is not declared: pass {request_hint} to resolve_generation_context to access that lane's resolved outputs"
     )
 
 

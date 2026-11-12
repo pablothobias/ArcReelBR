@@ -41,7 +41,7 @@ These rules apply to all operations throughout the project:
 > by a fixed +7 seconds per call. It is unsuitable for joining different shots. Join different shots or video units on an edit timeline.
 
 ### Audio rules
-- **Automatic BGM prohibition**: generation automatically appends a prohibition equivalent to `Avoid: BGM、文字字幕、水印` to video prompts; do not append it manually or describe BGM / scores in video_prompt
+- **Automatic BGM prohibition**: generation automatically appends a prohibition equivalent to `Avoid: BGM, text subtitles, watermarks, logos` to video prompts; do not append it manually or describe BGM / scores in video_prompt
 
 ### Video-prompt wording
 
@@ -60,7 +60,7 @@ These rules apply to all operations throughout the project:
 
 ### Referring to episodes and entries
 
-- **Episode ID** is the internal identifier in `episodes[].episode`, plan `target.episode` / `next_action.args.episode_id`, filename `episode_{集 ID}`, and entry prefix `E{集 ID}` (such as `E7S01`). IDs are allocated only, never reused; new episodes follow the historical maximum and **do not indicate playback position**
+- **Episode ID** is the internal identifier in `episodes[].episode`, plan `target.episode` / `next_action.args.episode_id`, filename `episode_{episode ID}`, and entry prefix `E{episode ID}` (such as `E7S01`). IDs are allocated only, never reused; new episodes follow the historical maximum and **do not indicate playback position**
 - **Playback order** is the order of `episodes[]`: its Nth entry is episode N
 - Tool `episode_id` takes only the internal ID: when the user says “episode 3” or gives a title, locate that episode by position/title in `episodes[]`, then take its ID
 - Refer to episodes using playback position and title (such as “episode 3, Attack at the City Gate”); leave IDs in tool calls. Relay tool output “Title (position N, id=X)” accordingly
@@ -73,7 +73,7 @@ The Agent session’s cwd is bound to the current project root. **All paths in t
 - **Read / Edit / Write / Glob / Grep**: use **absolute paths** for `file_path`
 - **Bash calls to skill scripts**: use paths **relative to project-root cwd**, for example:
   - ✅ `source/episode_1.txt`、`drafts/episode_1/script_plan_segments.json`、`scripts/episode_1.json`
-  - ❌ `projects/{项目名}/source/episode_1.txt` (double prefix; a substitution/concatenation error can land at the projects root)
+  - ❌ `projects/{project name}/source/episode_1.txt` (double prefix; a substitution/concatenation error can land at the projects root)
 - **Never** use the `projects/{...}/` prefix in tool arguments. It is only for documenting project layout and **must not be passed directly to any tool**
 - Skill scripts validate cwd and reject execution when it is outside the current project directory
 - **Relative forms in `.claude/agents/*.md` / `SKILL.md`**: relative paths in subagent instructions (such as “read `project.json`” or “read `source/episode_{N}.txt`”) describe **locations within the project**, not directly usable `file_path` arguments. Still join them to session cwd and pass absolute paths to Read/Edit/Write/Glob/Grep
@@ -107,7 +107,7 @@ Grids are not a separate generation mode: `grid_storyboard` is an independent bo
 
 ## Project structure
 
-- `projects/{项目名}` - video-project workspace
+- `projects/{project name}` - video-project workspace
 - `lib/` - shared Python library (multiprovider image / video / text-generation abstractions and project management)
 - `agent_runtime_profile/.claude/skills/` - available skills
 
@@ -199,10 +199,10 @@ Stale artifacts remain usable; rendering neither clears nor overwrites old paid 
 
 ## Project directory structure
 
-> The directory tree below is illustrative only; session cwd is already the project root. Use cwd-relative paths for **Bash calls to skill scripts** (such as `source/`, `scripts/`); **Read / Edit / Write / Glob / Grep** still require **absolute** `file_path` under the Path rules above. No tool may use a `projects/{项目名}/` prefix.
+> The directory tree below is illustrative only; session cwd is already the project root. Use cwd-relative paths for **Bash calls to skill scripts** (such as `source/`, `scripts/`); **Read / Edit / Write / Glob / Grep** still require **absolute** `file_path` under the Path rules above. No tool may use a `projects/{project name}/` prefix.
 
 ```text
-projects/{项目名}/      # ← session cwd is here; paths below are relative to it
+projects/{project name}/      # ← session cwd is here; paths below are relative to it
 ├── project.json       # Project metadata (characters, scenes, props, episodes, style)
 ├── source/            # Original novel content
 ├── scripts/           # Shot script (JSON)
@@ -224,7 +224,7 @@ projects/{项目名}/      # ← session cwd is here; paths below are relative t
 - `schema_version`: project-data format version (currently 1)
 - `title`, `content_mode` (`narration`/`drama`), `generation_mode` (`storyboard`/`reference_video`, immutable after creation), `grid_storyboard` (boolean, effective only for `generation_mode="storyboard"`, toggled by the user in settings), `style`, `style_description`
 - `overview`: project overview (synopsis, genre, theme, world_setting)
-- `episodes`: episode ledger (sole source of truth; order is playback order): episode (internal ID), title, script_file, and ledger fields `source_origin` (`whole_source` extracted from whole source / `own` own source / `none` no source), `source_range` (extracted episodes only; may span files, with `end_file` when the end differs from start `source_file`), `hook`, `outline` (drama episode outline), and `ledger_status` (planned/consumed/stale). Top-level `whole_source_files` lists whole-source files in source order; the next planning batch continues from the last extracted episode’s end. Unregistered `source/` files are not source input; register them through `upload_source`. Extracted `source/episode_{集 ID}.txt` files derive from the ledger and are maintained by planning tools; do not edit or rename manually. Own-source episode files are their source: register user-split episodes individually with `upload_source` (`role=episode`), then plan each script directly, without merging, resplitting, or renaming
+- `episodes`: episode ledger (sole source of truth; order is playback order): episode (internal ID), title, script_file, and ledger fields `source_origin` (`whole_source` extracted from whole source / `own` own source / `none` no source), `source_range` (extracted episodes only; may span files, with `end_file` when the end differs from start `source_file`), `hook`, `outline` (drama episode outline), and `ledger_status` (planned/consumed/stale). Top-level `whole_source_files` lists whole-source files in source order; the next planning batch continues from the last extracted episode’s end. Unregistered `source/` files are not source input; register them through `upload_source`. Extracted `source/episode_{episode ID}.txt` files derive from the ledger and are maintained by planning tools; do not edit or rename manually. Own-source episode files are their source: register user-split episodes individually with `upload_source` (`role=episode`), then plan each script directly, without merging, resplitting, or renaming
 - `characters`: complete character definitions (description, voice_style, character_sheet)
 - `scenes`: complete scene definitions (description, scene_sheet)
 - `props`: complete prop definitions (description, prop_sheet)

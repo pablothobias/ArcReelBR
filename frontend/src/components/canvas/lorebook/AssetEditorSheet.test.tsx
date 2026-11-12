@@ -6,6 +6,7 @@ import { Router } from "wouter";
 import { memoryLocation } from "wouter/memory-location";
 import { API, type AssetRenameResult } from "@/api";
 import { LeaveGuardProvider } from "@/components/shared/edit-unit/LeaveGuard";
+import i18n from "@/i18n";
 import { useAppStore } from "@/stores/app-store";
 import { useConfigStatusStore } from "@/stores/config-status-store";
 import { useProjectsStore } from "@/stores/projects-store";
@@ -25,12 +26,12 @@ function makeProject(overrides: Partial<ProjectData> = {}): ProjectData {
     style: "Anime",
     episodes: [],
     characters: {
-      林夕: { description: "白衣少女", voice_style: "清冷", character_sheet: "characters/林夕.png" },
-      苏白: { description: "黑衣剑客" },
+      Lena: { description: "Girl in white", voice_style: "Cool", character_sheet: "characters/Lena.png" },
+      Silas: { description: "Swordsman in black" },
     },
-    scenes: { 庭院: { description: "" } },
-    props: { 玉佩: { description: "温润白玉" } },
-    products: { 保温杯: { description: "不锈钢", brand: "暖暖", selling_points: ["保温 12 小时"] } },
+    scenes: { Courtyard: { description: "" } },
+    props: { "Jade Pendant": { description: "Smooth white jade" } },
+    products: { Thermos: { description: "Stainless steel", brand: "Warm", selling_points: ["Keeps hot for 12 hours"] } },
     ...overrides,
   };
 }
@@ -64,7 +65,7 @@ function Harness({
     <AssetGallery
       projectName="demo"
       assetType={assetType}
-      title="资产"
+      title="Assets"
       assets={assets}
       readOnly={readOnly}
       onGenerate={onGenerate as (name: string) => void}
@@ -96,8 +97,10 @@ function patchServer(type: AssetSheetType, name: string, patch: Record<string, u
   return Promise.resolve({ success: true });
 }
 
-describe("资产详情 Sheet", () => {
-  beforeEach(() => {
+describe("Asset detail sheet", () => {
+  // The global setup seeds the zh locale; this file asserts English UI copy and restores zh afterwards.
+  beforeEach(async () => {
+    await i18n.changeLanguage("en");
     server = makeProject();
     useAppStore.setState(useAppStore.getInitialState(), true);
     useProjectsStore.setState({ currentProjectName: "demo", currentProjectData: structuredClone(server) });
@@ -105,7 +108,7 @@ describe("资产详情 Sheet", () => {
       Promise.resolve({ project: structuredClone(server), scripts: {} }),
     );
     vi.spyOn(API, "getAssetSheetStatus").mockResolvedValue({
-      assets: [row("character", "林夕"), row("character", "苏白")],
+      assets: [row("character", "Lena"), row("character", "Silas")],
     });
     vi.spyOn(API, "updateCharacter").mockImplementation((_p, name, patch) => patchServer("character", name, patch));
     vi.spyOn(API, "updateProjectScene").mockImplementation((_p, name, patch) => patchServer("scene", name, patch));
@@ -113,7 +116,8 @@ describe("资产详情 Sheet", () => {
     vi.spyOn(API, "updateProjectProduct").mockImplementation((_p, name, patch) => patchServer("product", name, patch));
   });
 
-  afterEach(() => {
+  afterEach(async () => {
+    await i18n.changeLanguage("zh");
     vi.restoreAllMocks();
     useTasksStore.setState({ tasks: [], optimisticActive: new Set() });
     useConfigStatusStore.setState({ availableMediaTypes: [] });
@@ -125,111 +129,111 @@ describe("资产详情 Sheet", () => {
     const pending = createDeferred<{ success: boolean }>();
     vi.spyOn(API, "uploadFile").mockReturnValue(pending.promise);
     renderGallery();
-    const card = screen.getByRole("article", { name: "林夕" });
+    const card = screen.getByRole("article", { name: "Lena" });
     const file = new File(["image"], "sheet.png", { type: "image/png" });
-    fireEvent.change(within(card).getByLabelText("上传资产图", { selector: "input" }), { target: { files: [file] } });
+    fireEvent.change(within(card).getByLabelText("Upload Asset Sheet", { selector: "input" }), { target: { files: [file] } });
 
-    const sheet = await openAsset(user, "林夕");
-    expect(within(sheet).getByRole("button", { name: "重命名" })).toBeDisabled();
-    expect(within(sheet).getByRole("button", { name: "重新生成资产图" })).toBeDisabled();
-    expect(within(sheet).getByRole("button", { name: "上传原图", hidden: true })).toBeDisabled();
+    const sheet = await openAsset(user, "Lena");
+    expect(within(sheet).getByRole("button", { name: "Rename" })).toBeDisabled();
+    expect(within(sheet).getByRole("button", { name: "Regenerate Asset Sheet" })).toBeDisabled();
+    expect(within(sheet).getByRole("button", { name: "Upload reference image", hidden: true })).toBeDisabled();
     await act(() => pending.resolve({ success: true }));
-    expect(within(sheet).getByRole("button", { name: "重命名" })).toBeEnabled();
+    expect(within(sheet).getByRole("button", { name: "Rename" })).toBeEnabled();
   });
 
   it("keeps sibling writes disabled while the rename is in flight", async () => {
     const user = userEvent.setup();
     const pending = createDeferred<AssetRenameResult>();
-    const result: AssetRenameResult = { success: true, dry_run: false, old_name: "林夕", new_name: "林汐", episodes: 0, references: 0, files: 1 };
+    const result: AssetRenameResult = { success: true, dry_run: false, old_name: "Lena", new_name: "Lina", episodes: 0, references: 0, files: 1 };
     vi.spyOn(API, "renameProjectAsset").mockResolvedValueOnce({ ...result, dry_run: true }).mockReturnValueOnce(pending.promise);
     renderGallery();
-    const sheet = await openAsset(user, "林夕");
-    await user.click(within(sheet).getByRole("button", { name: "重命名" }));
-    const input = within(sheet).getByRole("textbox", { name: "重命名" });
+    const sheet = await openAsset(user, "Lena");
+    await user.click(within(sheet).getByRole("button", { name: "Rename" }));
+    const input = within(sheet).getByRole("textbox", { name: "Rename" });
     await user.clear(input);
-    await user.type(input, "林汐{Enter}");
-    const confirm = await screen.findByRole("alertdialog", { name: "重命名「林夕」？" });
-    await user.click(within(confirm).getByRole("button", { name: "重命名" }));
+    await user.type(input, "Lina{Enter}");
+    const confirm = await screen.findByRole("alertdialog", { name: 'Rename "Lena"?' });
+    await user.click(within(confirm).getByRole("button", { name: "Rename" }));
 
-    expect(within(sheet).getByRole("button", { name: "重新生成资产图", hidden: true })).toBeDisabled();
-    expect(within(sheet).getByRole("button", { name: "上传原图", hidden: true })).toBeDisabled();
+    expect(within(sheet).getByRole("button", { name: "Regenerate Asset Sheet", hidden: true })).toBeDisabled();
+    expect(within(sheet).getByRole("button", { name: "Upload reference image", hidden: true })).toBeDisabled();
     await user.keyboard("{Escape}");
-    expect(screen.getByRole("alertdialog", { name: "重命名「林夕」？" })).toBeInTheDocument();
+    expect(screen.getByRole("alertdialog", { name: 'Rename "Lena"?' })).toBeInTheDocument();
     await act(() => pending.resolve(result));
-    expect(await screen.findByRole("dialog", { name: "林汐" })).toBeInTheDocument();
+    expect(await screen.findByRole("dialog", { name: "Lina" })).toBeInTheDocument();
   });
 
   it("protects the character's mutations while a derivative task is occupying its files", async () => {
     const user = userEvent.setup();
     renderGallery();
-    const sheet = await openAsset(user, "林夕");
-    act(() => useTasksStore.setState({ tasks: [makeTask({ project_name: "demo", task_type: "character_derivative", resource_id: "林夕/战斗装", status: "running" })] }));
-    expect(within(sheet).getByRole("button", { name: "重命名" })).toBeDisabled();
-    expect(within(sheet).getByRole("button", { name: "重新生成资产图" })).toBeDisabled();
-    expect(within(sheet).getByRole("button", { name: "上传原图", hidden: true })).toBeDisabled();
+    const sheet = await openAsset(user, "Lena");
+    act(() => useTasksStore.setState({ tasks: [makeTask({ project_name: "demo", task_type: "character_derivative", resource_id: "Lena/Battle Armor", status: "running" })] }));
+    expect(within(sheet).getByRole("button", { name: "Rename" })).toBeDisabled();
+    expect(within(sheet).getByRole("button", { name: "Regenerate Asset Sheet" })).toBeDisabled();
+    expect(within(sheet).getByRole("button", { name: "Upload reference image", hidden: true })).toBeDisabled();
   });
 
   it("rechecks occupancy before confirming a TTS sample and shares the confirmation write with the sheet", async () => {
     const user = userEvent.setup();
     const pending = createDeferred<{ success: boolean; path: string; url: string }>();
     useConfigStatusStore.setState({ availableMediaTypes: ["audio"] });
-    vi.spyOn(API, "getAudioBackendVoices").mockResolvedValue({ configured: true, provider_id: "dashscope", model: "tts", voices: [{ id: "Cherry", label: "芊悦" }] });
+    vi.spyOn(API, "getAudioBackendVoices").mockResolvedValue({ configured: true, provider_id: "dashscope", model: "tts", voices: [{ id: "Cherry", label: "Sunny" }] });
     vi.spyOn(API, "generateCharacterVoiceSample").mockResolvedValue({ success: true, task_id: "sample-1", deduped: false, message: "" });
     const confirmSample = vi.spyOn(API, "confirmCharacterVoiceSample").mockReturnValue(pending.promise);
     renderGallery();
-    const sheet = await openAsset(user, "林夕");
-    await user.click(within(sheet).getByRole("button", { name: "可选：参考音频" }));
-    await user.click(within(sheet).getByRole("button", { name: "用 TTS 生成参考音频" }));
-    const dialog = await screen.findByRole("dialog", { name: "生成语音参考样本" });
-    await waitFor(() => expect(within(dialog).getByRole("combobox", { name: "音色" })).toHaveTextContent("芊悦"));
-    await user.click(within(dialog).getByRole("button", { name: "生成" }));
+    const sheet = await openAsset(user, "Lena");
+    await user.click(within(sheet).getByRole("button", { name: "Optional: reference audio" }));
+    await user.click(within(sheet).getByRole("button", { name: "Generate with TTS" }));
+    const dialog = await screen.findByRole("dialog", { name: "Generate voice reference sample" });
+    await waitFor(() => expect(within(dialog).getByRole("combobox", { name: "Voice" })).toHaveTextContent("Sunny"));
+    await user.click(within(dialog).getByRole("button", { name: "Generate" }));
     await waitFor(() => expect(API.generateCharacterVoiceSample).toHaveBeenCalled());
-    const succeeded = makeTask({ task_id: "sample-1", project_name: "demo", task_type: "voice_sample", resource_id: "林夕", status: "succeeded", result: { file_path: "audio/sample.wav" } });
+    const succeeded = makeTask({ task_id: "sample-1", project_name: "demo", task_type: "voice_sample", resource_id: "Lena", status: "succeeded", result: { file_path: "audio/sample.wav" } });
     act(() => useTasksStore.getState().setTasks([succeeded]));
-    const confirm = await within(dialog).findByRole("button", { name: "确认并保存" });
-    const running = makeTask({ project_name: "demo", task_type: "character", resource_id: "林夕", status: "running" });
+    const confirm = await within(dialog).findByRole("button", { name: "Confirm & save" });
+    const running = makeTask({ project_name: "demo", task_type: "character", resource_id: "Lena", status: "running" });
     act(() => useTasksStore.getState().setTasks([succeeded, running]));
     expect(confirm).toBeDisabled();
     await user.click(confirm);
     expect(confirmSample).not.toHaveBeenCalled();
     act(() => useTasksStore.getState().setTasks([succeeded]));
     await user.click(confirm);
-    expect(within(sheet).getByRole("button", { name: "重命名", hidden: true })).toBeDisabled();
+    expect(within(sheet).getByRole("button", { name: "Rename", hidden: true })).toBeDisabled();
     await user.keyboard("{Escape}");
-    expect(screen.getByRole("dialog", { name: "生成语音参考样本" })).toBeInTheDocument();
-    await act(() => pending.resolve({ success: true, path: "characters/refs_audio/林夕.wav", url: "/audio.wav" }));
-    expect(within(sheet).getByRole("button", { name: "重命名" })).toBeEnabled();
+    expect(screen.getByRole("dialog", { name: "Generate voice reference sample" })).toBeInTheDocument();
+    await act(() => pending.resolve({ success: true, path: "characters/refs_audio/Lena.wav", url: "/audio.wav" }));
+    expect(within(sheet).getByRole("button", { name: "Rename" })).toBeEnabled();
   });
 
   it("asks before switching to the next asset with unsaved changes, then saves and switches", async () => {
     const user = userEvent.setup();
     renderGallery();
-    const sheet = await openAsset(user, "林夕");
+    const sheet = await openAsset(user, "Lena");
 
-    const description = within(sheet).getByRole("textbox", { name: "描述" });
+    const description = within(sheet).getByRole("textbox", { name: "Description" });
     await user.clear(description);
-    await user.type(description, "红衣少女");
-    await user.click(within(sheet).getByRole("button", { name: "下一个" }));
+    await user.type(description, "Girl in red");
+    await user.click(within(sheet).getByRole("button", { name: "Next" }));
 
-    const leave = await screen.findByRole("alertdialog", { name: "「林夕」有未保存的修改" });
+    const leave = await screen.findByRole("alertdialog", { name: '"Lena" has unsaved changes' });
     expect(API.updateCharacter).not.toHaveBeenCalled();
-    await user.click(within(leave).getByRole("button", { name: "保存并切换" }));
+    await user.click(within(leave).getByRole("button", { name: "Save and switch" }));
 
-    expect(await screen.findByRole("dialog", { name: "苏白" })).toBeInTheDocument();
-    expect(API.updateCharacter).toHaveBeenCalledWith("demo", "林夕", { description: "红衣少女" });
+    expect(await screen.findByRole("dialog", { name: "Silas" })).toBeInTheDocument();
+    expect(API.updateCharacter).toHaveBeenCalledWith("demo", "Lena", { description: "Girl in red" });
   });
 
   it("asks before closing with unsaved changes and keeps nothing after discarding", async () => {
     const user = userEvent.setup();
     renderGallery();
-    const sheet = await openAsset(user, "林夕");
+    const sheet = await openAsset(user, "Lena");
 
-    await user.type(within(sheet).getByRole("textbox", { name: "描述" }), "，佩剑");
-    await user.click(within(sheet).getByRole("button", { name: "关闭" }));
-    const leave = await screen.findByRole("alertdialog", { name: "「林夕」有未保存的修改" });
-    await user.click(within(leave).getByRole("button", { name: "放弃修改" }));
+    await user.type(within(sheet).getByRole("textbox", { name: "Description" }), ", with sword");
+    await user.click(within(sheet).getByRole("button", { name: "Close" }));
+    const leave = await screen.findByRole("alertdialog", { name: '"Lena" has unsaved changes' });
+    await user.click(within(leave).getByRole("button", { name: "Discard changes" }));
 
-    await waitFor(() => expect(screen.queryByRole("dialog", { name: "林夕" })).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole("dialog", { name: "Lena" })).not.toBeInTheDocument());
     expect(API.updateCharacter).not.toHaveBeenCalled();
   });
 
@@ -243,22 +247,22 @@ describe("资产详情 Sheet", () => {
       derivatives: 0,
     });
     const { onGenerate } = renderGallery();
-    const sheet = await openAsset(user, "林夕");
-    await user.type(within(sheet).getByRole("textbox", { name: "描述" }), "，佩剑");
+    const sheet = await openAsset(user, "Lena");
+    await user.type(within(sheet).getByRole("textbox", { name: "Description" }), ", with sword");
 
-    await user.click(within(sheet).getByRole("button", { name: "保存并生成" }));
-    let confirm = await screen.findByRole("alertdialog", { name: "重新生成这张资产图？" });
-    expect(await within(confirm).findByText("重新生成后，用到它的 2 张分镜图、1 段视频会转为过期。")).toBeInTheDocument();
-    await user.click(within(confirm).getByRole("button", { name: "取消" }));
+    await user.click(within(sheet).getByRole("button", { name: "Save and generate" }));
+    let confirm = await screen.findByRole("alertdialog", { name: "Regenerate this sheet?" });
+    expect(await within(confirm).findByText("Once regenerated, 2 storyboard images and 1 videos that use it become stale.")).toBeInTheDocument();
+    await user.click(within(confirm).getByRole("button", { name: "Cancel" }));
     expect(API.updateCharacter).not.toHaveBeenCalled();
     expect(onGenerate).not.toHaveBeenCalled();
 
-    await user.click(within(sheet).getByRole("button", { name: "保存并生成" }));
-    confirm = await screen.findByRole("alertdialog", { name: "重新生成这张资产图？" });
-    await user.click(await within(confirm).findByRole("button", { name: "重新生成" }));
+    await user.click(within(sheet).getByRole("button", { name: "Save and generate" }));
+    confirm = await screen.findByRole("alertdialog", { name: "Regenerate this sheet?" });
+    await user.click(await within(confirm).findByRole("button", { name: "Regenerate" }));
 
-    await waitFor(() => expect(onGenerate).toHaveBeenCalledWith("林夕"));
-    expect(API.updateCharacter).toHaveBeenCalledWith("demo", "林夕", { description: "白衣少女，佩剑" });
+    await waitFor(() => expect(onGenerate).toHaveBeenCalledWith("Lena"));
+    expect(API.updateCharacter).toHaveBeenCalledWith("demo", "Lena", { description: "Girl in white, with sword" });
     expect(vi.mocked(API.updateCharacter).mock.invocationCallOrder[0]).toBeLessThan(
       onGenerate.mock.invocationCallOrder[0],
     );
@@ -270,19 +274,19 @@ describe("资产详情 Sheet", () => {
     vi.mocked(API.updateCharacter).mockReturnValue(saving.promise);
     vi.spyOn(API, "getAssetRegenerationImpact").mockResolvedValue({ stale: false, storyboards: 0, videos: 0, derivatives: 0 });
     const { onGenerate } = renderGallery();
-    const sheet = await openAsset(user, "林夕");
-    await user.type(within(sheet).getByRole("textbox", { name: "描述" }), "，佩剑");
-    await user.click(within(sheet).getByRole("button", { name: "保存并生成" }));
-    const confirm = await screen.findByRole("alertdialog", { name: "重新生成这张资产图？" });
-    await user.click(await within(confirm).findByRole("button", { name: "重新生成" }));
+    const sheet = await openAsset(user, "Lena");
+    await user.type(within(sheet).getByRole("textbox", { name: "Description" }), ", with sword");
+    await user.click(within(sheet).getByRole("button", { name: "Save and generate" }));
+    const confirm = await screen.findByRole("alertdialog", { name: "Regenerate this sheet?" });
+    await user.click(await within(confirm).findByRole("button", { name: "Regenerate" }));
     await waitFor(() => expect(API.updateCharacter).toHaveBeenCalled());
     act(() => useTasksStore.getState().setTasks([
-      makeTask({ project_name: "demo", task_type: "character", resource_id: "林夕", status: "running" }),
+      makeTask({ project_name: "demo", task_type: "character", resource_id: "Lena", status: "running" }),
     ]));
     await act(() => saving.resolve({ success: true }));
-    expect(await within(sheet).findByText("已保存")).toBeInTheDocument();
+    expect(await within(sheet).findByText("Saved")).toBeInTheDocument();
     expect(onGenerate).not.toHaveBeenCalled();
-    expect(useAppStore.getState().toast?.text).toBe("资产图正在生成或修改，请等它结束后再操作");
+    expect(useAppStore.getState().toast?.text).toBe("The asset image is being generated or edited. Try again when it finishes.");
   });
 
   it("aborts the impact check when the confirmation is cancelled before it answers", async () => {
@@ -293,13 +297,13 @@ describe("资产详情 Sheet", () => {
       return new Promise(() => {});
     });
     renderGallery();
-    const sheet = await openAsset(user, "林夕");
-    await user.type(within(sheet).getByRole("textbox", { name: "描述" }), "，佩剑");
+    const sheet = await openAsset(user, "Lena");
+    await user.type(within(sheet).getByRole("textbox", { name: "Description" }), ", with sword");
 
-    await user.click(within(sheet).getByRole("button", { name: "保存并生成" }));
-    const confirm = await screen.findByRole("alertdialog", { name: "重新生成这张资产图？" });
+    await user.click(within(sheet).getByRole("button", { name: "Save and generate" }));
+    const confirm = await screen.findByRole("alertdialog", { name: "Regenerate this sheet?" });
     expect(signal?.aborted).toBe(false);
-    await user.click(within(confirm).getByRole("button", { name: "取消" }));
+    await user.click(within(confirm).getByRole("button", { name: "Cancel" }));
 
     expect(signal?.aborted).toBe(true);
     expect(API.updateCharacter).not.toHaveBeenCalled();
@@ -310,28 +314,28 @@ describe("资产详情 Sheet", () => {
     const saving = createDeferred<{ success: boolean }>();
     vi.mocked(API.updateCharacter).mockReturnValue(saving.promise);
     renderGallery();
-    const sheet = await openAsset(user, "林夕");
-    await user.type(within(sheet).getByRole("textbox", { name: "描述" }), "，佩剑");
+    const sheet = await openAsset(user, "Lena");
+    await user.type(within(sheet).getByRole("textbox", { name: "Description" }), ", with sword");
 
-    await user.click(within(sheet).getByRole("button", { name: "保存" }));
-    await user.type(within(sheet).getByRole("textbox", { name: "描述" }), "，披风");
+    await user.click(within(sheet).getByRole("button", { name: "Save" }));
+    await user.type(within(sheet).getByRole("textbox", { name: "Description" }), ", with cloak");
 
-    expect(within(sheet).getByRole("button", { name: "保存并预览" })).toBeDisabled();
+    expect(within(sheet).getByRole("button", { name: "Save and preview" })).toBeDisabled();
     await act(() => saving.resolve({ success: true }));
   });
 
   it("warns that the fields were saved when refreshing the project afterwards fails", async () => {
     const user = userEvent.setup();
     renderGallery();
-    const sheet = await openAsset(user, "林夕");
-    await user.type(within(sheet).getByRole("textbox", { name: "描述" }), "，佩剑");
-    vi.mocked(API.getProject).mockRejectedValue(new Error("网络错误"));
+    const sheet = await openAsset(user, "Lena");
+    await user.type(within(sheet).getByRole("textbox", { name: "Description" }), ", with sword");
+    vi.mocked(API.getProject).mockRejectedValue(new Error("Network error"));
 
-    await user.click(within(sheet).getByRole("button", { name: "保存" }));
+    await user.click(within(sheet).getByRole("button", { name: "Save" }));
 
     await waitFor(() =>
       expect(useAppStore.getState().toast).toMatchObject({
-        text: "操作已完成，但页面数据刷新失败，请手动刷新查看最新状态",
+        text: "Done, but the page could not be refreshed. Reload to see the latest state",
         tone: "warning",
       }),
     );
@@ -340,59 +344,87 @@ describe("资产详情 Sheet", () => {
   it("saves the unsaved description before previewing the prompt", async () => {
     const user = userEvent.setup();
     const preview = vi.spyOn(API, "previewAssetPrompt").mockResolvedValue({
-      text: "Style: Anime\n白衣少女，佩剑",
+      text: "Style: Anime\nGirl in white, with sword",
       unavailable: null,
       is_text_form: true,
       warnings: [],
     });
     renderGallery();
-    const sheet = await openAsset(user, "林夕");
-    await user.type(within(sheet).getByRole("textbox", { name: "描述" }), "，佩剑");
+    const sheet = await openAsset(user, "Lena");
+    await user.type(within(sheet).getByRole("textbox", { name: "Description" }), ", with sword");
 
-    await user.click(within(sheet).getByRole("button", { name: "保存并预览" }));
+    await user.click(within(sheet).getByRole("button", { name: "Save and preview" }));
 
-    expect(await screen.findByText(/白衣少女，佩剑/, { selector: "pre" })).toBeInTheDocument();
-    expect(API.updateCharacter).toHaveBeenCalledWith("demo", "林夕", { description: "白衣少女，佩剑" });
-    expect(preview).toHaveBeenCalledWith("demo", "character", "林夕", "白衣少女，佩剑", expect.anything());
+    expect(await screen.findByText(/Girl in white, with sword/, { selector: "pre" })).toBeInTheDocument();
+    expect(API.updateCharacter).toHaveBeenCalledWith("demo", "Lena", { description: "Girl in white, with sword" });
+    expect(preview).toHaveBeenCalledWith("demo", "character", "Lena", "Girl in white, with sword", expect.anything());
+  });
+
+  it("saves an unsaved scene occupancy toggle before previewing, so the preview renders the new choice", async () => {
+    const user = userEvent.setup();
+    const preview = vi.spyOn(API, "previewAssetPrompt").mockResolvedValue({
+      text: "This sheet is an occupied environment reference",
+      unavailable: null,
+      is_text_form: true,
+      warnings: [],
+    });
+    renderGallery("scene");
+    const sheet = await openAsset(user, "Courtyard");
+    await user.click(within(sheet).getByRole("switch", { name: "People in asset sheet" }));
+
+    await user.click(within(sheet).getByRole("button", { name: "Save and preview" }));
+
+    expect(await screen.findByText(/occupied environment reference/, { selector: "pre" })).toBeInTheDocument();
+    const saved = vi.mocked(API.updateProjectScene).mock.invocationCallOrder[0];
+    expect(API.updateProjectScene).toHaveBeenCalledWith("demo", "Courtyard", { occupancy: "occupied" });
+    expect(saved).toBeLessThan(preview.mock.invocationCallOrder[0]);
   });
 
   it.each([
     {
       type: "character" as const,
-      name: "林夕",
+      name: "Lena",
       edit: async (user: ReturnType<typeof userEvent.setup>, sheet: HTMLElement) => {
-        await user.type(within(sheet).getByRole("textbox", { name: "声音风格" }), "而坚定");
+        await user.type(within(sheet).getByRole("textbox", { name: "Voice Style" }), " and firm");
       },
-      call: () => expect(API.updateCharacter).toHaveBeenCalledWith("demo", "林夕", { voice_style: "清冷而坚定" }),
+      call: () => expect(API.updateCharacter).toHaveBeenCalledWith("demo", "Lena", { voice_style: "Cool and firm" }),
     },
     {
       type: "scene" as const,
-      name: "庭院",
+      name: "Courtyard",
       edit: async (user: ReturnType<typeof userEvent.setup>, sheet: HTMLElement) => {
-        await user.type(within(sheet).getByRole("textbox", { name: "描述" }), "月下庭院");
+        await user.type(within(sheet).getByRole("textbox", { name: "Description" }), "Moonlit courtyard");
       },
-      call: () => expect(API.updateProjectScene).toHaveBeenCalledWith("demo", "庭院", { description: "月下庭院" }),
+      call: () => expect(API.updateProjectScene).toHaveBeenCalledWith("demo", "Courtyard", { description: "Moonlit courtyard" }),
+    },
+    {
+      type: "scene" as const,
+      name: "Courtyard",
+      edit: async (user: ReturnType<typeof userEvent.setup>, sheet: HTMLElement) => {
+        await user.click(within(sheet).getByRole("switch", { name: "People in asset sheet" }));
+      },
+      call: () => expect(API.updateProjectScene).toHaveBeenCalledWith("demo", "Courtyard", { occupancy: "occupied" }),
     },
     {
       type: "prop" as const,
-      name: "玉佩",
+      name: "Jade Pendant",
       edit: async (user: ReturnType<typeof userEvent.setup>, sheet: HTMLElement) => {
-        await user.type(within(sheet).getByRole("textbox", { name: "描述" }), "，刻有云纹");
+        await user.type(within(sheet).getByRole("textbox", { name: "Description" }), ", carved with clouds");
       },
       call: () =>
-        expect(API.updateProjectProp).toHaveBeenCalledWith("demo", "玉佩", { description: "温润白玉，刻有云纹" }),
+        expect(API.updateProjectProp).toHaveBeenCalledWith("demo", "Jade Pendant", { description: "Smooth white jade, carved with clouds" }),
     },
     {
       type: "product" as const,
-      name: "保温杯",
+      name: "Thermos",
       edit: async (user: ReturnType<typeof userEvent.setup>, sheet: HTMLElement) => {
-        await user.type(within(sheet).getByRole("textbox", { name: "品牌" }), "家");
-        await user.type(within(sheet).getByRole("textbox", { name: "卖点" }), "{Enter}{Enter}一键开盖");
+        await user.type(within(sheet).getByRole("textbox", { name: "Brand" }), "th");
+        await user.type(within(sheet).getByRole("textbox", { name: "Selling Points" }), "{Enter}{Enter}One-tap lid");
       },
       call: () =>
-        expect(API.updateProjectProduct).toHaveBeenCalledWith("demo", "保温杯", {
-          brand: "暖暖家",
-          selling_points: ["保温 12 小时", "一键开盖"],
+        expect(API.updateProjectProduct).toHaveBeenCalledWith("demo", "Thermos", {
+          brand: "Warmth",
+          selling_points: ["Keeps hot for 12 hours", "One-tap lid"],
         }),
     },
   ])("edits a $type in the same editor and saves only the changed fields", async ({ type, name, edit, call }) => {
@@ -401,10 +433,10 @@ describe("资产详情 Sheet", () => {
     const sheet = await openAsset(user, name);
 
     await edit(user, sheet);
-    await user.click(within(sheet).getByRole("button", { name: "保存" }));
+    await user.click(within(sheet).getByRole("button", { name: "Save" }));
 
     await waitFor(call);
-    expect(await within(sheet).findByText("已保存")).toBeInTheDocument();
+    expect(await within(sheet).findByText("Saved")).toBeInTheDocument();
   });
 
   it("creates an asset from the blank editor and switches to its details", async () => {
@@ -415,16 +447,16 @@ describe("资产详情 Sheet", () => {
     });
     renderGallery();
 
-    await user.click(screen.getByRole("button", { name: "添加角色" }));
-    const form = await screen.findByRole("dialog", { name: "添加角色" });
-    expect(within(form).getByRole("button", { name: "创建" })).toBeDisabled();
-    await user.type(within(form).getByRole("textbox", { name: "名称" }), " 阿青 ");
-    await user.type(within(form).getByRole("textbox", { name: "描述" }), "青衣少年");
-    await user.click(within(form).getByRole("button", { name: "创建" }));
+    await user.click(screen.getByRole("button", { name: "Add character" }));
+    const form = await screen.findByRole("dialog", { name: "Add character" });
+    expect(within(form).getByRole("button", { name: "Create" })).toBeDisabled();
+    await user.type(within(form).getByRole("textbox", { name: "Name" }), " Ash ");
+    await user.type(within(form).getByRole("textbox", { name: "Description" }), "Boy in blue");
+    await user.click(within(form).getByRole("button", { name: "Create" }));
 
-    const sheet = await screen.findByRole("dialog", { name: "阿青" });
-    expect(API.addCharacter).toHaveBeenCalledWith("demo", "阿青", "青衣少年", "");
-    expect(within(sheet).getByRole("textbox", { name: "描述" })).toHaveValue("青衣少年");
+    const sheet = await screen.findByRole("dialog", { name: "Ash" });
+    expect(API.addCharacter).toHaveBeenCalledWith("demo", "Ash", "Boy in blue", "");
+    expect(within(sheet).getByRole("textbox", { name: "Description" })).toHaveValue("Boy in blue");
   });
 
   it("offers to restore a same-named asset from the project trash after creating it", async () => {
@@ -434,27 +466,27 @@ describe("资产详情 Sheet", () => {
       return Promise.resolve({ success: true, trash_record_id: "rec-1" });
     });
     const restore = vi.spyOn(API, "restoreTrashRecord").mockResolvedValue({
-      object: { kind: "asset", asset_type: "character", name: "阿青 (1)" },
+      object: { kind: "asset", asset_type: "character", name: "Ash (1)" },
       restored: [],
       degraded: false,
       download_only: [],
     });
     renderGallery();
 
-    await user.click(screen.getByRole("button", { name: "添加角色" }));
-    const form = await screen.findByRole("dialog", { name: "添加角色" });
-    await user.type(within(form).getByRole("textbox", { name: "名称" }), "阿青");
-    await user.click(within(form).getByRole("button", { name: "创建" }));
+    await user.click(screen.getByRole("button", { name: "Add character" }));
+    const form = await screen.findByRole("dialog", { name: "Add character" });
+    await user.type(within(form).getByRole("textbox", { name: "Name" }), "Ash");
+    await user.click(within(form).getByRole("button", { name: "Create" }));
 
     await waitFor(() =>
-      expect(useAppStore.getState().toast?.text).toBe("项目回收站里有之前删除的「阿青」，恢复可以找回它的资产图与版本历史。"),
+      expect(useAppStore.getState().toast?.text).toBe('The project trash has a previously deleted "Ash". Restore it to get back its sheet and version history.'),
     );
     useAppStore.getState().toast?.action?.onClick();
 
     expect(restore).toHaveBeenCalledWith("demo", "rec-1");
     await waitFor(() =>
       expect(useAppStore.getState().toast).toMatchObject({
-        text: "已从项目回收站恢复为「阿青 (1)」，可以再把它并入现有资产。",
+        text: 'Restored from the project trash as "Ash (1)". You can merge it into the existing asset.',
         tone: "success",
       }),
     );
@@ -467,24 +499,24 @@ describe("资产详情 Sheet", () => {
       return Promise.resolve({ success: true, trash_record_id: "rec-1" });
     });
     vi.spyOn(API, "restoreTrashRecord").mockResolvedValue({
-      object: { kind: "asset", asset_type: "character", name: "阿青 (1)" },
+      object: { kind: "asset", asset_type: "character", name: "Ash (1)" },
       restored: [],
       degraded: false,
       download_only: [],
     });
     renderGallery();
 
-    await user.click(screen.getByRole("button", { name: "添加角色" }));
-    const form = await screen.findByRole("dialog", { name: "添加角色" });
-    await user.type(within(form).getByRole("textbox", { name: "名称" }), "阿青");
-    await user.click(within(form).getByRole("button", { name: "创建" }));
+    await user.click(screen.getByRole("button", { name: "Add character" }));
+    const form = await screen.findByRole("dialog", { name: "Add character" });
+    await user.type(within(form).getByRole("textbox", { name: "Name" }), "Ash");
+    await user.click(within(form).getByRole("button", { name: "Create" }));
     await waitFor(() => expect(useAppStore.getState().toast?.action).toBeDefined());
-    vi.mocked(API.getProject).mockRejectedValue(new Error("网络错误"));
+    vi.mocked(API.getProject).mockRejectedValue(new Error("Network error"));
     useAppStore.getState().toast?.action?.onClick();
 
     await waitFor(() =>
       expect(useAppStore.getState().toast).toMatchObject({
-        text: "操作已完成，但页面数据刷新失败，请手动刷新查看最新状态",
+        text: "Done, but the page could not be refreshed. Reload to see the latest state",
         tone: "warning",
       }),
     );
@@ -493,17 +525,17 @@ describe("资产详情 Sheet", () => {
   it("says the asset was created when refreshing the project afterwards fails", async () => {
     const user = userEvent.setup();
     vi.spyOn(API, "addCharacter").mockResolvedValue({ success: true });
-    vi.mocked(API.getProject).mockRejectedValue(new Error("网络错误"));
+    vi.mocked(API.getProject).mockRejectedValue(new Error("Network error"));
     renderGallery();
 
-    await user.click(screen.getByRole("button", { name: "添加角色" }));
-    const form = await screen.findByRole("dialog", { name: "添加角色" });
-    await user.type(within(form).getByRole("textbox", { name: "名称" }), "阿青");
-    await user.click(within(form).getByRole("button", { name: "创建" }));
+    await user.click(screen.getByRole("button", { name: "Add character" }));
+    const form = await screen.findByRole("dialog", { name: "Add character" });
+    await user.type(within(form).getByRole("textbox", { name: "Name" }), "Ash");
+    await user.click(within(form).getByRole("button", { name: "Create" }));
 
     await waitFor(() =>
       expect(useAppStore.getState().toast).toMatchObject({
-        text: "操作已完成，但页面数据刷新失败，请手动刷新查看最新状态",
+        text: "Done, but the page could not be refreshed. Reload to see the latest state",
         tone: "warning",
       }),
     );
@@ -517,10 +549,10 @@ describe("资产详情 Sheet", () => {
     });
     renderGallery();
 
-    await user.click(screen.getByRole("button", { name: "添加角色" }));
-    const form = await screen.findByRole("dialog", { name: "添加角色" });
-    await user.type(within(form).getByRole("textbox", { name: "名称" }), "Gia\u0301p");
-    await user.click(within(form).getByRole("button", { name: "创建" }));
+    await user.click(screen.getByRole("button", { name: "Add character" }));
+    const form = await screen.findByRole("dialog", { name: "Add character" });
+    await user.type(within(form).getByRole("textbox", { name: "Name" }), "Gia\u0301p");
+    await user.click(within(form).getByRole("button", { name: "Create" }));
 
     expect(await screen.findByRole("dialog", { name: "Giáp" })).toBeInTheDocument();
   });
@@ -531,17 +563,17 @@ describe("资产详情 Sheet", () => {
     vi.spyOn(API, "addCharacter").mockReturnValue(creating.promise);
     renderGallery();
 
-    await user.click(screen.getByRole("button", { name: "添加角色" }));
-    const form = await screen.findByRole("dialog", { name: "添加角色" });
-    await user.type(within(form).getByRole("textbox", { name: "名称" }), "阿青");
-    await user.click(within(form).getByRole("button", { name: "创建" }));
+    await user.click(screen.getByRole("button", { name: "Add character" }));
+    const form = await screen.findByRole("dialog", { name: "Add character" });
+    await user.type(within(form).getByRole("textbox", { name: "Name" }), "Ash");
+    await user.click(within(form).getByRole("button", { name: "Create" }));
 
     await user.keyboard("{Escape}");
-    expect(screen.getByRole("dialog", { name: "添加角色" })).toBeInTheDocument();
+    expect(screen.getByRole("dialog", { name: "Add character" })).toBeInTheDocument();
     expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
 
-    await act(async () => creating.reject(new Error("网络错误")));
-    expect(await within(form).findByRole("alert")).toHaveTextContent("网络错误");
+    await act(async () => creating.reject(new Error("Network error")));
+    expect(await within(form).findByRole("alert")).toHaveTextContent("Network error");
     // Closing works again after request settlement: unsaved form content triggers the leave guard.
     await user.keyboard("{Escape}");
     expect(await screen.findByRole("alertdialog")).toBeInTheDocument();
@@ -549,35 +581,35 @@ describe("资产详情 Sheet", () => {
 
   it("keeps the create form open and explains why when creating fails", async () => {
     const user = userEvent.setup();
-    vi.spyOn(API, "addProjectProduct").mockRejectedValue(new Error("商品「保温杯」已存在"));
+    vi.spyOn(API, "addProjectProduct").mockRejectedValue(new Error('Product "Thermos" already exists'));
     renderGallery("product");
 
-    await user.click(screen.getByRole("button", { name: "添加商品" }));
-    const form = await screen.findByRole("dialog", { name: "添加商品" });
-    await user.type(within(form).getByRole("textbox", { name: "名称" }), "保温杯");
-    await user.click(within(form).getByRole("button", { name: "创建" }));
+    await user.click(screen.getByRole("button", { name: "Add product" }));
+    const form = await screen.findByRole("dialog", { name: "Add product" });
+    await user.type(within(form).getByRole("textbox", { name: "Name" }), "Thermos");
+    await user.click(within(form).getByRole("button", { name: "Create" }));
 
-    expect(await within(form).findByRole("alert")).toHaveTextContent("创建失败：商品「保温杯」已存在");
-    expect(screen.getByRole("dialog", { name: "添加商品" })).toBeInTheDocument();
+    expect(await within(form).findByRole("alert")).toHaveTextContent('Couldn\'t create the asset: Product "Thermos" already exists');
+    expect(screen.getByRole("dialog", { name: "Add product" })).toBeInTheDocument();
   });
 
   it("keeps unsaved edits visible when the asset is removed elsewhere, and closes once they are discarded", async () => {
     const user = userEvent.setup();
     renderGallery();
-    const sheet = await openAsset(user, "林夕");
-    await user.type(within(sheet).getByRole("textbox", { name: "描述" }), "，佩剑");
+    const sheet = await openAsset(user, "Lena");
+    await user.type(within(sheet).getByRole("textbox", { name: "Description" }), ", with sword");
 
     // Agent deleted this character; pushed project data no longer contains it.
-    const { 林夕: _removed, ...rest } = server.characters;
+    const { Lena: _removed, ...rest } = server.characters;
     server.characters = rest;
     act(() => useProjectsStore.setState({ currentProjectData: structuredClone(server) }));
 
-    expect(screen.getByRole("dialog", { name: "林夕" })).toBeInTheDocument();
-    expect(within(sheet).getByRole("textbox", { name: "描述" })).toHaveValue("白衣少女，佩剑");
-    expect(within(sheet).getByText(/这个资产已被删除或改名/)).toBeInTheDocument();
+    expect(screen.getByRole("dialog", { name: "Lena" })).toBeInTheDocument();
+    expect(within(sheet).getByRole("textbox", { name: "Description" })).toHaveValue("Girl in white, with sword");
+    expect(within(sheet).getByText(/This asset was deleted or renamed/)).toBeInTheDocument();
 
-    await user.click(within(sheet).getByRole("button", { name: "放弃修改" }));
-    await waitFor(() => expect(screen.queryByRole("dialog", { name: "林夕" })).not.toBeInTheDocument());
+    await user.click(within(sheet).getByRole("button", { name: "Discard changes" }));
+    await waitFor(() => expect(screen.queryByRole("dialog", { name: "Lena" })).not.toBeInTheDocument());
   });
 
   it("stays on the asset with its unsaved edits after renaming it", async () => {
@@ -585,8 +617,8 @@ describe("资产详情 Sheet", () => {
     const result = (dryRun: boolean): AssetRenameResult => ({
       success: true,
       dry_run: dryRun,
-      old_name: "林夕",
-      new_name: "林汐",
+      old_name: "Lena",
+      new_name: "Lina",
       episodes: 0,
       references: 0,
       files: 1,
@@ -594,23 +626,23 @@ describe("资产详情 Sheet", () => {
     vi.spyOn(API, "renameProjectAsset")
       .mockResolvedValueOnce(result(true))
       .mockImplementationOnce(() => {
-        const { 林夕: renamed, ...rest } = server.characters;
-        server.characters = { ...rest, 林汐: renamed };
+        const { Lena: renamed, ...rest } = server.characters;
+        server.characters = { ...rest, Lina: renamed };
         return Promise.resolve(result(false));
       });
     renderGallery();
-    const sheet = await openAsset(user, "林夕");
-    await user.type(within(sheet).getByRole("textbox", { name: "描述" }), "，佩剑");
+    const sheet = await openAsset(user, "Lena");
+    await user.type(within(sheet).getByRole("textbox", { name: "Description" }), ", with sword");
 
-    await user.click(within(sheet).getByRole("button", { name: "重命名" }));
-    const input = within(sheet).getByRole("textbox", { name: "重命名" });
+    await user.click(within(sheet).getByRole("button", { name: "Rename" }));
+    const input = within(sheet).getByRole("textbox", { name: "Rename" });
     await user.clear(input);
-    await user.type(input, "林汐{Enter}");
-    const confirm = await screen.findByRole("alertdialog", { name: "重命名「林夕」？" });
-    await user.click(within(confirm).getByRole("button", { name: "重命名" }));
+    await user.type(input, "Lina{Enter}");
+    const confirm = await screen.findByRole("alertdialog", { name: 'Rename "Lena"?' });
+    await user.click(within(confirm).getByRole("button", { name: "Rename" }));
 
-    const renamed = await screen.findByRole("dialog", { name: "林汐" });
-    expect(within(renamed).getByRole("textbox", { name: "描述" })).toHaveValue("白衣少女，佩剑");
+    const renamed = await screen.findByRole("dialog", { name: "Lina" });
+    expect(within(renamed).getByRole("textbox", { name: "Description" })).toHaveValue("Girl in white, with sword");
     expect(useAppStore.getState().toast).toBeNull();
   });
 
@@ -619,8 +651,8 @@ describe("资产详情 Sheet", () => {
     const result = (dryRun: boolean): AssetRenameResult => ({
       success: true,
       dry_run: dryRun,
-      old_name: "林夕",
-      new_name: "林汐",
+      old_name: "Lena",
+      new_name: "Lina",
       episodes: 0,
       references: 0,
       files: 1,
@@ -628,139 +660,139 @@ describe("资产详情 Sheet", () => {
     vi.spyOn(API, "renameProjectAsset")
       .mockResolvedValueOnce(result(true))
       .mockImplementationOnce(() => {
-        const { 林夕: renamed, ...rest } = server.characters;
-        server.characters = { ...rest, 林汐: renamed };
+        const { Lena: renamed, ...rest } = server.characters;
+        server.characters = { ...rest, Lina: renamed };
         return Promise.resolve(result(false));
       });
     renderGallery();
-    const sheet = await openAsset(user, "林夕");
-    await user.click(within(sheet).getByRole("button", { name: "重命名" }));
-    const input = within(sheet).getByRole("textbox", { name: "重命名" });
+    const sheet = await openAsset(user, "Lena");
+    await user.click(within(sheet).getByRole("button", { name: "Rename" }));
+    const input = within(sheet).getByRole("textbox", { name: "Rename" });
     await user.clear(input);
-    await user.type(input, "林汐{Enter}");
-    const confirm = await screen.findByRole("alertdialog", { name: "重命名「林夕」？" });
-    await user.click(within(confirm).getByRole("button", { name: "重命名" }));
-    await screen.findByRole("dialog", { name: "林汐" });
-    await waitFor(() => expect(useProjectsStore.getState().currentProjectData?.characters).toHaveProperty("林汐"));
+    await user.type(input, "Lina{Enter}");
+    const confirm = await screen.findByRole("alertdialog", { name: 'Rename "Lena"?' });
+    await user.click(within(confirm).getByRole("button", { name: "Rename" }));
+    await screen.findByRole("dialog", { name: "Lina" });
+    await waitFor(() => expect(useProjectsStore.getState().currentProjectData?.characters).toHaveProperty("Lina"));
 
-    // Agent later deleted 林汐 and created an unrelated character with the old name 林夕; it is not the viewed 林汐.
-    const { 林汐: _removed, ...rest } = server.characters;
-    server.characters = { ...rest, 林夕: { description: "新来的说书人" } };
+    // Agent later deleted Lina and created an unrelated character with the old name Lena; it is not the viewed Lina.
+    const { Lina: _removed, ...rest } = server.characters;
+    server.characters = { ...rest, Lena: { description: "A new storyteller" } };
     act(() => useProjectsStore.setState({ currentProjectData: structuredClone(server) }));
 
-    await waitFor(() => expect(screen.queryByRole("dialog", { name: "林汐" })).not.toBeInTheDocument());
-    expect(screen.queryByDisplayValue("新来的说书人")).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByRole("dialog", { name: "Lina" })).not.toBeInTheDocument());
+    expect(screen.queryByDisplayValue("A new storyteller")).not.toBeInTheDocument();
   });
 
   it("cancels only the rename when Escape is pressed in the name input", async () => {
     const user = userEvent.setup();
     renderGallery();
-    const sheet = await openAsset(user, "林夕");
+    const sheet = await openAsset(user, "Lena");
 
-    await user.click(within(sheet).getByRole("button", { name: "重命名" }));
+    await user.click(within(sheet).getByRole("button", { name: "Rename" }));
     await user.keyboard("{Escape}");
 
-    expect(within(sheet).queryByRole("textbox", { name: "重命名" })).not.toBeInTheDocument();
-    expect(screen.getByRole("dialog", { name: "林夕" })).toBeInTheDocument();
+    expect(within(sheet).queryByRole("textbox", { name: "Rename" })).not.toBeInTheDocument();
+    expect(screen.getByRole("dialog", { name: "Lena" })).toBeInTheDocument();
   });
 
   it("uploads a character's reference image right away", async () => {
     const user = userEvent.setup();
     const upload = vi.spyOn(API, "uploadFile").mockImplementation(() => {
-      server.characters.苏白 = { ...server.characters.苏白, reference_image: "characters/refs/苏白.png" };
+      server.characters.Silas = { ...server.characters.Silas, reference_image: "characters/refs/Silas.png" };
       return Promise.resolve({ success: true });
     });
     renderGallery();
-    const sheet = await openAsset(user, "苏白");
+    const sheet = await openAsset(user, "Silas");
 
     const file = new File(["png"], "ref.png", { type: "image/png" });
-    await user.upload(within(sheet).getByLabelText("上传原图"), file);
+    await user.upload(within(sheet).getByLabelText("Upload reference image"), file);
 
-    await waitFor(() => expect(upload).toHaveBeenCalledWith("demo", "character_ref", file, "苏白"));
-    expect(await within(sheet).findByRole("button", { name: "查看大图：「苏白」的原图" })).toBeInTheDocument();
-    expect(within(sheet).queryByText("未保存的修改")).not.toBeInTheDocument();
+    await waitFor(() => expect(upload).toHaveBeenCalledWith("demo", "character_ref", file, "Silas"));
+    expect(await within(sheet).findByRole("button", { name: 'View full size: Reference image of "Silas"' })).toBeInTheDocument();
+    expect(within(sheet).queryByText("Unsaved changes")).not.toBeInTheDocument();
   });
 
   it("warns that the upload went through when refreshing the project afterwards fails", async () => {
     const user = userEvent.setup();
     vi.spyOn(API, "uploadFile").mockResolvedValue({ success: true });
     renderGallery();
-    const sheet = await openAsset(user, "苏白");
-    vi.mocked(API.getProject).mockRejectedValue(new Error("网络错误"));
+    const sheet = await openAsset(user, "Silas");
+    vi.mocked(API.getProject).mockRejectedValue(new Error("Network error"));
 
-    await user.upload(within(sheet).getByLabelText("上传原图"), new File(["png"], "ref.png", { type: "image/png" }));
+    await user.upload(within(sheet).getByLabelText("Upload reference image"), new File(["png"], "ref.png", { type: "image/png" }));
 
-    await waitFor(() => expect(useAppStore.getState().toast).toMatchObject({ text: "操作已完成，但页面数据刷新失败，请手动刷新查看最新状态", tone: "warning" }));
+    await waitFor(() => expect(useAppStore.getState().toast).toMatchObject({ text: "Done, but the page could not be refreshed. Reload to see the latest state", tone: "warning" }));
   });
 
   it("reports the upload error without refreshing when no image went through", async () => {
     const user = userEvent.setup();
-    vi.spyOn(API, "uploadFile").mockRejectedValue(new Error("文件过大"));
+    vi.spyOn(API, "uploadFile").mockRejectedValue(new Error("File too large"));
     renderGallery();
-    const sheet = await openAsset(user, "苏白");
+    const sheet = await openAsset(user, "Silas");
     vi.mocked(API.getProject).mockClear();
 
-    await user.upload(within(sheet).getByLabelText("上传原图"), new File(["png"], "ref.png", { type: "image/png" }));
+    await user.upload(within(sheet).getByLabelText("Upload reference image"), new File(["png"], "ref.png", { type: "image/png" }));
 
-    await waitFor(() => expect(useAppStore.getState().toast).toMatchObject({ text: "文件过大", tone: "error" }));
+    await waitFor(() => expect(useAppStore.getState().toast).toMatchObject({ text: "File too large", tone: "error" }));
     expect(API.getProject).not.toHaveBeenCalled();
   });
 
   it("collapses reference audio while the project binds voices by prompt", async () => {
     const user = userEvent.setup();
     renderGallery();
-    const sheet = await openAsset(user, "林夕");
+    const sheet = await openAsset(user, "Lena");
 
-    const toggle = within(sheet).getByRole("button", { name: "可选：参考音频" });
+    const toggle = within(sheet).getByRole("button", { name: "Optional: reference audio" });
     expect(toggle).toHaveAttribute("aria-expanded", "false");
     await user.click(toggle);
-    expect(within(sheet).getByText(/参考音频不会生效/)).toBeInTheDocument();
+    expect(within(sheet).getByText(/reference audio has no effect/)).toBeInTheDocument();
   });
 
   it("confirms before deleting reference audio and disables the deletion once the character became busy", async () => {
     const user = userEvent.setup();
     server = makeProject({ character_voice_binding: "reference_audio" });
-    server.characters.林夕.reference_audio = "characters/refs_audio/林夕.wav";
+    server.characters.Lena.reference_audio = "characters/refs_audio/Lena.wav";
     useProjectsStore.setState({ currentProjectData: structuredClone(server) });
     const remove = vi.spyOn(API, "deleteCharacterReferenceAudio").mockResolvedValue({ success: true } as never);
     renderGallery();
-    const sheet = await openAsset(user, "林夕");
+    const sheet = await openAsset(user, "Lena");
 
-    await user.click(within(sheet).getByRole("button", { name: "删除音频样本" }));
-    const confirm = await screen.findByRole("alertdialog", { name: "删除参考音频？" });
+    await user.click(within(sheet).getByRole("button", { name: "Delete audio sample" }));
+    const confirm = await screen.findByRole("alertdialog", { name: "Delete reference audio?" });
     // After confirmation opens, an Agent queues a task occupying the character.
     act(() =>
       useTasksStore.setState({
-        tasks: [makeTask({ project_name: "demo", task_type: "character", media_type: "image", resource_id: "林夕", status: "running" })],
+        tasks: [makeTask({ project_name: "demo", task_type: "character", media_type: "image", resource_id: "Lena", status: "running" })],
       }),
     );
-    expect(within(confirm).getByRole("button", { name: "删除" })).toBeDisabled();
+    expect(within(confirm).getByRole("button", { name: "Delete" })).toBeDisabled();
     expect(remove).not.toHaveBeenCalled();
 
     act(() => useTasksStore.setState({ tasks: [] }));
-    await user.click(within(confirm).getByRole("button", { name: "删除" }));
-    await waitFor(() => expect(remove).toHaveBeenCalledWith("demo", "林夕"));
+    await user.click(within(confirm).getByRole("button", { name: "Delete" }));
+    await waitFor(() => expect(remove).toHaveBeenCalledWith("demo", "Lena"));
   });
 
   it("disables generation until the asset has a description", async () => {
     const user = userEvent.setup();
     renderGallery("scene");
-    const sheet = await openAsset(user, "庭院");
+    const sheet = await openAsset(user, "Courtyard");
 
-    expect(within(sheet).getByRole("button", { name: "生成资产图" })).toBeDisabled();
-    expect(within(sheet).getByText("需要先填写描述")).toBeInTheDocument();
+    expect(within(sheet).getByRole("button", { name: "Generate Asset Sheet" })).toBeDisabled();
+    expect(within(sheet).getByText("Fill in the description first")).toBeInTheDocument();
 
-    await user.type(within(sheet).getByRole("textbox", { name: "描述" }), "月下庭院");
-    expect(within(sheet).getByRole("button", { name: "保存并生成" })).toBeEnabled();
+    await user.type(within(sheet).getByRole("textbox", { name: "Description" }), "Moonlit courtyard");
+    expect(within(sheet).getByRole("button", { name: "Save and generate" })).toBeEnabled();
   });
 
   it("shows the content without any write entry when read-only", async () => {
     const user = userEvent.setup();
     renderGallery("character", { readOnly: true });
-    const sheet = await openAsset(user, "林夕");
+    const sheet = await openAsset(user, "Lena");
 
-    expect(within(sheet).getByRole("textbox", { name: "描述" })).toHaveAttribute("readonly");
-    expect(within(sheet).getByRole("textbox", { name: "声音风格" })).toHaveAttribute("readonly");
-    expect(within(sheet).queryByRole("button", { name: /生成|上传|重命名|保存|预览|添加|衍生/ })).not.toBeInTheDocument();
+    expect(within(sheet).getByRole("textbox", { name: "Description" })).toHaveAttribute("readonly");
+    expect(within(sheet).getByRole("textbox", { name: "Voice Style" })).toHaveAttribute("readonly");
+    expect(within(sheet).queryByRole("button", { name: /generat|upload|rename|save|preview|add|derivative/i })).not.toBeInTheDocument();
   });
 });

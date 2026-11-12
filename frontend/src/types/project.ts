@@ -28,7 +28,7 @@ export interface CharacterDerivative {
   description: string;
   /** Relative path of the derivative asset sheet; empty before generation. */
   character_sheet?: string;
-  /** Whether the script contains `@[角色/衍生]` or `角色/衍生`. Computed at read time, not persisted, and returned with the entry when reading the project. */
+  /** Whether the script contains `@[character/derivative]` or `character/derivative`. Computed at read time, not persisted, and returned with the entry when reading the project. */
   referenced?: boolean;
 }
 
@@ -51,7 +51,7 @@ export interface Character {
   /** Acknowledged voice version (ISO8601, the original voice_updated_at value when dismissed);
    *  a later voice_updated_at is considered a new version. */
   voice_notice_dismissed_at?: string;
-  /** Derivative table: derivative name → entry. Names are unique only within this character and are written as `@[角色/衍生]` in scripts. */
+  /** Derivative table: derivative name → entry. Names are unique only within this character and are written as `@[character/derivative]` in scripts. */
   derivatives?: Record<string, CharacterDerivative>;
   /** Aliases: used only as identification references during AI planning, not for references. */
   aliases?: string[];
@@ -60,6 +60,8 @@ export interface Character {
 export interface Scene {
   description: string;
   scene_sheet?: string;
+  /** Scene-sheet occupancy: absent means "empty". "occupied" draws the people the description asks for; set explicitly, never inferred. */
+  occupancy?: "empty" | "occupied";
   /** Aliases: used only as identification references during AI planning, not for references. */
   aliases?: string[];
 }

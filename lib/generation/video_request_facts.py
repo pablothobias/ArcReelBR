@@ -203,9 +203,9 @@ class VideoRequestFactsFailure:
         return dict(self.params)
 
     def summary(self) -> str:
-        """One-line issue-code/rendering-parameter summary (``code（k=v, …）``), for Agent receipts and draft-contract violation copy."""
+        """One-line issue-code/rendering-parameter summary (``code (k=v, …)``), for Agent receipts and draft-contract violation copy."""
         params = ", ".join(f"{key}={value}" for key, value in self.params)
-        return f"{self.code}（{params}）" if params else self.code
+        return f"{self.code} ({params})" if params else self.code
 
     def problem_payload(self) -> dict[str, object]:
         """Reader issue envelopes: issue codes, rendering parameters and remediation, identical in Web and Agent payloads."""

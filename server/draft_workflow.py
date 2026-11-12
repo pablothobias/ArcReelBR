@@ -232,8 +232,9 @@ async def revalidate_reference_script_plan_draft(
     # If another source file was specified originally, reassessing a different range would admit source anchors copied from elsewhere.
     if "source" not in draft.meta:
         raise ValueError(
-            f"草稿 {draft.path} 的 meta.source 缺失（产出时记录的源文范围）；"
-            "请恢复该字段（指定源文时为其相对路径，按本集派生源文产出时为 null）后重试"
+            f"Draft {draft.path} is missing meta.source (the source text range recorded at production time); "
+            "restore the field (the relative path when a source text was specified, null when produced from "
+            "this episode's derived source text) and retry"
         )
     # Source text may span hundreds of KB; synchronous disk reads directly inside this async function would occupy
     # the event loop. Promotion tools use a separate session thread and are insensitive, but content-confirmation read-time reassessment
@@ -264,7 +265,7 @@ async def revalidate_reference_script_plan_draft(
         logger.debug("草稿 content.units 形状非法: %s", type(raw_units).__name__)
         violations = [
             DraftViolation(
-                "草稿的 content.units 必须是非空的 unit 对象数组",
+                "The draft's content.units must be a non-empty array of unit objects",
                 code="schema_invalid",
             )
         ]
@@ -344,9 +345,9 @@ def _commit_reference_script_plan(
 
 def _script_plan_confirmed_detail(episode: int) -> str:
     return (
-        f"❌ 集（id={episode}）的脚本规划已确认，确认后只读，不能再改。"
-        "内容修改请在正式脚本上进行（patch_episode_script，或请用户在时间线上修改）；"
-        "要整集重做，请重跑 generate_script_plan，新的脚本规划会让该集回到待确认。"
+        f"❌ The script plan of Episode (id={episode}) is confirmed; it is read-only after confirmation and cannot be changed. "
+        "Make content changes on the formal script (patch_episode_script, or ask the user to edit on the timeline). "
+        "To redo the whole episode, rerun generate_script_plan; the new script plan returns the episode to pending confirmation."
     )
 
 
@@ -530,24 +531,27 @@ def _render_script_plan_conflict_report(
     latest_content = to_draft_shape(conflict.current_content) if conflict.current_content is not None else None
     if latest_content is not None:
         latest = json.dumps(latest_content, ensure_ascii=False, indent=2)
-        latest_block = f"当前正式 script_plan 的最新内容（与草稿 content 同形）：\n{latest}"
+        latest_block = f"Latest content of the current formal script_plan (same shape as the draft content):\n{latest}"
     else:
-        latest_block = "当前正式文件不存在或不是合法的 script_plan JSON，无法附上最新内容；请自行读取该文件确认。"
+        latest_block = (
+            "The current formal file does not exist or is not valid script_plan JSON, so its latest content cannot be "
+            "included; read the file yourself to confirm."
+        )
     # Render fingerprints as JSON literals: if the formal file was deleted, the current value is null. Writing "None" would make the Agent
     # accept an incorrect baseline; every promotion would mismatch and return the same report, making the conflict impossible to resolve.
     actual_literal = json.dumps(script_review.published_revision(conflict.actual))
     doc_type = QUARANTINE_KIND_TO_DOC_TYPE[draft.kind]
     return (
-        "❌ 晋升中止（并发冲突）：正式 script_plan 在本草稿产出后已被其他写入方（如 Web 端保存）修改，"
-        "直接晋升会覆盖对方的修改，本次未写盘、草稿仍在场。\n"
-        f"草稿基线指纹: {json.dumps(script_review.published_revision(conflict.expected))}；"
-        f"盘上现值指纹: {actual_literal}\n\n"
+        "❌ Promotion aborted (concurrency conflict): the formal script_plan was modified by another writer (such as a Web save) "
+        "after this draft was produced. Promoting directly would overwrite those changes; nothing was written and the draft remains.\n"
+        f"Draft baseline fingerprint: {json.dumps(script_review.published_revision(conflict.expected))}; "
+        f"Current on-disk fingerprint: {actual_literal}\n\n"
         f"{latest_block}\n\n"
-        f"处置：调用 open_draft 读取当前草稿与 formal_revision，对照上方最新内容合并 {field_hint}；"
-        "再调用 patch_draft 提交完整 content，并把 formal_revision 作为 accept_formal_revision；"
-        "该值为 null 时同样显式传入 null；"
-        f'最后调用 {PROMOTE_TOOL_NAME}({{"episode_id": {episode}, "doc_type": "{doc_type}", '
-        '"base_revision": "<patch_draft 返回的新 revision>"}) 重新晋升。'
+        f"Resolution: call open_draft to read the current draft and formal_revision, and merge {field_hint} against the latest content above; "
+        "then call patch_draft with the complete content, passing formal_revision as accept_formal_revision; "
+        "if that value is null, pass null explicitly; "
+        f'finally call {PROMOTE_TOOL_NAME}({{"episode_id": {episode}, "doc_type": "{doc_type}", '
+        '"base_revision": "<new revision returned by patch_draft>"}) to promote again.'
     )
 
 
@@ -562,15 +566,16 @@ def _render_prompt_authoring_conflict_report(
         else "null"
     )
     return (
-        "❌ 晋升中止（并发冲突）：正式剧本在本草稿产出后已被修改，本次未写盘、草稿仍在场。\n"
-        f"草稿基线指纹: {json.dumps(script_review.published_revision(conflict.expected))}；"
-        f"盘上现值指纹: {json.dumps(script_review.published_revision(conflict.actual))}\n\n"
-        f"当前正式剧本的最新内容：\n{latest}\n\n"
-        "处置：调用 open_draft 读取当前草稿与 formal_revision，合并最新正式内容；"
-        "再调用 patch_draft 提交完整 content，并把 formal_revision 作为 accept_formal_revision；"
-        "该值为 null 时同样显式传入 null；"
-        f'最后调用 {PROMOTE_TOOL_NAME}({{"episode_id": {episode}, "doc_type": "reference_prompt_authoring", '
-        '"base_revision": "<patch_draft 返回的新 revision>"}) 重新晋升。'
+        "❌ Promotion aborted (concurrency conflict): the formal script was modified after this draft was produced; "
+        "nothing was written and the draft remains.\n"
+        f"Draft baseline fingerprint: {json.dumps(script_review.published_revision(conflict.expected))}; "
+        f"Current on-disk fingerprint: {json.dumps(script_review.published_revision(conflict.actual))}\n\n"
+        f"Latest content of the current formal script:\n{latest}\n\n"
+        "Resolution: call open_draft to read the current draft and formal_revision, and merge the latest formal content; "
+        "then call patch_draft with the complete content, passing formal_revision as accept_formal_revision; "
+        "if that value is null, pass null explicitly; "
+        f'finally call {PROMOTE_TOOL_NAME}({{"episode_id": {episode}, "doc_type": "reference_prompt_authoring", '
+        '"base_revision": "<new revision returned by patch_draft>"}) to promote again.'
     )
 
 
@@ -675,7 +680,9 @@ async def revalidate_drama_script_plan_draft(
 
     raw_scenes = content.get("scenes")
     if not isinstance(raw_scenes, list) or not raw_scenes:
-        violation = DraftViolation("草稿的 content.scenes 必须是非空的分镜对象数组", code="schema_invalid")
+        violation = DraftViolation(
+            "The draft's content.scenes must be a non-empty array of storyboard objects", code="schema_invalid"
+        )
         return SingleScriptPlanDraftRevalidation([violation], {}, schema_failed=True, basis=script_plan_basis)
     for scene in raw_scenes:
         admission = admit_script_unit("scenes", scene, ignore_marker=True)
@@ -791,8 +798,8 @@ async def _open_drama_script_plan_for_edit(
         QUARANTINE_KIND_DRAMA_SCRIPT_PLAN,
         source,
         _drama_script_plan_draft_shape,
-        f"❌ 集（id={episode}）没有可编辑的正式 script_plan（{script_plan_path.relative_to(project_path).as_posix()} 不存在、不是合法 JSON，"
-        "或 scenes 不是非空数组）；首次生成请调用 generate_script_plan",
+        f"❌ Episode (id={episode}) has no editable formal script_plan ({script_plan_path.relative_to(project_path).as_posix()} "
+        "does not exist, is not valid JSON, or scenes is not a non-empty array); for first-time generation call generate_script_plan",
     )
 
 
@@ -815,8 +822,9 @@ async def revalidate_narration_script_plan_draft(
     # If another source file was originally specified, assessing coverage against a different range asks a different question than production did.
     if "source" not in draft.meta:
         raise ValueError(
-            f"草稿 {draft.path} 的 meta.source 缺失（产出时记录的源文范围）；"
-            "请恢复该字段（指定源文时为其相对路径，按本集派生源文产出时为 null）后重试"
+            f"Draft {draft.path} is missing meta.source (the source text range recorded at production time); "
+            "restore the field (the relative path when a source text was specified, null when produced from "
+            "this episode's derived source text) and retry"
         )
     # Source text may span hundreds of KB; synchronous disk reads directly inside this async function would occupy the event
     # loop. Promotion tools use a separate session thread and are insensitive, but content-confirmation read-time reassessment runs in request
@@ -838,7 +846,9 @@ async def revalidate_narration_script_plan_draft(
     raw_segments = draft.content.get("segments")
     if not isinstance(raw_segments, list) or not raw_segments:
         logger.debug("草稿 content.segments 形状非法: %s", type(raw_segments).__name__)
-        violation = DraftViolation("草稿的 content.segments 必须是非空的分镜对象数组", code="schema_invalid")
+        violation = DraftViolation(
+            "The draft's content.segments must be a non-empty array of storyboard objects", code="schema_invalid"
+        )
         return SingleScriptPlanDraftRevalidation([violation], {}, schema_failed=True, basis=script_plan_basis)
     try:
         content = NarrationScriptPlanDraft.model_validate(draft.content).model_dump()
@@ -864,8 +874,9 @@ async def revalidate_narration_script_plan_draft(
         # while a draft exists it cannot be reopened, so patch_draft must update the source range.
         source_scope=(
             f"{coverage_source_scope(cast(str | None, draft.meta['source']), episode=episode)}"
-            "，取自草稿的源文范围；若该范围与产出本集正式 script_plan 时不同，"
-            "请调用 patch_draft，用 source 传入当初那个源文件的相对路径后重试"
+            ", taken from the draft's source text range; if this range differs from the one used to produce "
+            "this episode's formal script_plan, call patch_draft with source set to the relative path of that "
+            "original source file and retry"
         ),
     )
     return SingleScriptPlanDraftRevalidation(violations, content, schema_failed=False, basis=script_plan_basis)
@@ -986,8 +997,8 @@ async def _open_narration_script_plan_for_edit(
         QUARANTINE_KIND_NARRATION_SCRIPT_PLAN,
         source,
         _narration_script_plan_draft_shape,
-        f"❌ 集（id={episode}）没有可编辑的正式 script_plan（{script_plan_path.relative_to(project_path).as_posix()} 不存在、不是合法 JSON，"
-        "或 segments 不是非空数组）；首次生成请调用 generate_script_plan",
+        f"❌ Episode (id={episode}) has no editable formal script_plan ({script_plan_path.relative_to(project_path).as_posix()} "
+        "does not exist, is not valid JSON, or segments is not a non-empty array); for first-time generation call generate_script_plan",
     )
 
 
@@ -1050,7 +1061,7 @@ async def revalidate_script_plan_draft(
         return ScriptPlanDraftRevalidation(reference.violations, content, tuple(reference.soft_violations))
     revalidator = _SINGLE_SCRIPT_PLAN_REVALIDATORS.get(draft.kind)
     if revalidator is None:
-        raise ValueError(f"不是 script_plan 草稿来源，无法重判: {draft.kind}")
+        raise ValueError(f"Not a script_plan draft source; cannot reassess: {draft.kind}")
     single = await revalidator(project_path, project, episode, draft, config_resolver=config_resolver)
     return ScriptPlanDraftRevalidation(single.violations, None if single.schema_failed else single.content)
 
@@ -1085,8 +1096,8 @@ async def _open_reference_script_plan_for_edit(
         QUARANTINE_KIND_SCRIPT_PLAN,
         source,
         _reference_script_plan_draft_shape,
-        f"❌ 集（id={episode}）没有可编辑的正式 script_plan（{script_plan_path.relative_to(project_path).as_posix()} 不存在、不是合法 JSON，"
-        "或 units 不是非空数组）；首次生成请调用 generate_script_plan",
+        f"❌ Episode (id={episode}) has no editable formal script_plan ({script_plan_path.relative_to(project_path).as_posix()} "
+        "does not exist, is not valid JSON, or units is not a non-empty array); for first-time generation call generate_script_plan",
     )
 
 
@@ -1162,7 +1173,7 @@ class DraftWorkflow:
             )
             return payload
         if quarantine_exists(self.ctx.project_path, episode, kind):
-            detail = f"集（id={episode}）{doc_type_for_kind(kind)} draft is not a valid JSON envelope"
+            detail = f"Episode (id={episode}) {doc_type_for_kind(kind)} draft is not a valid JSON envelope"
             raise DraftWorkflowError("draft_not_found", detail)
         return None
 
@@ -1174,7 +1185,7 @@ class DraftWorkflow:
         payload = self._read_if_present(episode, kind)
         if payload is not None:
             return payload
-        detail = f"集（id={episode}）has no {doc_type_for_kind(kind)} draft"
+        detail = f"Episode (id={episode}) has no {doc_type_for_kind(kind)} draft"
         raise DraftWorkflowError("draft_not_found", detail)
 
     def _draft_snapshot(
@@ -1402,7 +1413,7 @@ class DraftWorkflow:
                         _prompt_authoring_lock_held=True,
                         **promote_kwargs,
                     )
-                    message = f"✅ 提示词编写晋升（正式剧本）已保存: {_project_relative(result_path, project_path)}"
+                    message = f"✅ Prompt-authoring promotion (formal script) saved: {_project_relative(result_path, project_path)}"
             except (DraftWorkflowError, ModelNotInCatalogError):
                 # Propagate ModelNotInCatalogError unchanged: callers use it to guide model reselection.
                 raise
@@ -1448,7 +1459,7 @@ class DraftWorkflow:
         current = await asyncio.to_thread(lambda: read_quarantine(self.ctx.project_path, episode, resolved))
         if current is not None and draft_owner(current) == DRAFT_OWNER_AGENT:
             raise DraftWorkflowError(
-                "draft_agent_owned", f"集（id={episode}）{doc_type} draft is being edited by the agent"
+                "draft_agent_owned", f"Episode (id={episode}) {doc_type} draft is being edited by the agent"
             )
         patched = await self.patch(episode, doc_type, content, base_revision)
         try:

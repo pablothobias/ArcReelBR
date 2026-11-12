@@ -118,13 +118,13 @@ def test_partial_frontmatter_accepts_only_boolean_protected(tmp_path):
 def test_duplicate_id_rejected_at_load(tmp_path):
     path = write_template(tmp_path, "{{ name }}")
     (tmp_path / "duplicate.md").write_text(path.read_text(), encoding="utf-8")
-    with pytest.raises(TemplateError, match="重复"):
+    with pytest.raises(TemplateError, match="duplicate template id"):
         PromptTemplates(tmp_path)
 
 
 def test_partial_route_prefix_is_reserved_for_template_ids(tmp_path):
     write_template(tmp_path, "{{ name }}", id="partials/example")
-    with pytest.raises(TemplateError, match="保留前缀 partials/"):
+    with pytest.raises(TemplateError, match="reserved prefix partials/"):
         PromptTemplates(tmp_path)
 
 
@@ -137,8 +137,8 @@ def test_unknown_axis_key_rejected_at_load(tmp_path):
 @pytest.mark.parametrize(
     ("body", "slots", "message"),
     [
-        ("{{ missing }}", {}, "未声明.*missing"),
-        ("固定正文", {"unused": "未使用"}, "未使用.*unused"),
+        ("{{ missing }}", {}, "undeclared slots.*missing"),
+        ("固定正文", {"unused": "未使用"}, "unused slots.*unused"),
     ],
 )
 def test_slot_declarations_match_body_at_load(tmp_path, body, slots, message):
@@ -150,9 +150,9 @@ def test_slot_declarations_match_body_at_load(tmp_path, body, slots, message):
 def test_render_requires_all_slots_and_nested_keys(tmp_path):
     write_template(tmp_path, "{% if name.hook %}{{ name.hook }}{% endif %}")
     templates = PromptTemplates(tmp_path)
-    with pytest.raises(TemplateError, match=r"缺少.*name"):
+    with pytest.raises(TemplateError, match=r"missing slots.*name"):
         templates.render("text/example")
-    with pytest.raises(TemplateError, match=r"多余.*unknown"):
+    with pytest.raises(TemplateError, match=r"extra slots.*unknown"):
         templates.render("text/example", name={"hook": None}, unknown="x")
     with pytest.raises(TemplateError, match="hook"):
         templates.render("text/example", name={})
@@ -232,10 +232,10 @@ def test_invalid_partial_references_rejected_at_load(tmp_path, body):
 def test_nested_partial_slots_and_cycles_checked_at_load(tmp_path):
     write_template(tmp_path, '{{ partial("shared/label") }}{{ name }}')
     write_partial(tmp_path, "shared/label", "{{ undeclared }}")
-    with pytest.raises(TemplateError, match=r"未声明.*undeclared"):
+    with pytest.raises(TemplateError, match=r"undeclared slots.*undeclared"):
         PromptTemplates(tmp_path)
     write_partial(tmp_path, "shared/label", '{{ partial("shared/label") }}')
-    with pytest.raises(TemplateError, match="循环引用"):
+    with pytest.raises(TemplateError, match="circular partial reference"):
         PromptTemplates(tmp_path)
 
 

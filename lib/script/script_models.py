@@ -162,7 +162,9 @@ class VideoPrompt(_VideoPromptCore):
 
 def _require_no_dialogue(value: list[Dialogue]) -> list[Dialogue]:
     if value:
-        raise ValueError("旁白/解说片段不写台词：角色说的话由旁白在正文里转述")
+        raise ValueError(
+            "Narration segments do not contain dialogue lines: the narrator relays what characters say in the body"
+        )
     return value
 
 
@@ -533,9 +535,9 @@ class Utterance(BaseModel):
     def _check_kind_speaker(self) -> "Utterance":
         if self.kind == "dialogue":
             if not self.speaker:
-                raise ValueError("dialogue utterance 必须带非空 speaker")
+                raise ValueError("A dialogue utterance must have a non-empty speaker")
         elif self.speaker is not None:
-            raise ValueError("voiceover utterance 不得带 speaker")
+            raise ValueError("A voiceover utterance must not have a speaker")
         return self
 
 
@@ -1002,9 +1004,9 @@ class ReferenceVideoUnit(BaseModel):
         """A fully dangling migration shell may be empty and zero seconds; other units must remain executable."""
         if not self.text.strip():
             if not self.needs_replan or self.duration_seconds != 0:
-                raise ValueError("空 video unit 仅允许 needs_replan=true 且 duration_seconds=0")
+                raise ValueError("An empty video unit is allowed only with needs_replan=true and duration_seconds=0")
         elif self.duration_seconds < REFERENCE_UNIT_DURATION_RANGE[0]:
-            raise ValueError("非空 video unit 的 duration_seconds 必须为正整数")
+            raise ValueError("A non-empty video unit's duration_seconds must be a positive integer")
         return self
 
 
@@ -1212,7 +1214,7 @@ def _duration_literal(supported_durations: list[int]) -> Any:
     """
     values = tuple(sorted({int(d) for d in supported_durations}))
     if not values:
-        raise ValueError("supported_durations 为空，无法构造 duration 枚举约束")
+        raise ValueError("supported_durations is empty; cannot build the duration enum constraint")
     return Annotated[Literal[values], BeforeValidator(_coerce_digit_string)]
 
 
